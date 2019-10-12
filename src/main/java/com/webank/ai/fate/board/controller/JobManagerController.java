@@ -138,7 +138,7 @@ public class JobManagerController {
             e.printStackTrace();
             return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
         }
-        if (result == null) {
+        if ((result == null) || (result == "")) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
         }
         JSONObject resultObject = JSON.parseObject(result);
