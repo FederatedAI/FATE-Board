@@ -18,6 +18,7 @@ package com.webank.ai.fate.board.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.base.Preconditions;
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
@@ -136,8 +137,17 @@ public class JobDetailController {
             e.printStackTrace();
             return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
         }
+        if(StringUtils.isEmpty(result)){
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
 
-        return ResponseUtil.buildResponse(result, Dict.DATA);
+        }
+        JSONObject resultObject = JSON.parseObject(result);
+        Integer retcode = resultObject.getInteger(Dict.RETCODE);
+        String msg = resultObject.getString(Dict.REMOTE_RETURN_MSG);
+        JSONObject data = resultObject.getJSONObject(Dict.DATA);
+        String dataWithNull = JSON.toJSONString(data, SerializerFeature.WriteMapNullValue);
+
+        return new ResponseResult<>(retcode, msg, dataWithNull);
 
     }
 
