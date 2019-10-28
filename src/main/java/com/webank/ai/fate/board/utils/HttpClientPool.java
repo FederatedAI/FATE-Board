@@ -60,9 +60,9 @@ public class HttpClientPool implements InitializingBean {
 
     private static void config(HttpRequestBase httpRequestBase) {
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectionRequestTimeout(8000)
-                .setConnectTimeout(8000)
-                .setSocketTimeout(8000).build();
+                .setConnectionRequestTimeout(20000)
+                .setConnectTimeout(20000)
+                .setSocketTimeout(20000).build();
         httpRequestBase.addHeader("Content-Type", "application/json;charset=UTF-8");
         httpRequestBase.setConfig(requestConfig);
     }
