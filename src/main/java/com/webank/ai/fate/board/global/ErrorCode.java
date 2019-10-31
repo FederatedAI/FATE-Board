@@ -20,13 +20,18 @@ public enum ErrorCode {
 
     //COMMON CODE
     SUCCESS(0, "OK"),
-    AUTH_ERROR(10000, "AUTH_ERROR"),
-    PARAM_ERROR(10001, "PARAM_ERROR"),
-    TIME_OUT(10002, "TIME_OUT"),
-    SYSTEM_ERROR(100003, "SYSTEM_ERROR"),
-    RUNNING_ERROR(100004, "RUNNING_ERROR"),
-    RETURNED_PARAM_ERROR(100005, "ERROR FOR RETURNED PARAMS!"),
-    INCOMING_PARAM_ERROR(100006, "ERROR FOR INCOMING PARAMS!");
+    SERVLET_ERROR(10000, "Request parameters error !"),
+    REQUESTBODY_ERROR(10001,"Requestbody error !"),
+    REQUEST_PARAMETER_ERROR(10002,"Some request parameters are null!"),
+    FATEFLOW_ERROR_CONNECTION(10003, "Fateflow Module Connection Error !"),
+    FATEFLOW_ERROR_NULL_RESULT(10004, "Results of fateflow are null!"),
+    FATEFLOW_ERROR_WRONG_RESULT(10005, "Retcode-result of fateflow is null!"),
+    DATABASE_ERROR_RESULT_NULL(10006, "No data in database !"),
+    DATA_ERROR (10007, "Error occurs when getting data !"),
+    ERROR_PARAMETER(10008, "Parameters are illegal !"),
+    DATABASE_ERROR_CONNECTION(10009, "Database Connection Error !"),
+    SYSTEM_ERROR(10010, "System error !"),
+    ;
 
 
     private int code;
