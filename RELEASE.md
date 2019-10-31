@@ -1,6 +1,5 @@
 # Release 1.1
 ## Major Features and Improvements
-
 * Support the visual tree models of secureboost
 * Support the visualization for heterogeneous LinearRegression
 * Support the visualization for homogeneous Deep Neural Network
