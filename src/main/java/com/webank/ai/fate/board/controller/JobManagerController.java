@@ -117,6 +117,7 @@ public class JobManagerController {
     }
 
 
+
     @RequestMapping(value = "/query/{jobId}/{role}/{partyId}", method = RequestMethod.GET)
     public ResponseResult queryJobById(@PathVariable("jobId") String jobId,
                                        @PathVariable("role") String role,
@@ -224,5 +225,69 @@ public class JobManagerController {
         return new ResponseResult<>(ErrorCode.SUCCESS, listPageBean);
     }
 
+    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    public ResponseResult updateJobById(@RequestBody String parameters) {
+//        JSONObject jsonObject = JSON.parseObject(parameters);
+//        String jobId = jsonObject.getString(Dict.JOBID);
+//        String role = jsonObject.getString(Dict.ROLE);
+//        String partyId = jsonObject.getString(Dict.PARTY_ID);
+//        String notes = jsonObject.getString(Dict.NOTES);
+//        try {
+//            Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId,notes));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+//        }
+        JSONObject jsonObject = checkParameter(parameters, Dict.JOBID, Dict.ROLE, Dict.PARTY_ID, Dict.NOTES);
+        if (jsonObject==null){
+            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+        }
+        String partyId = jsonObject.getString(Dict.PARTY_ID);
+        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
+
+        String result = null;
+        try {
+            result = httpClientPool.post(fateUrl + Dict.URL_JOB_UPDATE, jsonObject.toJSONString());
+//            result="{\n" +
+//                    "    \"retcode\": 0,\n" +
+//                    "    \"retmsg\": \"OK\",\n" +
+//                    "    \"data\":[\n" +
+//                    "        [1,0.5],\n" +
+//                    "        [2,0.4],\n" +
+//                    "        [3,0.4]\n" +
+//                    "    ],\n" +
+//                    "    \"meta\": {\n" +
+//                    "        \"metric_type\": \"LOSS\",\n" +
+//                    "        \"BEST\": 0.4,\n" +
+//                    "        \"unit_name\": \"iter num\"\n" +
+//                    "    }\n" +
+//                    "}\n";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
+        }
+        if ((result == null) || (result.equals(""))) {
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
+        }
+        return ResponseUtil.buildResponse(result, null);
+
+    }
+    private JSONObject checkParameter(String parameters,String... parametersNeedCheck){
+        JSONObject jsonObject = JSON.parseObject(parameters);
+        ArrayList<String> results = new ArrayList<>();
+        for (String parameter : parametersNeedCheck) {
+            String result = jsonObject.getString(parameter);
+            results.add(result);
+        }
+        String[] results_Array =new String[results.size()];
+        results.toArray(results_Array);
+        try {
+            Preconditions.checkArgument(StringUtils.isNoneEmpty(results_Array));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return jsonObject;
+    }
 
 }

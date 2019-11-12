@@ -31,6 +31,7 @@ public class Dict {
     static public final String START_TIME="start_time";
     static public final String END_TIME="end_time";
     static public final String RETMSG="retmsg";
+    static public final String NOTES="notes";
 
     static public final String DEPENDENCY_DATA = "dependency_data";
     static public final String DATAVIEW_DATA = "dataview_data";
@@ -62,6 +63,7 @@ public class Dict {
     static public final String URL_JOB_STOP = "/v1/job/stop";
     static public final String REMOTE_RETURN_MSG = "retmsg";
     static public final String URL_JOB_CANCEL="/v1/job/cancel";
+    static public final String URL_JOB_UPDATE="/v1/job/update";
 
     static public final String SSH_IP = "ip";
     static public final String SSH_USER = "user";
