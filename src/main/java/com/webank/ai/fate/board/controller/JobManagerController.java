@@ -117,7 +117,6 @@ public class JobManagerController {
     }
 
 
-
     @RequestMapping(value = "/query/{jobId}/{role}/{partyId}", method = RequestMethod.GET)
     public ResponseResult queryJobById(@PathVariable("jobId") String jobId,
                                        @PathVariable("role") String role,
@@ -239,7 +238,7 @@ public class JobManagerController {
 //            return new ResponseResult(REQUEST_PARAMETER_ERROR);
 //        }
         JSONObject jsonObject = checkParameter(parameters, Dict.JOBID, Dict.ROLE, Dict.PARTY_ID, Dict.NOTES);
-        if (jsonObject==null){
+        if (jsonObject == null) {
             return new ResponseResult(REQUEST_PARAMETER_ERROR);
         }
         String partyId = jsonObject.getString(Dict.PARTY_ID);
@@ -248,20 +247,6 @@ public class JobManagerController {
         String result = null;
         try {
             result = httpClientPool.post(fateUrl + Dict.URL_JOB_UPDATE, jsonObject.toJSONString());
-//            result="{\n" +
-//                    "    \"retcode\": 0,\n" +
-//                    "    \"retmsg\": \"OK\",\n" +
-//                    "    \"data\":[\n" +
-//                    "        [1,0.5],\n" +
-//                    "        [2,0.4],\n" +
-//                    "        [3,0.4]\n" +
-//                    "    ],\n" +
-//                    "    \"meta\": {\n" +
-//                    "        \"metric_type\": \"LOSS\",\n" +
-//                    "        \"BEST\": 0.4,\n" +
-//                    "        \"unit_name\": \"iter num\"\n" +
-//                    "    }\n" +
-//                    "}\n";
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
@@ -272,14 +257,15 @@ public class JobManagerController {
         return ResponseUtil.buildResponse(result, null);
 
     }
-    private JSONObject checkParameter(String parameters,String... parametersNeedCheck){
+
+    private JSONObject checkParameter(String parameters, String... parametersNeedCheck) {
         JSONObject jsonObject = JSON.parseObject(parameters);
         ArrayList<String> results = new ArrayList<>();
         for (String parameter : parametersNeedCheck) {
             String result = jsonObject.getString(parameter);
             results.add(result);
         }
-        String[] results_Array =new String[results.size()];
+        String[] results_Array = new String[results.size()];
         results.toArray(results_Array);
         try {
             Preconditions.checkArgument(StringUtils.isNoneEmpty(results_Array));
