@@ -1,3 +1,8 @@
+# Release 1.1.1
+## Major Features and Improvements
+* Add Union component and support the model visualization
+
+
 # Release 1.1
 ## Major Features and Improvements
 
