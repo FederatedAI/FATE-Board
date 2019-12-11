@@ -27,7 +27,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.webank.ai.fate.board.*"})
+@ComponentScan(basePackages = {"com.webank.*"})
 @ImportResource(locations = {
         "classpath:db-mybatis-context.xml"
 })
