@@ -226,18 +226,8 @@ public class JobManagerController {
 
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public ResponseResult updateJobById(@RequestBody String parameters) {
-//        JSONObject jsonObject = JSON.parseObject(parameters);
-//        String jobId = jsonObject.getString(Dict.JOBID);
-//        String role = jsonObject.getString(Dict.ROLE);
-//        String partyId = jsonObject.getString(Dict.PARTY_ID);
-//        String notes = jsonObject.getString(Dict.NOTES);
-//        try {
-//            Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId,notes));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ResponseResult(REQUEST_PARAMETER_ERROR);
-//        }
-        JSONObject jsonObject = checkParameter(parameters, Dict.JOBID, Dict.ROLE, Dict.PARTY_ID, Dict.NOTES);
+
+        JSONObject jsonObject = checkParameter(parameters, Dict.JOBID, Dict.ROLE, Dict.PARTY_ID);
         if (jsonObject == null) {
             return new ResponseResult(REQUEST_PARAMETER_ERROR);
         }
