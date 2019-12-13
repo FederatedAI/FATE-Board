@@ -167,7 +167,7 @@
                 </includes>
             </resource>
             <resource>
-                <directory>${project.basedir}/lib</directory>
+                <directory>plugins</directory>
                 <targetPath>BOOT-INF/lib/</targetPath>
                 <includes>
                     <include>**/*.jar</include>
