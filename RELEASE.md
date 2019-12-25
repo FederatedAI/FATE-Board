@@ -1,32 +1,26 @@
 # Release 1.2.0
 ## Major Features and Improvements
 
-**New components:**
+* **New components**:  
+1. Heterogeneous feature correlation component: visualizing the correlation matrix diagram，filtering by role or variable, and scaling of diagram  
+2. Upload component:uploading data, and supporting for viewing data output
+3. Download component:downloading data, and supporting for viewing data output 
+4. LocalBaseline component：A LR component based on Sklearn run to compare the performance  of Federated LR 
+* **Component optimization:**
+5.  secureboost：Visual enhancement of secureboost tree diagrams, and support for scaling  and dragging trees 
+6.  Federated Sample：filtering by label to display the table content 
+7.  Model output of some components supports global fuzzy search 
+8.  Model output of some components supports for table column sorting 
+9.  Model output of some components supports multi-host visualization and filtering by role,  and adds variable mapping 
+10.  Optimize cross-validation curves and loss curves  support visualization and interaction of  large data volumes, and support for manual refresh during operation 
+* **others**:
+11. Job detail page redesign, and support for workflow scaling and dragging, and optimize parameter  display 
 
-* Upload: Having data-input port, showing basic info currently.
+12. Add job note and support for description and classification 
 
-* Download: Just like upload component.
+13. Log load optimization 
 
-* RSA: Will only show us data output model.
-
-* Hetero Feature Correlation: Displaying correlation table and name-contrast information.
-
-* sklearnLR：Single side operation components，showing content which just like other LR component
-
-**Component optimization:**
-
-* Sample: Added label-selection for filtering content of table according to information of label
-
-* Secureboost: Now providing adaptation and zoom function.
-* Table for some components support global fuzzy search 
-* Table for some components support sorting function
-* Optimizing usability and large data volume support for corss validation curve.
-* Selection and binning components support mult-host
-
-**Other:**
-* Added 'notes’ parameter for each job, for descripting and classifying jobs conviently
-* Styles of detail-page has been updated.
-* Flow chart support adaptation and zoom function now.
+      
 
 # Release 1.1
 ## Major Features and Improvements
