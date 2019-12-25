@@ -1,4 +1,4 @@
-# Release 1.2
+# Release 1.2.0
 ## Major Features and Improvements
 
 **New components:**
