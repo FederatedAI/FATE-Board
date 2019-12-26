@@ -174,6 +174,10 @@ public class JobWebSocketService implements InitializingBean, ApplicationContext
                             } else {
                                 duration = now - startTime;
                             }
+                            logger.info("time now:{}",now);
+                            logger.info("time  start:{}",startTime);
+                            logger.info("time  end:{}",endTime);
+                            logger.info("duration:{}",duration);
 
                             String status = job.getfStatus();
 
@@ -210,6 +214,7 @@ public class JobWebSocketService implements InitializingBean, ApplicationContext
                                 if (session.isOpen()) {
                                     try {
                                         session.getBasicRemote().sendText(JSON.toJSONString(flushToWebData));
+                                        logger.info("data to push:{}",JSON.toJSONString(flushToWebData));
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                         logger.error("IOException", e);
