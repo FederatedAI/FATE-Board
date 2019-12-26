@@ -1,0 +1,89 @@
+$light-gray: #bbbbc8;
+$dark-gray: #7f7d8e;
+$deep-purple: #534c77;
+$primary: #494ece;
+$common-bg: #f8f8fa;
+$link: #409eff;
+.history-container {
+  /*padding-top: 40px;*/
+  .table-wrapper {
+    /*height: 70vh;*/
+    border-radius: 4px;
+    margin-bottom: 20px;
+    .notes-showing {
+      display: block;
+      max-width: 60%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      padding-right: 5px;
+    }
+    .notes-editor {
+      width: 60%;
+    }
+  }
+  .tool-bar {
+    margin-bottom: 20px;
+    .tool-item {
+      display: flex;
+      align-items: center;
+      margin-right: 24px;
+      .title {
+        white-space: nowrap;
+        margin-right: 10px;
+        color: $dark-gray;
+        font-weight: bold;
+      }
+    }
+  }
+  .t-header {
+    height: 52px;
+    color: $dark-gray;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: left;
+  }
+  .t-row {
+    height: 56px;
+    font-size: 16px;
+    color: $dark-gray;
+  }
+  .el-table {
+    padding: 0 30px;
+  }
+  .el-table th{
+    padding: 0;
+  }
+  .el-input input{
+    width: 120px;
+    height: 30px;
+  }
+  .el-select__caret {
+    line-height: 30px;
+  }
+  .el-table .history-stripe {
+    background: #ededfa;
+  }
+  .el-button{
+    padding: 4px 16px;
+  }
+  .progress-wrapper {
+    .progress-bg {
+      $h: 5px;
+      width: 50%;
+      height: $h;
+      border-radius: $h;
+      background: #e8e8ef;
+      overflow: hidden;
+      .progress-block {
+        height: 100%;
+        background: $primary;
+      }
+    }
+    .progress-text {
+      margin-left: 7px;
+      color: $primary;
+      font-size: 16px;
+    }
+  }
+}
