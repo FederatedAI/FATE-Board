@@ -1,6 +1,6 @@
-Release 1.2.0
+# Release 1.2.0
 
-Major Features and Improvements
+#### Major Features and Improvements
 
 New components:  
 
@@ -25,11 +25,11 @@ Others:
 - Job detail page redesign, and support for workflow scaling and dragging, and optimize  parameter  display 
 - Add job note and support for description and classification 
 - Log load optimization 
-      
+  
 
-Release 1.1
+# Release 1.1
 
-Major Features and Improvements
+#### Major Features and Improvements
 
 - Support the visual tree models of secureboost
 - Support the visualization for heterogeneous LinearRegression
@@ -43,23 +43,49 @@ Major Features and Improvements
 
 
 
-Release 1.0.2
+# Release 1.1.1
 
-Major Features and Improvements
+#### Major Features and Improvements
+
+- Support the visual tree models of secureboost
+
+- Support the visualization for heterogeneous LinearRegression
+
+- Support the visualization for homogeneous Deep Neural Network
+
+- Support to view all component parameters
+
+- Support separation of data ports and model ports in all the components
+
+- Support visualization of evaluation results during training
+
+- Support for job queries, filters, and list sorting
+
+- Optimize the visual outputs of feature selection,feature binning,etc
+
+- Optimize dashboard and workflow visualization,and support workflow scaling
+
+  
+
+# Release 1.0.2
+
+#### Major Features and Improvements
 
 - Support  various ways for searching job
   
+  
 
-Release 1.0.1
+# Release 1.0.1
 
-Bug Fixes
+#### Bug Fixes
 
 - Fix the display problems 
   
+  
 
-Release 1.0
+# Release 1.0
 
-Major Features and Improvements
+#### Major Features and Improvements
 
 This version includes one new product of FATE:FATE-Board. FATE-Board as a visual tool for federation modeling. 
 
