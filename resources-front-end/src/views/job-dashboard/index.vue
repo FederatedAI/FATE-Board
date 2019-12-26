@@ -25,7 +25,6 @@
                     :value="option.value"
                     :label="option.label"
                   />
-                  {{ row.roleValue }}
                 </el-select>
               </div>
             </el-col>
