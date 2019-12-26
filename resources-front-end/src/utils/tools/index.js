@@ -1,0 +1,56 @@
+const request = function(func, params) {
+  const getImplement = function(obj, impl) {
+    let checkKey = obj
+    if (checkKey === undefined) {
+      return
+    } else if (typeof impl === 'string') {
+      impl = impl.split('.')
+      for (const val of impl) {
+        checkKey = checkKey[val]
+        if (checkKey === undefined) {
+          throw new Error('there has no such varible in this object')
+        }
+      }
+    } else if (impl instanceof Function) {
+      checkKey = impl(checkKey)
+    } else if (typeof impl === 'object') {
+      // object之中包含imple, default, callback
+      checkKey = impl.imple ? getImplement(checkKey, impl.imple) : impl.default ? impl.default : ''
+      checkKey = impl.callback ? impl.callback.call(null, checkKey, obj) : checkKey
+    }
+    return checkKey
+  }
+
+  const getreflect = function(obj, imple) {
+    const item = {}
+    try {
+      for (const key in imple) {
+        item[key] = getImplement(obj, imple[key])
+      }
+      return item
+    } catch (err) {
+      throw err
+    }
+  }
+
+  return async function(imple, key, callback) {
+    if (key instanceof Function) {
+      callback = key
+      key = undefined
+    }
+    const res = await func.call(this, params)
+    let originData = getImplement(res, key)
+    if (originData instanceof Object && !(originData instanceof Array)) {
+      originData = [originData]
+    }
+    let final = []
+    originData.forEach((val) => {
+      final.push(getreflect(val, imple))
+    })
+    final = final.length > 1 ? final : final[0]
+    callback && callback(final)
+    final
+  }
+}
+
+export { request }
