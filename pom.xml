@@ -160,10 +160,16 @@
                     <include>**/*.properties</include>
                 </includes>
             </resource>
+<!--            <resource>-->
+<!--                <directory>src/main/java</directory>-->
+<!--                <includes>-->
+<!--                    <include>**/*.properties</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
             <resource>
-                <directory>src/main/java</directory>
+                <directory>src/main/lib</directory>
                 <includes>
-                    <include>**/*.properties</include>
+                    <include>**/*.jar</include>
                 </includes>
             </resource>
         </resources>
