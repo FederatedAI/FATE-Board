@@ -7,12 +7,26 @@
     <artifactId>fateboard</artifactId>
     <version>1.2.0</version>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.5.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
     <packaging>jar</packaging>
 
     <name>fateboard</name>
     <description>fateboard</description>
 
-
+    <properties>
+        <druid.version>1.1.10</druid.version>
+        <mybatis-plus.version>3.0.6</mybatis-plus.version>
+        <druid.version>1.1.10</druid.version>
+        <lombok.version>1.16.6</lombok.version>
+        <jasypt.version>2.0.0</jasypt.version>
+        <swagger.version>2.9.2</swagger.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -143,6 +157,43 @@
             <artifactId>disruptor</artifactId>
             <version>3.4.2</version>
         </dependency>
+
+        <!--*******************  Swagger Begin ********************* -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <!--********************* Swagger End ********************* -->
+
+        <!--  *********************  数据库相关 Begin   ********************* -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+
+        <!--  *********************  数据库相关  End ********************* -->
+        <dependency>
+            <groupId>com.webank.ai</groupId>
+            <artifactId>fate-manager</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/lib/fate-manager-1.0-SNAPSHOT.jar</systemPath>
+        </dependency>
     </dependencies>
 
 
@@ -166,7 +217,7 @@
             <!--                    <include>**/*.properties</include>-->
             <!--                </includes>-->
             <!--            </resource>-->
-    
+
             <resource>
                 <directory>src/main/lib</directory>
                 <targetPath>BOOT-INF/lib/</targetPath>
