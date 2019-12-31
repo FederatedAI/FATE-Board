@@ -26,7 +26,7 @@ you can launch a fateboard service by following steps.
    | spring.http.encoding.charset              | code set for http         | UTF-8                                                        |
    | spring.http.encoding.enabled              | toggle for encoding       | true                                                         |
    | server.tomcat.uri-encoding                | code set for tomcat       | UTF-8                                                        |
-   | spring.datasource.url                     | url of database           | jdbc:mysql://localhost:3306/task_manager?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8 |
+   | spring.datasource.url                     | url of database           | jdbc:mysql://localhost:3306/fate_flow?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8 |
    | spring.datasource.username                | username of database      | none                                                         |
    | spring.datasource.password                | password of database      | none                                                         |
    | server.tomcat.max-threads                 | max threads of tomcat     | 1000                                                         |
@@ -42,7 +42,7 @@ you can launch a fateboard service by following steps.
      spring.http.encoding.charset=UTF-8
      spring.http.encoding.enabled=true
      server.tomcat.uri-encoding=UTF-8
-     spring.datasource.url=jdbc:mysql://localhost:3306/task_manager?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
+     spring.datasource.url=jdbc:mysql://localhost:3306/fate_flow?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
      spring.datasource.username=fate_dev
      spring.datasource.password=fate_dev
      server.tomcat.max-threads=1000
@@ -105,7 +105,7 @@ you can launch a fateboard service by following steps.
    command example:
 
    ```
-   java -Dspring.config.location=FATE/fateboard/src/main/resources/application.properties -DFATE_DEPLOY_PREFIX=FATE/logs/  -Dssh_config_file=FATE/fateboard/src/main/resources/  -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -jar FATE/fateboard/target/fateboard-1.1.jar  >/dev/null 2>&1 &
+   java -Dspring.config.location=FATE/fateboard/src/main/resources/application.properties -DFATE_DEPLOY_PREFIX=FATE/logs/  -Dssh_config_file=FATE/fateboard/src/main/resources/  -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -jar FATE/fateboard/target/fateboard-1.2.0.jar  >/dev/null 2>&1 &
    ```
 
 5. Stop the service
@@ -113,7 +113,7 @@ you can launch a fateboard service by following steps.
    Get the pid of fateboard:
 
    ```
-   ps -ef|grep java|grep fateboard-1.1.jar|grep -v grep|awk '{print $2}'
+   ps -ef|grep java|grep fateboard-1.2.0.jar|grep -v grep|awk '{print $2}'
    ```
 
    kill the fateboard:
