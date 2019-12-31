@@ -16,7 +16,6 @@
 package com.webank.ai.fate.board.conf;
 
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
-
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
@@ -31,17 +30,15 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import javax.sql.DataSource;
-
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
+import javax.sql.DataSource;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 
 @Configuration
-@MapperScan(basePackages = "com.webank.ai.fate.board.dao", sqlSessionFactoryRef = "fateboardSqlSessionFactory")
+@MapperScan(basePackages="com.webank.ai.fate.board.dao" ,sqlSessionFactoryRef="fateboardSqlSessionFactory")
 public class WebConfigration implements WebMvcConfigurer {
 
     @Override
@@ -69,12 +66,14 @@ public class WebConfigration implements WebMvcConfigurer {
     }
 
     @Bean("fateboardSqlSessionFactory")
-    public SqlSessionFactory sqlSessionFactory(@Qualifier("fateboardDatasource") DataSource dataSource) throws Exception {
+    public SqlSessionFactory sqlSessionFactory(@Qualifier("fateboardDataSource") DataSource  dataSource) throws Exception {
         SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);
+        //sessionFactory.setTypeAliasesPackage(env.getProperty("mybatis.typeAliasesPackage"));
         sessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("fate/fateboard/mapping/*"));
         return sessionFactory.getObject();
     }
+
 
     @Bean
     public ServerEndpointExporter serverEndpointExporter() {
