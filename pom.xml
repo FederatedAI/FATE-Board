@@ -160,20 +160,15 @@
                     <include>**/*.properties</include>
                 </includes>
             </resource>
-<!--            <resource>-->
-<!--                <directory>src/main/java</directory>-->
-<!--                <includes>-->
-<!--                    <include>**/*.properties</include>-->
-<!--                </includes>-->
-<!--            </resource>-->
+            <!--            <resource>-->
+            <!--                <directory>src/main/java</directory>-->
+            <!--                <includes>-->
+            <!--                    <include>**/*.properties</include>-->
+            <!--                </includes>-->
+            <!--            </resource>-->
+    
             <resource>
                 <directory>src/main/lib</directory>
-                <includes>
-                    <include>**/*.jar</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>plugins</directory>
                 <targetPath>BOOT-INF/lib/</targetPath>
                 <includes>
                     <include>**/*.jar</include>
