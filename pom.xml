@@ -188,6 +188,7 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/lib/fate-manager-1.0-SNAPSHOT.jar</systemPath>
         </dependency>
+
         <dependency>
             <groupId>com.webank.ai</groupId>
             <artifactId>fate-client</artifactId>

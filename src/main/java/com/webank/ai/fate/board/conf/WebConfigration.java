@@ -48,18 +48,18 @@ public class WebConfigration implements WebMvcConfigurer {
         registry.addMapping("/**").allowedMethods("*").allowedOrigins("http://localhost:8028").allowCredentials(true);
     }
 
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
-        converters.add(fastJsonHttpMessageConverter);
-    }
-
-    @Bean
-    public HttpMessageConverters fastJsonHttpMessageConverter() {
-        FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
-        return new HttpMessageConverters(fastJsonHttpMessageConverter);
-
-    }
+//    @Override
+//    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+//        FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
+//        converters.add(fastJsonHttpMessageConverter);
+//    }
+//
+//    @Bean
+//    public HttpMessageConverters fastJsonHttpMessageConverter() {
+//        FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
+//        return new HttpMessageConverters(fastJsonHttpMessageConverter);
+//
+//    }
 
     @Bean("fateboardDataSource")
     @ConfigurationProperties(prefix = "fateboard.datasource")
