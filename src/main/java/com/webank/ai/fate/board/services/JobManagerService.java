@@ -36,10 +36,10 @@ import java.util.Set;
 public class JobManagerService {
     public static Set<String> jobFinishStatus = new HashSet<String>() {
         {
-            add("success");
+            add("complete");
             add("failed");
-            add("partial");
-            add("setFailed");
+            add("timeout");
+            add("canceled");
         }
     };
     private final Logger logger = LoggerFactory.getLogger(JobManagerService.class);
