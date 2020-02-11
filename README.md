@@ -22,13 +22,12 @@ you can launch a fateboard service by following steps.
    | server.port                               | port of fateboard         | 8080                                                         |
    | fateflow.url                              | the url of fate_flow node | none                                                         |
    | spring.datasource.driver-Class-Name       | driver for database       | com.mysql.cj.jdbc.Driver                                     |
-   | management.endpoints.web.exposure.include | endpoints for exposure    | *                                                            |
    | spring.http.encoding.charset              | code set for http         | UTF-8                                                        |
    | spring.http.encoding.enabled              | toggle for encoding       | true                                                         |
    | server.tomcat.uri-encoding                | code set for tomcat       | UTF-8                                                        |
-   | spring.datasource.url                     | url of database           | jdbc:mysql://localhost:3306/fate_flow?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8 |
-   | spring.datasource.username                | username of database      | none                                                         |
-   | spring.datasource.password                | password of database      | none                                                         |
+   | fateboard.datasource.jdbc-url                     | url of database           | jdbc:mysql://localhost:3306/fate_flow?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8 |
+   | fateboard.datasource.username                | username of database      | none                                                         |
+   | fateboard.datasource.password                | password of database      | none                                                         |
    | server.tomcat.max-threads                 | max threads of tomcat     | 1000                                                         |
    | server.tomcat.max-connections             | max connections of tomcat | 2000                                                         |
 
@@ -38,13 +37,12 @@ you can launch a fateboard service by following steps.
      server.port=8080
      fateflow.url=http://localhost:9380
      spring.datasource.driver-Class-Name=com.mysql.cj.jdbc.Driver
-     management.endpoints.web.exposure.include=*
      spring.http.encoding.charset=UTF-8
      spring.http.encoding.enabled=true
      server.tomcat.uri-encoding=UTF-8
-     spring.datasource.url=jdbc:mysql://localhost:3306/fate_flow?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
-     spring.datasource.username=fate_dev
-     spring.datasource.password=fate_dev
+     fateboard.datasource.jdbc-url=jdbc:mysql://localhost:3306/fate_flow?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
+     fateboard.datasource.username=fate_dev
+     fateboard.datasource.password=fate_dev
      server.tomcat.max-threads=1000
      server.tomcat.max-connections=20000
      ```
@@ -55,13 +53,12 @@ you can launch a fateboard service by following steps.
      server.port=8080
      fateflow.url=http://localhost:9380
      spring.datasource.driver-class-name=org.sqlite.JDBC
-     spring.datasource.url=jdbc:sqlite:/fate/fate_flow/fate_flow_sqlite.db
-     management.endpoints.web.exposure.include=*
+     fateboard.datasource.jdbc-url=jdbc:sqlite:/fate/fate_flow/fate_flow_sqlite.db
      spring.http.encoding.charset=UTF-8
      spring.http.encoding.enabled=true
      server.tomcat.uri-encoding=UTF-8
-     spring.datasource.username=
-     spring.datasource.password=
+     fateboard.datasource.username=
+     fateboard.datasource.password=
      server.tomcat.max-threads=1000
      server.tomcat.max-connections=20000
      ```
@@ -113,7 +110,7 @@ you can launch a fateboard service by following steps.
    Get the pid of fateboard:
 
    ```
-   ps -ef|grep java|grep fateboard-1.2.0.jar|grep -v grep|awk '{print $2}'
+   ps -ef|grep java|grep fateboard-1.2.1.jar|grep -v grep|awk '{print $2}'
    ```
 
    kill the fateboard:
