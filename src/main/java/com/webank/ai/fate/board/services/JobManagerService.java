@@ -36,7 +36,7 @@ import java.util.Set;
 public class JobManagerService {
     public static Set<String> jobFinishStatus = new HashSet<String>() {
         {
-            add("complete");
+            add("success");
             add("failed");
             add("timeout");
             add("canceled");
