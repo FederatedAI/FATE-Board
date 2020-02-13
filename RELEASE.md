@@ -1,3 +1,9 @@
+# Release 1.2.1
+
+#### Major Features and Improvements
+- Fix the bug of getting logs
+
+
 # Release 1.2.0
 
 #### Major Features and Improvements
