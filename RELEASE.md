@@ -1,3 +1,9 @@
+# Release 1.2.1
+
+#### Major Features and Improvements
+- Fix the bug of getting logs
+
+
 # Release 1.2.0
 
 #### Major Features and Improvements
@@ -64,6 +70,7 @@ Others:
 - Support for job queries, filters, and list sorting
 - Optimize the visual outputs of feature selection,feature binning,etc
 - Optimize dashboard and workflow visualization,and support workflow scaling
+
 
 
 
