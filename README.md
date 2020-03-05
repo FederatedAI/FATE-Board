@@ -103,20 +103,25 @@ you can launch a fateboard service by following steps.
    | -DFATE_DEPLOY_PREFIX     | path of logs directory which produced by fate_flow |
 
    command example:
+   
+    NOTES: Please replace ${version} in command below with the real fateboard version you use.
 
    ```
-   java -Dspring.config.location=FATE/fateboard/src/main/resources/application.properties -DFATE_DEPLOY_PREFIX=FATE/logs/  -Dssh_config_file=FATE/fateboard/src/main/resources/  -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -jar FATE/fateboard/target/fateboard-1.3.0.jar  >/dev/null 2>&1 &
+   java -Dspring.config.location=FATE/fateboard/src/main/resources/application.properties -DFATE_DEPLOY_PREFIX=FATE/logs/  -Dssh_config_file=FATE/fateboard/src/main/resources/  -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -jar FATE/fateboard/target/fateboard-${version}.jar  >/dev/null 2>&1 &
    ```
-
 5. Stop the service
 
    Get the pid of fateboard:
+   
+   NOTES: Please replace ${version} in command below with the real fateboard version you use.
 
    ```
-   ps -ef|grep java|grep fateboard-1.3.0.jar|grep -v grep|awk '{print $2}'
+   ps -ef|grep java|grep fateboard-${version}.jar|grep -v grep|awk '{print $2}'
    ```
 
    kill the fateboard:
+   
+   NOTES: Please replace ${pid} in command below with the real pid you get.
 
    ```
    kill -9 ${pid}
