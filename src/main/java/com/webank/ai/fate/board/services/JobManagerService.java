@@ -38,8 +38,8 @@ public class JobManagerService {
         {
             add("success");
             add("failed");
-            add("partial");
-            add("setFailed");
+            add("timeout");
+            add("canceled");
         }
     };
     private final Logger logger = LoggerFactory.getLogger(JobManagerService.class);
