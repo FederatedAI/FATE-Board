@@ -1,8 +1,13 @@
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+# FATE-Board
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
 [![CodeStyle](https://img.shields.io/badge/Check%20Style-Google-brightgreen)](https://checkstyle.sourceforge.io/google_style.html)  
 [![Style](https://img.shields.io/badge/Check%20Style-Black-black)](https://checkstyle.sourceforge.io/google_style.html) 
 
-FATEBoard as a suite of visualization tool for federated learning modeling designed to deep explore models and understand models easily and effectively. 
+
+## Introduction
+
+FATE-Board as a suite of visualization tool for federated learning modeling designed to deep explore models and understand models easily and effectively. 
 
 To make it easier to understand, track, debug, and explore federated learning modeling, as well as examine, evaluate, and compare various federation learning models. FATEBoard provides a visual way to probe models, from which you can reshape and improve models efficiently.
 <div style="text-align:center", align=center>
@@ -11,7 +16,7 @@ To make it easier to understand, track, debug, and explore federated learning mo
 
 # **Deploy** #
 
-The FATE stand-alone version has been integrated with FATEBoard, and users just follow the steps indicated on the home page to launch the relevant components instead of configuring additional information.
+The FATE stand-alone version has been integrated with FATE-Board, and users just follow the steps indicated on the home page to launch the relevant components instead of configuring additional information.
 
 In a distributed environment, FATEBoard needs to be deployed through cluster automated deployment script rather than individually, which you need to configure some information about the cluster, such as URL of FATEFlow, directory of log files, SSH information of each machine, etc. All the configuration information could be generated automatically using automated script deployment. If the information is not filled in correctly, it will not work properly.
 
