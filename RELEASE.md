@@ -1,3 +1,9 @@
+# Release 1.3.1
+
+#### Major Features and Improvements
+- Support the plugins
+
+
 # Release 1.3.0
 
 #### Major Features and Improvements
