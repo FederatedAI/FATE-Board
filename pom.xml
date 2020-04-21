@@ -45,6 +45,7 @@
             <version>3.8.1</version>
         </dependency>
 
+
         <dependency>
             <groupId>ch.ethz.ganymed</groupId>
             <artifactId>ganymed-ssh2</artifactId>
@@ -57,11 +58,16 @@
             <version>2.1.5.RELEASE</version>
         </dependency>
 
+
         <dependency>
+
             <groupId>org.springframework.boot</groupId>
+
             <artifactId>spring-boot-starter-actuator</artifactId>
             <version>2.0.4.RELEASE</version>
+
         </dependency>
+
 
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -133,8 +139,10 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
+
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.jcraft/jsch -->
         <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
@@ -146,6 +154,7 @@
             <artifactId>spring-boot-test</artifactId>
             <version>2.0.3.RELEASE</version>
         </dependency>
+
 
         <dependency>
             <groupId>com.lmax</groupId>
@@ -285,6 +294,7 @@
                     </execution>
                 </executions>
             </plugin>
+
 
         </plugins>
     </build>
