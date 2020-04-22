@@ -81,6 +81,7 @@ public class Dict {
     static public final String FILED_END_TIME="f_end_time";
     static public final String TIME="time";
 
-
+    static public final String TIMEOUT="timeout";
+    static public final String FAILED="failed";
 
 }

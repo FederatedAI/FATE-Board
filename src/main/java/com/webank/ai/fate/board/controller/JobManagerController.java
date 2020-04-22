@@ -127,6 +127,9 @@ public class JobManagerController {
         if (jobWithBLOBs == null) {
             return new ResponseResult<>(ErrorCode.DATABASE_ERROR_RESULT_NULL);
         }
+        if(jobWithBLOBs.getfStatus().equals(Dict.TIMEOUT)){
+            jobWithBLOBs.setfStatus(Dict.FAILED);
+        }
         Map params = Maps.newHashMap();
         params.put(Dict.JOBID, jobId);
         params.put(Dict.ROLE, role);
@@ -198,6 +201,9 @@ public class JobManagerController {
                 String jobId1 = jobWithBLOB.getfJobId();
                 String role1 = jobWithBLOB.getfRole();
                 String partyId1 = jobWithBLOB.getfPartyId();
+                if(jobWithBLOB.getfStatus().equals(Dict.TIMEOUT)){
+                    jobWithBLOB.setfStatus(Dict.FAILED);
+                }
                 HashMap<String, String> jobParams = Maps.newHashMap();
                 jobParams.put(Dict.JOBID, jobId1);
                 jobParams.put((Dict.ROLE), role1);
