@@ -1,0 +1,60 @@
+@import './font_import.scss';
+
+//font color
+$basic-font: #999BA3;
+$deep-font: #3E4052;
+$blue-font: #4159D1;
+
+@mixin reg-deep-font {
+  font: 'roboto_regular';
+  font-size: 14px;
+  color: $deep-font;
+}
+
+@mixin reg-light-font {
+  font: 'roboto_regular';
+  font-size: 14px;
+  color: $basic-font;
+}
+
+@mixin reg-blue-font {
+  font: 'roboto_regular';
+  font-size: 14px;
+  color: $blue-font;
+}
+
+@mixin bold-deep-font {
+  font: 'roboto_bold';
+  font-size: 14px;
+  color: $deep-font;
+}
+
+@mixin bold-light-font {
+  font: 'roboto_bold';
+  font-size: 14px;
+  color: $basic-font;
+}
+
+@mixin bold-blue-font {
+  font: 'roboto_bold';
+  font-size: 14px;
+  color: $blue-font;
+}
+
+@mixin med-deep-font {
+  font: 'roboto_medium';
+  font-size: 14px;
+  color: $deep-font;
+}
+
+@mixin med-light-font {
+  font: 'roboto_medium';
+  font-size: 14px;
+  color: $basic-font;
+}
+
+@mixin med-blue-font {
+  font: 'roboto_medium';
+  font-size: 14px;
+  color: $blue-font;
+}

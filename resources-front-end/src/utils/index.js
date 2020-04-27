@@ -91,9 +91,11 @@ export function filterLineArr(arr) {
 }
 
 export function initWebSocket(url, onopen, onmessage, onclose = null) {
-  const baseUrl = window.location.origin
-  const baseWsUrl = baseUrl.replace(/http|https/g, 'ws')
-  const instance = new WebSocket(baseWsUrl + url)
+  const instance = new WebSocket('ws://127.0.0.1:8080' + url)
+  // const instance = new WebSocket('ws://127.0.0.1:8080' + url)
+  // const baseUrl = window.location.origin
+  // const baseWsUrl = baseUrl.replace(/http|https/g, 'ws')
+  // const instance = new WebSocket(baseWsUrl + url)
   instance.onopen = onopen
   instance.onmessage = onmessage
   instance.onerror = () => {

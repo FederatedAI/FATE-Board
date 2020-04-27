@@ -1,0 +1,57 @@
+@import '../font/mixin_font.scss';
+
+.nav-container {
+  $top-height: 48px;
+  $router-height: 35px;
+  
+  position: relative;
+  background: #3145a6;
+  z-index: 3000;
+  .navbar {
+    width: calc(100% - 48px);
+    height: $top-height;
+    line-height: $top-height;
+    border-radius: 0 0 24px 0;
+    background-color: #4859d1;
+    .home-btn {
+      padding: 0 48px;
+      font-size: 28px;
+      /*font-weight: bold;*/
+      line-height: $top-height;
+      text-align: center;
+      cursor: pointer;
+    }
+    .router-btns {
+      margin-right: 28px;
+      > span {
+        margin: 0 8px;
+        padding: 0 15px;
+        $h: 28px;
+        color: rgba(255,255,255,0.6);
+        height: $h;
+        line-height: $h;
+        border-radius: $h;
+        cursor: pointer;
+        &:hover{
+          color: #fff;
+        }
+      }
+      .active {
+        color: #fff;
+      }
+    }
+  }
+
+  .help {
+    width: 48px;
+    .icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      color: #fff;
+      opacity: 0.4;
+      text-align: center;
+      cursor: pointer;
+    }
+  }
+}

@@ -1,12 +1,13 @@
 $light-gray: #bbbbc8;
 $dark-gray: #7f7d8e;
 $deep-purple: #534c77;
-$primary: #494ece;
+$primary: #4159D1;
 $common-bg: #f8f8fa;
 $link: #409eff;
+
 .app-content {
-  height: calc(100% - 75px);
-  font-size: 14px;
+  height: calc(100% - 36px);
+  font-size: 12px;
 }
 
 .details-container {
@@ -30,22 +31,22 @@ $link: #409eff;
     padding-left: 5px;
   }
   .section-wrapper {
-    height: calc(100% - 24px);
+    height: calc(100% - 12px);
     .section {
       &-title {
         margin-bottom: 16px;
         font-size: 1.29em;
-        color: $deep-purple;
+        color: #3E4052;
         font-weight: bold;
       }
       &-view {
-        padding: 8.9%;;
+        padding: 16px 8.9%;
         background: #fff;
         border-radius: 4px;
         overflow-y: auto;
         .summary-items {
           li {
-            margin-bottom: 3.6%;
+            margin-bottom: 12px;
             hr {
               margin: 10px 0;
             }
@@ -97,46 +98,64 @@ $link: #409eff;
             border: none;
           }
           .prop {
-            color: #BBBBC8;
-            size: 16px;
+            color: #999BA3;
+            size: 1em;
             font-family: 'Lato';
           }
           .prop-content {
-            font-family: 'Lato';
-            font-weight: 'bold';
             font-size: 1.14em;
-            color: #7F7D8E;
+            color: #6A6C75;
             .value {
               padding-right: 12px;
+            }
+            .tip {
+              font-size: 12px;
+              color: #4159D1;
+              cursor: pointer;
+              text-decoration: underline;
+            }
+          }
+          .prop-dataset {
+            max-width: calc(100% - 85px);
+            .prop-dataset-item {
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              width: 100%;
+              display: block;
+              overflow: hidden;
+              margin-bottom: 12px;
             }
           }
         }
         .log-list {
           padding: 24px;
-          background: $common-bg;
           border-radius: 5px;
           height: 80%;
           overflow: auto;
           > li {
             /*height: 25px;*/
-            line-height: 25px;
-            text-indent: 10px;
-            color: $dark-gray;
+            line-height: 20px;
+            font-size: 12px;
+            color: #999ba3;
             .num {
+              display: inline-block;
+              min-width: 40px;
               white-space: nowrap;
-              margin-right: 15px;
-              color: $light-gray;
+              margin-right: 10px;
+              color: #c6c8cc;
             }
           }
         }
         .echart {
-          width: calc(75vw - 25px);
-          // width: 100%;
+          // width: 75vw;
+          width: 100%;
           height: 500px;
+          background-color: #EBEDF0;
         }
         .full-screen-echart {
           width: 100%;
           height: 500px;
+          background-color: #EBEDF0;
         }
         .tab {
           //max-height: 55vh;
@@ -146,7 +165,26 @@ $link: #409eff;
       }
     }
     .section-summary {
-      height: calc(100% - 38px);
+      height: 100%;
+
+      .dashboard-btn {
+        height: 32px;
+        width: 100%;
+        margin-top: 12px;
+
+        font-size: 1em;
+        color: #4159D1;
+        text-align: center;
+        line-height: 32px;
+
+        background-color: #F8F9FA;
+        border-radius: 2px;
+        border: 0px;
+        &:hover {
+          color: #fff;
+          background-color: #4159D1;
+        }
+      }
     }
   }
   .prop-section {
@@ -156,19 +194,23 @@ $link: #409eff;
     width: calc(100% - 18.8% - 15px);
   }
   .tab-bar {
-    margin: 0 48px 24px;
+    margin: 0 18px 24px 24px;
+    height: 24px;
+    background: #F8F9FA;
+    border: 1px solid #F8F9FA;
     .tab-btn {
+      $h: 24px;
+      width: 138px;
       display: flex;
-      align-items: center;
-      $h: 26px;
-      margin-right: 24px;
+      margin-right: 1px;
       padding: 4px 18px 3px;
-      background: $common-bg;
+      background: #fff;
       line-height: $h;
-      border-radius: $h;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
       .text {
-        font-size: 1.14em;
+        font-size: 14px;
         font-weight: bold;
         color: $dark-gray;
       }
@@ -187,24 +229,31 @@ $link: #409eff;
     }
   }
   .output-wrapper {
-    height: calc(100% - 37px);
-    padding: 24px;
+    height: 100%;
+    padding: 12px;
+    padding-top: 16px;
     background: #fff;
-    border-radius: 4px;
+    .output-content {
+      max-height: 100%;
+      min-height: calc(100% - 36px);
+    }
     .dag-wrapper {
       width: 100%;
       position: relative;
       .output-title {
-        margin-bottom: 8px;
         font-size: 1.14em;
         color: $dark-gray;
       }
       .output-desc {
+        padding-left: 10px;
         color: $light-gray;
       }
       .echart-wrapper {
-        height: calc(100% - 45px);
+        height: calc(100% - 32px);
         overflow: hidden;
+        margin-top: 16px;
+        margin-right: 16px;
+        border: 2px solid #F8F9FA;
         .echarts {
           height: 100%;
         }
@@ -240,11 +289,18 @@ $link: #409eff;
         min-width: 100%;
         .el-tree-node__label {
           font-size: 1em;
+          color: #999BA3;
+        }
+        .el-tree-node__expand-icon{
+          padding: 0px;
+        }
+        .el-tree-node__content {
+          height: 22px;
         }
       }
       .para-warpper-content{
         width: 100%;
-        height: calc(100% - 32px);
+        height: calc(100% - 48px);
         position: relative;
       }
       .para-title {
@@ -256,12 +312,13 @@ $link: #409eff;
         color: #7f7d8e !important;
       }
       .msg {
-        height: calc(100% - 36px);
-        padding: 6px;
-        margin-bottom: 24px;
+        max-height: calc(100% - 35px);
+        min-height: calc(100% - 35px);
+        margin-bottom: 12px;
         color: #7f7d8e !important;
         overflow: auto;
-        padding-left: 6px;
+        padding: 6px;
+        padding-left: 12px;
         .msg-list {
           > li {
             margin-bottom: 20px;
@@ -275,7 +332,7 @@ $link: #409eff;
         .unfold-tree {
           position: absolute;
           top: 0px;
-          right: 24px;
+          right: 0px;
           color: #BBBBC8;
           text-decoration: underline;
           cursor: pointer;
@@ -291,24 +348,36 @@ $link: #409eff;
     right: 15px;
     top: 15px;
     .img-wrapper {
-      width: 32px;
-      height: 32px;
+      width: 24px;
+      height: 24px;
       margin-left: 10px;
       cursor: pointer;
     }
   }
   .el-dialog {
-    border-radius: 4px;
+    overflow: hidden;
+    padding-right: 6px;
+    height: calc(100% - 70px);
     .el-dialog__header {
-      padding: 24px 48px 18px;
+      padding: 16px 24px 16px;
       .el-dialog__title {
-        font-size: 1.29em;
-        color: $deep-purple;
+        font-size: 1.16em;
+        color: #3E4052;
         font-weight: bold;
       }
     }
     .el-dialog__body {
       padding: 0;
+      height: calc(100% - 60px);
     }
   }
+  .is-fullscreen{
+    margin-top: 48px;
+    height: calc(100% - 50px);
+  }
+  .v-modal{
+    opacity: 1;
+    background: #EBEDF0;
+    top: 48px;
+  } 
 }
