@@ -1,5 +1,9 @@
 <template>
-  <div v-if="total>0" :class="{'hidden':hidden}" class="pagination-container flex flex-end">
+  <div
+    v-if="total>0"
+    :class="{'hidden':hidden, 'flex-end': position==='end', 'justify-center':position==='center'}"
+    class="pagination-container flex"
+  >
     <el-pagination
       :background="background"
       :current-page.sync="currentPage"
@@ -53,6 +57,10 @@ export default {
     hidden: {
       type: Boolean,
       default: false
+    },
+    position: {
+      type: String,
+      default: 'end'
     }
   },
   computed: {
@@ -91,12 +99,12 @@ export default {
 </script>
 
 <style scoped>
-  .pagination-container {
-    background: #fff;
-    padding: 32px 16px;
-  }
+.pagination-container {
+	background: #fff;
+	padding: 32px 16px;
+}
 
-  .pagination-container.hidden {
-    display: none;
-  }
+.pagination-container.hidden {
+	display: none;
+}
 </style>

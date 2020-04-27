@@ -41,5 +41,15 @@ export default function(data, role) {
       }
     }
   }
+  if (role === 'host') {
+    for (let i = 0; i < final.localHeader.length; i++) {
+      for (const val of final.anony) {
+        if (val.name === final.localHeader[i]) {
+          final.localHeader[i] += '(' + val.anonymous + ')'
+          break
+        }
+      }
+    }
+  }
   return final
 }

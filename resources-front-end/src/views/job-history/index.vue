@@ -1,18 +1,18 @@
 <template>
-  <div class="app-container history-container bg-dark" @click="uploadEditor($event)">
-    <h3 class="app-title">Job Overview</h3>
+  <div class="app-container flex flex-col history-container bg-dark" @click="uploadEditor($event)">
+    <breadcrumb-ext :breads="[{type:'content', val:'Job Overview'}]"/>
     <div class="tool-bar flex flex-center flex-end">
       <div class="tool-item">
         <div class="tool-item">
           <span class="title">Job ID:</span>
-          <el-input v-model="condition.job_id" size="small" clearable @keyup.native.enter="search" @clear="search" />
+          <el-input v-model="condition.job_id" :size="'mini'" clearable @keyup.native.enter="search" @clear="search" />
         </div>
         <div class="tool-item">
           <span class="title">Party ID:</span>
-          <el-input v-model="condition.party_id" @keyup.native.enter="search" />
+          <el-input v-model="condition.party_id" :size="'mini'" @keyup.native.enter="search" />
         </div>
         <span class="title">Role:</span>
-        <el-select v-model="condition.role" multiple placeholder>
+        <el-select v-model="condition.role" :size="'mini'" collapse-tags multiple placeholder>
           <el-option
             v-for="item in roleOptions"
             :key="item.value"
@@ -23,7 +23,7 @@
       </div>
       <div class="tool-item">
         <span class="title">Status:</span>
-        <el-select v-model="condition.status" multiple placeholder>
+        <el-select v-model="condition.status" :size="'mini'" collapse-tags multiple placeholder>
           <el-option
             v-for="item in statusOptions"
             :key="item.value"
@@ -32,9 +32,9 @@
           />
         </el-select>
       </div>
-      <el-button type="primary" round @click="search">Search</el-button>
+      <el-button :size="'mini'" type="primary" round @click="search">Search</el-button>
     </div>
-    <div v-loading="listLoading" class="table-wrapper shadow">
+    <div v-loading="listLoading" class="flex flex-col space-between table-wrapper">
       <el-table
         ref="currentRowTable"
         :data="list"
@@ -44,7 +44,7 @@
         element-loading-text="Loading"
         highlight-current-row
         empty-text="NO DATA"
-        height="68vh"
+        height="100%"
         @current-change="setCurrentRow"
       >
         <template v-for="item in tHead">
@@ -59,46 +59,6 @@
             :show-overflow-tooltip="item.label !== 'Notes'"
             border
           >
-            <template slot="header" slot-scope="scope">
-              <div
-                v-if="item.key==='start_time'"
-                class="pointer flex flex-center"
-                style="padding: 0;padding-top: 5px;"
-                @click="changeSort(item.key)"
-              >
-                <span>{{ item.label }}</span>
-                <div class="pos-r" style="width: 30px;height: 26px;">
-                  <i
-                    :style="{color:startTimeSort==='asc'?'#494ECE':'#E8E8EF'}"
-                    class="iconfont iconsort-asc-s pos-a"
-                  />
-                  <i
-                    :style="{color:startTimeSort==='desc'?'#494ECE':'#E8E8EF'}"
-                    class="iconfont iconsort-desc-s pos-a"
-                  />
-                </div>
-                <!--<i :class="['iconfont',startTimeSortDesc?'iconsort-down':'iconsort-up']"/>-->
-              </div>
-              <div
-                v-else-if="item.key==='end_time'"
-                class="pointer flex flex-center"
-                style="padding: 0;padding-top: 5px;"
-                @click="changeSort(item.key)"
-              >
-                <span>{{ item.label }}</span>
-                <div class="pos-r" style="width: 30px;height: 26px;">
-                  <i
-                    :style="{color:endTimeSort==='asc'?'#494ECE':'#E8E8EF'}"
-                    class="iconfont iconsort-asc-s pos-a"
-                  />
-                  <i
-                    :style="{color:endTimeSort==='desc'?'#494ECE':'#E8E8EF'}"
-                    class="iconfont iconsort-desc-s pos-a"
-                  />
-                </div>
-              </div>
-              <div v-else style="padding: 0;padding-top: 5px;">{{ item.label }}</div>
-            </template>
             <template slot-scope="scope">
               <span
                 v-if="item.key==='jobId'"
@@ -107,11 +67,6 @@
               >{{ scope.row[item.key] }}</span>
               <div v-else-if="item.key==='status'">
                 <div v-if="scope.row.progress || scope.row.progress===0">
-                  <!--<el-progress-->
-                  <!--:percentage="scope.row.progress"-->
-                  <!--:show-text="true"-->
-                  <!--color="#494ece"-->
-                  <!--/>-->
                   <div class="progress-wrapper flex flex-center">
                     <div class="progress-bg">
                       <div :style="{width:`${scope.row.progress}%`}" class="progress-block" />
@@ -120,14 +75,12 @@
                   </div>
                 </div>
                 <div v-else>{{ scope.row[item.key] }}</div>
-                <!-- <span class="text-primary" style="font-size: 12px;">{{ scope.row.progress }}%</span>-->
               </div>
               <div v-else-if="item.key==='notes'">
-                <div v-if="!scope.row.notesEdit" class="flex flex-row flex-start flex-center">
+                <div v-if="!scope.row.notesEdit" class="flex flex-row flex-end flex-center">
                   <el-tooltip :content="scope.row[item.key]" :disabled="willshowingToolTip(scope)" effect="dark" placement="top-end">
                     <span class="notes-showing">{{ scope.row[item.key] }}</span>
                   </el-tooltip>
-                  <!-- <i class="el-icon-edit" @click="editorNoteForJob(scope)"/> -->
                   <icon-hover-and-active
                     :default-url="icons.normal['edit']"
                     :hover-url="icons.hover['edit']"
@@ -135,7 +88,7 @@
                     @clickFn="editorNoteForJob(scope)"
                   />
                 </div>
-                <div v-else-if="scope.row.notesEdit" class="flex flex-row flex-start flex-center" @click.stop="stopToTop($event)">
+                <div v-else-if="scope.row.notesEdit" class="flex flex-row flex-end flex-center" @click.stop="stopToTop($event)">
                   <el-input v-model="editorText" :ref="scope.column.id+'_'+scope.$index" placeholder="请输入" class="notes-editor" @keyup.native.enter="uploadEditor($event)"/>
                   <i class="el-icon-check" @click.self="uploadEditor($event)"/>
                   <i class="el-icon-close" @click.self="closeEditor(scope)"/>
@@ -151,6 +104,7 @@
         :page.sync="page"
         :layout="'prev, pager, next'"
         :limit.sync="pageSize"
+        :position="'center'"
         @pagination="handlePageChange"
       />
       <!--<header-select :options="roleOptions"/>-->
@@ -164,12 +118,14 @@ import { parseTime, formatSeconds, deepClone } from '@/utils'
 import { mapGetters } from 'vuex'
 import { queryJobs, addNotes } from '@/api/job'
 import IconHoverAndActive from '@/components/IconHoverAndActive'
+import BreadcrumbExt from '@/components/BreadcrumbExt'
 
 export default {
   name: 'Job',
   components: {
     Pagination,
-    IconHoverAndActive
+    IconHoverAndActive,
+    BreadcrumbExt
   },
   filters: {},
   data() {
@@ -202,12 +158,14 @@ export default {
         {
           key: 'start_time',
           label: 'Start Time',
-          width: 200
+          width: 200,
+          sortable: true
         },
         {
           key: 'end_time',
           label: 'End Time',
-          width: 200
+          width: 200,
+          sortable: true
         },
         {
           key: 'duration',
@@ -479,27 +437,31 @@ export default {
         query.search_status = search_status.toString()
       }
       // console.log(query)
-      this.$router.push({
+      const href = this.$router.resolve({
         path: '/details',
         query
       })
+      window.open(href.href, '_blank')
+    },
+    toHome() {
+      this.$router.push({
+        path: '/'
+      })
     },
     tableRowClassName({ row, rowIndex }) {
-      // if (rowIndex % 2 === 0) {
-      //   // console.log(rowIndex)
-      //   return 't-row history-stripe'
-      // }
-      // console.log(row)
-      // console.log(this.lastJob)
+      let final = 't-row'
+      if (rowIndex % 2 === 0) {
+        final += ' between-line'
+      }
       if (
         this.lastJob &&
 				row.jobId === this.lastJob.job_id &&
 				row.role === this.lastJob.role &&
 				row.partyId === this.lastJob.party_id
       ) {
-        return 't-row history-stripe'
+        final += ' history-stripe'
       }
-      return 't-row'
+      return final
     },
     setCurrentRow(val) {
       if (!val) return

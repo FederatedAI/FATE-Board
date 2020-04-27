@@ -1,25 +1,24 @@
 $light-gray: #bbbbc8;
-$deep-gray: #7f7d8e;
+$deep-gray: #999BA3;
+$deeper-gray: #3E4052;
 $content-gray: #7F7D8E;
 $dark-purple: #534c77;
 $primary: #494ece;
 $common-bg:#f8f8fa;
 .dashboard-container {
   //$section-width: 28vw;
-  $section-height: 360px;
+  $section-height: 346px;
   $echart-height: $section-height - 40px;
   height: 100%;
   .dash-board-list {
     .col {
       height: $section-height;
       background: #fff;
-      border-radius: 4px;
       .list-title {
-        height: 40px;
-        padding-top: 20px;
-        font-size: 18px;
-        color: $dark-purple;
-        //line-height: 40px;
+        font-family: 'roboto_bold';
+        padding-top: 12px;
+        font-size: 16px;
+        color: #3e4052;
         text-indent: 24px;
       }
       .echarts-container {
@@ -30,27 +29,27 @@ $common-bg:#f8f8fa;
     }
     .dataset-info {
       flex-direction: column;
+      font-family: 'roboto_medium';
       //padding: 0 20px 20px 20px;
       .dataset-row {
         &:first-of-type {
           margin-top: 32px;
         }
         margin-top: 30px;
+        margin-left: 48px !important;
         .dataset-item {
-          margin-bottom: 20px;
+          margin-bottom: 30px;
           .name {
+            font-size: 14px;
             margin-bottom: 6px;
-            color: $light-gray;
+            color: $deep-gray;
           }
           .dataset-title {
-            //font-size: 16px;
-            font-weight: bold;
             color: $deep-gray;
           }
           .value {
-            font-size: 16px;
-            color: $deep-gray;
-            font-weight: bold;
+            font-size: 14px;
+            color: $deeper-gray;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -105,7 +104,7 @@ $common-bg:#f8f8fa;
               margin-bottom: 6px;
             }
             .value {
-              font-size: 16px;
+              font-size: 14px;
               font-weight: bold;
               color: $deep-gray;
             }
@@ -126,11 +125,10 @@ $common-bg:#f8f8fa;
         .el-button {
           padding: 7px 24px 6px;
           margin-top: 6px;
-          background-color: rgba(73,78,206,0.1);
-          color: #494ece;
-          font-size: 16px;
-          font-family: 'Lato';
-          font-weight: 600;
+          background-color: #DEECFC;
+          color: #4159D1;
+          font-size: 14px;
+          font-weight: bold;
           border: 0px;
         }
       }
@@ -155,40 +153,41 @@ $common-bg:#f8f8fa;
     }
   }
   .log-wrapper {
-    margin: 24px 0 16px;
+    margin: 12px 0 16px;
     padding: 0 24px 8px;
     background: #fff;
     border-radius: 4px;
+    min-height: 400px;
+    height: calc(100% - 410px);
     .title {
-      padding-top: 20px;
+      padding-top: 12px;
       margin-bottom: 15px;
-      font-size: 18px;
-      color: $dark-purple;
+      font-size: 15px;
+      color: $deeper-gray;
+      font-family: 'roboto_bold'
     }
     .tab-bar {
-      margin-left: 18px;
+      margin-left: 43px;
       .tab-btn {
         display: flex;
+        font-family: 'roboto_medium';
         align-items: center;
         $h: 26px;
         margin-right: 24px;
         padding: 0 5px;
-        background: $common-bg;
-        //background: #f00;
         line-height: $h;
         border-radius: $h;
         cursor: pointer;
         .text {
           padding: 0 10px;
-          font-size: 16px;
-          font-weight: bold;
-          color: $deep-gray;
+          font-size: 14px;
+          color: #6A6C75;
         }
         .count {
           min-width: 16px;
           height: 16px;
           padding: 0 5px;
-          border-radius: 16px;
+          border-radius: 2px;
           line-height: 16px;
           text-align: center;
           color: #fff;
@@ -207,38 +206,39 @@ $common-bg:#f8f8fa;
         }
         &:hover {
           .text {
-            color: #fff;
+            color: #4159D1;
+            text-decoration: underline;
           }
-          background: $primary;
         }
       }
       .tab-btn-active {
         .text {
-          color: #fff;
+          color: #4159D1;
         }
-        background: $primary;
       }
     }
     .log-container {
-      height: 270px;
-      padding: 24px;
-      background: $common-bg;
+      height: calc(100% - 97px);
+      padding: 0px 12px 0px 0px;
+      margin-top: 15px;
       overflow: auto;
       .log-list {
         > li {
           /*height: 25px;*/
-          line-height: 25px;
+          line-height: 20px;
           text-indent: 10px;
           .line-num{
-            color: $light-gray;
-            margin-right: 36px;
-            font-size: 14px;
-            text-align: right;
+            color: #C6C8CC;
+            min-width: 50px;
+            margin-right: 20px;
+            font-size: 12px;
+            text-align: left;
           }
           .content{
-            color: $content-gray;
-            font-size: 14px;
+            color: $deep-gray;
+            font-size: 12px;
             text-align: left;
+            text-indent: initial;
           }
         }
       }
