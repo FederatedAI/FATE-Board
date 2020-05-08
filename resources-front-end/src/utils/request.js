@@ -8,7 +8,10 @@ import { Message } from 'element-ui'
 // create an axios instance
 // console.log(window.location.origin)
 const service = axios.create({
-  baseURL: window.location.origin,
+  // baseURL: 'http://172.16.153.43:8080',
+  // baseURL: 'http://172.16.153.63:8080',
+  baseURL: 'http://172.16.153.25:8080',
+  // baseURL: window.location.origin,
   withCredentials: false,
   timeout: 20000 // request timeout
 })

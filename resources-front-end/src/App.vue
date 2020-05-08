@@ -9,8 +9,8 @@ export default {
   name: 'App',
   data: () => {
     return {
-      version: 'v1.2.0',
-      packageTime: '2019/12/23'
+      version: 'v1.4.0',
+      packageTime: '2020/4/27-12:21'
     }
   }
 }

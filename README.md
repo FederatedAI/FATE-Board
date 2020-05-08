@@ -1,6 +1,13 @@
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![CodeStyle](https://img.shields.io/badge/Check%20Style-Google-brightgreen)](https://checkstyle.sourceforge.io/google_style.html) [![Pinpoint Satellite](https://img.shields.io/endpoint?url=https%3A%2F%2Fscan.sbrella.com%2Fadmin%2Fapi%2Fv1%2Fpinpoint%2Fshield%2FFederatedAI%2FFATE-Board)](https://github.com/mmyjona/FATE-Serving/pulls) [![Style](https://img.shields.io/badge/Check%20Style-Black-black)](https://checkstyle.sourceforge.io/google_style.html) 
+# FATE-Board
 
-FATEBoard as a suite of visualization tool for federated learning modeling designed to deep explore models and understand models easily and effectively. 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
+[![CodeStyle](https://img.shields.io/badge/Check%20Style-Google-brightgreen)](https://checkstyle.sourceforge.io/google_style.html)  
+[![Style](https://img.shields.io/badge/Check%20Style-Black-black)](https://checkstyle.sourceforge.io/google_style.html) 
+
+
+## Introduction
+
+FATE-Board as a suite of visualization tool for federated learning modeling designed to deep explore models and understand models easily and effectively. 
 
 To make it easier to understand, track, debug, and explore federated learning modeling, as well as examine, evaluate, and compare various federation learning models. FATEBoard provides a visual way to probe models, from which you can reshape and improve models efficiently.
 <div style="text-align:center", align=center>
@@ -9,7 +16,7 @@ To make it easier to understand, track, debug, and explore federated learning mo
 
 # **Deploy** #
 
-The FATE stand-alone version has been integrated with FATEBoard, and users just follow the steps indicated on the home page to launch the relevant components instead of configuring additional information.
+The FATE stand-alone version has been integrated with FATE-Board, and users just follow the steps indicated on the home page to launch the relevant components instead of configuring additional information.
 
 In a distributed environment, FATEBoard needs to be deployed through cluster automated deployment script rather than individually, which you need to configure some information about the cluster, such as URL of FATEFlow, directory of log files, SSH information of each machine, etc. All the configuration information could be generated automatically using automated script deployment. If the information is not filled in correctly, it will not work properly.
 
@@ -22,13 +29,12 @@ you can launch a fateboard service by following steps.
    | server.port                               | port of fateboard         | 8080                                                         |
    | fateflow.url                              | the url of fate_flow node | none                                                         |
    | spring.datasource.driver-Class-Name       | driver for database       | com.mysql.cj.jdbc.Driver                                     |
-   | management.endpoints.web.exposure.include | endpoints for exposure    | *                                                            |
    | spring.http.encoding.charset              | code set for http         | UTF-8                                                        |
    | spring.http.encoding.enabled              | toggle for encoding       | true                                                         |
    | server.tomcat.uri-encoding                | code set for tomcat       | UTF-8                                                        |
-   | spring.datasource.url                     | url of database           | jdbc:mysql://localhost:3306/fate_flow?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8 |
-   | spring.datasource.username                | username of database      | none                                                         |
-   | spring.datasource.password                | password of database      | none                                                         |
+   | fateboard.datasource.jdbc-url                     | url of database           | jdbc:mysql://localhost:3306/fate_flow?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8 |
+   | fateboard.datasource.username                | username of database      | none                                                         |
+   | fateboard.datasource.password                | password of database      | none                                                         |
    | server.tomcat.max-threads                 | max threads of tomcat     | 1000                                                         |
    | server.tomcat.max-connections             | max connections of tomcat | 2000                                                         |
 
@@ -38,13 +44,12 @@ you can launch a fateboard service by following steps.
      server.port=8080
      fateflow.url=http://localhost:9380
      spring.datasource.driver-Class-Name=com.mysql.cj.jdbc.Driver
-     management.endpoints.web.exposure.include=*
      spring.http.encoding.charset=UTF-8
      spring.http.encoding.enabled=true
      server.tomcat.uri-encoding=UTF-8
-     spring.datasource.url=jdbc:mysql://localhost:3306/fate_flow?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
-     spring.datasource.username=fate_dev
-     spring.datasource.password=fate_dev
+     fateboard.datasource.jdbc-url=jdbc:mysql://localhost:3306/fate_flow?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
+     fateboard.datasource.username=fate_dev
+     fateboard.datasource.password=fate_dev
      server.tomcat.max-threads=1000
      server.tomcat.max-connections=20000
      ```
@@ -55,13 +60,12 @@ you can launch a fateboard service by following steps.
      server.port=8080
      fateflow.url=http://localhost:9380
      spring.datasource.driver-class-name=org.sqlite.JDBC
-     spring.datasource.url=jdbc:sqlite:/fate/fate_flow/fate_flow_sqlite.db
-     management.endpoints.web.exposure.include=*
+     fateboard.datasource.jdbc-url=jdbc:sqlite:/fate/fate_flow/fate_flow_sqlite.db
      spring.http.encoding.charset=UTF-8
      spring.http.encoding.enabled=true
      server.tomcat.uri-encoding=UTF-8
-     spring.datasource.username=
-     spring.datasource.password=
+     fateboard.datasource.username=
+     fateboard.datasource.password=
      server.tomcat.max-threads=1000
      server.tomcat.max-connections=20000
      ```
@@ -103,20 +107,25 @@ you can launch a fateboard service by following steps.
    | -DFATE_DEPLOY_PREFIX     | path of logs directory which produced by fate_flow |
 
    command example:
+   
+    NOTES: Please replace ${version} in command below with the real fateboard version you use.
 
    ```
-   java -Dspring.config.location=FATE/fateboard/src/main/resources/application.properties -DFATE_DEPLOY_PREFIX=FATE/logs/  -Dssh_config_file=FATE/fateboard/src/main/resources/  -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -jar FATE/fateboard/target/fateboard-1.3.0.jar  >/dev/null 2>&1 &
+   java -Dspring.config.location=FATE/fateboard/src/main/resources/application.properties -DFATE_DEPLOY_PREFIX=FATE/logs/  -Dssh_config_file=FATE/fateboard/src/main/resources/  -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -jar FATE/fateboard/target/fateboard-${version}.jar  >/dev/null 2>&1 &
    ```
-
 5. Stop the service
 
    Get the pid of fateboard:
+   
+   NOTES: Please replace ${version} in command below with the real fateboard version you use.
 
    ```
-   ps -ef|grep java|grep fateboard-1.3.0.jar|grep -v grep|awk '{print $2}'
+   ps -ef|grep java|grep fateboard-${version}.jar|grep -v grep|awk '{print $2}'
    ```
 
    kill the fateboard:
+   
+   NOTES: Please replace ${pid} in command below with the real pid you get.
 
    ```
    kill -9 ${pid}

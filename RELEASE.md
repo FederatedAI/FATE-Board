@@ -1,3 +1,19 @@
+# Release 1.4.0
+
+#### Major Features and Improvements
+- Add security check for file path of logs
+- Pearson correlation：support drawing a matrix graph by selecting different roles or features, or by interval filtering of correlation values. support sorting by the size of the correlation value.
+- Homo secureboost: new visualization of model ouput，including trees，feature importance、cross validation，etc.
+- GLM-stepwise：new visualization of stepwise from hetero LR，hetero LinLR and hetero poisson, including Model Fitting Statistics, Analysis of Effects, Analysis of Maximum Likelihood Estimates, and Analysis of Effect Eligible for Entry for each step, as well as for the summary.
+- Hetero LR, localbaseline: new visualization of one_vs_rest.
+- Show the best iteration version in model output.
+
+# Release 1.3.1
+
+#### Major Features and Improvements
+- Support the plugins
+
+
 # Release 1.3.0
 
 #### Major Features and Improvements

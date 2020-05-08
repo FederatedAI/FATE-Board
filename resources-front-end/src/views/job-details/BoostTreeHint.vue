@@ -1,19 +1,24 @@
 <template>
-  <div class="flex flex-row flex-center picker-container">
-    <el-tooltip
-      v-for="(item, index) in treeHint"
-      :key="index"
-      :content="toolTipContent(item)"
-      placement="top"
-      popper-class="for-tree"
-    >
-      <div
-        :class="{ 'each-item-choosed': currentChoose === index }"
-        :style="{ 'background-color': item.color, width: itemWidth, 'border': currentChoose===index ? '2px solid ' + border : '0px' }"
-        class="each-item"
-        @click.self="chooseItem(item, index)"
-      />
-    </el-tooltip>
+  <div class="flex picker-container">
+    <div class="flex flex-row flex-start picker-tip">
+      <div v-for="(item, index) in treeHint" :key="index" class="each-item-hint" />
+    </div>
+    <div class="flex flex-row flex-start picker-content">
+      <el-tooltip
+        v-for="(item, index) in treeHint"
+        :key="index"
+        :content="toolTipContent(item)"
+        placement="top"
+        popper-class="for-tree"
+      >
+        <div
+          :class="{ 'each-item-choosed': currentChoose === index }"
+          :style="{ 'background-color': item.color, width: itemWidth, 'border': currentChoose===index ? '2px solid ' + border : '0px' }"
+          class="each-item"
+          @click.self="chooseItem(item, index)"
+        />
+      </el-tooltip>
+    </div>
   </div>
 </template>
 
@@ -98,7 +103,17 @@ export default {
 	top: 0;
 	left: 0;
 	background: #e8e8ef;
+	overflow: auto;
+	flex-direction: column-reverse;
+	.picker-content {
+		height: 100%;
+	}
+	.picker-tip {
+		background-color: #ffffff;
+	}
 	.each-item {
+		max-width: 20px;
+		min-width: 15px;
 		height: 100%;
 		z-index: 5;
 		position: relative;
@@ -131,6 +146,16 @@ export default {
 			right: 0;
 			margin: auto;
 		}
+	}
+	.each-item-hint {
+		max-width: 20px;
+		min-width: 15px;
+		height: 15px;
+		padding-bottom: 6px;
+		z-index: 5;
+		position: relative;
+		margin: 0px 0.5px;
+		background-color: #ffffff;
 	}
 }
 .for-tree.el-tooltip__popper[x-placement^='top'].popper__arrow {

@@ -1,10 +1,11 @@
 const setScale = (el, binding) => {
+  const changeEl = el.children[0]
   const val = binding.value
   if (val.whole) {
-    el.style.transform = `scale(${val.x})`
+    changeEl.style.transform = `scale(${val.x})`
   } else {
-    const now = parseFloat(el.style.transform.replace('scale(', ''))
-    el.style.transform = `scale(${now + val.x})`
+    const now = parseFloat(changeEl.style.transform.replace('scale(', ''))
+    changeEl.style.transform = `scale(${now + val.x})`
   }
 }
 
@@ -29,6 +30,7 @@ const scaleFunction = function(el, deltaY) {
 
 export default {
   bind: el => {
+    const changeEl = el.children[0]
     el.onmousewheel = e => {
       e = e || window.event
       if (e.stopPropagation) {
@@ -41,7 +43,7 @@ export default {
       } else {
         e.returnValue = false
       }
-      scaleFunction(el, e.deltaY)
+      scaleFunction(changeEl, e.deltaY)
     }
   },
   update: setScale

@@ -1,26 +1,22 @@
 <template>
   <div class="app-container details-container bg-dark" @click="notePopover = false">
-
-    <h3 class="app-title">
-      <span class="text-primary pointer" @click="toPrevPage">{{ jobFrom }}</span> > {{ jobId }}
-    </h3>
+    <breadcrumb-ext :breads="breads"/>
 
     <div class="flex flex-row space-between app-content">
       <section class="section-wrapper prop-section">
-        <h3 class="section-title">JOB SUMMARY</h3>
-
-        <div v-loading="summaryLoading" class="section-view job-summary shadow section-summary">
+        <div v-loading="summaryLoading" class="section-view job-summary section-summary">
+          <h3 class="section-title">Job Summary</h3>
           <ul class="summary-items">
             <li>
-              <div class="prop">Job ID</div>
+              <div class="prop">job ID:</div>
               <p class="prop-content">{{ jobId }}</p>
             </li>
             <li>
-              <div class="prop">Status</div>
+              <div class="prop">status:</div>
               <p class="prop-content">{{ jobInfo.status }}</p>
             </li>
             <li style="position:relative;">
-              <div class="prop">Notes</div>
+              <div class="prop">notes:</div>
               <div class="prop-content notes-content">
                 <p id="notesP" :class="{'notes-content-fold': foldPForNote, 'notes-content-unfold': !foldPForNote}">{{ jobInfo.notes }}</p>
               </div>
@@ -30,15 +26,34 @@
               <hr class="hr-style">
             </li>
             <li class="inline-row">
-              <div class="prop inline-prop">Role</div>
+              <div class="prop inline-prop">role:</div>
               <p class="prop-content">{{ role }}</p>
             </li>
             <li class="inline-row">
-              <div class="prop inline-prop">Party_ID</div>
+              <div class="prop inline-prop">party_ID:</div>
               <p class="prop-content">{{ partyId }}</p>
             </li>
-            <li v-for="(item,index) in roleList" :key="index" class="inline-row">
-              <div class="prop inline-prop">{{ item.role }}</div>
+            <li class="inline-row" style="margin-bottom: 0px;">
+              <div class="prop inline-prop">dataset:</div>
+              <div class="flex flex-col flex-start prop-content prop-dataset">
+                <el-popover v-for="(item, index) in showingRoleList" :key="index" :content="item" :disabled="popover[index]" trigger="hover" placement="right" effect="light">
+                  <span slot="reference" :id="'spanPopOver' + index" class="prop-dataset-item">{{ item }}</span>
+                </el-popover>
+                <el-popover
+                  v-if="thisRoleList.length > 3"
+                  placement="right-start"
+                  title=""
+                  width="250"
+                  trigger="click">
+                  <div class="flex flex-col flex-start">
+                    <span v-for="(itemRole, indexRole) in thisRoleList" :key="indexRole" style="margin-bottom: 6px;">{{ itemRole }}</span>
+                  </div>
+                  <p slot="reference" class="text-primary tip" style="margin-bottom:12px;">more</p>
+                </el-popover>
+              </div>
+            </li>
+            <li v-for="(item,index) in otherRoleList" :key="index" class="inline-row">
+              <div class="prop inline-prop">{{ item.role.toLowerCase() + ':' }}</div>
               <div class="flex flex-center prop-content">
                 <p class="value">{{ item.datasetList.length }}</p>
                 <el-popover
@@ -65,7 +80,7 @@
                                 color: #7f7d8e;
                                 height: 18px;
                                 line-height: 18px;"
-                        >DATASET</p>
+                        >Dataset</p>
                         <!-- <p v-for="(dataset,index) in item.datasetList" :key="index">{{ dataset.dataset }}</p> -->
                       </el-col>
                     </el-row>
@@ -86,77 +101,60 @@
               <hr class="hr-style">
             </li>
             <li>
-              <div class="prop">Submission Time</div>
+              <div class="prop">submission time:</div>
               <p class="prop-content">{{ jobInfo.submmissionTime }}</p>
             </li>
             <li>
-              <div class="prop">Start Time</div>
+              <div class="prop">start time:</div>
               <p class="prop-content">{{ jobInfo.startTime }}</p>
             </li>
             <li>
-              <div class="prop">End Time</div>
+              <div class="prop">end time:</div>
               <p class="prop-content">{{ jobInfo.endTime }}</p>
             </li>
             <li>
-              <div class="prop">Duration</div>
+              <div class="prop">duration:</div>
               <p class="prop-content">{{ jobInfo.duration }}</p>
             </li>
           </ul>
+          <button class="dashboard-btn" @click="toDashboard">dashboard</button>
         </div>
       </section>
 
       <section class="section-wrapper echart-section">
-        <div class="flex space-between" style="align-items:flex-start">
-          <h3 class="section-title">OUTPUTS FROM JOB</h3>
-          <div class="flex flex-row flex-center" @click="$router.push({path:'/dashboard',query:{job_id:jobId,role,party_id:partyId}})">
-            <img src="@/icons/svg/dashboard_icon.svg" alt="">
-            <span class="dashboard-link">dashboard</span>
-          </div>
-        </div>
-        <div class="output-wrapper shadow flex">
+        <div class="output-wrapper flex flex-col">
+          <h3 class="section-title">Outputs From Job</h3>
           <!--DAG-->
-          <div class="dag-wrapper overflow-auto">
-            <h4 class="output-title">Main Graph</h4>
-            <p class="output-desc">Click component to view details</p>
-            <!--<div v-if="DAGData" :style="{'min-height':DAGData.component_list.length * 120+'px'}" class="echart-wrapper">-->
-            <div v-if="DAGData" class="echart-wrapper">
-              <!-- <echart-container
-                :class="'echarts'"
-                :options="graphOptions"
-                @getEchartInstance="getGraphEchartInstance"
-              /> -->
-              <dag ref="dagForJobFlow" :msg="DAGData" @click-progress="getDagInstance"/>
-              <div class="flex flex-col flex-center suitable-button">
-                <div class="sutiable-button-item item-suitable" @click="dagSuitable">
-                  <i class="el-icon-full-screen"/>
-                </div>
-                <div class="sutiable-button-item item-plus" @click="dagPlus">
-                  <i class="el-icon-plus"/>
-                </div>
-                <div class="sutiable-button-item item-minus" @click="dagMinus">
-                  <i class="el-icon-minus"/>
-                </div>
+          <div class="flex flex-row output-content">
+            <div class="dag-wrapper overflow-auto">
+              <div class="flex flex-row flex-center justift-center">
+                <h4 class="output-title">Main Graph</h4>
+                <p class="output-desc">Click component to view details</p>
+              </div>
+              <!--<div v-if="DAGData" :style="{'min-height':DAGData.component_list.length * 120+'px'}" class="echart-wrapper">-->
+              <div v-if="DAGData" class="echart-wrapper">
+                <dag ref="dagForJobFlow" :dag-info="DAGData" @choose="getDagInstance"/>
               </div>
             </div>
-          </div>
 
-          <div v-loading="paraLoading" class="para-wrapper flex flex-col flex-center">
-            <div class="flex flex-col flex-start para-warpper-content" style="width:100%;">
-              <h4 class="para-title">Parameter({{ parameterCount }})</h4>
-              <div v-loading="msgLoading" class="msg bg-dark">
-                <el-tree v-if="treeRefresh" ref="foldParameterTree" :data="paramList" :empty-text="''" :default-expand-all="treeUnfoldAll" :props="defaultPropsForTree" class="bg-dark"/>
-                <div v-if="paramList && paramList.length > 0" class="unfold-tree" @click.stop="unfoldAll">{{ treeUnfoldAll ? 'fold all' : 'unfold all' }}</div>
+            <div v-loading="paraLoading" class="para-wrapper flex flex-col space-between">
+              <div class="flex flex-col flex-start para-warpper-content" style="width:100%;">
+                <h4 class="para-title">Parameter({{ parameterCount }})</h4>
+                <div v-loading="msgLoading" class="msg bg-dark">
+                  <el-tree v-if="treeRefresh" ref="foldParameterTree" :data="paramList" :empty-text="''" :default-expand-all="treeUnfoldAll" :props="defaultPropsForTree" class="bg-dark"/>
+                  <div v-if="paramList && paramList.length > 0" class="unfold-tree" @click.stop="unfoldAll">{{ treeUnfoldAll ? 'fold all' : 'unfold all' }}</div>
+                </div>
               </div>
+              <el-button
+                :disabled="!componentName"
+                type="primary"
+                round
+                style="height: 32px;line-height: 0;font-size: 14px;border-radius: 2px;width:100%;"
+                @click="visualization"
+              >
+                view the outputs
+              </el-button>
             </div>
-            <el-button
-              :disabled="!componentName"
-              type="primary"
-              round
-              style="height: 32px;line-height: 0;font-size: 16px;"
-              @click="visualization"
-            >
-              view the outputs
-            </el-button>
           </div>
         </div>
       </section>
@@ -167,8 +165,9 @@
       :close-on-click-modal="false"
       :show-close="false"
       :fullscreen="fullscreen"
+      :modal-append-to-body="false"
       width="80%"
-      top="10vh"
+      top="70px"
       @close="initOutput"
     >
       <div class="dialog-icons flex flex-center">
@@ -201,9 +200,9 @@
       <section
         v-loading="metricLoading && modelLoading"
         id="sectionWrapperScroll"
-        :style="{height:fullscreen?'calc(100vh - 130px)':'70vh'}"
+        :style="{height:fullscreen?'calc(100vh - 130px)': 'calc(100% - 48px)'}"
         class="section-wrapper"
-        style="padding: 0 48px 48px;margin-bottom: 0;overflow: auto"
+        style="padding: 0 42px 24px 48px;margin-bottom: 0;overflow: auto;"
         @mousedown="scrollHoldChange=true"
         @mouseup="scrollHoldChange=false"
         @mousemove="sectionMove"
@@ -267,20 +266,21 @@ import graphOptions from '@/utils/chart-options/graph'
 import treeOptions from '@/utils/chart-options/tree'
 // import KSOptions from '@/utils/chart-options/KS'
 import doubleBarOptions from '@/utils/chart-options/doubleBar'
-import Dag from '@/components/Dag'
-import { measureText } from '@/utils/dag/basePath/text'
+import Dag from '@/components/CanvasComponent/flowDiagram'
+import BreadcrumbExt from '@/components/BreadcrumbExt'
 
 // import axios from 'axios'
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'JobDtails',
+  name: 'JobDetails',
   components: {
     EchartContainer,
     ModelOutput,
     DataOutput,
     IconHoverAndActive,
-    Dag
+    Dag,
+    BreadcrumbExt
   },
   data() {
     return {
@@ -337,7 +337,9 @@ export default {
       needRequest: 0,
       scrollTopPos: 0,
       refreshCheck: false,
-      scrollHoldChange: false
+      scrollHoldChange: false,
+      breads: [],
+      popover: []
     }
   },
   computed: {
@@ -346,7 +348,49 @@ export default {
       'metricTypeMap',
       'icons',
       'evaluationInstances'
-    ])
+    ]),
+    otherRoleList() {
+      const final = JSON.parse(JSON.stringify(this.roleList))
+      for (let i = 0; i < final.length; i++) {
+        if (this.role === final[i].role.toLowerCase()) {
+          final.splice(i, 1)
+          i--
+        }
+      }
+      return final
+    },
+    thisRoleList() {
+      const final = JSON.parse(JSON.stringify(this.roleList))
+      for (let i = 0; i < final.length; i++) {
+        if (this.role !== final[i].role.toLowerCase()) {
+          final.splice(i, 1)
+          i--
+        } else {
+          for (let j = 0; j < final[i].datasetList.length; j++) {
+            const val = final[i].datasetList[j]
+            if (val.name.toString() !== this.partyId) {
+              final[i].datasetList.splice(j, 1)
+              j--
+            }
+          }
+        }
+      }
+      const check = []
+      for (const val of final) {
+        for (const item of val.datasetList) {
+          check.push(item.dataset)
+        }
+      }
+      return check
+    },
+    showingRoleList() {
+      const final = JSON.parse(JSON.stringify(this.thisRoleList))
+      if (final.length <= 3) {
+        return final
+      } else {
+        return final.slice(0, 3)
+      }
+    }
   },
   mounted() {
     const para = {
@@ -359,10 +403,21 @@ export default {
       this.DAGData = res.data
     })
     this.timer = setInterval(() => {
-      this.getDatasetInfo()
-      getDAGDpencencies(para).then(res => {
-        this.DAGData = res.data
-      })
+      let finish = true
+      for (const item of this.DAGData.component_list) {
+        if (!item.status || !item.status.match(/success|failed/i)) {
+          finish = false
+          break
+        }
+      }
+      if (!this.jobInfo.status.match(/success|failed/i) || !finish) {
+        this.getDatasetInfo()
+        getDAGDpencencies(para).then(res => {
+          this.DAGData = res.data
+        })
+      } else {
+        clearInterval(this.timer)
+      }
     }, 5000)
   },
   updated() {
@@ -375,12 +430,39 @@ export default {
     this.closeWebsocket()
     clearInterval(this.timer)
   },
+  beforeMount() {
+    this.breads = [
+      { type: 'content', val: 'Job Overview', click: this.toHistory },
+      { type: 'content', val: 'Dashboard', click: this.toDashboard },
+      { type: 'content', val: 'Job detail' }
+    ]
+  },
   methods: {
+    toHistory() {
+      this.toPrevPage('history')
+    },
+    toDashboard() {
+      this.toPrevPage('dashboard')
+    },
+    shouldShowPopover(item, id) {
+      const ctx = document.getElementById('historyForDetail').getContext('2d')
+      for (let i = 0; i < this.showingRoleList.length; i++) {
+        const width = this.measureText(ctx, this.showingRoleList[i] || '', { font: (12 * 1.14) + 'px roboto_bold' }).width
+        const acWidth = parseInt(getComputedStyle(document.getElementById('spanPopOver' + i)).width.replace('px', ''))
+        this.popover[i] = acWidth > width
+      }
+    },
     notesHint() {
       const cvs = document.getElementById('historyForDetail').getContext('2d')
-      const width = measureText(cvs, this.jobInfo.notes || '', { size: 14, weight: 'bold' }).width
+      const width = this.measureText(cvs, this.jobInfo.notes || '', { size: 14, weight: 'bold' }).width
       const acWidth = parseInt(getComputedStyle(document.getElementById('notesP')).width.replace('px', ''))
       this.noteHint = width > (acWidth * 3) - 45
+    },
+    measureText(ctx, text, style) {
+      for (const key in style) {
+        ctx[key] = style[key]
+      }
+      return ctx.measureText(text)
     },
     getDatasetInfo(refresh = false) {
       const vm = this
@@ -425,17 +507,26 @@ export default {
           }
           this.$nextTick(() => {
             vm.notesHint()
+            vm.shouldShowPopover()
           })
         }
       })
     },
-    toPrevPage() {
+    toPrevPage(toPage) {
       // console.log(this.$route)
       let path = null
-      if (this.jobFrom === 'Job overview') {
-        path = '/history'
-      } else if (this.jobFrom === 'Dashboard') {
-        path = '/dashboard'
+      if (!toPage) {
+        if (this.jobFrom === 'Job overview') {
+          path = '/history'
+        } else if (this.jobFrom === 'Dashboard') {
+          path = '/dashboard'
+        }
+      } else {
+        if (toPage === 'history') {
+          path = './history'
+        } else {
+          path = './dashboard'
+        }
       }
       this.$router.push({
         path,
@@ -464,7 +555,7 @@ export default {
     },
 
     getDagInstance(data) {
-      if (data.model === this.modelNameMap.correlation) {
+      if (data.model === this.modelNameMap.correlation || data.model === this.modelNameMap.evaluation) {
         this.dataOutputShow = false
       } else {
         this.dataOutputShow = true
@@ -535,6 +626,11 @@ export default {
     },
     switchLogTab(tab) {
       this.currentTab = tab
+      if (tab === 'model') {
+        this.$nextTick(() => {
+          this.$refs.dialog.EchartInstancesResize()
+        })
+      }
       if (tab === 'data' && this.dataOutputHeader.length === 0) {
         this.getDataOutput(this.componentName)
       }
@@ -605,7 +701,7 @@ export default {
       const vm = this
       this.fullscreen = !this.fullscreen
       setTimeout(() => {
-        this.$refs.dialog.EchartInstancesResize()
+        vm.$refs.dialog.EchartInstancesResize()
       }, 100)
       this.$nextTick(() => {
         const m = vm.$refs['dialog']
@@ -749,6 +845,7 @@ export default {
                   const { metric_type, unit_name, curve_name, pair_type, thresholds } = meta
                   if (metric_type === this.metricTypeMap.RSA) {
                     this.modelOutputShowing = false
+                    this.dataOutputShow = false
                     this.switchLogTab('data')
                   } else if (metric_type) {
                     metricDataHandle({
@@ -764,7 +861,9 @@ export default {
                       unit_name,
                       curve_name,
                       pair_type,
-                      thresholds
+                      thresholds,
+                      role: this.role,
+                      party_id: this.partyId
                     })
                     vm.requested++
                   }
@@ -916,15 +1015,6 @@ export default {
       this.scrollTopPos = document.getElementById('sectionWrapperScroll').scrollTop
       this.refreshCheck = true
       this.visualization()
-    },
-    dagSuitable() {
-      this.$refs.dagForJobFlow.suitable()
-    },
-    dagPlus() {
-      this.$refs.dagForJobFlow.dagPlus()
-    },
-    dagMinus() {
-      this.$refs.dagForJobFlow.dagMinus()
     },
     unfoldAll() {
       const vm = this

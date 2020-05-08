@@ -2,6 +2,7 @@ import store from '@/store/modules/app'
 // import { deepClone, filterLineArr } from '@/utils'
 import { deepClone, formatFloat } from '@/utils'
 import evaluationOptions from '@/utils/chart-options/evaluation-curve'
+import stepwiseDataHandler from './stepwiseDataHandler'
 // import { colorRgb } from '../tools/color'
 
 const { metricTypeMap } = store.state
@@ -33,7 +34,7 @@ const curveAlphaColor = [
   '#77E3FF',
   '#FF5A5A'
 ]
-const hideColor = '#bbbbc8'
+const hideColor = '#999BA3'
 // const curveColor = ['#f00', '#0f0', '#00f', '#0088ff']
 const curveFormatter = (xName, yName, legendData, thresholdsArr = []) => {
   return (params) => {
@@ -73,7 +74,9 @@ export default function(
     curve_name,
     pair_type,
     modelSummaryData,
-    thresholds
+    thresholds,
+    role,
+    party_id
   }) {
   let type = ''
   let outputData = ''
@@ -179,6 +182,9 @@ export default function(
       }
     }
     outputData = deepClone(evaluationOptions)
+    if (metric_type === metricTypeMap.loss) {
+      outputData.xAxis.minInterval = 1
+    }
     outputData.xAxis.name = unit_name
     const seriesObj = {
       name: curve_name,
@@ -640,31 +646,39 @@ export default function(
               item.data.KSFormaterArr.forEach((ksObj, ksIndex) => {
                 if (item.legendData[ksIndex].isActive !== false) {
                   // console.log(thresholds, params[0])
+                  const listCheck = []
                   const thresholdValue = ksObj.thresholds[params[0].dataIndex]
-                  if (thresholdValue || thresholdValue === 0) {
-                    str += `Threshold: (${ksObj.pairType})${thresholdValue}<br>`
-                  }
-                  let ksflag = false
-                  let v1 = 0
-                  let v2 = 0
-                  params.forEach(obj => {
-                    if (obj.seriesType !== 'line' || obj.color !== hideColor) {
-                      if (obj.seriesName === ksObj.tpr) {
-                        // str += `Tpr(${ksObj.tpr}): ${obj.data[1]}<br>`
-                        str += `${ksObj.tpr}: ${obj.data[1]}<br>`
-                        v1 = obj.data[1]
-                        ksflag = true
-                      }
-                      if (obj.seriesName === ksObj.fpr) {
-                        // str += `Fpr(${ksObj.fpr}): ${obj.data[1]}<br>`
-                        str += `${ksObj.fpr}: ${obj.data[1]}<br>`
-                        v2 = obj.data[1]
+                  if ((thresholdValue || thresholdValue === 0)) {
+                    for (const val of params) {
+                      if (val.seriesName.match(ksObj.pairType)) {
+                        listCheck.push(val)
                       }
                     }
-                  })
-                  if (ksflag) {
-                    const ks = Math.abs(v1 - v2)
-                    str += `KS: ${formatFloat(ks)}<br>`
+                    if (listCheck[0].color !== hideColor) {
+                      str += `Threshold: (${ksObj.pairType})${thresholdValue}<br>`
+                      let ksflag = false
+                      let v1 = 0
+                      let v2 = 0
+                      listCheck.forEach(obj => {
+                        if (obj.seriesType !== 'line' || obj.color !== hideColor) {
+                          if (obj.seriesName === ksObj.tpr) {
+                            // str += `Tpr(${ksObj.tpr}): ${obj.data[1]}<br>`
+                            str += `${ksObj.tpr}: ${obj.data[1]}<br>`
+                            v1 = obj.data[1]
+                            ksflag = true
+                          }
+                          if (obj.seriesName === ksObj.fpr) {
+                            // str += `Fpr(${ksObj.fpr}): ${obj.data[1]}<br>`
+                            str += `${ksObj.fpr}: ${obj.data[1]}<br>`
+                            v2 = obj.data[1]
+                          }
+                        }
+                      })
+                      if (ksflag) {
+                        const ks = v1 - v2
+                        str += `KS: ${formatFloat(ks)}<br>`
+                      }
+                    }
                   }
                 }
               })
@@ -798,11 +812,35 @@ export default function(
   } else if (metric_type === metricTypeMap.Upload || metric_type === metricTypeMap.Download) {
     type = 'text'
     outputData = `${data[0][0]}: ${data[0][1]}`
+  } else if (metric_type === metricTypeMap.Stepwise) {
+    type = 'stepwise'
+    let has = false
+    // let index = 0
+    let original = { steps: [], summary: { tables: [] }}
+    for (let i = 0; i < metricOutputList.length; i++) {
+      if (metricOutputList[i].type === type) {
+        has = true
+        original = metricOutputList[i].data
+        // index = i
+        break
+      }
+    }
+    if (!has) {
+      metricOutputList.push({
+        type,
+        nameSpace: metric_namespace,
+        data: original,
+        scaleMethod
+      })
+    }
+    stepwiseDataHandler(original, data, meta, role, party_id)
   }
-  metricOutputList.push({
-    type,
-    nameSpace: metric_namespace,
-    data: outputData,
-    scaleMethod
-  })
+  if (metric_type !== metricTypeMap.Stepwise) {
+    metricOutputList.push({
+      type,
+      nameSpace: metric_namespace,
+      data: outputData,
+      scaleMethod
+    })
+  }
 }
