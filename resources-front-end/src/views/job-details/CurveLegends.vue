@@ -1,18 +1,17 @@
 <template>
   <div v-if="showing">
     <div v-show="hidden">
-      <ul class="flex flex-row justify-center">
+      <ul class="flex flex-row flex-center">
         <li v-for="(item, index) in briefLegends" :key="index">
           <template v-if="item && item.legend">
-            <div class="flex flex-col flex-center line-hint">
+            <div class="flex flex-col line-hint">
               <div
                 v-for="(color, i) in item.legend"
                 :key="i"
                 class="flex flex-row flex-center basic-choose"
                 @click.stop="chooseOne(item)"
               >
-                <span :style="'background-color:' + color.color + ';'" class="hint-color" />
-                <span :style="'color:' + color.color + ';'" class="hint-text">{{ color.text }}</span>
+                <span :style="'background-color:' + color.color + ';color: #ffffff;'" class="hint-text">{{ color.text }}</span>
               </div>
             </div>
           </template>
@@ -52,15 +51,14 @@
       <div class="flex flex-row flex-wrap flex-start detail-content">
         <div v-for="(item, index) in showingLegends" :key="index" class="detail-item">
           <template v-if="item && item.legend">
-            <div class="flex flex-col flex-center line-hint-detail">
+            <div class="flex flex-col line-hint-detail">
               <div
                 v-for="(color, i) in item.legend"
                 :key="i"
                 class="flex flex-row flex-center basic-choose"
                 @click.stop="chooseOne(item)"
               >
-                <span :style="'background-color:' + color.color + ';'" class="hint-color-detail" />
-                <span :style="'color:' + color.color + ';'" class="hint-text-deltail">{{ color.text }}</span>
+                <span :style="'background-color:' + color.color + ';color: #ffffff;'" class="hint-text-detail">{{ color.text }}</span>
               </div>
             </div>
           </template>
@@ -483,7 +481,7 @@ export default {
 
 <style scoped lang="scss">
 .line-hint {
-	margin-right: 20px;
+	margin-right: 12px;
 	.hint-color {
 		width: 10px;
 		height: 10px;
@@ -502,8 +500,25 @@ export default {
 }
 
 .basic-choose {
-	cursor: pointer;
-	padding: 2.5px 0px;
+  cursor: pointer;
+  .hint-text {
+    height: 18px;
+    line-height: 14px;
+    color: #6A6C75;
+    background-color: #EBEDF0;
+    padding: 2px 8px;
+    font-size: 12px;
+    border-radius: 2px;
+  }
+  .hint-text-detail {
+    height: 18px;
+    line-height: 14px;
+    color: #6A6C75;
+    background-color: #EBEDF0;
+    padding: 2px 8px;
+    font-size: 12px;
+    border-radius: 2px;
+  }
 }
 
 .detail-choose-dialog {
@@ -518,7 +533,7 @@ export default {
 			.title-hint-content {
 				font-size: 110%;
 				font-weight: 700;
-				margin: 0px 10px 0px 20px;
+				margin: 0px 15px 0px 5px;
 				.content-font {
 					color: #494ece;
 				}
@@ -543,9 +558,7 @@ export default {
 					margin-right: 5px;
 				}
 				.basic-choose {
-					border-radius: 20px;
-					background-color: #f8f8fa;
-					padding: 2px 10px;
+					padding: 2px 5px;
 					margin: 1px 0px;
 				}
 			}

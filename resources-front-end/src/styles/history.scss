@@ -4,26 +4,22 @@ $deep-purple: #534c77;
 $primary: #494ece;
 $common-bg: #f8f8fa;
 $link: #409eff;
+
 .history-container {
-  /*padding-top: 40px;*/
-  .table-wrapper {
-    /*height: 70vh;*/
-    border-radius: 4px;
-    margin-bottom: 20px;
-    .notes-showing {
-      display: block;
-      max-width: 60%;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-      padding-right: 5px;
-    }
-    .notes-editor {
-      width: 60%;
-    }
+  height: 100%;
+  .history-title {
+    height: 24px;
+    padding: 0px 12px;
+    margin-bottom: 12px;
+
+    background-color: #EBEDF0;
+
+    font-size: 12px;
+    color: #3145A6;
   }
+
   .tool-bar {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     .tool-item {
       display: flex;
       align-items: center;
@@ -34,32 +30,91 @@ $link: #409eff;
         color: $dark-gray;
         font-weight: bold;
       }
+      .el-select__tags {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow: hidden;
+      }
     }
   }
+
+  .table-wrapper {
+    border-radius: 4px;
+    height: calc(100% - 72px);
+
+    .notes-showing {
+      display: block;
+      max-width: 60%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      padding-right: 5px;
+    }
+
+    .notes-editor {
+      width: 120px;
+    }
+
+    .between-line {
+      background-color: #FAFBFC;
+    }
+  }
+  
   .t-header {
-    height: 52px;
-    color: $dark-gray;
+    height: 67px;
+    color: #4159D1;
     font-size: 16px;
     font-weight: bold;
     text-align: left;
   }
   .t-row {
-    height: 56px;
-    font-size: 16px;
+    height: 48px;
+    font-size: 14px;
     color: $dark-gray;
-  }
-  .el-table {
-    padding: 0 30px;
   }
   .el-table th{
     padding: 0;
   }
+  .el-table td {
+    border-bottom: 0px;
+  }
+  .el-table .cell {
+    padding-left: 24px;
+  }
   .el-input input{
     width: 120px;
-    height: 30px;
+    height: 24px;
+    border-radius: 2px;
+    border: 2px solid #EBEDF0;
+    .el-input__icon {
+      line-height: 24px;
+    }
   }
+  .el-select__tags {
+    border-radius: 2px;
+    height: 16px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+  .el-tag {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 2px;
+    height: 16px;
+    margin-right: 2px;
+    .el-select__tags-text {
+      line-height: 16px;
+    }
+    .el-tag__close {
+      line-height: 16px;
+      margin-top: 0px;
+    }
+  }
+}
   .el-select__caret {
-    line-height: 30px;
+    line-height: 24px;
   }
   .el-table .history-stripe {
     background: #ededfa;

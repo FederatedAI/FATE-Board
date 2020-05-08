@@ -52,6 +52,9 @@ export default {
   },
   xAxis: {
     type: 'value',
+    splitLine: {
+      show: false
+    },
     axisTick: {
       alignWithLabel: true
     },
@@ -63,7 +66,13 @@ export default {
   },
   yAxis: {
     type: 'value',
-    name: ''
+    name: '',
+    splitArea: {
+      show: true,
+      areaStyle: {
+        color: ['#ffffff']
+      }
+    }
   },
   series: [
     // {

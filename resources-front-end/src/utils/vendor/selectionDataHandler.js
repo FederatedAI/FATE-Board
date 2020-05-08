@@ -1,6 +1,6 @@
 import { formatFloat } from '../index'
 
-export default function(data) {
+export default function(data, partyId) {
   if (!data || Object.keys(data).length === 0) {
     return
   }
@@ -25,9 +25,10 @@ export default function(data) {
   // })
   hostColNames.forEach(item => {
     const final = []
-    const finalHeader = [{ prop: 'variable', label: 'variable' }]
-    item.colNames.forEach(variable => {
-      final.push({ variable })
+    const finalHeader = [{ prop: 'anony', label: 'variable' }]
+    item.colNames.forEach((variable) => {
+      const index = variable.match(/[0-9]+$/)[0]
+      final.push({ variable, anony: 'host_' + (item.partyId || index) + '_' + index })
     })
     hostBody.push(final)
     hostHeader.push(finalHeader)
@@ -52,7 +53,7 @@ export default function(data) {
       }
       for (let i = 0; i < data.header.length; i++) {
         if (data.header[i] === variable) {
-          guestBody[index].binding = i
+          guestBody[index].binding = 'host_' + partyId + '_' + i
           break
         }
       }

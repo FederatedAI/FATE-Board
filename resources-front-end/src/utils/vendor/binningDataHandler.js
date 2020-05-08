@@ -1,32 +1,40 @@
 import { formatFloat, deepClone } from '../index'
 import stackBarOptions from '@/utils/chart-options/stackBar'
 
-export default function(data, header, type, partyId, role) {
+function formatFloatWithDefault(num, role) {
+  if (role === 'host') {
+    return formatFloat(num) || '-'
+  } else {
+    return formatFloat(num)
+  }
+}
+
+export default function(data, header, type, partyId, role, Currentrole) {
   if (data && Object.keys(data).length > 0) {
     const sourceData = []
     const options = []
     const variableData = {}
     const stackBarData = {}
     const woeData = {}
-    Object.keys(data).forEach(key => {
+    for (const key in data) {
       const tableData = []
       let min = -9999
       const formatterArr = []
       const iterationArr = data[key].ivArray.length > 0 ? data[key].ivArray : data[key].splitPoints
       iterationArr.forEach((item, index, self) => {
-        let point = data[key].splitPoints[index]
+        let point = formatFloat(data[key].splitPoints[index])
         if (!point && point !== 0) {
-          point = data[key].splitPoints[index - 1]
+          point = formatFloat(data[key].splitPoints[index - 1])
         }
-        let binning = '-'
+        let binning = 'bin_' + index
         let formatterBinning = '-'
-        if (point || point === 0) {
+        if ((point || point === 0) && !(Currentrole === 'guest' && type === 'host')) {
           if (min === -9999) {
             binning = `${key} <= ${point}`
             formatterBinning = `(-∞,${point}]`
           } else if (index === self.length - 1) {
-            binning = `${key} > ${point}`
-            formatterBinning = `(${point},+∞)`
+            binning = `${key} > ${min}`
+            formatterBinning = `(${min}, +∞)`
           } else {
             binning = `${min} < ${key} <= ${point}`
             formatterBinning = `(${min},${point}]`
@@ -35,20 +43,21 @@ export default function(data, header, type, partyId, role) {
         }
         tableData.push({
           binning,
-          event_count: data[key].eventCountArray[index] || '0',
-          event_ratio: formatFloat(data[key].eventRateArray[index]),
-          non_event_count: data[key].nonEventCountArray[index] || '0',
-          non_event_ratio: formatFloat(data[key].nonEventRateArray[index]),
-          woe: formatFloat(data[key].woeArray[index]),
-          iv: formatFloat(data[key].ivArray[index])
+          'anonym in guest': 'bin_' + index,
+          event_count: formatFloatWithDefault(data[key].eventCountArray[index], Currentrole),
+          event_ratio: formatFloatWithDefault(data[key].eventRateArray[index], Currentrole),
+          non_event_count: formatFloatWithDefault(data[key].nonEventCountArray[index], Currentrole),
+          non_event_ratio: formatFloatWithDefault(data[key].nonEventRateArray[index], Currentrole),
+          woe: formatFloatWithDefault(data[key].woeArray[index], Currentrole),
+          iv: formatFloatWithDefault(data[key].ivArray[index], Currentrole)
         })
         formatterArr.push({
           formatterBinning,
-          event_count: data[key].eventCountArray[index] || '0',
-          event_ratio: formatFloat(data[key].eventRateArray[index]),
-          non_event_count: data[key].nonEventCountArray[index] || '0',
-          non_event_ratio: formatFloat(data[key].nonEventRateArray[index]),
-          woe: formatFloat(data[key].woeArray[index])
+          event_count: formatFloatWithDefault(data[key].eventCountArray[index], Currentrole),
+          event_ratio: formatFloatWithDefault(data[key].eventRateArray[index], Currentrole),
+          non_event_count: formatFloatWithDefault(data[key].nonEventCountArray[index], Currentrole),
+          non_event_ratio: formatFloatWithDefault(data[key].nonEventRateArray[index], Currentrole),
+          woe: formatFloatWithDefault(data[key].woeArray[index], Currentrole)
         })
       })
       variableData[key] = tableData
@@ -56,9 +65,17 @@ export default function(data, header, type, partyId, role) {
       const woeOptions = deepClone(stackBarOptions)
       eventOptions.tooltip.formatter = (params) => {
         const obj = formatterArr[params[0].dataIndex]
-        return `${obj.formatterBinning}<br>Event Count: ${obj.event_count}<br>
-                Event Ratio: ${obj.event_ratio}<br>Non-Event Count: ${obj.non_event_count}<br>
-                Non-Event Ratio: ${obj.non_event_ratio}<br>`
+        let str = `${obj.formatterBinning}<br>`
+        for (const val of params) {
+          if (val.seriesName === 'event count') {
+            str += `Event Count: ${obj.event_count}<br>
+            Event Ratio: ${obj.event_ratio}<br>`
+          } else if (val.seriesName === 'non-event count') {
+            str += `Non-Event Count: ${obj.non_event_count}<br>
+            Non-Event Ratio: ${obj.non_event_ratio}<br>`
+          }
+        }
+        return str
       }
       woeOptions.tooltip.trigger = 'item'
       woeOptions.tooltip.formatter = (params) => {
@@ -69,16 +86,24 @@ export default function(data, header, type, partyId, role) {
         name: 'event count',
         type: 'bar',
         data: data[key].eventCountArray,
-        stack: 'event'
-        // barWidth: '20%',
+        stack: 'event',
+        barMinWidth: '12',
+        barMaxWidth: '15',
+        itemStyle: {
+          color: '#4159D1'
+        }
       })
 
       eventOptions.series.push({
         name: 'non-event count',
         type: 'bar',
         data: data[key].nonEventCountArray,
-        stack: 'event'
-        // barWidth: '20%',
+        stack: 'event',
+        barMinWidth: '12',
+        barMaxWidth: '15',
+        itemStyle: {
+          color: '#0EC7A5'
+        }
       })
       for (let i = 1; i <= data[key].eventCountArray.length; i++) {
         eventOptions.xAxis.data.push(i)
@@ -89,8 +114,12 @@ export default function(data, header, type, partyId, role) {
       woeOptions.series.push({
         name: 'woe',
         type: 'bar',
-        data: data[key].woeArray
-        // barWidth: '20%',
+        data: data[key].woeArray,
+        barMinWidth: '12',
+        barMaxWidth: '15',
+        itemStyle: {
+          color: '#4159D1'
+        }
       })
       woeOptions.series.push({
         // name: 'woe ',
@@ -98,12 +127,28 @@ export default function(data, header, type, partyId, role) {
         tooltip: {
           show: false
         },
-        data: data[key].woeArray
+        data: data[key].woeArray,
         // barWidth: '20%',
+        lineStyle: {
+          color: '#0EC7A5'
+        }
       })
       woeData[key] = woeOptions
       sourceData.push({
-        variable: key,
+        variable: (() => {
+          if (Currentrole === role) {
+            return key
+          } else {
+            return role + '_' + partyId + '_' + key.match(/[0-9]+/)[0]
+          }
+        })(),
+        anonymInGuest: (() => {
+          if (Currentrole === role) {
+            return role + '_' + partyId + '_' + key.match(/[0-9]+/)[0]
+          } else {
+            return key
+          }
+        })(),
         iv: formatFloat(data[key].iv),
         // woe: data[key].woe,
         binding: (() => {
@@ -121,8 +166,28 @@ export default function(data, header, type, partyId, role) {
       })
       options.push({
         value: key,
-        label: key
+        label: (() => {
+          if (Currentrole === role) {
+            return key
+          } else {
+            return role + '_' + partyId + '_' + key.match(/[0-9]+/)[0]
+          }
+        })()
       })
+    }
+    sourceData.sort((a, b) => {
+      if (parseInt(a.variable.match(/[0-9]+$/)[0]) > parseInt(b.variable.match(/[0-9]+$/)[0])) {
+        return 1
+      } else {
+        return -1
+      }
+    })
+    options.sort((a, b) => {
+      if (parseInt(a.value.match(/[0-9]+$/)[0]) > parseInt(b.value.match(/[0-9]+$/)[0])) {
+        return 1
+      } else {
+        return -1
+      }
     })
     return {
       sourceData,

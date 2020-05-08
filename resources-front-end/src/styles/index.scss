@@ -2,52 +2,54 @@
 @import './mixin.scss';
 @import './transition.scss';
 @import './element-ui.scss';
-//@import './running.scss';
-//@import './bootstrap/bootstrap.scss';
 
-$primary: #409eff;
-$primary: #494ece;
-body {
-  height: 100%;
-  margin: 0;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  font-size: 14px;
-  //font-family: BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  font-family: "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
-  //font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
-}
-pre{
-  font-family: "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
-}
-label {
-  font-weight: 700;
-}
+@import './common/color.scss';
 
-html {
-  height: 100%;
-  box-sizing: border-box;
-}
+//import font ttf files
+@import './common/font/font_import.scss';
+
+$primary: #4159D1;
 
 * {
   padding: 0;
   margin: 0;
   //font-size: 16px;
 }
-
 *::-webkit-scrollbar {
   background-color: #E8E8EF;
   width: 6px;
   height: 6px;
   border-radius: 3px;
 }
-
 *::-webkit-scrollbar-thumb {
   background: #BBBBC8;
   width: 6px;
   height: 6px;
   border-radius: 3px;
+}
+
+html {
+  height: 100%;
+  box-sizing: border-box;
+}
+body {
+  height: 100%;
+  margin: 0;
+
+  // font-basic
+  font-size: 14px;
+  text-rendering: optimizeLegibility;
+  font-family: "roboto_regular", "roboto_bold", "roboto_medium", "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  
+  background-color: $gray-light;
+}
+pre{
+  font-family: "roboto_regular", "roboto_bold", "roboto_medium", "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
+}
+label {
+  font-weight: 700;
 }
 
 #app {
@@ -269,4 +271,13 @@ ul, ol {
 }
 .common-cell{
   background: #0f0;
+}
+
+.el-dialog {
+  border-radius: 0px;
+  box-shadow: none;
+}
+
+.el-message {
+  z-index: 4000 !important;
 }
