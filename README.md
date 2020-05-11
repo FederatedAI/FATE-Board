@@ -18,7 +18,7 @@ The default database for FATE-Board for cluster version is mysql. If you want to
 
 spring.datasource.driver-Class-Name=org.sqlite.JDBC 
 
-fateboard.datasource.url=xxx 
+fateboard.datasource.jdbc-url=xxx 
 
 fateboard.datasource.username= 
 
