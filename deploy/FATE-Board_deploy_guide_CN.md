@@ -2,6 +2,8 @@
 
 #                      **FATE-Board 部署指导**
 
+**DOC|[English](./FATE-Board_deploy_guide_EN.md)**
+
 # 服务器配置
 
 | 服务器   |                                              |

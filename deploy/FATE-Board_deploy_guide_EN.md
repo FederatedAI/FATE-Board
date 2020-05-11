@@ -2,7 +2,9 @@
 
 #                      **FATE-Board deployment Guide**
 
-- Install FATE-Board [Chinese guide](./FATE-Board_deploy_guide_CN.md) 
+
+**DOC|[中文](./FATE-Board_deploy_guide_CN.md)**
+
 
   
 

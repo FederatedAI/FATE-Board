@@ -17,7 +17,7 @@ FATE-Board是联邦学习建模的可视化工具，旨在帮助用户简单而�
 集群版本FATE-Board默认的数据库是mysql，如果你使用单机版FATE-Board，那么你需要用sqlite数据库。只要用sqlite参数更新这个文件：FATE-Board/src/main/resources/application.properties。你需要更新的参数如下：
 spring.datasource.driver-Class-Name=org.sqlite.JDBC 
 
-fateboard.datasource.url=xxx 
+fateboard.datasource.jdbc-url=xxx 
 
 fateboard.datasource.username= 
 
