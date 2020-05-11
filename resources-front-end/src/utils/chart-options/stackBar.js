@@ -1,4 +1,5 @@
 export default {
+  backgroundColor: '#EBEDF0',
   title: {
     text: ''
   },
@@ -24,7 +25,7 @@ export default {
     containLabel: true
   },
   yAxis: {
-    type: 'value'
+    type: 'value',
     // axisTick: {
     //   show: false
     // },
@@ -37,11 +38,17 @@ export default {
     // splitLine: {
     //   show: false
     // }
+    splitArea: {
+      show: true,
+      areaStyle: {
+        color: '#ffffff'
+      }
+    }
   },
   xAxis: {
     type: 'category',
     // data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    data: []
+    data: [],
     // axisTick: {
     //   show: false
     // },
@@ -54,6 +61,11 @@ export default {
     // splitLine: {
     //   show: false
     // }
+    axisLine: {
+      lineStyle: {
+        color: '#A9A9A9'
+      }
+    }
   },
   series: [
     // {

@@ -137,7 +137,7 @@ public class JobDetailController {
             e.printStackTrace();
             return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
         }
-        if(StringUtils.isEmpty(result)){
+        if (StringUtils.isEmpty(result)) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
 
         }
@@ -174,7 +174,7 @@ public class JobDetailController {
             e.printStackTrace();
             return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
         }
-        if ((result == null) || (result == "")) {
+        if ((result == null) || ("".equals(result))) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
         }
 

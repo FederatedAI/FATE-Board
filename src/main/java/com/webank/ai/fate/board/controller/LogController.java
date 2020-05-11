@@ -83,33 +83,37 @@ public class LogController {
                                        @PathVariable String type,
                                        @PathVariable String role,
                                        @PathVariable String partyId
-    ) throws Exception {
+    ) {
 
         ResponseResult responseResult = new ResponseResult();
         responseResult.setData(0);
-        String filePath = logFileService.buildFilePath(jobId, componentId, type, role, partyId);
-        Preconditions.checkArgument(StringUtils.isNotEmpty(filePath));
-        if (LogFileService.checkFileIsExist(filePath)) {
-            Integer count = LogFileService.getLocalFileLineCount(new File(filePath));
-            responseResult.setData(count);
-        } else {
-            String ip = logFileService.getJobTaskInfo(jobId, componentId, role, partyId).ip;
-            String localIp = GetSystemInfo.getLocalIp();
-            if (logger.isDebugEnabled()) {
-                logger.debug("local ip {} remote ip {}", localIp, ip);
-            }
-            if (localIp.equals(ip) || "0.0.0.0".equals(ip) || "127.0.0.1".equals(ip)) {
-                return responseResult;
-            }
-            logFileService.checkSshInfo(ip);
-            SshInfo sshInfo = this.sshService.getSSHInfo(ip);
-            try {
+        try {
+            String filePath = logFileService.buildFilePath(jobId, componentId, type, role, partyId);
+            Preconditions.checkArgument(StringUtils.isNotEmpty(filePath));
+            if (LogFileService.checkFileIsExist(filePath)) {
+                Integer count = LogFileService.getLocalFileLineCount(new File(filePath));
+                responseResult.setData(count);
+            } else {
+                String ip = logFileService.getJobTaskInfo(jobId, componentId, role, partyId).ip;
+                String localIp = GetSystemInfo.getLocalIp();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("local ip {} remote ip {}", localIp, ip);
+                }
+                if (localIp.equals(ip) || "0.0.0.0".equals(ip) || "127.0.0.1".equals(ip)) {
+                    return responseResult;
+                }
+                logFileService.checkSshInfo(ip);
+                SshInfo sshInfo = this.sshService.getSSHInfo(ip);
+
                 Integer count = logFileService.getRemoteFileLineCount(sshInfo, filePath);
                 responseResult.setData(count);
-            } catch (Exception e) {
-                responseResult.setData(0);
+
             }
+        } catch (Exception e) {
+            logger.error("query log size error", e);
+            responseResult.setData(0);
         }
+
         return responseResult;
     }
 

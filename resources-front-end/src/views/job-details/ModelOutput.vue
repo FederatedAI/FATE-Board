@@ -3,7 +3,7 @@
   <section>
     <div v-if="isNoMetricOutput && isNoModelOutput" class="no-data">No data</div>
     <ul>
-      <li v-for="(output,index) in metricOutputList" :key="index">
+      <li v-for="(output,index) in filterForSpecialData" :key="index">
         <div v-if="output.type==='text'" class="flex">
           <p class="model-text" v-html="output.data"/>
         </div>
@@ -21,7 +21,7 @@
           >
             <template slot="form">
               <div v-if="modelOutputType === modelNameMap.sample" class="flex flex-row flex-start flex-center">
-                <el-select v-model="sampleSelection" :clearable="true" placeholder="请选择label">
+                <el-select v-model="sampleSelection" :clearable="true" size="small" placeholder="请选择label">
                   <el-option v-for="(data,index) in sampleLabels(output.data.tBody)" :key="index" :label="data.label" :value="data.value"/>
                 </el-select>
               </div>
@@ -30,18 +30,19 @@
         </div>
       </li>
     </ul>
-    <div v-if="modelOutputType && modelOutput && !isNoModelOutput" class="line-height-between">
+    <div v-if="checkForModelDisplay" class="line-height-between">
       <!--boost-->
-      <div v-if="modelOutputType===modelNameMap.boost">
+      <div v-if="modelOutputType===modelNameMap.boost || modelOutputType===modelNameMap.homoBoost">
         <!--<pre class="boost-json"> {{ modelOutput.formatString }} </pre>-->
+        <p v-if="bestIterationCheck" class="model-text model-text-big" style="color: #3e4052;font-family: 'Roboto';font-weight: bold;margin-bottom: 12px;">The final model: iter {{ modelOutput.bestIteration }}</p>
         <div class="boost-wrapper">
           <div class="boost-top flex flex-center space-between">
             <!--top-left-->
             <div class="flex flex-center">
-              <span class="boost-text">Tree</span>
+              <span class="boost-text h3-style">Tree</span>
               <div>
                 <span v-if="modelOutput.classOptions">label_index: </span>
-                <el-select v-if="modelOutput.classOptions" v-model="treesValue" @change="changeBoostTrees">
+                <el-select v-if="modelOutput.classOptions" v-model="treesValue" size="small" @change="changeBoostTrees">
                   <el-option
                     v-for="item in modelOutput.classOptions"
                     :key="item.value"
@@ -52,15 +53,6 @@
             </div>
             <!--top-right-->
             <div class="flex flex-center">
-              <!--query-->
-              <el-input
-                v-model="treeId"
-                type="text"
-                placeholder="tree Id"
-                class="query"
-                @keyup.enter.native="enterTreeId">
-                <img slot="suffix" :src="icons.normal.query" alt="" class="icon-query" @click="enterTreeId">
-              </el-input>
               <div v-show="isTreeBtnLikeLine" class="spectrum-wrapper flex flex-center">
                 <span>tree size: max</span>
                 <span
@@ -68,6 +60,16 @@
                   class="spectrum-bar"/>
                 <span>min</span>
               </div>
+              <!--query-->
+              <el-input
+                v-model="treeId"
+                type="text"
+                placeholder="tree Id"
+                class="query"
+                size="small"
+                @keyup.enter.native="enterTreeId">
+                <img slot="suffix" :src="icons.normal.query" alt="" class="icon-query" @click="enterTreeId">
+              </el-input>
               <icon-hover-and-active
                 :class-name="'boost-switch-btn'"
                 :default-url="isTreeBtnLikeLine?icons.normal['tree-line']:icons.normal['tree-spectrum']"
@@ -88,14 +90,14 @@
             <span class="boost-text">Tree ID: {{ modelOutput.currentTreeData.id }}</span>
             <span class="boost-text">Tree Size: {{ modelOutput.currentTreeData.size }}</span>
           </div>
-          <div class="tree-container pos-r overflow-hidden">
-            <div v-drag="treeSuitables" v-scale="treeScale" ref="forTreePic" :style="calcTreeSize" class="pos-a" style="">
+          <div v-drag="treeSuitables" v-scale="treeScale" class="tree-container box-border pos-r overflow-hidden">
+            <div ref="forTreePic" :style="calcTreeSize" class="pos-a" style="">
               <echart-container
                 :class="['w-100','h-100']"
                 :options="treeStuffOptions"
                 @getEchartInstance="getTreeInstance"/>
             </div>
-            <div class="flex flex-col flex-center suitable-button">
+            <div class="flex flex-col flex-center suitable-button" style="margin-left:20px">
               <div class="sutiable-button-item item-suitable" @click="treeSuitable">
                 <i class="el-icon-full-screen"/>
               </div>
@@ -110,12 +112,12 @@
         </div>
         <!--variable importance-->
         <div v-if="modelOutput.variableImportanceOptions" class="boost-wrapper" style="position:relative;">
-          <div class="variable-importance-wrapper" style="overflow-x:hidden;">
-            <div class="flex flex-row space-between">
-              <h3 class="feature-title">Feature Importance</h3>
-              <div v-if="role==='guest' && featureSelectedColors.length > 0" class="flex flex-end flex-center feature-check">
-                <el-checkbox v-model="featureGuest" label="guest" @change="featureSelectedChange">guest</el-checkbox>
-                <el-checkbox v-model="featureHost" label="host" @change="featureSelectedChange">host</el-checkbox>
+          <div class="flex flex-col variable-importance-wrapper" style="overflow:hidden;">
+            <div class="flex flex-row space-between" style="margin-bottom:24px">
+              <h3 class="feature-title h3-style">Feature Importance</h3>
+              <div v-if="(role==='guest' && featureSelectedColors.length > 0) && modelOutputType !== modelNameMap.homoBoost" class="flex flex-end flex-center feature-check">
+                <el-checkbox v-model="featureGuest" label="guest" size="small" @change="featureSelectedChange">guest</el-checkbox>
+                <el-checkbox v-model="featureHost" label="host" size="small" @change="featureSelectedChange">host</el-checkbox>
                 <span class="feature-select" @click.stop="hiddenFeatreSelected">select</span>
                 <div v-show="!featureHidden" class="flex flex-col flex-center feature-detail-choose-dialog">
                   <div class="flex flex-row flex-center space-between feature-detail-title" @click.stop>
@@ -134,8 +136,7 @@
                   </div>
                   <div class="flex flex-row flex-wrap flex-start feature-detail-content">
                     <div v-for="(item, index) in featureSelectedColors" :key="index" class="flex flex-row flex-center feature-detail-item" @click.stop="chooseOneFeature(item)">
-                      <div class="flex flex-row flex-center justify-center feature-detail-content">
-                        <span :style="'background-color:' + item.color + ';'" class="feature-hint-color-detail" />
+                      <div :style="'background-color:' + item.bgColor + ';'" class="flex flex-row flex-center justify-center feature-detail-content">
                         <span :style="'color:' + item.color + ';'" class="feature-hint-text-deltail">{{ item.text }}</span>
                       </div>
                     </div>
@@ -143,20 +144,28 @@
                 </div>
               </div>
             </div>
-            <div v-if="role==='guest'" class="feature-table">
+            <div v-if="role==='guest' || modelOutputType === modelNameMap.homoBoost" class="feature-table">
               <el-table
                 v-if="featureImportanceShowing"
                 :data="featureTableBody"
-                :max-height="'450px'"
+                :cell-class-name="featureImportanceClass"
+                :header-cell-class-name="featureImportanceHeaderClass"
+                :max-height="'440px'"
                 :empty-text="'No Data'"
-                highlight-current-row
-                style="padding:0px 20px;"
+                size="small"
+                @current-change="featureImportanceCurrentChange"
               >
-                <el-table-column :label="'ROLE'" :prop="'sitename'" width="150"/>
-                <el-table-column :label="'FEATURE'">
+                <el-table-column :label="'FEATURE'" width="100">
+                  <template slot-scope="scope">
+                    <span class="fearture-span" style="padding-right:20px;">
+                      <!-- {{ modelOutputType !== modelNameMap.homoBoost ? (scope.row.sitename.indexOf('guest') >=0 ? scope.row.name : scope.row.fid) : scope.row.name }} -->
+                      {{ scope.row.name }}
+                    </span>
+                  </template>
+                </el-table-column>
+                <el-table-column :label="''">
                   <template slot-scope="scope">
                     <div class="flex flex-row flex-center">
-                      <span class="fearture-span" style="padding-right:20px;">{{ scope.row.sitename.indexOf('guest') >=0 ? scope.row.name : scope.row.fid }}</span>
                       <el-progress :percentage="featureImportanceProgress(scope)" :format="boostProgressFormat" :show-text="false" class="feature-progress"/>
                       <span>{{ scope.row.importance }}</span>
                     </div>
@@ -166,9 +175,9 @@
             </div>
           </div>
         </div>
-        <div v-if="role==='host' && modelOutput.featureHostTable" class="boost-wrapper" style="position:relative;">
+        <div v-if="role==='host' && modelOutput.featureHostTable && modelOutputType !== modelNameMap.homoBoost" class="boost-wrapper" style="position:relative;">
           <div class="variable-importance-wrapper" style="overflow-x:hidden;max-height:800px">
-            <h3 class="feature-title">Feature Implement</h3>
+            <h3 class="feature-title h3-style">Feature Mapping</h3>
             <pagination-table
               :table-data="modelOutput.featureHostTable.tBody"
               :page-size="10"
@@ -180,7 +189,7 @@
       </div>
       <!--dataio-->
       <div v-else-if="modelOutputType===modelNameMap.dataIO">
-        <div v-if="modelOutput.imputerData" style="margin-bottom: 20px;">
+        <div v-if="modelOutput.imputerData" style="margin-bottom: 12px;">
           <pagination-table
             :table-data="modelOutput.imputerData"
             :page-size="10"
@@ -220,13 +229,29 @@
           modelOutputType===modelNameMap.homoNN ||
         modelOutputType===modelNameMap.poisson"
         class="line-height-between">
-        <p class="model-text" style="margin-bottom: 0">max iterations: {{ modelOutput.iters }}</p>
-        <p class="model-text">converged: {{ modelOutput.isConverged }}</p>
+        <p v-if="bestIterationCheck" class="model-text model-text-big" style="color: #3e4052;font-family: 'Roboto';font-weight: bold;margin-bottom: 12px;">The Final Model: iter {{ modelOutput.bestIteration }}</p>
+        <div v-if="LRSelect.length > 0" class="flex flex-row flex-center">
+          <span class="model-text lr-span-label" style="padding-right:5px;margin-bottom: 0px;">one_vs_rest model:</span>
+          <el-select :value="lrModelChooseItem" size="mini" @change="LrSelection">
+            <el-option
+              v-for="(item, index) in LRSelect"
+              :key="index"
+              :label="item.replace(/\:.+/, '')"
+              :value="item"/>
+          </el-select>
+        </div>
+        <p v-if="filterForStepwise" class="model-text" style="color: #3e4052;font-family: 'Roboto';font-weight: bold;margin-bottom: 12px;">The Final Model Information:</p>
+        <p v-if="LRSelect.length > 0 && role === 'guest'" class="model-text" style="margin-bottom: 0">model label: {{ lrModelChooseItem.replace(/^.+\:/, '') }}</p>
+        <p class="model-text" style="margin-bottom: 0">max iterations: {{ LRIters }}</p>
+        <p class="model-text">converged: {{ LRisConverged }}</p>
         <pagination-table
-          :table-data="modelOutput.tData"
+          :table-data="LRtData"
           :page-size="10"
-          :header="lrHeader"
-        />
+          :header="lrHeader"/>
+      </div>
+      <!-- heteroNN -->
+      <div v-else-if="modelOutputType===modelNameMap.heteroNN">
+        <p v-if="bestIterationCheck" class="model-text model-text-big" style="color: #3e4052;font-family: 'Roboto';font-weight: bold;margin-bottom: 12px;">The Final Model: iter {{ modelOutput.bestIteration }}</p>
       </div>
       <!--selection-->
       <div v-else-if="modelOutputType===modelNameMap.selection">
@@ -243,9 +268,9 @@
               v-if="role==='guest'"
               class="flex flex-end flex-center"
               style="margin-left:40px;">
-              <el-radio v-model="selectionType" label="guest">guest</el-radio>
-              <el-radio v-model="selectionType" :disabled="!(modelOutput.hostBody && modelOutput.hostBody.length>0)" label="host" @change="hostSelectionRadio">host</el-radio>
-              <el-select :disabled="!(selectionType === 'host')" v-model="selectionSelection" placeholder="请选择">
+              <el-radio v-model="selectionType" size="small" label="guest">guest</el-radio>
+              <el-radio v-model="selectionType" :disabled="!(modelOutput.hostBody && modelOutput.hostBody.length>0)" label="host" size="small" @change="hostSelectionRadio">host</el-radio>
+              <el-select :disabled="!(selectionType === 'host')" v-model="selectionSelection" size="small" placeholder="请选择">
                 <el-option v-for="(item, index) in selectionHostType" :key="index" :label="item.label" :value="item.value"/>
               </el-select>
             </div>
@@ -254,21 +279,24 @@
       </div>
       <!--one hot-->
       <div v-else-if="modelOutputType===modelNameMap.oneHot">
-        <el-select v-model="oneHotSelectValue" no-data-text="no data" placeholder="" @change="changeOneHot">
-          <el-option
-            v-for="(item,index) in modelOutput.options"
-            :key="index"
-            :label="item.label"
-            :value="item.value"
-          />
-        </el-select>
-        <div v-if="oneHotSelectValue" style="margin-top: 20px;">
+        <div style="margin-top: 20px;">
           <pagination-table
-            :table-data="modelOutput.variableData[oneHotSelectValue]"
+            :table-data="oneHotSelectValue ? modelOutput.variableData[oneHotSelectValue] : []"
             :page-size="10"
             :header="oneHotHeader"
             :has-search="false"
-          />
+          >
+            <div slot="form">
+              <el-select v-model="oneHotSelectValue" no-data-text="no data" size="small" placeholder="" @change="changeOneHot">
+                <el-option
+                  v-for="(item,index) in modelOutput.options"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </div>
+          </pagination-table>
         </div>
       </div>
       <!--binning-->
@@ -280,24 +308,25 @@
         >
           <template slot="formAppend">
             <div v-if="role==='guest'" class="flex flex-end flex-center" style="margin-left:40px;" >
-              <el-checkbox v-model="binningType" label="guest">guest</el-checkbox>
-              <el-checkbox v-model="binningHostType" :disabled="countingModel['hostData'].id.length === 0" label="host">host</el-checkbox>
-              <el-select :disabled="!binningHostType" v-model="binningSelection" multiple collapse-tags placeholder="请选择">
+              <el-checkbox v-model="binningType" size="small" label="guest">guest</el-checkbox>
+              <el-checkbox v-model="binningHostType" :disabled="countingModel['hostData'].id.length === 0" size="small" label="host">host</el-checkbox>
+              <el-select :disabled="!binningHostType" v-model="binningSelection" multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="(item, index) in binningHostSelections" :key="index" :label="item" :value="item"/>
               </el-select>
             </div>
           </template>
         </pagination-table>
-        <div style="border:1px solid #eee;padding: 25px 0px;margin-top: 25px">
+        <div class="border-spliter"/>
+        <div>
           <div v-if="binningSelectValue">
             <pagination-table
               :has-search="false"
               :table-data="binningSecondTableContent"
               :page-size="10"
-              :header="binningHeader"
+              :header="binningHeaderfliter"
             >
               <template slot="form">
-                <el-select v-model="binningSelectValue" @change="changeBinning">
+                <el-select v-model="binningSelectValue" size="small" @change="changeBinning">
                   <el-option
                     v-for="(item,index) in binningSecongTableContentSelect"
                     :key="index"
@@ -308,9 +337,9 @@
               </template>
               <template slot="formAppend">
                 <div v-if="role==='guest'" class="flex flex-end flex-center">
-                  <el-radio v-model="binningSelectValueType" label="guest" @change="changeToHost">guest</el-radio>
-                  <el-radio v-model="binningSelectValueType" :disabled="binningHostSelections.length === 0" label="host" @change="changeToHost">host</el-radio>
-                  <el-select :disabled="binningSelectValueType !== 'host'" v-model="binningSelectHostContent" placeholder="请选择" @change="changeToHost">
+                  <el-radio v-model="binningSelectValueType" label="guest" size="small" @change="changeToHost">guest</el-radio>
+                  <el-radio v-model="binningSelectValueType" :disabled="binningHostSelections.length === 0" size="small" label="host" @change="changeToHost">host</el-radio>
+                  <el-select :disabled="binningSelectValueType !== 'host'" v-model="binningSelectHostContent" placeholder="请选择" size="small" @change="changeToHost">
                     <el-option v-for="(item, index) in binningHostSelections" :key="index" :label="item" :value="item"/>
                   </el-select>
                 </div>
@@ -318,9 +347,10 @@
             </pagination-table>
           </div>
         </div>
-        <echart-container v-if="hostEchartsHiddenBeforeHaveData" :class="isFullScreen?'full-screen-echart':'echart'" @getEchartInstance="getStackBarInstance"/>
-        <echart-container v-if="hostEchartsHiddenBeforeHaveDatas" :class="isFullScreen?'full-screen-echart':'echart'" @getEchartInstance="getWoeInstance"/>
+        <echart-container v-if="hostEchartsHiddenBeforeHaveData" :class="isFullScreen?'full-screen-echart':'echart'" style="margin-top:24px;" @getEchartInstance="getStackBarInstance" />
+        <echart-container v-if="hostEchartsHiddenBeforeHaveDatas" :class="isFullScreen?'full-screen-echart':'echart'" style="margin-top:24px;" @getEchartInstance="getWoeInstance"/>
       </div>
+      <!-- correlation -->
       <div v-else-if="modelOutputType===modelNameMap.correlation">
         <div class="flex flex-row flex-start correlation-containers">
           <pagination-table
@@ -335,12 +365,15 @@
             :other-variable="modelOutput.correlation.otherHeader"
             :nums="modelOutput.correlation.corr"
             :role="role"
+            :class="{'fullscreen-canvas':isFullScreen}"
             class="correlation-relationship-canvas"
           />
         </div>
       </div>
     </div>
-
+    <div v-if="filterForStepwise">
+      <stepwise :output="filterForStepwise" :role="role" :requested="requested" :need-request="needRequest"/>
+    </div>
     <ul v-if="lossList.length>0" class="cv-wrapper line-height-between">
       <li
         v-for="(output,instanceIndex) in lossList"
@@ -350,9 +383,9 @@
         <div v-if="output.type.toLowerCase()==='loss'" class="w-100 overflow-hidden">
           <div class="cv-top flex flex-center space-between" style="min-height:42px;align-items:flex-start;">
             <div class="flex flex-center">
-              <h3 style="margin-right: 20px;">{{ output.type }}</h3>
-              <p>{{ output.nameSpace }}</p>
-              <div v-if="showFresh" class="flex flex-row flex-center refresh-pointer" @click="refreshNew">
+              <h3 class="h3-style" style="margin-right: 20px;">{{ output.type }}</h3>
+              <p class="name_space_for_h3_style">{{ output.nameSpace }}</p>
+              <div v-if="showFresh" class="flex flex-row flex-center refresh-pointer loss-refresh" @click="refreshNew">
                 <i class="el-icon-refresh-right refresh-content"/>
                 <span>refresh</span>
               </div>
@@ -378,7 +411,7 @@
         <div v-else class="w-100 overflow-hidden">
           <div class="cv-top flex flex-center space-between" style="min-height:42px;align-items:flex-start;">
             <div class="flex flex-center">
-              <h3 style="margin-right: 20px;">{{ output.type }}</h3>
+              <h3 class="h3-style" style="margin-right: 20px;">{{ output.type }}</h3>
               <p>{{ output.nameSpace }}</p>
             </div>
             <curve-legends
@@ -396,21 +429,22 @@
       </li>
     </ul>
     <!--model summary-->
-    <div v-if="modelSummaryData.tHeader.length>0 && modelSummaryCollapsedMsg.length>0" style="margin-bottom: 20px;">
+    <div v-if="modelSummaryData.tHeader.length>0 && modelSummaryCollapsedMsg.length>0">
       <pagination-table
         :header="modelSummaryCollapsedHeader"
         :table-data="modelSummaryCollapsedMsg"
         :span-method="summarySpanMethod"
-        :has-search="(modelSummaryTitle === 'Validation scores')"
+        :has-search="(modelSummaryTitle === 'Performance scores')"
         :has-pagination="false"
         :have-index="false"
       >
-        <h3 slot="form" style="margin-bottom: 20px;">{{ modelSummaryTitle }}</h3>
+        <h3 slot="form" class="h3-style">{{ modelSummaryTitle }}</h3>
       </pagination-table>
+      <div class="border-spliter" />
     </div>
     <!--cv-->
     <div class="flex flex-row flex-center space-between">
-      <ul v-if="evaluationOutputTypeList.length>1" class="cv-tab-list flex flex-center line-height-between">
+      <ul v-if="evaluationOutputTypeList.length > 1" class="cv-tab-list flex flex-center line-height-between">
         <li
           v-for="(type,index) in evaluationOutputTypeList"
           :key="index"
@@ -419,15 +453,11 @@
         >{{ type }}
         </li>
       </ul>
-      <div v-if="showFresh" class="flex flex-row flex-center refresh-pointer" @click="refreshNew">
-        <i class="el-icon-refresh-right refresh-content"/>
-        <span>refresh</span>
-      </div>
     </div>
     <ul v-if="evaluationInstances.length>0" class="cv-wrapper line-height-between">
       <li
         v-for="(output,instanceIndex) in evaluationInstances"
-        v-show="output.type === evaluationOutputTypeList[currentCvTab]"
+        v-show="output.type === evaluationOutputTypeList[currentCvTab] && allNameSpace[choosedNameSpace] === output.nameSpace"
         :key="instanceIndex"
         style="position:relative;"
         @click="exchangeCurveStatus('cv' + output.type + output.nameSpace)"
@@ -435,8 +465,19 @@
         <div v-if="haveDataTypeList.indexOf(output.type)!==-1" class="w-100 overflow-hidden">
           <div class="cv-top flex flex-center space-between" style="min-height:42px;align-items:flex-start;">
             <div class="flex flex-center">
-              <h3 style="margin-right: 20px;">{{ output.type }}</h3>
-              <p>{{ output.nameSpace }}</p>
+              <h3 class="h3-style" style="margin-right: 20px;">{{ output.type }}</h3>
+              <div class="flex flex-row">
+                <span
+                  v-for="(nameItem, nameIndex) in allNameSpace"
+                  :key="nameIndex"
+                  :class="{'chooseed-namespace':allNameSpace[choosedNameSpace] === nameItem}"
+                  class="chooseable-namespace"
+                  @click="changeChoosedNameSpace(nameIndex, 'echart' + output.type)">{{ nameItem }}</span>
+                <div v-if="showFresh" class="flex flex-row flex-center refresh-pointer" @click="refreshNew">
+                  <i class="el-icon-refresh-right refresh-content"/>
+                  <span>refresh</span>
+                </div>
+              </div>
             </div>
             <curve-legends
               :ref="'cv' + output.type + output.nameSpace"
@@ -448,6 +489,7 @@
               @clickLegend="clickLegendForCurves"/>
           </div>
           <echart-container
+            :ref="'echart' + output.type + output.nameSpace"
             :class="[isFullScreen?'full-screen-echart':'echart']"
             :options="initEchartOptions(output.data, true)"
             :legend-index="instanceIndex"
@@ -468,9 +510,10 @@ import PaginationTable from './PaginationTable'
 import { deepCloneArr, exportExcel, deepClone, formatFloat } from '@/utils'
 import CurveLegend from './CurveLegend'
 import CurveLegends from './CurveLegends'
-import Correlation from '@/components/Correlation'
+import Correlation from '@/components/CanvasComponent/pearsonDiagram'
 import BoostTreeHint from './BoostTreeHint'
 import { mapGetters } from 'vuex'
+import stepwise from './stepwise'
 
 export default {
   name: 'ModelOutput',
@@ -481,7 +524,8 @@ export default {
     CurveLegends,
     IconHoverAndActive,
     Correlation,
-    BoostTreeHint
+    BoostTreeHint,
+    stepwise
   },
   props: {
     metricOutputList: {
@@ -561,6 +605,7 @@ export default {
       hostEchartsHiddenBeforeHaveData: false,
       hostEchartsHiddenBeforeHaveDatas: false,
       evaluationOutputTypeListArr: ['ROC', 'K-S', 'Lift', 'Gain', 'Precision Recall', 'Accuracy'],
+      choosedNameSpace: 0,
       dataIoOulierHeader: [
         {
           prop: 'variable',
@@ -677,7 +722,7 @@ export default {
           label: 'non_event_ratio'
         }
       ],
-      hideColor: '#bbbbc8',
+      hideColor: '#999BA3',
       sampleSelection: '',
       featureHidden: true,
       featureSelected: [],
@@ -685,8 +730,10 @@ export default {
       binningSelectionInit: false,
       binningSelectValueType: 'guest',
       binningSelectHostContent: '',
-      treeSuitables: '',
-      treeScale: ''
+      treeSuitables: {},
+      treeScale: '',
+      featureImportCurrentRow: '',
+      lrModelChoose: 0
     }
   },
   computed: {
@@ -700,6 +747,83 @@ export default {
       'treesBorderColor',
       'icons'
     ]),
+    checkForModelDisplay() {
+      return this.modelOutputType && this.modelOutput && !this.isNoModelOutput
+    },
+    bestIterationCheck() {
+      const bi = this.modelOutput.bestIteration
+      return bi !== undefined ? (bi !== -1) : false
+    },
+    allNameSpace() {
+      const final = []
+      for (const val of this.evaluationInstances) {
+        if (final.indexOf(val.nameSpace) < 0) {
+          final.push(val.nameSpace)
+        }
+      }
+      return final
+    },
+    LRisConverged() {
+      if (this.modelOutput.isConverged !== undefined) {
+        return this.modelOutput.isConverged
+      } else {
+        return this.modelOutput.tData[this.lrModelChoose].isConverged
+      }
+    },
+    LRIters() {
+      if (this.modelOutput.iters !== undefined) {
+        return this.modelOutput.iters
+      } else {
+        return this.modelOutput.tData[this.lrModelChoose].iters
+      }
+    },
+    LRtData() {
+      if (this.modelOutput.tData[this.lrModelChoose].data) {
+        return this.modelOutput.tData[this.lrModelChoose].data
+      } else {
+        return this.modelOutput.tData
+      }
+    },
+    LRSelect() {
+      const final = []
+      if (this.modelOutput.tData[0].name) {
+        for (const val of this.modelOutput.tData) {
+          final.push(val.name)
+        }
+      }
+      return final
+    },
+    lrModelChooseItem() {
+      return this.modelOutput.tData[this.lrModelChoose].name
+    },
+    filterForSpecialData() {
+      const final = []
+      const special = ['stepwise']
+      for (const val of this.metricOutputList) {
+        if (val.type.indexOf(special) < 0) {
+          final.push(val)
+        }
+      }
+      return final
+    },
+    filterForStepwise() {
+      for (const val of this.metricOutputList) {
+        if (val.type === 'stepwise') {
+          return val.data
+        }
+      }
+      return null
+    },
+    binningHeaderfliter() {
+      const headers = JSON.parse(JSON.stringify(this.binningHeader))
+      if (this.role.toUpperCase() === 'HOST') {
+        headers.splice(1, 0, {
+          prop: 'anonym in guest',
+          label: 'anonym in guest'
+        })
+      }
+      return headers
+    },
     treeStuffOptions() {
       return this.modelOutput.treeOptions
     },
@@ -748,16 +872,16 @@ export default {
       for (let i = 0; i < final.length; i++) {
         const val = final[i]
         if (this.featureSelected.indexOf(val) >= 0) {
-          final[i] = { text: val, color: '#494ece' }
+          final[i] = { text: val, color: '#ffff', bgColor: '#4159D1' }
         } else {
-          final[i] = { text: val, color: this.hideColor }
+          final[i] = { text: val, color: this.hideColor, bgColor: '#EBEDF0' }
         }
       }
       return final
     },
     featureTableBody() {
       const final = JSON.parse(JSON.stringify(this.modelOutput.featureTable.tBody))
-      if (!this.featureGuest) {
+      if (!this.featureGuest && this.modelOutputType !== this.modelNameMap.homoBoost) {
         for (let i = 0; i < final.length; i++) {
           if (final[i].sitename.indexOf('guest') >= 0) {
             final.splice(i, 1)
@@ -765,7 +889,7 @@ export default {
           }
         }
       }
-      if (!this.featureHost) {
+      if (!this.featureHost && this.modelOutputType !== this.modelNameMap.homoBoost) {
         for (let i = 0; i < final.length; i++) {
           if (final[i].sitename.indexOf('host') >= 0) {
             final.splice(i, 1)
@@ -852,6 +976,8 @@ export default {
         return ''
       }
       const data = this.modelOutput.treesOverviewData
+      const color = this.treesColor[this.treesValue || 0]
+      const border = this.treesBorderColor[this.treesValue || 0]
       if (data.length > 1) {
         const unit = 100 / (data.length - 1)
         let maxSize = 0
@@ -872,10 +998,8 @@ export default {
         const diffValue = maxSize - minSize
         const getOpacity = size => {
           const v = size - minSize
-          return diffValue > 0 ? v / diffValue + 0.1 : 1
+          return diffValue > 0 ? (v / diffValue * 0.7) + 0.3 : 1
         }
-        const color = this.treesColor[this.treesValue || 0]
-        const border = this.treesBorderColor[this.treesValue || 0]
         let gradientStr = ''
         const fromColor = []
         this.modelOutput.treesOverviewData.forEach((item, index, data) => {
@@ -893,23 +1017,37 @@ export default {
           border: border
         }
       } else {
-        return { 'background': 'rgba(73,78,206,0.05)', colors: [{ color: 'rgba(73,78,206,0.05)', treeId: 0 }], border: 'rgba(73,78,206,0.05)' }
+        return { 'background': 'rgba(73,78,206,0.05)', colors: [{ color: `rgba(${color},1)`, treeId: 0 }], border: `rgba(${border},1)` }
       }
     },
     calcTreeSize() {
-      const size = this.modelOutput.currentTreeData.size
+      const vm = this
+      // const size = this.modelOutput.currentTreeData.size
+      const treeWidth = this.modelOutput.currentTreeData.treeWidth
       const depth = this.modelOutput.currentTreeData.maxDepth
       // console.log(size, depth)
       let height = '100%'
-      let width = '100%'
+      const width = '100%'
+      let minWidth = '100%'
       if (depth > 3) {
-        width = `calc(100% + ${size * depth} * 15px`
+        // width = `calc(100% + ${size} * 75px)`
+        minWidth = `${treeWidth}px`
       }
       if (depth > 5) {
-        height = `calc(100% + ${depth - 5} * 50px`
+        height = `calc(100% + ${depth - 5} * 100px)`
       }
+      this.$nextTick(() => {
+        const p = getComputedStyle(this.$refs['forTreePic'].parentElement)
+        const s = getComputedStyle(this.$refs['forTreePic'])
+        const scale = this.$refs['forTreePic'].style.transform ? parseFloat(this.$refs['forTreePic'].style.transform.replace(/scale\(/, '')) : 1
+        const cleft = (parseFloat(p.width) - parseFloat(s.width)) / 2
+        const ctop = (parseFloat(s.height) * (scale - 1)) / 2
+        vm.$refs['forTreePic'].style.top = ctop + 'px'
+        vm.$refs['forTreePic'].style.left = cleft + 'px'
+        vm.treeInstance.resize()
+      })
       return {
-        width, height
+        width, height, minWidth
       }
     },
     evaluationOutputTypeList() {
@@ -943,7 +1081,7 @@ export default {
     },
     modelSummaryCollapsedHeader() {
       const header = JSON.parse(JSON.stringify(this.modelSummaryData.tHeader))
-      if (this.modelSummaryTitle === 'Validation scores') {
+      if (this.modelSummaryTitle === 'Performance scores') {
         for (const val of header) {
           if (val.label !== '') {
             val.sortable = true
@@ -964,8 +1102,8 @@ export default {
     },
     modelSummaryTitle() {
       return this.modelOutputType === this.modelNameMap.evaluation
-        // ? 'Evaluation scores' : 'Cross validation scores'
-        ? 'Evaluation scores' : 'Validation scores'
+        // ? 'Evaluation scores' : 'Cross Performance scores'
+        ? 'Evaluation scores' : 'Performance scores'
     },
     filterScaleHeader() {
       const isHideCol = this.metricOutputList[0] && this.metricOutputList[0].scaleMethod === 'min_max_scale'
@@ -1099,6 +1237,14 @@ export default {
     // }
   },
   methods: {
+    LrSelection(item) {
+      for (let i = 0; i < this.LRSelect.length; i++) {
+        if (this.LRSelect[i] === item) {
+          this.lrModelChoose = i
+          break
+        }
+      }
+    },
     featureSelectedClear() {
       this.featureSelected = []
     },
@@ -1238,6 +1384,11 @@ export default {
     chooseItems(item) {
       this.clickTreesLine(item.treeId)
     },
+    treeSuitablePosition(top, left) {
+      this.treeSuitables.top = top
+      this.treeSuitables.left = left
+      this.treeSuitables.original = true
+    },
     getTreesHintInstance(instance) {
       // console.log(instance.getZr())
       const _this = this
@@ -1272,6 +1423,7 @@ export default {
         modelOutput.currentTreeData.id = id
         modelOutput.currentTreeData.size = newTreeData.size
         modelOutput.currentTreeData.maxDepth = newTreeData.maxDepth
+        modelOutput.currentTreeData.treeWidth = newTreeData.treeWidth
         modelOutput.treeOptions.series.data = newTreeData.data
         const treesLineOption = this.treesLineInstance.getOption()
         const maxTreeSize = modelOutput.maxTreeSize
@@ -1346,6 +1498,14 @@ export default {
         arr[index] = true
         this.$store.dispatch('SetCvFlags', arr)
       }
+      this.choosedNameSpace = 0
+    },
+    changeChoosedNameSpace(newIndex, instanceref) {
+      const that = this
+      this.choosedNameSpace = newIndex
+      this.$nextTick(() => {
+        that.$refs[instanceref + that.allNameSpace[that.choosedNameSpace]][0].resize()
+      })
     },
     enterTreeId() {
       const treeId = Number.parseInt(this.treeId)
@@ -1416,6 +1576,7 @@ export default {
         this.modelOutput.currentTreeData.id = 0
         this.modelOutput.currentTreeData.size = this.modelOutput.allTreesOverviewData[value][0].size
         this.modelOutput.currentTreeData.maxDepth = this.modelOutput.allTreesOverviewData[value][0].maxDepth
+        this.modelOutput.currentTreeData.treeWidth = this.modelOutput.allTreesOverviewData[value][0].treeWidth
         this.treesLineInstance.setOption(option, true)
       }
     },
@@ -1656,34 +1817,16 @@ export default {
       if (this.role === 'host') {
         let had = false
         for (let i = 0; i < this.binningSummaryHeader.length; i++) {
-          if (this.binningSummaryHeader[i].prop === 'binding') {
+          if (this.binningSummaryHeader[i].prop === 'anonymInGuest') {
             had = true
             break
           }
         }
         if (!had) {
           this.binningSummaryHeader.splice(1, 0, {
-            prop: 'binding',
+            prop: 'anonymInGuest',
             label: 'anonym in guest'
           })
-        }
-      }
-      if (this.role === 'guest') {
-        let had = false
-        for (let i = 0; i < this.binningSummaryHeader.length; i++) {
-          if (this.binningSummaryHeader[i].prop === 'role') {
-            had = true
-            break
-          }
-        }
-        if (!had) {
-          this.binningSummaryHeader.unshift(...[{
-            label: 'role',
-            prop: 'role'
-          }, {
-            label: 'partyId',
-            prop: 'partyid'
-          }])
         }
       }
       for (const val of this.binningSummaryHeader) {
@@ -1779,6 +1922,41 @@ export default {
       }
       return (progress.row.importance / big) * 100
     },
+    featureImportanceClass(obj) {
+      let final = ''
+      if (obj.columnIndex === 0) {
+        final += 'featureImportFirstCol'
+      } else if (obj.columnIndex === 1) {
+        final += 'featureImportSecongCol'
+      } else {
+        final += 'featureImportOtherCol'
+      }
+      if (this.featureImportCurrentRow) {
+        let check = true
+        for (const key in obj.row) {
+          if (obj.row[key] !== this.featureImportCurrentRow[key]) {
+            check = false
+            break
+          }
+        }
+        if (check) {
+          final += ' featureImportCurrentRowStyle'
+        }
+      }
+      return final
+    },
+    featureImportanceHeaderClass(obj) {
+      if (obj.columnIndex === 0) {
+        return 'featureImportHeaderFirstCol'
+      } else if (obj.columnIndex === 1) {
+        return 'featureImportHeaderSecongCol'
+      } else {
+        return 'featureImportHeaderOtherCol'
+      }
+    },
+    featureImportanceCurrentChange(row, oldRow) {
+      this.featureImportCurrentRow = row
+    },
     initbinningSelection(list) {
       this.binningSelectionInit = true
       this.binningSelection = []
@@ -1829,7 +2007,9 @@ export default {
           val.canvasResize()
         }
       } else {
-        c.canvasResize()
+        if (c) {
+          c.canvasResize()
+        }
       }
     },
     treeSuitable() {
@@ -1843,15 +2023,15 @@ export default {
         scal.x = xScale
         scal.y = xScale
         scal.whole = true
-        pos.left = parseInt(sty.width) * (xScale - 1) / 2
-        pos.top = 0
+        pos.left = parseFloat(sty.width) * (xScale - 1) / 2
+        pos.top = parseFloat(sty.height) * (xScale - 1) / 2
       } else {
         pos.top = 0
         scal.x = yScale
         scal.y = yScale
         scal.whole = true
-        pos.left = 0
-        pos.top = parseInt(sty.height) * (xScale - 1) / 2
+        pos.left = parseFloat(sty.width) * (yScale - 1) / 2
+        pos.top = parseInt(sty.height) * (yScale - 1) / 2
       }
       pos.original = true
       this.treeSuitables = pos
@@ -1933,12 +2113,15 @@ export default {
 
   .refresh-pointer{
     padding-right: 10px;
-    color: #808080;
+    color: #4159D1;
     cursor: pointer;
     .refresh-content{
       padding-right: 5px;
       margin-left: 15px;
     }
+  }
+  .loss-refresh {
+    margin-bottom: 0px;
   }
   .feature-title {
     margin-bottom: 15px;
@@ -1952,22 +2135,26 @@ export default {
       position: absolute;
       top: 14px;
       right: 22px;
-      padding: 10px;
+      padding: 24px 24px 14px 24px;
       box-shadow: 1px 3px 10px -1px #aaa;
       border-radius: 4px;
       background-color: #fff;
-      width: 35%;
+      min-width: 35%;
+      max-width: 35%;
     }
     .feature-detail-title {
       width: 100%;
       margin-bottom: 10px;
       .feature-detail-title-hint {
         .feature-title-hint-content {
-          font-size: 110%;
+          font-size: 16px;
           font-weight: 700;
-          margin: 0px 10px 0px 20px;
+          margin-right:30px;
           .content-font {
             color: #494ece;
+          }
+          .feature-content-font {
+            color: #4159D1
           }
         }
         .feature-title-operation {
@@ -1980,13 +2167,13 @@ export default {
     .feature-detail-content {
       width: 100%;
       .feature-detail-item {
-        width: 25%;
         padding: 5px 5px 10px 5px;
         .feature-detail-content {
-          border-radius: 20px;
+          border-radius: 2px;
           background-color: #F8F8FA;
-          padding: 2px;
-          margin: 1px 0px;
+          padding: 2px 8px;
+          margin: 1px 5px 1px 0px;
+          cursor: pointer;
         }
 				.feature-hint-color-detail {
 					width: 10px;
@@ -2004,7 +2191,6 @@ export default {
   }
   .feature-table {
     height: calc(100% - 65px);
-    padding: 0px 15px 15px;
     .el-table {
       .fearture-span {
         display: block;
@@ -2035,6 +2221,75 @@ export default {
         }
       }
     }
+    .featureImportFirstCol {
+      padding: 0px !important;
+      border-top: 6px solid #fff !important;
+      .cell {
+        background-color: #EBEDF0;
+        height: 24px;
+        padding: 0px 12px !important;
+      }
+    }
+    .featureImportSecongCol {
+      padding: 0px !important;
+      border-top: 6px solid #fff !important;
+      border-right: 6px solid #fff !important;
+      .cell {
+        background-color: #FAFBFC;
+        height: 24px;
+        padding: 0px 12px !important;
+      }
+    }
+    .featureImportOtherCol {
+      padding: 0px !important;
+      border-top: 6px solid #fff !important;
+      .cell {
+        background-color: #ffffff;
+        height: 24px;
+        padding: 0px 12px !important;
+      }
+    }
+    .featureImportHeaderFirstCol {
+      background-color: #4159D1;
+      padding: 0px 1px;
+      .cell {
+        color: #fff !important;
+        height: 24px;
+        font-size: 14px !important;
+        line-height: 24px;
+        padding: 0px 12px !important;
+      }
+    }
+    .featureImportHeaderSecongCol {
+      background-color: #5E7FEB;
+      max-height: 24px;
+      padding: 0px 1px;
+      border-right: 6px solid #fff;
+      .cell {
+        color: #fff !important;
+        height: 24px;
+        font-size: 14px !important;
+        line-height: 24px;
+        padding: 0px 12px !important;
+      }
+    }
+    .featureImportHeaderOtherCol {
+      background-color: #DEECFC;
+      max-height: 24px;
+      padding: 0px 1px;
+      .cell {
+        height: 24px;
+        font-size: 14px !important;
+        line-height: 24px;
+        padding: 0px 12px !important;
+      }
+    }
+    .featureImportCurrentRowStyle {
+      border-right-color: #ededfa !important;
+      .cell {
+        background-color: #ededfa !important;
+      }
+    }
   }
   .suitable-button {
     position: absolute;
@@ -2055,5 +2310,12 @@ export default {
         color: #fff;
       }
     }
+  }
+  .border-spliter {
+    width: 100%;
+    height: 2px;
+    margin: 24px 0px;
+    border: 0px;
+    background-color: #DCDDE0;
   }
 </style>

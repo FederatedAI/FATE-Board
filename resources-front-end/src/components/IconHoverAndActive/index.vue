@@ -34,11 +34,20 @@ export default {
     activeUrl: {
       type: String,
       default: ''
+    },
+    origin: {
+      type: String,
+      default: 'default'
+    },
+    hold: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
-      status: 'default'
+      status: 'default',
+      holded: 'default'
     }
   },
   computed: {
@@ -54,27 +63,53 @@ export default {
       return url
     }
   },
+
+  beforeMount() {
+    this.inited()
+  },
+
   methods: {
+    inited() {
+      this.status = this.origin
+    },
     mouseenter() {
+      if (this.hold) {
+        this.holded = this.status
+      }
       if (this.hoverUrl) {
         this.status = 'hover'
       }
     },
     mouseout() {
-      this.status = 'default'
+      if (this.hold) {
+        this.status = this.holded
+      } else {
+        this.status = 'default'
+      }
     },
     mousedown() {
       if (this.activeUrl) {
+        if (this.holded) {
+          this.holded = 'active'
+        }
         this.status = 'active'
       }
     },
     mouseup() {
-      if (this.status === 'active') {
+      if (this.status === 'active' && !this.hold) {
         this.status = 'default'
       }
     },
     click() {
       this.$emit('clickFn')
+    },
+    restart() {
+      this.holded = 'default'
+      this.status = this.holded
+    },
+    setActive() {
+      this.holded = 'active'
+      this.status = 'active'
     }
   }
 }

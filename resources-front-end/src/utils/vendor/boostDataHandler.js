@@ -4,7 +4,7 @@ import treeOptions from '@/utils/chart-options/tree'
 import treeLineOptions from '@/utils/chart-options/treeLine'
 import doubleBarOptions from '@/utils/chart-options/doubleBar'
 
-export default function({ responseData, output, role, partyId }) {
+export default function({ responseData, output, role, partyId, outputType }) {
   output.formatObj = responseData
   output.formatString = JSON.stringify(responseData, null, 2)
   const options = deepClone(treeOptions)
@@ -15,7 +15,7 @@ export default function({ responseData, output, role, partyId }) {
   let maxTreeSize = 0
   if (treeDim < 3) {
     trees.forEach((item, index) => {
-      treesOverviewData.push(handleTreeData(item.tree, role, partyId, featureNameFidMapping, item.splitMaskdict, item.missingDirMaskdict))
+      treesOverviewData.push(handleTreeData(item.tree, role, partyId, featureNameFidMapping, item.splitMaskdict, item.missingDirMaskdict, outputType))
       lineSeriesData.push([index, item.tree.length])
       if (item.tree.length > maxTreeSize) {
         maxTreeSize = item.tree.length
@@ -25,7 +25,8 @@ export default function({ responseData, output, role, partyId }) {
     output.currentTreeData = {
       id: treesOverviewData[0].data[0].treeid,
       size: treesOverviewData[0].size,
-      maxDepth: treesOverviewData[0].maxDepth
+      maxDepth: treesOverviewData[0].maxDepth,
+      treeWidth: treesOverviewData[0].treeWidth
     }
     output.maxTreeSize = maxTreeSize
     output.treesOverviewData = treesOverviewData
@@ -53,7 +54,7 @@ export default function({ responseData, output, role, partyId }) {
       allTreesLineSeriesData.push([])
     }
     trees.forEach((item, index) => {
-      allTreesOverviewData[index % treeDim].push(handleTreeData(item.tree, role, partyId, featureNameFidMapping, item.splitMaskdict, item.missingDirMaskdict))
+      allTreesOverviewData[index % treeDim].push(handleTreeData(item.tree, role, partyId, featureNameFidMapping, item.splitMaskdict, item.missingDirMaskdict, outputType))
       allTreesLineSeriesData[index % treeDim].push([Number.parseInt(index / treeDim), item.tree.length])
     })
     output.allTreesOverviewData = allTreesOverviewData
@@ -70,7 +71,8 @@ export default function({ responseData, output, role, partyId }) {
     output.currentTreeData = {
       id: treesOverviewData[0].data[0].treeid,
       size: treesOverviewData[0].size,
-      maxDepth: treesOverviewData[0].maxDepth
+      maxDepth: treesOverviewData[0].maxDepth,
+      treeWidth: treesOverviewData[0].treeWidth
     }
     output.treesOverviewData = treesOverviewData
     treesLineData.series.data = lineSeriesData
@@ -132,7 +134,14 @@ export default function({ responseData, output, role, partyId }) {
   if (responseData.featureImportances && responseData.featureImportances.length > 0) {
     const tBody = JSON.parse(JSON.stringify(responseData.featureImportances))
     for (const val of tBody) {
-      val.name = responseData.featureNameFidMapping[val.fid]
+      if (val.sitename.match('host') && !role.match('host')) {
+        const party_Id = val.sitename.match(/[0-9]+$/)[0]
+        if (party_Id) {
+          val.name = 'host_' + party_Id + '_' + val.fid
+        }
+      } else {
+        val.name = responseData.featureNameFidMapping[val.fid]
+      }
     }
     output.featureTable = { tBody }
   }
@@ -140,9 +149,9 @@ export default function({ responseData, output, role, partyId }) {
   if (responseData.featureNameFidMapping && Object.keys(responseData.featureNameFidMapping).length > 0) {
     const final = JSON.parse(JSON.stringify(responseData.featureNameFidMapping))
     const tBody = []
-    const tHeader = [{ label: 'feature_index', prop: 'featureIndex' }, { label: 'variable', prop: 'variable' }]
+    const tHeader = [{ label: 'variable', prop: 'variable' }, { label: 'anonym in guest', prop: 'featureIndex' }]
     for (const key in final) {
-      tBody.push({ variable: final[key], featureIndex: key })
+      tBody.push({ variable: final[key], featureIndex: role + '_' + partyId + '_' + key })
     }
     output.featureHostTable = { tHeader, tBody }
   }
