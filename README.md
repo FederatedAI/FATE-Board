@@ -1,4 +1,4 @@
-**DOC|[Chinese guide](./README-CN.md)**
+**DOC|[中文](./README-CN.md)**
 
 FATE-Board as a suite of visualization tool for federated learning modeling designed to deep explore models and understand models easily and effectively. 
 
