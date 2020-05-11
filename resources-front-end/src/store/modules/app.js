@@ -23,7 +23,9 @@ const app = {
       oneHot: 'OneHotEncoder',
       poisson: 'HeteroPoisson',
       homoNN: 'HomoNN',
-      correlation: 'HeteroPearson'
+      heteroNN: 'HeteroNN',
+      correlation: 'HeteroPearson',
+      homoBoost: 'HomoSecureboost'
     },
     metricTypeMap: {
       dataIOTable: 'DATAIO_TABLE',
@@ -46,7 +48,8 @@ const app = {
       Union: 'UNION',
       Upload: 'UPLOAD',
       Download: 'DOWNLOAD',
-      RSA: 'RSA'
+      RSA: 'RSA',
+      Stepwise: 'STEPWISE'
     },
     icons: {
       normal: {

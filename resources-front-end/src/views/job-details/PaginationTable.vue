@@ -4,11 +4,12 @@
       <slot name="form">
         <span />
       </slot>
-      <div class="flex flex-row flex-end">
+      <div class="flex flex-row flex-center flex-end query-container">
         <el-input
           v-if="hasSearch"
           :value="searchFor"
-          placeholder="searching"
+          :size="size"
+          placeholder="search variable"
           class="search-input"
           clearable
           @keyup.enter.native="searchData"
@@ -25,10 +26,11 @@
       ref="tableTemplate"
       :data="tablePageData"
       :cell-class-name="cellClassNameRow"
+      :header-cell-class-name="'header-section-style'"
+      :size="tableSize"
       v-bind="$attrs"
       highlight-current-row
       fit
-      border
       empty-text="No data"
       element-loading-text="Loading"
       style="margin-bottom: 20px;"
@@ -127,6 +129,14 @@ export default {
     height: {
       type: Number | String,
       default: '60vh'
+    },
+    size: {
+      type: String,
+      default: 'small'
+    },
+    tableSize: {
+      type: String,
+      default: 'mini'
     }
   },
   data() {
@@ -398,6 +408,12 @@ export default {
       let check = true
       let str = ''
       str += this.cellClassName(obj)
+      if (!str) {
+        str += 'default-cell-style'
+      }
+      if (obj.column.label.match(/(index)/)) {
+        str += ' default-cell-first-col-style'
+      }
       if (this.currentRowInfo) {
         Object.keys(row).forEach(item => {
           if (
@@ -420,9 +436,95 @@ export default {
 
 <style lang="scss">
 .table-search {
-	margin-bottom: 20px;
+	margin-bottom: 12px;
 	.search-input {
-		max-width: 250px;
-	}
+    max-width: 150px;
+    .el-input__inner {
+      background: #F8F8FA;
+      height: 24px;
+      border: 0px;
+      border-radius: 2px;
+      width: 130px;
+      padding-right: 20px;
+      line-height: 24px;
+    }
+    .el-input-group__append {
+      border: 0px;
+      border-radius: 2px;
+      background: #F8F8FA;
+      padding-right: 10px;
+      padding-left: 0px;
+    }
+    .el-input__icon {
+      line-height: 24px;
+      margin-right: 7px;
+    }
+  }
+  .el-select {
+      max-width: 135px;
+      .el-select__tags {
+        border-radius: 2px;
+        height: 16px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        .el-tag {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          border-radius: 2px;
+          height: 16px;
+          margin-right: 2px;
+          .el-select__tags-text {
+            line-height: 16px;
+          }
+          .el-tag__close {
+            line-height: 16px;
+            margin-top: 0px;
+          }
+        }
+      }
+      .el-input__inner {
+        height: 24px;
+        background-color: #fff;
+        border: 2px solid #EBEDF0;
+        border-radius: 2px;
+      }
+      .el-select__caret {
+        line-height: 24px;
+      }
+    }
+}
+.header-section-style {
+  background-color: #DEECFC !important;
+  border: 1px solid #ffffff;
+  color: #6A6C75;
+  padding: 3px 0px;
+  .caret-wrapper {
+    height: 22px;
+    .ascending {
+      top: 0px;
+    }
+    .descending {
+      bottom: 0px;
+    }
+  }
+}
+.default-cell-style {
+  border: 1px solid #fff;
+  border-bottom: 1px solid #fff !important;
+  background-color: #FAFBFC;
+  color: #999BA3;
+  font-size: 12px;
+  padding: 3px 0px;
+}
+.default-cell-first-col-style {
+  background-color: #EBEDF0 !important;
+  color: #6A6C75;
+}
+
+.selction-row-choosed {
+  background-color: #ebedf0 !important;
+  color: #6A6C75;
 }
 </style>

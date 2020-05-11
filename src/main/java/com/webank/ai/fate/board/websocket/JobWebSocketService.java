@@ -71,10 +71,10 @@ public class JobWebSocketService implements InitializingBean, ApplicationContext
 
     static ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-    static  {
-        executorService.scheduleAtFixedRate(()->{
+    static {
+        executorService.scheduleAtFixedRate(() -> {
             schedule();
-        },1000, 1000,TimeUnit.MILLISECONDS);
+        }, 1000, 1000, TimeUnit.MILLISECONDS);
 
     }
 
@@ -124,15 +124,15 @@ public class JobWebSocketService implements InitializingBean, ApplicationContext
             session.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             jobSessionMap.remove(session);
         }
         error.printStackTrace();
     }
 
 
-    static  void schedule() {
-       // logger.info("job schedule begin");
+    static void schedule() {
+        // logger.info("job schedule begin");
         try {
             Set<Map.Entry> entrySet = jobSessionMap.entrySet();
             if (logger.isDebugEnabled()) {
@@ -174,12 +174,15 @@ public class JobWebSocketService implements InitializingBean, ApplicationContext
                             } else {
                                 duration = now - startTime;
                             }
-                            logger.info("time now:{}",now);
-                            logger.info("time  start:{}",startTime);
-                            logger.info("time  end:{}",endTime);
-                            logger.info("duration:{}",duration);
+                            logger.info("time now:{}", now);
+                            logger.info("time  start:{}", startTime);
+                            logger.info("time  end:{}", endTime);
+                            logger.info("duration:{}", duration);
 
                             String status = job.getfStatus();
+                            if (status.equals(Dict.TIMEOUT)) {
+                                status = Dict.FAILED;
+                            }
 
                             flushToWebData.put(Dict.JOB_PROCESS, process);
                             flushToWebData.put(Dict.JOB_DURATION, duration);
@@ -214,7 +217,7 @@ public class JobWebSocketService implements InitializingBean, ApplicationContext
                                 if (session.isOpen()) {
                                     try {
                                         session.getBasicRemote().sendText(JSON.toJSONString(flushToWebData));
-                                        logger.info("data to push:{}",JSON.toJSONString(flushToWebData));
+                                        logger.info("data to push:{}", JSON.toJSONString(flushToWebData));
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                         logger.error("IOException", e);
@@ -229,12 +232,12 @@ public class JobWebSocketService implements InitializingBean, ApplicationContext
                         } else {
                             logger.error("job {} is not exist", k);
                         }
-                        ;
+
 
                     }
             );
-        }catch (Exception e ){
-
+        } catch (Exception e) {
+            logger.error("Exception occurs", e);
         }
 
     }

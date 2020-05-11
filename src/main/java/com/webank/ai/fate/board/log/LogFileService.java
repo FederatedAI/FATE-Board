@@ -44,7 +44,7 @@ import java.util.Map;
 
 
 @Service
-public class LogFileService implements InitializingBean{
+public class LogFileService implements InitializingBean {
 
 
     final static String TASK_LOG_PATH = "$job_id/$role/$party_id/$component_id/$file_name";
@@ -100,18 +100,26 @@ public class LogFileService implements InitializingBean{
 
     public String getJobDir(String jobId) {
 
-
-
-            return FATE_DEPLOY_PREFIX + jobId + "/";
+        return FATE_DEPLOY_PREFIX + jobId + "/";
 
     }
 
+    public boolean checkPathParameters(String... parameters) {
+        String regex = "^\\w+$";
+        for (String parameter : parameters) {
+            if (!parameter.matches(regex)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public String buildFilePath(String jobId, String componentId, String type, String role, String partyId) {
 
         Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, componentId, type, role, partyId));
+        Preconditions.checkArgument(checkPathParameters(jobId, componentId, type, role, partyId));
         String filePath = "";
-        if (componentId == null || (componentId != null && componentId.equals(DEFAULT_COMPONENT_ID))) {
+        if (componentId == null || componentId.equals(DEFAULT_COMPONENT_ID)) {
 
             filePath = JOB_LOG_PATH.replace("$job_id", jobId).replace("$role", role).replace("$party_id", partyId);
 
@@ -138,7 +146,6 @@ public class LogFileService implements InitializingBean{
                     break;
                 default:
                     filePath = filePath.replace("$file_name", "INFO.log");
-
             }
 
         }
@@ -268,7 +275,7 @@ public class LogFileService implements InitializingBean{
         String ip = jobWithBLOBs.getfRunIp();
         Preconditions.checkArgument(StringUtils.isNoneEmpty(ip));
         String[] splits = ip.split(":");
-        ip=splits[0];
+        ip = splits[0];
 
         jobTaskInfo.jobStatus = jobWithBLOBs.getfStatus();
 
@@ -285,12 +292,12 @@ public class LogFileService implements InitializingBean{
             Task task = tasks.get(0);
 
             ip = task.getfRunIp();
-            logger.info("task ip:{}",ip);
+            logger.info("task ip:{}", ip);
 
             jobTaskInfo.taskStatus = task.getfStatus();
 
         }
-        logger.info("ssh ip:{}",ip);
+        logger.info("ssh ip:{}", ip);
         jobTaskInfo.ip = ip;
         return jobTaskInfo;
 
@@ -299,10 +306,10 @@ public class LogFileService implements InitializingBean{
     @Override
     public void afterPropertiesSet() throws Exception {
 
-        String systemDeloyPrefix =  System.getProperty("FATE_DEPLOY_PREFIX");
+        String systemDeloyPrefix = System.getProperty("FATE_DEPLOY_PREFIX");
 
-        if(systemDeloyPrefix!=null&&systemDeloyPrefix.length()!=0){
-            FATE_DEPLOY_PREFIX=  System.getProperty("FATE_DEPLOY_PREFIX");
+        if (systemDeloyPrefix != null && systemDeloyPrefix.length() != 0) {
+            FATE_DEPLOY_PREFIX = System.getProperty("FATE_DEPLOY_PREFIX");
         }
     }
 

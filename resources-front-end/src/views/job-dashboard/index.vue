@@ -1,20 +1,16 @@
 <template>
-  <div class="dashboard-container bg-dark app-container">
+  <div ref="dashboardPage" class="dashboard-container bg-dark app-container">
+    <breadcrumb-ext :breads="[{type:'content', val:'Dashboard'}, {type:'content', val:'Job: ' + jobId}]"/>
+    <el-row :gutter="12" class="dash-board-list">
 
-    <h3 v-if="!showingAllLog" class="app-title flex space-between">
-      <span>Dashboard</span>
-      <!--<p>Job: <span class="text-primary pointer" @click="toDetails()">{{ jobId }}</span></p>-->
-      <p>Job: <span>{{ jobId }}</span></p>
-    </h3>
-
-    <el-row v-if="!showingAllLog" :gutter="24" class="dash-board-list">
       <el-col :span="8">
-        <div v-loading="datasetLoading" class="col dataset-info shadow">
+        <div v-loading="datasetLoading" class="flex flex-col col dataset-info">
+          <!-- title -->
+          <h3 class="list-title">Dataset info.</h3>
 
-          <h3 class="list-title" style="margin-bottom: 24px;">DATASET INFO</h3>
-
+          <!-- content -->
           <el-row v-for="(row,index) in datasetList" :key="index" :gutter="4" class="dataset-row">
-            <el-col :span="6" :offset="2">
+            <el-col :span="6">
               <div class="dataset-item">
                 <p class="name dataset-title">{{ row.role }}</p>
                 <p v-if="row.options.length===1" class="value">{{ row.roleValue }}</p>
@@ -28,10 +24,9 @@
                 </el-select>
               </div>
             </el-col>
-
             <el-col :span="14">
               <div class="dataset-item">
-                <p class="name">DATASET</p>
+                <p class="name">dataset</p>
                 <p class="value">
                   <el-tooltip
                     popper-class="tooltip-content"
@@ -46,32 +41,17 @@
                 </p>
               </div>
             </el-col>
-
           </el-row>
-
         </div>
       </el-col>
+
       <el-col :span="8">
-        <div class="col job flex-center justify-center shadow pos-r">
-          <h3 class="list-title">JOB</h3>
+        <div class="col job flex-center justify-center pos-r">
+          <h3 class="list-title">Job</h3>
 
           <div v-if="jobStatus==='failed' || jobStatus==='success'" class="job-end-container flex flex-col flex-center">
-            <!--<i-->
-            <!--v-if="jobStatus === 'failed'"-->
-            <!--class="el-icon-circle-close job-icon"-->
-            <!--style="color: #ff6464;"/>-->
             <img
-              v-if="jobStatus === 'failed'"
-              :src="icons.normal.failed"
-              alt=""
-              class="job-icon">
-            <!--<i-->
-            <!--v-else-if="jobStatus === 'success'"-->
-            <!--class="el-icon-circle-check job-icon"-->
-            <!--style="color: #24b68b;"/>-->
-            <img
-              v-if="jobStatus === 'success'"
-              :src="icons.normal.success"
+              :src="jobStatus === 'success' ? icons.normal.success : icons.normal.failed"
               alt=""
               class="job-icon">
             <ul class="job-info flex space-around flex-wrap w-100">
@@ -99,12 +79,7 @@
           </div>
 
           <div v-else-if="jobStatus==='waiting' || jobStatus==='running'" class="echarts-container">
-            <!-- <div v-if="elapsed" class="elapsed">
-              <p class="elapsed-title">elapsed</p>
-              <p class="elapsed-time text-primary">{{ elapsed }}</p>
-            </div>
-            <echart-container :class="'echarts'" :options="jobOptions" @getEchartInstance="getJobEchartInstance"/> -->
-            <panel :msg="jobDetail" class="echarts"/>
+            <panel :progress="jobDetail.progress" :time="jobDetail.time" class="echarts"/>
           </div>
 
           <div class="btn-wrapper flex flex-col flex-center pos-a">
@@ -137,38 +112,31 @@
           </div>
         </div>
       </el-col>
+
       <el-col :span="8">
-        <div v-loading="false" class="col graph flex-center justify-center shadow">
+        <div v-loading="false" class="col graph flex-center justify-center">
           <div class="flex flex-row space-between">
-            <h3 class="list-title">GRAPH</h3>
+            <h3 class="list-title">Graph</h3>
             <icon-hover-and-active
               :class-name="'img-wrapper'"
               :default-url="icons.normal['fullscreen']"
               :hover-url="icons.hover['fullscreen']"
               :active-url="icons.active['fullscreen']"
-              @clickFn="showGraph = true"
+              @clickFn="clickForBigger"
             />
           </div>
           <div
             v-if="DAGData"
-            class="wrapper w-100 pointer"
-            style="min-width:400px;">
-            <!--class="wrapper w-100"-->
-            <!--style="min-width:400px;">-->
-            <!-- <echart-container
-              :class="'echarts'"
-              :options="graphOptions"
-              @getEchartInstance="getGraphEchartInstance"
-            /> -->
-            <dag :id="'graphCanvas'" :msg="DAGData" :thumbnail="true" :pure-pic="true"/>
+            class="wrapper w-100 pointer">
+            <dag :id="'graphCanvas'" :dag-info="DAGData" :thumbnail="true" :pure-pic="true" :operation-list="false"/>
           </div>
         </div>
       </el-col>
     </el-row>
 
-    <div class="log-wrapper shadow" >
-      <div class="flex flex-center" style="padding: 18px 0;">
-        <h3 class="title">LOG</h3>
+    <div :style="logContainer" class="log-wrapper">
+      <div class="flex flex-center">
+        <h3 class="title">Log</h3>
         <ul class="tab-bar flex">
           <li
             v-for="(tab,index) in Object.keys(logsMap)"
@@ -178,25 +146,23 @@
             @click="switchLogTab(tab)"
           >
             <span class="text">{{ tab }}</span>
-            <span v-if="tab!=='all'" :class="[tab]" class="count">{{ logsMap[tab].length }}</span>
+            <span v-if="tab!=='all' && logsMap[tab].length !== 0" :class="[tab]" class="count">{{ logsMap[tab].length }}</span>
           </li>
-          <!--<div class="tab-search">debug</div>-->
         </ul>
       </div>
-      <div v-loading="logLoading" ref="logView" :style="largestLog" class="log-container" @mousewheel="logOnMousewheel">
+      <div v-loading="logLoading" ref="logView" :style="logLoading ? largestLog : ''" class="log-container" @mousewheel="logOnMousewheel">
         <ul class="log-list overflow-hidden">
           <li v-for="(log,index) in logsMap[currentLogTab].list" :key="index">
-            <div class="flex">
+            <div class="flex flex-row flex-start">
               <span class="line-num">{{ log.lineNum }}</span>
               <span class="content"> {{ log.content }}</span>
             </div>
           </li>
         </ul>
       </div>
-      <div class="log-extend flex flex-center justify-center">
-        <!-- <i v-if="!showingAllLog" class="el-icon-caret-top" /> -->
+      <div ref="checklog" class="log-extend flex flex-center justify-center">
         <icon-hover-and-active
-          v-if="!showingAllLog"
+          v-if="showingAllLog"
           :default-url="icons.normal['dashBoardFold']"
           :hover-url="icons.hover['dashBoardFold']"
           :active-url="icons.active['dashBoardFold']"
@@ -204,7 +170,7 @@
         />
         <!-- <i v-if="showingAllLog" class="el-icon-caret-bottom" /> -->
         <icon-hover-and-active
-          v-if="showingAllLog"
+          v-if="!showingAllLog"
           :default-url="icons.normal['dashBoardUnfold']"
           :hover-url="icons.hover['dashBoardUnfold']"
           :active-url="icons.active['dashBoardUnfold']"
@@ -219,28 +185,12 @@
       width="50%"
       top="10vh"
     >
-      <h3 slot="title" class="list-title t-a-c" style="color:rgb(96, 98, 102);">GRAPH</h3>
+      <h3 slot="title" class="list-title t-a-c" style="font-size: 14px;color:#3E4052;">GRAPH</h3>
       <div
         v-if="DAGData"
         class="wrapper w-100"
         style="width:100%;height:70vh;position:relative;">
-        <!-- <echart-container
-          :class="'echarts'"
-          :options="graphOptions"
-          @getEchartInstance="getGraphEchartInstance"
-        /> -->
-        <dag ref="purePicBigerDag" :id="'dialogCanvas'" :msg="DAGData" :pure-pic="true"/>
-        <div class="flex flex-col flex-center suitable-button">
-          <div class="sutiable-button-item item-suitable" @click="dagSuitable">
-            <i class="el-icon-full-screen"/>
-          </div>
-          <div class="sutiable-button-item item-plus" @click="dagPlus">
-            <i class="el-icon-plus"/>
-          </div>
-          <div class="sutiable-button-item item-minus" @click="dagMinus">
-            <i class="el-icon-minus"/>
-          </div>
-        </div>
+        <dag ref="purePicBigerDag" :id="'dialogCanvas'" :dag-info="DAGData" :pure-pic="true"/>
       </div>
     </el-dialog>
 
@@ -254,18 +204,20 @@ import jobOptions from '@/utils/chart-options/gauge'
 import graphOptions from '@/utils/chart-options/graph'
 import graphChartHandler from '@/utils/vendor/graphChartHandler'
 import { formatSeconds, initWebSocket } from '@/utils'
-import Dag from '@/components/Dag'
-import Panel from '@/components/Panel'
+import Dag from '@/components/CanvasComponent/flowDiagram'
+import Panel from '@/components/CanvasComponent/panelDiagram'
 import IconHoverAndActive from '@/components/IconHoverAndActive'
+import BreadcrumbExt from '@/components/BreadcrumbExt'
 
-import { getJobDetails, getDAGDpencencies, queryLog, killJob } from '@/api/job'
+import { getJobDetails, getDAGDpencencies, queryLog, killJob, queryLogSize } from '@/api/job'
 
 export default {
   components: {
     EchartContainer,
     Dag,
     Panel,
-    IconHoverAndActive
+    IconHoverAndActive,
+    BreadcrumbExt
   },
   data() {
     return {
@@ -278,7 +230,7 @@ export default {
       jobStatus: '',
       jobDetail: {},
       datasetLoading: true,
-      logLoading: false,
+      logLoading: true,
       jobTimer: null,
       logWebsocket: {
         // 'all': null,
@@ -304,11 +256,15 @@ export default {
       elapsed: '',
       currentLogTab: 'info',
       showGraph: false,
-      butImage: require('@/utils/dag/icon/button.png'),
+      butImage: require('@/icons/button.png'),
       butBackground: '',
       butFontColor: '',
       showingAllLog: false,
-      largestLog: ''
+      largestLog: 'overflow:hidden;',
+      logContainer: '',
+      scrollPos: '',
+      initedLog: false,
+      releaseLimit: null
     }
   },
   computed: {
@@ -316,18 +272,33 @@ export default {
       'icons'
     ])
   },
+  created() {
+    this.getLogSize()
+  },
   mounted() {
     // console.log(process.env.BASE_API)
     const vm = this
-    this.jobTimer = setInterval(function() {
-      vm.getDatasetInfo(true)
-      vm.getDAGDpendencies()
+    this.jobTimer = setInterval(() => {
+      let finish = true
+      for (const item of this.DAGData.component_list) {
+        if (!item.status || !item.status.match(/success|failed/i)) {
+          finish = false
+          break
+        }
+      }
+      if (!vm.jobStatus.match(/success|failed/i) || !finish) {
+        vm.getDatasetInfo(true)
+        vm.getDAGDpendencies()
+      } else {
+        clearInterval(vm.jobTimer)
+      }
     }, 5000)
     this.getDatasetInfo()
     this.getDAGDpendencies()
     this.getLogSize()
     this.openLogsWebsocket()
     this.openJobWebsocket()
+    this.$refs.logView.addEventListener('scroll', vm.scrollChange)
   },
   beforeDestroy() {
     clearInterval(this.jobTimer)
@@ -355,13 +326,53 @@ export default {
             if (data.length > 0) {
               this.logsMap[item].list = [...this.logsMap[item].list, ...data]
               this.logsMap[item].length = data[data.length - 1].lineNum
+              this.$set(this.logsMap, item, this.logsMap[item])
+              this.checkHowManyLogGetForInited()
             }
           } else {
             this.logsMap[item].list.push(data)
             this.logsMap[item].length = data.lineNum
+            this.$set(this.logsMap, item, this.logsMap[item])
+            this.checkHowManyLogGetForInited()
           }
         })
       })
+    },
+    checkHowManyLogGetForInited() {
+      const vm = this
+      if (!this.releaseLimit) {
+        this.releaseLimit = setTimeout(function() {
+          vm.initedLog = true
+          vm.logLoading = false
+        }, 5000)
+      }
+      if (!this.initedLog) {
+        let checkGet = true
+        for (const key in this.logsMap) {
+          if (this.logsMap[key].maxlength === undefined) {
+            checkGet = false
+            break
+          } else {
+            if (this.logsMap[key].list.length > 0 && parseInt(this.logsMap[key].list[this.logsMap[key].list.length - 1].lineNum) !== parseInt(this.logsMap[key].maxlength)) {
+              checkGet = false
+              break
+            }
+            if (this.logsMap[key].maxlength > 0 && this.logsMap[key].list.length === 0) {
+              checkGet = false
+              break
+            }
+          }
+        }
+        if (checkGet) {
+          this.$nextTick(() => {
+            vm.logLoading = false
+            if (vm.releaseLimit) {
+              clearTimeout(vm.releaseLimit)
+            }
+          })
+          this.initedLog = true
+        }
+      }
     },
     openJobWebsocket() {
       const vm = this
@@ -380,7 +391,7 @@ export default {
           this.elapsed = formatSeconds(duration)
         }
         this.jobStatus = status
-        if (this.jobStatus !== 'failed' && this.jobStatus !== 'success') {
+        if (this.jobStatus !== 'failed' && this.jobStatus !== 'complete') {
           this.jobOptions.series[0].pointer.show = true
           this.jobOptions.series[0].detail.show = true
           this.jobOptions.series[0].data[0].value = process || 0
@@ -391,16 +402,17 @@ export default {
       })
     },
     getLogSize() {
-      // Object.keys(this.logsMap).forEach(item => {
-      //   queryLogSize({
-      //     job_id: this.jobId,
-      //     party_id: this.partyId,
-      //     role: this.role,
-      //     type: item
-      //   }).then(res => {
-      //     this.logsMap[item].length = res.data
-      //   })
-      // })
+      Object.keys(this.logsMap).forEach(item => {
+        queryLogSize({
+          job_id: this.jobId,
+          party_id: this.partyId,
+          role: this.role,
+          type: item
+        }).then(res => {
+          this.logsMap[item].maxlength = res.data
+          this.checkHowManyLogGetForInited()
+        })
+      })
     },
     getDatasetInfo(isInterval = false) {
       const para = {
@@ -538,8 +550,6 @@ export default {
       this.currentLogTab = tab
     },
     logOnMousewheel(e) {
-      // console.log(e.target.parentNode.parentNode.scrollTop)
-      // console.log(e.wheelDelta)
       const topLog = this.logsMap[this.currentLogTab].list[0]
       if (!topLog) {
         return
@@ -586,12 +596,12 @@ export default {
     overButton(e) {
       this.butBackground = '#494ece'
       this.butFontColor = '#ffffff'
-      this.butImage = require('@/utils/dag/icon/button2.png')
+      this.butImage = require('@/icons/button2.png')
     },
     outButton(e) {
       this.butBackground = ''
       this.butFontColor = ''
-      this.butImage = require('@/utils/dag/icon/button.png')
+      this.butImage = require('@/icons/button.png')
     },
     clickButton() {
       this.butBackground = '#3135A6'
@@ -604,13 +614,18 @@ export default {
       }
       return final
     },
-    showingAllLogs() {
+    showingAllLogs(part) {
+      const vm = this
       this.showingAllLog = !this.showingAllLog
+      const wrapper = { 'height': 'calc(100% - 28px)' }
       if (this.showingAllLog) {
-        this.largestLog = 'height:703px;'
+        this.logContainer = wrapper
       } else {
-        this.largestLog = ''
+        this.logContainer = ''
       }
+      this.$nextTick(() => {
+        vm.$refs.checklog.scrollIntoView()
+      })
     },
     dagSuitable() {
       this.$refs.purePicBigerDag.suitable()
@@ -620,6 +635,29 @@ export default {
     },
     dagMinus() {
       this.$refs.purePicBigerDag.dagMinus()
+    },
+    _getPos(ev) {
+      let x, y
+      if (ev.layerX || ev.layerX === 0) {
+        x = ev.layerX
+        y = ev.layerY
+      } else if (ev.offsetX || ev.offsetY === 0) {
+        x = ev.offsetX
+        y = ev.offsetY
+      }
+      return { x, y }
+    },
+    scrollChange(ev) {
+      ev.stopPropagation()
+      if (Math.abs(ev.currentTarget.scrollTop - this.scrollPos) > ev.currentTarget.scrollHeight * 1 / 3) {
+        ev.currentTarget.scrollTop = this.scrollPos
+        return false
+      } else {
+        this.scrollPos = ev.currentTarget.scrollTop
+      }
+    },
+    clickForBigger() {
+      this.showGraph = true
     }
   }
 }
@@ -634,6 +672,7 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    color: #4159D1;
   }
 
   .el-tooltip__popper[x-placement^=top] .popper__arrow::after {

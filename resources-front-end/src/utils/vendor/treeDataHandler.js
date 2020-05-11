@@ -1,29 +1,39 @@
 import { formatFloat } from '../index'
+import store from '@/store/modules/app'
 
-export default function(data, role, partyId, featureNameFidMapping, splitMaskdict, missingDirMaskdict) {
+const { modelNameMap } = store.state
+
+export default function(data, role, partyId, featureNameFidMapping, splitMaskdict, missingDirMaskdict, outputType) {
   if (data.length === 0) {
     return []
   }
   let maxDepth = 0
   const pushData = ({ arr, node, grandChildrenArr = [], depth = 0 }) => {
     const variable = featureNameFidMapping[node.fid]
-    const splitValue = splitMaskdict[node.id]
+    const splitValue = outputType !== modelNameMap.homoBoost ? splitMaskdict[node.id] : parseFloat(node.bid).toFixed(6)
     const nodeRole = node.sitename.split(':')[0]
     const nodePartyId = node.sitename.split(':')[1]
-    // TODO
     let name = `ID: ${node.id}\n`
     // console.log(nodeRole, role, nodePartyId, partyId)
-    if (nodeRole === role && nodePartyId === partyId && !node.isLeaf) {
+    if (nodeRole === role && nodePartyId === partyId && !node.isLeaf && outputType !== modelNameMap.homoBoost) {
       name += `${variable} <= ${splitValue}`
       if (missingDirMaskdict[node.id] !== 1) {
         name += '\nor missing'
       }
       name += '\n'
+    } else if (outputType === modelNameMap.homoBoost && !node.isLeaf && variable) {
+      name += `${variable} <= ${splitValue}`
+      if (node.missingDir === -1) {
+        name += '\nis a missing value'
+      }
+      name += '\n'
     }
-    if (node.isLeaf && role === 'guest') {
+    if ((node.isLeaf && role === 'guest') || (node.isLeaf && outputType === modelNameMap.homoBoost)) {
       name += `weight: ${formatFloat(node.weight)}\n`
     }
-    name += `${nodeRole && nodeRole.toUpperCase()}: ${nodePartyId}`
+    if (modelNameMap.homoBoost !== outputType) {
+      name += `${nodeRole && nodeRole.toUpperCase()}: ${nodePartyId}`
+    }
     arr.push({
       treeid: node.id,
       name,
@@ -38,6 +48,8 @@ export default function(data, role, partyId, featureNameFidMapping, splitMaskdic
   pushData({ arr: treeData, node: rootNode })
   const insertChild = (arr, leftNodeId, rightNodeId, depth) => {
     ++depth
+    let treeWidth = 0
+    const defWidth = 170
     // 获取左右儿子节点
     const leftNode = data.find(item => item.id === leftNodeId)
     const rightNode = data.find(item => item.id === rightNodeId)
@@ -48,20 +60,27 @@ export default function(data, role, partyId, featureNameFidMapping, splitMaskdic
       const rightGranChildId = leftNode.rightNodeid
       // 递归插入
       pushData({ arr, node: leftNode, grandChildrenArr: leftGrandChildrenArr, depth })
-      insertChild(leftGrandChildrenArr, leftGranChildId, rightGranChildId, depth)
+      treeWidth += insertChild(leftGrandChildrenArr, leftGranChildId, rightGranChildId, depth)
+    } else if (rightNode) {
+      treeWidth += defWidth
     }
     if (rightNode) {
       const rightGrandChildrenArr = []
       const rightGranChildId = rightNode.rightNodeid
       const leftGranChildId = rightNode.leftNodeid
       // 递归插入
-      insertChild(rightGrandChildrenArr, leftGranChildId, rightGranChildId)
-      pushData({ arr, node: rightNode, grandChildrenArr: rightGrandChildrenArr })
+      treeWidth += insertChild(rightGrandChildrenArr, leftGranChildId, rightGranChildId, depth)
+      pushData({ arr, node: rightNode, grandChildrenArr: rightGrandChildrenArr, depth })
+    } else if (leftNode) {
+      treeWidth += defWidth
     }
+    if (!leftNode && !rightNode) {
+      treeWidth = defWidth
+    }
+    return treeWidth
   }
-
-  insertChild(treeData[0].children, data[0].leftNodeid, data[0].rightNodeid, 1)
+  const treeWidth = insertChild(treeData[0].children, data[0].leftNodeid, data[0].rightNodeid, 1)
   // console.log(treeData)
   // console.log(maxHorizontalLength)
-  return { data: treeData, size: data.length, maxDepth }
+  return { data: treeData, size: data.length, maxDepth, treeWidth }
 }

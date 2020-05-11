@@ -16,9 +16,9 @@ export default function({ outputType, responseData, role, partyId }) {
     output.isNoModelOutput = true
     return output
   }
-  if (outputType === modelNameMap.boost) {
+  if (outputType === modelNameMap.boost || outputType === modelNameMap.homoBoost) {
     if (Object.keys(responseData).length > 0) {
-      handleBoostData({ responseData, output, role, partyId })
+      handleBoostData({ responseData, output, role, partyId, outputType })
     } else {
       output.isNoModelOutput = true
     }
@@ -84,9 +84,39 @@ export default function({ outputType, responseData, role, partyId }) {
     outputType === modelNameMap.heteroLinR ||
     outputType === modelNameMap.homoNN ||
     outputType === modelNameMap.poisson) {
-    const { weight, intercept, isConverged, iters, needOneVsRest } = responseData
+    const { weight, intercept, isConverged, iters, needOneVsRest, oneVsRestResult } = responseData
     const tData = []
-    if (weight && Object.keys(weight).length > 0) {
+    if (oneVsRestResult) {
+      const mod = oneVsRestResult.completedModels
+      const classed = oneVsRestResult.oneVsRestClasses
+      for (let i = 0; i < mod.length; i++) {
+        const oWeight = mod[i].weight
+        const header = mod[i].header
+        const data = []
+        for (const val of header) {
+          data.push({
+            variable: val,
+            weight: formatFloat(oWeight[val])
+          })
+        }
+        if (role.toLowerCase() !== 'host') {
+          data.push({
+            variable: 'intercept',
+            weight: formatFloat(mod[i].intercept)
+          })
+        }
+        const name = 'model_' + i + (role === 'guest' ? ':' + classed[i] : '')
+        tData.push({
+          name,
+          data,
+          isConverged: mod[i].isConverged,
+          iters: mod[i].iters
+        })
+      }
+      output = {
+        tData
+      }
+    } else if (weight && Object.keys(weight).length > 0) {
       Object.keys(weight).forEach(key => {
         tData.push({
           variable: key,
@@ -185,7 +215,7 @@ export default function({ outputType, responseData, role, partyId }) {
       //   correlationData,
       //   correlationDataReverse
       // }
-      output = Object.assign(handleSelectionData(responseData), output)
+      output = Object.assign(handleSelectionData(responseData, partyId), output)
     } else {
       output.isNoModelOutput = true
     }
@@ -230,7 +260,7 @@ export default function({ outputType, responseData, role, partyId }) {
     const hostData = responseData && responseData.hostResults
 
     if ((data && Object.keys(data).length > 0) || (hostData && hostData.length > 0)) {
-      const middleData = handleBinningData(data, responseData.header, 'guest', guestPartyId, role)
+      const middleData = handleBinningData(data, responseData.header, 'guest', guestPartyId, role, role)
       const sd = []
       const op = []
       for (const val of responseData.header) {
@@ -253,7 +283,7 @@ export default function({ outputType, responseData, role, partyId }) {
       const hostMiddle = []
       const hostPartyId = []
       for (const key in hostData) {
-        hostMiddle.push(handleBinningData(hostData[key].binningResult, responseData.header, 'host', hostData[key].partyId, hostData[key].role))
+        hostMiddle.push(handleBinningData(hostData[key].binningResult, responseData.header, 'host', hostData[key].partyId, hostData[key].role, role))
         hostPartyId.push(hostData[key].partyId || key)
       }
       output.hostData = { data: hostMiddle, id: hostPartyId }
@@ -264,6 +294,18 @@ export default function({ outputType, responseData, role, partyId }) {
     output.correlation = handleCorrelationData(responseData, role)
     output.role = role
     output.partyId = partyId
+  }
+  if (outputType === modelNameMap.heteroLR ||
+    outputType === modelNameMap.heteroLinR ||
+    outputType === modelNameMap.poisson ||
+    outputType === modelNameMap.heteroNN ||
+    outputType === modelNameMap.boost) {
+    output.bestIteration = responseData.bestIteration
+    if (Object.getOwnPropertyNames(output).length === 2) {
+      if (output.bestIteration === -1) {
+        output.isNoModelOutput = true
+      }
+    }
   }
   return output
 }

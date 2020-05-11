@@ -45,7 +45,7 @@ public class WebConfigration implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedMethods("*").allowedOrigins("http://localhost:8028").allowCredentials(true);
+        registry.addMapping("/**").allowedMethods("*").allowedOrigins("*").allowCredentials(true);
     }
 
     @Bean("fateboardDataSource")

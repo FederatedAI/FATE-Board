@@ -3,10 +3,11 @@
     <div v-if="tBody.length>0 && tHeader.length>0">
       <el-table
         :data="tBody"
+        :cell-class-name="checkCellStyle"
         highlight-current-row
-        border
+        header-cell-class-name="default-header-style"
         element-loading-text="Loading"
-        size="mini"
+        size="small"
         height="550"
         style="width: 100%;margin-bottom: 20px;"
       >
@@ -129,6 +130,13 @@ export default {
   },
   mounted() {},
   methods: {
+    checkCellStyle(obj) {
+      let str = ' default-cell-style'
+      if (obj.column.label === 'index') {
+        str += ' default-cell-first-col-style'
+      }
+      return str
+    },
     redefinedPage() {
       this.page = 1
     },
@@ -221,5 +229,24 @@ export default {
 	font-size: 20px;
 	font-weight: bold;
 	color: #bbbbc8;
+}
+
+.default-header-style {
+	background-color: #deecfc !important;
+	border: 1px solid #ffffff;
+}
+
+.default-cell-style {
+	border: 1px solid #fff;
+	border-bottom: 1px solid #fff !important;
+	background-color: #fafbfc;
+}
+.default-cell-first-col-style {
+	background-color: #ebedf0 !important;
+}
+
+.selction-row-choosed {
+	background-color: #ebedf0 !important;
+	color: #6a6c75;
 }
 </style>
