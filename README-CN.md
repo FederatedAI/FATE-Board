@@ -1,4 +1,4 @@
-**DOC|[English deployment](./README.md)**
+**DOC|[English](./README.md)**
 
 FATE-Board是联邦学习建模的可视化工具，旨在帮助用户简单而高效地理解模型与探索模型。
 
