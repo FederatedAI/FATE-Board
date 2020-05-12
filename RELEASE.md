@@ -1,3 +1,8 @@
+# Release 1.4.1
+
+#### Major Features and Improvements
+- Update source code of front-end 
+
 # Release 1.4.0
 
 #### Major Features and Improvements
