@@ -36,9 +36,9 @@
             <li class="inline-row" style="margin-bottom: 0px;">
               <div class="prop inline-prop">dataset:</div>
               <div class="flex flex-col flex-start prop-content prop-dataset">
-                <el-popover v-for="(item, index) in showingRoleList" :key="index" :content="item" :disabled="popover[index]" trigger="hover" placement="right" effect="light">
-                  <span slot="reference" :id="'spanPopOver' + index" class="prop-dataset-item">{{ item }}</span>
-                </el-popover>
+                <el-tooltip v-for="(item, index) in showingRoleList" :key="index" :content="item" :disabled="popover[index]" placement="right">
+                  <p :id="'spanPopOver' + index" class="prop-dataset-item">{{ item }}</p>
+                </el-tooltip>
                 <el-popover
                   v-if="thisRoleList.length > 3"
                   placement="right-start"
@@ -89,7 +89,11 @@
                         <p> {{ dataset.name }} </p>
                       </el-col>
                       <el-col :span="12" :offset="4">
-                        <p> {{ dataset.dataset }} </p>
+                        <div class="flex flex-col">
+                          <p v-for="(item, index) in checkDataSetForOther(dataset.dataset)" :key="index">
+                            {{ item }}
+                          </p>
+                        </div>
                       </el-col>
                     </el-row>
                   </div>
@@ -375,10 +379,17 @@ export default {
           }
         }
       }
-      const check = []
+      let check = []
       for (const val of final) {
         for (const item of val.datasetList) {
           check.push(item.dataset)
+        }
+      }
+      const len = check.length
+      for (let i = 0; i < len; i++) {
+        const item = check.splice(0, 1)
+        for (const val of item) {
+          check = check.concat(val.split(','))
         }
       }
       return check
@@ -447,9 +458,9 @@ export default {
     shouldShowPopover(item, id) {
       const ctx = document.getElementById('historyForDetail').getContext('2d')
       for (let i = 0; i < this.showingRoleList.length; i++) {
-        const width = this.measureText(ctx, this.showingRoleList[i] || '', { font: (12 * 1.14) + 'px roboto_bold' }).width
+        const width = this.measureText(ctx, this.showingRoleList[i] || '', { font: (12 * 1.14) + 'px roboto_regular' }).width
         const acWidth = parseInt(getComputedStyle(document.getElementById('spanPopOver' + i)).width.replace('px', ''))
-        this.popover[i] = acWidth > width
+        this.popover.splice(i, 1, acWidth > width)
       }
     },
     notesHint() {
@@ -463,6 +474,9 @@ export default {
         ctx[key] = style[key]
       }
       return ctx.measureText(text)
+    },
+    checkDataSetForOther(dataset) {
+      return dataset.split(',')
     },
     getDatasetInfo(refresh = false) {
       const vm = this
