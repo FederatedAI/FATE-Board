@@ -242,7 +242,7 @@
         </div>
         <p v-if="filterForStepwise" class="model-text" style="color: #3e4052;font-family: 'Roboto';font-weight: bold;margin-bottom: 12px;">The Final Model Information:</p>
         <p v-if="LRSelect.length > 0 && role === 'guest'" class="model-text" style="margin-bottom: 0">model label: {{ lrModelChooseItem.replace(/^.+\:/, '') }}</p>
-        <p class="model-text" style="margin-bottom: 0">max iterations: {{ LRIters }}</p>
+        <p class="model-text" style="margin-bottom: 0">iterations: {{ LRIters }}</p>
         <p class="model-text">converged: {{ LRisConverged }}</p>
         <pagination-table
           :table-data="LRtData"
