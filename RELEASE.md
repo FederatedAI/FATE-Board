@@ -1,3 +1,10 @@
+# Release 1.4.1
+
+#### Major Features and Improvements
+- Add security check for file path of logs
+- support PSI display in evaluation component
+- Support confusion matrix display
+
 # Release 1.4.0
 
 #### Major Features and Improvements
