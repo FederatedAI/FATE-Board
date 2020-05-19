@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.log.LogFileService;
+import com.webank.ai.fate.board.pojo.FuzzyLogQO;
 import com.webank.ai.fate.board.pojo.SshInfo;
 import com.webank.ai.fate.board.ssh.SshService;
 import com.webank.ai.fate.board.utils.GetSystemInfo;
@@ -28,11 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.xml.ws.Response;
 import java.io.*;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +73,6 @@ public class LogController {
         return result;
 
     }
-
 
     @RequestMapping(value = "/queryLogSize/{jobId}/{role}/{partyId}/{componentId}/{type}", method = RequestMethod.GET)
     @ResponseBody
@@ -163,11 +161,20 @@ public class LogController {
                     logger.debug("execute  cmd {} return count {}", cmd, index);
                 }
             } finally {
-                if (inputStream != null) {
-                    inputStream.close();
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                if (process != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
                     process.destroyForcibly();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             return result;
@@ -184,6 +191,62 @@ public class LogController {
 
     }
 
+    private List<Map> queryFuzzyLog(String componentId, String jobId, String type, String role, String partyId, String condition, Integer begin, Integer end) throws Exception {
+        String filePath = logFileService.buildFilePath(jobId, componentId, type, role, partyId);
+//        Preconditions.checkArgument(filePath != null && 0!=filePath.trim().length());
+        Preconditions.checkArgument(StringUtils.isNoneEmpty(condition, filePath));
+        Preconditions.checkArgument(begin != null && end != null);
+        Preconditions.checkArgument(end > begin && begin > 0);
+
+        if (LogFileService.checkFileIsExist(filePath)) {
+            List<Map> result = Lists.newArrayList();
+
+            String[] cmd = {"sh", "-c", "grep -n " + condition + " " + filePath + " | tail -n +" + begin + " | head -n " + (end - begin + 1)};
+            Process process = Runtime.getRuntime().exec(cmd);
+            InputStream inputStream = process.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            try {
+                String content = null;
+                do {
+                    content = reader.readLine();
+                    if (content != null) {
+                        int i = content.indexOf(":");
+                        String lineNumber = content.substring(0, i);
+                        String lineContent = content.substring(i + 1);
+                        result.add(LogFileService.toLogMap(lineContent, Long.parseLong(lineNumber)));
+                    }
+                } while (content != null);
+                logger.info("execute  cmd : {} ", (Object) cmd);
+            } finally {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    process.destroyForcibly();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            return result;
+        } else {
+            String ip = logFileService.getJobTaskInfo(jobId, componentId, role, partyId).ip;
+            if (StringUtils.isEmpty(ip)) {
+                return null;
+            }
+            logFileService.checkSshInfo(ip);
+            List<Map> remoteFuzzyLog = logFileService.getRemoteFuzzyLog(filePath, ip, condition, begin, end);
+            return remoteFuzzyLog;
+
+        }
+
+    }
 
     @RequestMapping(value = "/queryLogWithSize/{jobId}/{role}/{partyId}/{componentId}/{type}/{begin}/{end}", method = RequestMethod.GET)
     @ResponseBody
@@ -200,6 +263,22 @@ public class LogController {
         List<Map> result = this.queryLog(componentId, jobId, type, role, partyId, begin, end);
 
         return new ResponseResult<>(ErrorCode.SUCCESS, result);
+    }
+
+    @RequestMapping(value = "/queryFuzzyLog", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseResult queryFuzzyLog(@RequestBody FuzzyLogQO fuzzyLogQO) throws Exception {
+        logger.info("RequestBody: queryFuzzyLog  {}", fuzzyLogQO);
+        List<Map> result = this.queryFuzzyLog(fuzzyLogQO.getComponentId(), fuzzyLogQO.getJobId(), fuzzyLogQO.getType(), fuzzyLogQO.getRole(), fuzzyLogQO.getPartyId(), fuzzyLogQO.getCondition(), fuzzyLogQO.getBegin(), fuzzyLogQO.getEnd());
+        return new ResponseResult<>(ErrorCode.SUCCESS, result);
+    }
+
+    @RequestMapping(value = "/queryFuzzyLogSize", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseResult queryFuzzyLogSize(@RequestBody FuzzyLogQO fuzzyLogQO) throws Exception {
+        logger.info("RequestBody: queryFuzzyLogSize {}", fuzzyLogQO);
+        long size = logFileService.queryFuzzyLogSize(fuzzyLogQO.getComponentId(), fuzzyLogQO.getJobId(), fuzzyLogQO.getType(), fuzzyLogQO.getRole(), fuzzyLogQO.getPartyId(), fuzzyLogQO.getCondition());
+        return new ResponseResult<>(ErrorCode.SUCCESS, size);
     }
 
 }
