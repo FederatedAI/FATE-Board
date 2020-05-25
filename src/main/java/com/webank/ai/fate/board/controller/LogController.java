@@ -143,7 +143,7 @@ public class LogController {
             if (begin > end || begin <= 0) {
                 throw new Exception();
             }
-            String[] cmd = {"sh", "-c", "tail -n +" + begin + " " + filePath + " | head -n " + (end - begin)};
+            String[] cmd = {"sh", "-c", "tail -n +" + begin + " " + filePath + " | head -n " + (end - begin + 1)};
             Process process = Runtime.getRuntime().exec(cmd);
             InputStream inputStream = process.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
