@@ -1,9 +1,16 @@
+# Release 1.4.2
+
+#### Major Features and Improvements
+- Support display of schedule-log from fate-flow
+- Support fuzzy search of notes
+
+
 # Release 1.4.1
 
 #### Major Features and Improvements
-- support PSI display in evaluation component
+- Support PSI display in evaluation component
 - Support confusion matrix display
-- update logs interface
+- Update logs interface
 
 # Release 1.4.0
 

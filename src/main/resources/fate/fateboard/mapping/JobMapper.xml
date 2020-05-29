@@ -86,16 +86,16 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-    f_job_id, f_role, f_party_id, f_name, f_tag, f_initiator_party_id, f_status, f_current_steps, 
-    f_current_tasks, f_progress, f_create_time, f_update_time, f_start_time, f_end_time, 
-    f_elapsed, f_run_ip
-  </sql>
+        f_job_id, f_role, f_party_id, f_name, f_tag, f_initiator_party_id, f_status, f_current_steps,
+        f_current_tasks, f_progress, f_create_time, f_update_time, f_start_time, f_end_time,
+        f_elapsed, f_run_ip
+    </sql>
     <sql id="Blob_Column_List">
-    f_description, f_roles, f_dsl, f_runtime_conf
-  </sql>
+        f_description, f_roles, f_dsl, f_runtime_conf
+    </sql>
 
     <select id="selectByPage" resultMap="ResultMapWithBLOBs">
-        select * from t_job  ORDER  BY  f_create_time  desc limit #{startIndex},#{pageSize}
+        select * from t_job ORDER BY f_create_time desc limit #{startIndex},#{pageSize}
     </select>
 
 
@@ -117,7 +117,7 @@
             order by ${orderByClause}
         </if>
         <if test="limitClause != null">
-             limit ${limitClause}
+            limit ${limitClause}
         </if>
     </select>
     <select id="selectByExample" parameterType="com.webank.ai.fate.board.pojo.JobExample" resultMap="BaseResultMap">
@@ -149,11 +149,11 @@
         and f_party_id = #{fPartyId,jdbcType=VARCHAR}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="com.webank.ai.fate.board.pojo.JobKey">
-    delete from t_job
-    where f_job_id = #{fJobId,jdbcType=VARCHAR}
-      and f_role = #{fRole,jdbcType=VARCHAR}
-      and f_party_id = #{fPartyId,jdbcType=VARCHAR}
-  </delete>
+        delete from t_job
+        where f_job_id = #{fJobId,jdbcType=VARCHAR}
+        and f_role = #{fRole,jdbcType=VARCHAR}
+        and f_party_id = #{fPartyId,jdbcType=VARCHAR}
+    </delete>
     <delete id="deleteByExample" parameterType="com.webank.ai.fate.board.pojo.JobExample">
         delete from t_job
         <if test="_parameter != null">
@@ -161,21 +161,21 @@
         </if>
     </delete>
     <insert id="insert" parameterType="com.webank.ai.fate.board.pojo.JobWithBLOBs">
-    insert into t_job (f_job_id, f_role, f_party_id, 
-      f_name, f_tag, f_initiator_party_id, 
-      f_status, f_current_steps, f_current_tasks, 
-      f_progress, f_create_time, f_update_time, 
-      f_start_time, f_end_time, f_elapsed, 
-      f_run_ip, f_description, f_roles, 
-      f_dsl, f_runtime_conf)
-    values (#{fJobId,jdbcType=VARCHAR}, #{fRole,jdbcType=VARCHAR}, #{fPartyId,jdbcType=VARCHAR}, 
-      #{fName,jdbcType=VARCHAR}, #{fTag,jdbcType=VARCHAR}, #{fInitiatorPartyId,jdbcType=VARCHAR}, 
-      #{fStatus,jdbcType=VARCHAR}, #{fCurrentSteps,jdbcType=VARCHAR}, #{fCurrentTasks,jdbcType=VARCHAR}, 
-      #{fProgress,jdbcType=INTEGER}, #{fCreateTime,jdbcType=BIGINT}, #{fUpdateTime,jdbcType=BIGINT}, 
-      #{fStartTime,jdbcType=BIGINT}, #{fEndTime,jdbcType=BIGINT}, #{fElapsed,jdbcType=BIGINT}, 
-      #{fRunIp,jdbcType=VARCHAR}, #{fDescription,jdbcType=LONGVARCHAR}, #{fRoles,jdbcType=LONGVARCHAR}, 
-      #{fDsl,jdbcType=LONGVARCHAR}, #{fRuntimeConf,jdbcType=LONGVARCHAR})
-  </insert>
+        insert into t_job (f_job_id, f_role, f_party_id,
+        f_name, f_tag, f_initiator_party_id,
+        f_status, f_current_steps, f_current_tasks,
+        f_progress, f_create_time, f_update_time,
+        f_start_time, f_end_time, f_elapsed,
+        f_run_ip, f_description, f_roles,
+        f_dsl, f_runtime_conf)
+        values (#{fJobId,jdbcType=VARCHAR}, #{fRole,jdbcType=VARCHAR}, #{fPartyId,jdbcType=VARCHAR},
+        #{fName,jdbcType=VARCHAR}, #{fTag,jdbcType=VARCHAR}, #{fInitiatorPartyId,jdbcType=VARCHAR},
+        #{fStatus,jdbcType=VARCHAR}, #{fCurrentSteps,jdbcType=VARCHAR}, #{fCurrentTasks,jdbcType=VARCHAR},
+        #{fProgress,jdbcType=INTEGER}, #{fCreateTime,jdbcType=BIGINT}, #{fUpdateTime,jdbcType=BIGINT},
+        #{fStartTime,jdbcType=BIGINT}, #{fEndTime,jdbcType=BIGINT}, #{fElapsed,jdbcType=BIGINT},
+        #{fRunIp,jdbcType=VARCHAR}, #{fDescription,jdbcType=LONGVARCHAR}, #{fRoles,jdbcType=LONGVARCHAR},
+        #{fDsl,jdbcType=LONGVARCHAR}, #{fRuntimeConf,jdbcType=LONGVARCHAR})
+    </insert>
     <insert id="insertSelective" parameterType="com.webank.ai.fate.board.pojo.JobWithBLOBs">
         insert into t_job
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -485,45 +485,102 @@
         and f_party_id = #{fPartyId,jdbcType=VARCHAR}
     </update>
     <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.webank.ai.fate.board.pojo.JobWithBLOBs">
-    update t_job
-    set f_name = #{fName,jdbcType=VARCHAR},
-      f_tag = #{fTag,jdbcType=VARCHAR},
-      f_initiator_party_id = #{fInitiatorPartyId,jdbcType=VARCHAR},
-      f_status = #{fStatus,jdbcType=VARCHAR},
-      f_current_steps = #{fCurrentSteps,jdbcType=VARCHAR},
-      f_current_tasks = #{fCurrentTasks,jdbcType=VARCHAR},
-      f_progress = #{fProgress,jdbcType=INTEGER},
-      f_create_time = #{fCreateTime,jdbcType=BIGINT},
-      f_update_time = #{fUpdateTime,jdbcType=BIGINT},
-      f_start_time = #{fStartTime,jdbcType=BIGINT},
-      f_end_time = #{fEndTime,jdbcType=BIGINT},
-      f_elapsed = #{fElapsed,jdbcType=BIGINT},
-      f_run_ip = #{fRunIp,jdbcType=VARCHAR},
-      f_description = #{fDescription,jdbcType=LONGVARCHAR},
-      f_roles = #{fRoles,jdbcType=LONGVARCHAR},
-      f_dsl = #{fDsl,jdbcType=LONGVARCHAR},
-      f_runtime_conf = #{fRuntimeConf,jdbcType=LONGVARCHAR}
-    where f_job_id = #{fJobId,jdbcType=VARCHAR}
-      and f_role = #{fRole,jdbcType=VARCHAR}
-      and f_party_id = #{fPartyId,jdbcType=VARCHAR}
-  </update>
+        update t_job
+        set f_name = #{fName,jdbcType=VARCHAR},
+        f_tag = #{fTag,jdbcType=VARCHAR},
+        f_initiator_party_id = #{fInitiatorPartyId,jdbcType=VARCHAR},
+        f_status = #{fStatus,jdbcType=VARCHAR},
+        f_current_steps = #{fCurrentSteps,jdbcType=VARCHAR},
+        f_current_tasks = #{fCurrentTasks,jdbcType=VARCHAR},
+        f_progress = #{fProgress,jdbcType=INTEGER},
+        f_create_time = #{fCreateTime,jdbcType=BIGINT},
+        f_update_time = #{fUpdateTime,jdbcType=BIGINT},
+        f_start_time = #{fStartTime,jdbcType=BIGINT},
+        f_end_time = #{fEndTime,jdbcType=BIGINT},
+        f_elapsed = #{fElapsed,jdbcType=BIGINT},
+        f_run_ip = #{fRunIp,jdbcType=VARCHAR},
+        f_description = #{fDescription,jdbcType=LONGVARCHAR},
+        f_roles = #{fRoles,jdbcType=LONGVARCHAR},
+        f_dsl = #{fDsl,jdbcType=LONGVARCHAR},
+        f_runtime_conf = #{fRuntimeConf,jdbcType=LONGVARCHAR}
+        where f_job_id = #{fJobId,jdbcType=VARCHAR}
+        and f_role = #{fRole,jdbcType=VARCHAR}
+        and f_party_id = #{fPartyId,jdbcType=VARCHAR}
+    </update>
     <update id="updateByPrimaryKey" parameterType="com.webank.ai.fate.board.pojo.Job">
-    update t_job
-    set f_name = #{fName,jdbcType=VARCHAR},
-      f_tag = #{fTag,jdbcType=VARCHAR},
-      f_initiator_party_id = #{fInitiatorPartyId,jdbcType=VARCHAR},
-      f_status = #{fStatus,jdbcType=VARCHAR},
-      f_current_steps = #{fCurrentSteps,jdbcType=VARCHAR},
-      f_current_tasks = #{fCurrentTasks,jdbcType=VARCHAR},
-      f_progress = #{fProgress,jdbcType=INTEGER},
-      f_create_time = #{fCreateTime,jdbcType=BIGINT},
-      f_update_time = #{fUpdateTime,jdbcType=BIGINT},
-      f_start_time = #{fStartTime,jdbcType=BIGINT},
-      f_end_time = #{fEndTime,jdbcType=BIGINT},
-      f_elapsed = #{fElapsed,jdbcType=BIGINT},
-      f_run_ip = #{fRunIp,jdbcType=VARCHAR}
-    where f_job_id = #{fJobId,jdbcType=VARCHAR}
-      and f_role = #{fRole,jdbcType=VARCHAR}
-      and f_party_id = #{fPartyId,jdbcType=VARCHAR}
-  </update>
+        update t_job
+        set f_name = #{fName,jdbcType=VARCHAR},
+        f_tag = #{fTag,jdbcType=VARCHAR},
+        f_initiator_party_id = #{fInitiatorPartyId,jdbcType=VARCHAR},
+        f_status = #{fStatus,jdbcType=VARCHAR},
+        f_current_steps = #{fCurrentSteps,jdbcType=VARCHAR},
+        f_current_tasks = #{fCurrentTasks,jdbcType=VARCHAR},
+        f_progress = #{fProgress,jdbcType=INTEGER},
+        f_create_time = #{fCreateTime,jdbcType=BIGINT},
+        f_update_time = #{fUpdateTime,jdbcType=BIGINT},
+        f_start_time = #{fStartTime,jdbcType=BIGINT},
+        f_end_time = #{fEndTime,jdbcType=BIGINT},
+        f_elapsed = #{fElapsed,jdbcType=BIGINT},
+        f_run_ip = #{fRunIp,jdbcType=VARCHAR}
+        where f_job_id = #{fJobId,jdbcType=VARCHAR}
+        and f_role = #{fRole,jdbcType=VARCHAR}
+        and f_party_id = #{fPartyId,jdbcType=VARCHAR}
+    </update>
+
+    <select id="countJob" parameterType="com.webank.ai.fate.board.pojo.PagedJobQO" resultType="java.lang.Long">
+        select count(1) from t_job
+        <where>
+            <if test="jobId != null and jobId != ''">
+                and f_job_id like concat('%', #{jobId}, '%')
+            </if>
+            <if test="partyId != null and partyId != ''">
+                and f_party_id like concat('%', #{partyId}, '%')
+            </if>
+            <if test="fDescription != null and fDescription != ''">
+                and f_description like concat('%', #{fDescription}, '%')
+            </if>
+            <if test="role != null and role.size() > 0">
+                <foreach collection="role" open=" and f_role  in (" close=")" item="roleType" separator=",">
+                    #{roleType}
+                </foreach>
+            </if>
+            <if test="status != null and status.size() > 0">
+                <foreach collection="status" open=" and f_status  in (" close=")" item="statusType" separator=",">
+                    #{statusType}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="queryPagedJobs" resultMap="ResultMapWithBLOBs">
+        select * from t_job
+        <where>
+            <if test="pagedJobQO.jobId != null and pagedJobQO.jobId != ''">
+                and f_job_id like concat('%', #{pagedJobQO.jobId}, '%')
+            </if>
+            <if test="pagedJobQO.partyId != null and pagedJobQO.partyId != ''">
+                and f_party_id like concat('%', #{pagedJobQO.partyId}, '%')
+            </if>
+            <if test="pagedJobQO.fDescription != null and pagedJobQO.fDescription != ''">
+                and f_description like concat('%', #{pagedJobQO.fDescription}, '%')
+            </if>
+            <if test="pagedJobQO.role != null and pagedJobQO.role.size() > 0">
+                <foreach collection="pagedJobQO.role" open=" and f_role  in (" close=")" item="roleType" separator=",">
+                    #{roleType}
+                </foreach>
+            </if>
+            <if test="pagedJobQO.status != null and pagedJobQO.status.size() > 0">
+                <foreach collection="pagedJobQO.status" open=" and f_status  in (" close=")" item="statusType"
+                         separator=",">
+                    #{statusType}
+                </foreach>
+            </if>
+        </where>
+        <if test="pagedJobQO.orderField != null and pagedJobQO.orderField != '' and pagedJobQO.orderRule != null and pagedJobQO.orderRule != ''">
+            order by ${pagedJobQO.orderField} ${pagedJobQO.orderRule}
+        </if>
+        <if test="startIndex != null and pagedJobQO.pageSize != null ">
+            limit #{startIndex}, #{pagedJobQO.pageSize}
+        </if>
+    </select>
 </mapper>

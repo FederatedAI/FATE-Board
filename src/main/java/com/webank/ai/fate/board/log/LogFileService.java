@@ -149,6 +149,9 @@ public class LogFileService implements InitializingBean {
             }
 
         }
+        if (role.equals("fateFlow")) {
+            filePath = jobId + "/" + "fate_flow_schedule.log";
+        }
         String result = FATE_DEPLOY_PREFIX + filePath;
         logger.info("build filePath result {}", result);
         return result;
