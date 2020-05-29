@@ -25,6 +25,7 @@ import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.pojo.Job;
 import com.webank.ai.fate.board.pojo.JobWithBLOBs;
+import com.webank.ai.fate.board.pojo.PagedJobQO;
 import com.webank.ai.fate.board.services.JobManagerService;
 import com.webank.ai.fate.board.utils.*;
 import org.apache.commons.lang3.StringUtils;
@@ -127,7 +128,7 @@ public class JobManagerController {
         if (jobWithBLOBs == null) {
             return new ResponseResult<>(ErrorCode.DATABASE_ERROR_RESULT_NULL);
         }
-        if(jobWithBLOBs.getfStatus().equals(Dict.TIMEOUT)){
+        if (jobWithBLOBs.getfStatus().equals(Dict.TIMEOUT)) {
             jobWithBLOBs.setfStatus(Dict.FAILED);
         }
         Map params = Maps.newHashMap();
@@ -167,6 +168,11 @@ public class JobManagerController {
         return new ResponseResult<>(ErrorCode.SUCCESS, count);
     }
 
+    @RequestMapping(value = "/query/page/new", method = RequestMethod.POST)
+    public ResponseResult<PageBean<Map<String, Object>>> queryPagedJob(@RequestBody PagedJobQO pagedJobQO) {
+        PageBean<Map<String, Object>> listPageBean = jobManagerService.queryPagedJobs(pagedJobQO);
+        return new ResponseResult<>(ErrorCode.SUCCESS, listPageBean);
+    }
 
     @RequestMapping(value = "/query/page", method = RequestMethod.POST)
     public ResponseResult queryJobByPage(@RequestBody String pageParams) {
@@ -201,7 +207,7 @@ public class JobManagerController {
                 String jobId1 = jobWithBLOB.getfJobId();
                 String role1 = jobWithBLOB.getfRole();
                 String partyId1 = jobWithBLOB.getfPartyId();
-                if(jobWithBLOB.getfStatus().equals(Dict.TIMEOUT)){
+                if (jobWithBLOB.getfStatus().equals(Dict.TIMEOUT)) {
                     jobWithBLOB.setfStatus(Dict.FAILED);
                 }
                 HashMap<String, String> jobParams = Maps.newHashMap();

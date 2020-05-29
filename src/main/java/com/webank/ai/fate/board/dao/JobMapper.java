@@ -15,10 +15,7 @@
  */
 package com.webank.ai.fate.board.dao;
 
-import com.webank.ai.fate.board.pojo.Job;
-import com.webank.ai.fate.board.pojo.JobExample;
-import com.webank.ai.fate.board.pojo.JobKey;
-import com.webank.ai.fate.board.pojo.JobWithBLOBs;
+import com.webank.ai.fate.board.pojo.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -56,4 +53,7 @@ public interface JobMapper {
 
     int updateByPrimaryKey(Job record);
 
+    long countJob(PagedJobQO pagedJobQO);
+
+    List<JobWithBLOBs> queryPagedJobs(@Param("pagedJobQO") PagedJobQO pagedJobQO, @Param("startIndex") long startIndex);
 }
