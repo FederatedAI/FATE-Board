@@ -4,7 +4,7 @@
 - support PSI display in evaluation component
 - Support confusion matrix display
 - update logs interface
-
+- Firefox basic compatibility
 # Release 1.4.0
 
 #### Major Features and Improvements
