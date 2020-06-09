@@ -142,7 +142,7 @@ public class JobManagerController {
             e.printStackTrace();
             return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
         }
-        if ((result == null) || (result == "")) {
+        if ((result == null) || (0 == result.trim().length())) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
         }
         JSONObject resultObject = JSON.parseObject(result);
@@ -253,7 +253,7 @@ public class JobManagerController {
             e.printStackTrace();
             return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
         }
-        if ((result == null) || (result.equals(""))) {
+        if ((result == null) || (0 == result.trim().length())) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
         }
         return ResponseUtil.buildResponse(result, null);
