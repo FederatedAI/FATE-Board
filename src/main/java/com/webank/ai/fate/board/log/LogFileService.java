@@ -216,14 +216,66 @@ public class LogFileService implements InitializingBean {
 
             } while (content != null);
         } finally {
-            if (channel != null) {
-                channel.disconnect();
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                channel.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return results;
     }
 
+    public List<Map> getRemoteFuzzyLog(String filePath, String ip, String condition, Integer begin, Integer end) throws Exception {
+        List<Map> results = Lists.newArrayList();
+//        JobTaskInfo jobTaskInfo = this.getJobTaskInfo(jobId, componentId, role, partyId);
+        SshInfo sshInfo = this.sshService.getSSHInfo(ip);
+//        String filePath = this.buildFilePath(jobId, componentId, type, role, partyId);
+        Session session = this.sshService.connect(sshInfo);
+        String cmd = "grep -n " + condition + " " + filePath + " | tail -n +" + begin + " | head -n " + (end - begin + 1);
+        Channel channel = this.sshService.executeCmd(session, cmd);
+        logger.info("cmd:{}", cmd);
+        InputStream inputStream = channel.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        try {
+            String content = null;
+            do {
+                content = reader.readLine();
+                if (content != null) {
+                    int i = content.indexOf(":");
+                    String lineNumber = content.substring(0, i);
+                    String lineContent = content.substring(i + 1);
+                    results.add(LogFileService.toLogMap(lineContent, Long.parseLong(lineNumber)));
+                }
+            } while (content != null);
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                channel.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return results;
+    }
 
     public Channel getRemoteLogStream(String jobId, String componentId, String role, String partyId, String cmd) throws Exception {
 
@@ -313,7 +365,82 @@ public class LogFileService implements InitializingBean {
         }
     }
 
-    ;
+    public long queryFuzzyLogSize(String componentId, String jobId, String type, String role, String partyId, String condition) throws Exception {
+        String filePath = this.buildFilePath(jobId, componentId, type, role, partyId);
+        Preconditions.checkArgument(StringUtils.isNoneEmpty(condition, filePath));
+        long size;
+        if (LogFileService.checkFileIsExist(filePath)) {
+            String[] cmd = {"sh", "-c", "grep -c " + condition + " " + filePath};
+            Process process = Runtime.getRuntime().exec(cmd);
+            InputStream inputStream = process.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            try {
+                String content = reader.readLine();
+                size = Long.parseLong(content);
+                logger.info("execute  cmd : {} ----result : {}", (Object) cmd, content);
+            } finally {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    process.destroyForcibly();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            return size;
+        } else {
+            String ip = this.getJobTaskInfo(jobId, componentId, role, partyId).ip;
+            if (StringUtils.isEmpty(ip)) {
+                return 0;
+            }
+            this.checkSshInfo(ip);
+            size = this.getRemoteFuzzyLogSize(filePath, ip, condition);
+            return size;
+
+        }
+    }
+
+    private long getRemoteFuzzyLogSize(String filePath, String ip, String condition) throws Exception {
+        SshInfo sshInfo = this.sshService.getSSHInfo(ip);
+        Session session = this.sshService.connect(sshInfo);
+        String cmd = "grep -c " + condition + " " + filePath;
+        Channel channel = this.sshService.executeCmd(session, cmd);
+        logger.info("cmd:{}", cmd);
+        InputStream inputStream = channel.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        long size;
+        try {
+            String content = reader.readLine();
+            size = Long.parseLong(content);
+            logger.info("execute  cmd : {} ----result : {}", (Object) cmd, content);
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                channel.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return size;
+    }
+
 
     public static class JobTaskInfo {
 
