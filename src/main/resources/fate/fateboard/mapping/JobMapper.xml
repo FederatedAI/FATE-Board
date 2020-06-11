@@ -531,13 +531,13 @@
         select count(1) from t_job
         <where>
             <if test="jobId != null and jobId != ''">
-                and f_job_id like concat('%', #{jobId}, '%')
+                and f_job_id like #{jobId}
             </if>
             <if test="partyId != null and partyId != ''">
-                and f_party_id like concat('%', #{partyId}, '%')
+                and f_party_id like #{partyId}
             </if>
             <if test="fDescription != null and fDescription != ''">
-                and f_description like concat('%', #{fDescription}, '%')
+                and f_description like #{fDescription}
             </if>
             <if test="role != null and role.size() > 0">
                 <foreach collection="role" open=" and f_role  in (" close=")" item="roleType" separator=",">
@@ -556,13 +556,13 @@
         select * from t_job
         <where>
             <if test="pagedJobQO.jobId != null and pagedJobQO.jobId != ''">
-                and f_job_id like concat('%', #{pagedJobQO.jobId}, '%')
+                and f_job_id like #{pagedJobQO.jobId}
             </if>
             <if test="pagedJobQO.partyId != null and pagedJobQO.partyId != ''">
-                and f_party_id like concat('%', #{pagedJobQO.partyId}, '%')
+                and f_party_id like #{pagedJobQO.partyId}
             </if>
             <if test="pagedJobQO.fDescription != null and pagedJobQO.fDescription != ''">
-                and f_description like concat('%', #{pagedJobQO.fDescription}, '%')
+                and f_description like #{pagedJobQO.fDescription}
             </if>
             <if test="pagedJobQO.role != null and pagedJobQO.role.size() > 0">
                 <foreach collection="pagedJobQO.role" open=" and f_role  in (" close=")" item="roleType" separator=",">
