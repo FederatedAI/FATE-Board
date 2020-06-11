@@ -238,6 +238,15 @@ public class JobManagerService {
     }
 
     public PageBean<Map<String, Object>> queryPagedJobs(PagedJobQO pagedJobQO) {
+        if (pagedJobQO.getJobId() != null && 0 != pagedJobQO.getJobId().trim().length()) {
+            pagedJobQO.setJobId("%" + pagedJobQO.getJobId() + "%");
+        }
+        if (pagedJobQO.getPartyId() != null && 0 != pagedJobQO.getPartyId().trim().length()) {
+            pagedJobQO.setPartyId("%" + pagedJobQO.getPartyId() + "%");
+        }
+        if (pagedJobQO.getfDescription() != null && 0 != pagedJobQO.getfDescription().trim().length()) {
+            pagedJobQO.setfDescription("%" + pagedJobQO.getfDescription() + "%");
+        }
         long jobSum = this.countJob(pagedJobQO);
         PageBean<Map<String, Object>> listPageBean = new PageBean<>(pagedJobQO.getPageNum(), pagedJobQO.getPageSize(), jobSum);
         long startIndex = listPageBean.getStartIndex();
