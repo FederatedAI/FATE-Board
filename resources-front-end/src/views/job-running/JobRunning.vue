@@ -82,11 +82,7 @@ export default {
       }
     },
     mouseoverHandler() {
-      if (this.status === 'waiting') {
-        this.mouseoverd = false
-      } else {
-        this.mouseoverd = true
-      }
+      this.mouseoverd = true
     },
     killOperation() {
       this.$emit('kill')

@@ -1,3 +1,10 @@
+# Release 1.4.1
+
+#### Major Features and Improvements
+- support PSI display in evaluation component
+- Support confusion matrix display
+- update logs interface
+- Firefox basic compatibility
 # Release 1.4.0
 
 #### Major Features and Improvements
