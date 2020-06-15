@@ -675,16 +675,16 @@ export default {
     color: #4159D1;
   }
 
-  .el-tooltip__popper[x-placement^=top] .popper__arrow::after {
-    border-top-color: rgba(127,125,142,0.7)
-  }
+  // .el-tooltip__popper[x-placement^=top] .popper__arrow::after {
+  //   border-top-color: rgba(127,125,142,0.7)
+  // }
 
-  .el-tooltip__popper[x-placement^=top] .popper__arrow {
-    border-top-color: rgba(127,125,142,0.7)
-  }
+  // .el-tooltip__popper[x-placement^=top] .popper__arrow {
+  //   border-top-color: rgba(127,125,142,0.7)
+  // }
 
-  .tooltip-content {
-    font-family: 'Lato';
-    background-color:rgba(127,125,142,0.7) !important
-  }
+  // .tooltip-content {
+  //   font-family: 'Lato';
+  //   background-color:rgba(127,125,142,0.7) !important
+  // }
 </style>
