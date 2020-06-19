@@ -47,7 +47,7 @@ import java.util.Map;
 
 @ServerEndpoint(value = "/log/{jobId}/{role}/{partyId}/{componentId}/{type}", configurator = Configurator.class)
 @Component
-public class LogWebSocketSSHService implements InitializingBean, ApplicationContextAware {
+public class LogWebSocketSSHService  {
 
     private static final Logger logger = LoggerFactory.getLogger(LogWebSocketSSHService.class);
     static ApplicationContext applicationContext;
@@ -192,41 +192,42 @@ public class LogWebSocketSSHService implements InitializingBean, ApplicationCont
         }
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
+//    @Override
+//    public void afterPropertiesSet() throws Exception {
+//
+//        LogWebSocketSSHService.logFileService = (LogFileService) applicationContext.getBean("logFileService");
+//        LogWebSocketSSHService.sshService = (SshService) applicationContext.getBean("sshService");
+//        //    LogWebSocketSSHService.applicationEventPublisher  =  (ApplicationEventPublisher)applicationContext.getBean(ApplicationEventPublisher.class);
+//        LogWebSocketSSHService.logFileTransferEventProducer = (LogFileTransferEventProducer) applicationContext.getBean("logFileTransferEventProducer");
+//        asyncServiceExecutor = (ThreadPoolTaskExecutor) applicationContext.getBean("asyncServiceExecutor");
+//
+//        new  Thread(()->{
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            sessionMap.keySet().forEach(session->{
+//
+//                if(! session.isOpen()){
+//                    try {
+//                        session.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//
+//            });
+//        }).start();
+//
+//    }
 
-        LogWebSocketSSHService.logFileService = (LogFileService) applicationContext.getBean("logFileService");
-        LogWebSocketSSHService.sshService = (SshService) applicationContext.getBean("sshService");
-        //    LogWebSocketSSHService.applicationEventPublisher  =  (ApplicationEventPublisher)applicationContext.getBean(ApplicationEventPublisher.class);
-        LogWebSocketSSHService.logFileTransferEventProducer = (LogFileTransferEventProducer) applicationContext.getBean("logFileTransferEventProducer");
-        asyncServiceExecutor = (ThreadPoolTaskExecutor) applicationContext.getBean("asyncServiceExecutor");
-
-        new  Thread(()->{
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            sessionMap.keySet().forEach(session->{
-
-                if(! session.isOpen()){
-                    try {
-                        session.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-
-            });
-        }).start();
-
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        LogWebSocketSSHService.applicationContext = applicationContext;
-    }
+//    @Override
+//    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+//        logger.info("~~~~~~{}",applicationContext);
+//        this.applicationContext = applicationContext;
+//    }
 
 
 }

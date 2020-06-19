@@ -15,6 +15,12 @@
  */
 package com.webank.ai.fate.board.utils;
 
+import com.google.common.collect.Lists;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Dict {
 
     static public final String ID = "id";
@@ -28,10 +34,10 @@ public class Dict {
     static public final String COMPONENT_NAME = "component_name";
     static public final String ROLE = "role";
     static public final String PARTY_ID = "party_id";
-    static public final String START_TIME="start_time";
-    static public final String END_TIME="end_time";
-    static public final String RETMSG="retmsg";
-    static public final String NOTES="notes";
+    static public final String START_TIME = "start_time";
+    static public final String END_TIME = "end_time";
+    static public final String RETMSG = "retmsg";
+    static public final String NOTES = "notes";
 
     static public final String DEPENDENCY_DATA = "dependency_data";
     static public final String DATAVIEW_DATA = "dataview_data";
@@ -41,7 +47,7 @@ public class Dict {
     static public final String METRIC_NAME = "metric_name";
     static public final String STATUS = "status";
     static public final String COMPONENT_LIST = "component_list";
-    static public final String TASK_ECLAPSED_TIME="task_elapsed_time";
+    static public final String TASK_ECLAPSED_TIME = "task_elapsed_time";
 
 
     static public final String CREATE_TIME = "create_time";
@@ -62,26 +68,36 @@ public class Dict {
     static public final String URL_JOB_DATAVIEW = "/v1/tracking/job/data_view";
     static public final String URL_JOB_STOP = "/v1/job/stop";
     static public final String REMOTE_RETURN_MSG = "retmsg";
-    static public final String URL_JOB_CANCEL="/v1/job/cancel";
-    static public final String URL_JOB_UPDATE="/v1/job/update";
+    static public final String URL_JOB_CANCEL = "/v1/job/cancel";
+    static public final String URL_JOB_UPDATE = "/v1/job/update";
 
     static public final String SSH_IP = "ip";
     static public final String SSH_USER = "user";
     static public final String SSH_PASSWORD = "password";
     static public final String SSH_PORT = "port";
 
-    static public final String ORDERFIELD="order_field";
-    static public final String ORDERTYPE="order_type";
-    static public final String FILTERFIELD="filter_field";
-    static public final String FILTERVALUE="filter_value";
-    static public final String TOTALRECORD="total_record";
-    static public final String PAGENUM="page_num";
-    static public final String PAGESIZE="page_size";
-    static public final String FIELD_START_TIME="f_start_time";
-    static public final String FILED_END_TIME="f_end_time";
-    static public final String TIME="time";
+    static public final String ORDERFIELD = "order_field";
+    static public final String ORDERTYPE = "order_type";
+    static public final String FILTERFIELD = "filter_field";
+    static public final String FILTERVALUE = "filter_value";
+    static public final String TOTALRECORD = "total_record";
+    static public final String PAGENUM = "page_num";
+    static public final String PAGESIZE = "page_size";
+    static public final String FIELD_START_TIME = "f_start_time";
+    static public final String FILED_END_TIME = "f_end_time";
+    static public final String TIME = "time";
 
-    static public final String TIMEOUT="timeout";
-    static public final String FAILED="failed";
+    static public final String TIMEOUT = "timeout";
+    static public final String FAILED = "failed";
+
+    //for build log path
+    static public final String DEFAULT = "default";
+    static public final List<String> ALGORITHM_LOG_TYPE = Arrays.asList("ERROR","WARNING","INFO","DEBUG");
+    static public final List<String> FLOW_LOG_TYPE = Arrays.asList("error","fate_flow_schedule");
+    static public final String COMPONENT_LOG_TYPE = "INFO";
+
+    static public final String ALGORITHM_LOG="ALGORITHM_LOG_";
+    static public final String FLOW_LOG="FLOW_LOG_";
+    static public final String COMPONENT_LOG="COMPONENT_LOG_";
 
 }
