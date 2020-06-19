@@ -1,3 +1,13 @@
+# Release 1.5.0
+
+#### Major Features and Improvements
+- Pearson support unilateraly operation
+- Optimize the display of logs
+- Optimize the display of job details
+- Support the sort for job duration
+
+
+
 # Release 1.4.2
 
 #### Major Features and Improvements
