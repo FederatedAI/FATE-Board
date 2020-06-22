@@ -52,8 +52,8 @@ public class LogFileService {
     final static String DEFAULT_COMPONENT_ID = "default";
     final static String DEFAULT_LOG_TYPE = "default";
     String JOB_LOG_PATH = "$job_id/$role/$party_id/$file_name";
-//    @Value("${FATE_DEPLOY_PREFIX:/data/projects/fate/python/logs/}")
-    @Value("${FATE_DEPLOY_PREFIX:C:\\Users\\v_wbymxu\\Downloads\\}")
+        @Value("${FATE_DEPLOY_PREFIX:/data/projects/fate/python/logs/}")
+//    @Value("${FATE_DEPLOY_PREFIX:C:\\Users\\v_wbymxu\\Downloads\\}")
     String FATE_DEPLOY_PREFIX;
 
     @Autowired
@@ -77,7 +77,7 @@ public class LogFileService {
     }
 
 
-    public static Map<String,Object> toLogMap(String content, long lineNum) {
+    public static Map<String, Object> toLogMap(String content, long lineNum) {
         Map logInfo = Maps.newHashMap();
         logInfo.put(Dict.LOG_CONTENT, content);
         logInfo.put(Dict.LOG_LINE_NUM, lineNum);
@@ -165,8 +165,26 @@ public class LogFileService {
     public String buildLogPath(String jobId, String role, String partyId, String componentId, String type) {
         Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentId, type));
         Preconditions.checkArgument(checkPathParameters(jobId, role, partyId, componentId, type));
+
         String logRelativePath;
-        if (Dict.DEFAULT.equals(role)) {
+        switch (type) {
+            case "jobSchedule":
+            case "jobError":
+                logRelativePath = jobId + "/";
+                break;
+            case "partyError":
+            case "partyWarning":
+            case "partyInfo":
+            case "partyDebug":
+                logRelativePath = jobId + "/" + role + "/" + partyId + "/";
+                break;
+            default:
+                logRelativePath = jobId + "/" + role + "/" + partyId + "/" + componentId + "/";
+        }
+
+//        String logPath = Dict.logMap.get(type);
+
+//        if (Dict.DEFAULT.equals(role)) {
 //            switch (type) {
 //                case "error":
 //                    logRelativePath = jobId + "/" + "error.log";
@@ -174,9 +192,9 @@ public class LogFileService {
 //                default:
 //                    logRelativePath = jobId + "/" + "fate_flow_schedule.log";
 //            }
-            logRelativePath = jobId + "/" + type+".log";
-        } else {
-            if (Dict.DEFAULT.equals(componentId)) {
+//            logRelativePath = jobId + "/" + type + ".log";
+//        } else {
+//            if (Dict.DEFAULT.equals(componentId)) {
 //                switch (type) {
 //                    case "error":
 //                        logRelativePath = jobId + "/" + role + "/" + partyId + "/" + "ERROR.log";
@@ -190,12 +208,13 @@ public class LogFileService {
 //                    default:
 //                        logRelativePath = jobId + "/" + role + "/" + partyId + "/" + "DEBUG.log";
 //                }
-                logRelativePath = jobId + "/" + role + "/" + partyId + "/" + type+".log";
-            } else {
-                logRelativePath = jobId + "/" + role + "/" + partyId + "/" + componentId + type+".log";
-            }
-        }
-        String logPath = FATE_DEPLOY_PREFIX + logRelativePath;
+//                logRelativePath = jobId + "/" + role + "/" + partyId + "/" + type + ".log";
+//            } else {
+//                logRelativePath = jobId + "/" + role + "/" + partyId + "/" + componentId + type + ".log";
+//            }
+//        }
+
+        String logPath = FATE_DEPLOY_PREFIX + logRelativePath + Dict.logMap.get(type);
         return logPath;
     }
 

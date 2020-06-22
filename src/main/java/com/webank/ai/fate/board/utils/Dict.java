@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class Dict {
@@ -99,5 +100,16 @@ public class Dict {
     static public final String ALGORITHM_LOG="ALGORITHM_LOG_";
     static public final String FLOW_LOG="FLOW_LOG_";
     static public final String COMPONENT_LOG="COMPONENT_LOG_";
+
+    static public final HashMap<String,String> logMap= new HashMap<>();
+    static {
+        logMap.put("jobSchedule","fate_flow_schedule.log");
+        logMap.put("jobError","error.log");
+        logMap.put("partyError","ERROR.log");
+        logMap.put("partyWarning","WARNING.log");
+        logMap.put("partyInfo","INFO.log");
+        logMap.put("partyDebug","DEBUG.log");
+        logMap.put("componentInfo","INFO.log");
+    }
 
 }
