@@ -39,29 +39,43 @@ public class LogService implements Runnable {
 
     @Override
     public void run() {
-//        HashMap<String, String> logPathMap = new HashMap<>();
-        ArrayList<String> logPathList = new ArrayList<>();
+        HashMap<String, String> logPathMap = new HashMap<>();
+        if(Dict.DEFAULT.equals(componentId)){
+            Set<String> logTypes = Dict.logMap.keySet();
+            for (String type : logTypes) {
+                if (!"componentInfo".equals(type)){
+                    String logPath = logFileService.buildLogPath(jobId, role, partyId, componentId, type);
+                    logPathMap.put(type,logPath);
+                }
+            }
+        }else {
+            String logPath = logFileService.buildLogPath(jobId, role, partyId, componentId, "componentInfo");
+            logPathMap.put("componentInfo",logPath);
+        }
+
+
+//        ArrayList<String> logPathList = new ArrayList<>();
         //judge log type
-        if (Dict.DEFAULT.equals(componentId)) {
-            for (String type : Dict.ALGORITHM_LOG_TYPE) {
-                String logPath = logFileService.buildLogPath(jobId, role, partyId, componentId, type);
+//        if (Dict.DEFAULT.equals(componentId)) {
+//            for (String type : Dict.ALGORITHM_LOG_TYPE) {
+//                String logPath = logFileService.buildLogPath(jobId, role, partyId, componentId, type);
 //                String logType = Dict.ALGORITHM_LOG + type;
 //                logPathMap.put(logType, logPath);
-                logPathList.add(logPath);
-            }
-            for (String type : Dict.FLOW_LOG_TYPE) {
-                String logPath = logFileService.buildLogPath(jobId, Dict.DEFAULT, partyId, componentId, type);
+//                logPathList.add(logPath);
+//            }
+//            for (String type : Dict.FLOW_LOG_TYPE) {
+//                String logPath = logFileService.buildLogPath(jobId, Dict.DEFAULT, partyId, componentId, type);
 //                String logType = Dict.FLOW_LOG + type;
 //                logPathMap.put(logType, logPath);
-                logPathList.add(logPath);
-            }
-
-        } else {
-            String logPath = logFileService.buildLogPath(jobId, role, partyId, componentId, Dict.COMPONENT_LOG_TYPE);
+//                logPathList.add(logPath);
+//            }
+//
+//        } else {
+//            String logPath = logFileService.buildLogPath(jobId, role, partyId, componentId, Dict.COMPONENT_LOG_TYPE);
 //            String logType = Dict.COMPONENT_LOG + Dict.COMPONENT_LOG_TYPE;
 //            logPathMap.put(logType, logPath);
-            logPathList.add(logPath);
-        }
+//            logPathList.add(logPath);
+//        }
 
         //get remote ip
         String jobIp = logFileService.getJobIp(jobId, role, partyId);
@@ -69,15 +83,13 @@ public class LogService implements Runnable {
 
         //get size of logs
         while (session.isOpen()) {
-//            HashMap<String, Integer> logSizeMap = new HashMap<>();
-            LinkedList<Integer> logSizeList = new LinkedList<>();
-//            Set<Map.Entry<String, String>> entries = logPathMap.entrySet();
-            for (String logPath : logPathList) {
-
-
-//            for (Map.Entry<String, String> entry : entries) {
-//                String logType = entry.getKey();
-//                String logPath = entry.getValue();
+            HashMap<String, Integer> logSizeMap = new HashMap<>();
+//            LinkedList<Integer> logSizeList = new LinkedList<>();
+            Set<Map.Entry<String, String>> entries = logPathMap.entrySet();
+//            for (String logPath : logPathList) {
+            for (Map.Entry<String, String> entry : entries) {
+                String logType = entry.getKey();
+                String logPath = entry.getValue();
                 File file = new File(logPath);
                 Integer lineSum = 0;
 
@@ -104,13 +116,13 @@ public class LogService implements Runnable {
                     }
                 }
 
-//                logSizeMap.put(logType, lineSum);
-                logSizeList.add(lineSum);
+                logSizeMap.put(logType, lineSum);
+//                logSizeList.add(lineSum);
             }
 
             HashMap<String, Object> result = new HashMap<>();
             result.put("type", "logSize");
-            result.put("data", logSizeList);
+            result.put("data", logSizeMap);
             try {
                 session.getBasicRemote().sendText(JSON.toJSONString(result));
             } catch (IOException e) {

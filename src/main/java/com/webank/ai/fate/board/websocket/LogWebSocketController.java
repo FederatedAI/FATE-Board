@@ -45,7 +45,7 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
                                     @PathParam("componentId") String componentId
     ) throws Exception {
         Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentId));
-        logger.info("input:{},{},{},{},{}",jobId,role,partyId,componentId);
+        logger.info("input: {},{},{},{}", jobId, role, partyId, componentId);
         LogService logService = new LogService(jobId, role, partyId, componentId, session, logFileService, sshService);
 
         new Thread(logService).start();
@@ -97,11 +97,11 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
 
         //build log path
         String logPath;
-        if (Dict.FLOW_LOG_TYPE.contains(type)) {
-            logPath = logFileService.buildLogPath(jobId, Dict.DEFAULT, partyId, componentId, type);
-        } else {
-            logPath = logFileService.buildLogPath(jobId, role, partyId, componentId, type);
-        }
+//        if (Dict.FLOW_LOG_TYPE.contains(type)) {
+//            logPath = logFileService.buildLogPath(jobId, Dict.DEFAULT, partyId, componentId, type);
+//        } else {
+        logPath = logFileService.buildLogPath(jobId, role, partyId, componentId, type);
+//        }
         Preconditions.checkArgument(StringUtils.isNoneEmpty(logPath));
 
 
@@ -227,6 +227,7 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
+
     private static ApplicationContext applicationContext;
     private static SshService sshService;
     private static LogFileService logFileService;
