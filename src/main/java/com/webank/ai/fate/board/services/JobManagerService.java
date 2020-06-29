@@ -290,4 +290,8 @@ public class JobManagerService {
     public long countJob(PagedJobQO pagedJobQO) {
         return jobMapper.countJob(pagedJobQO);
     }
+
+    public Map<String,List<String>> queryFields() {
+        return Dict.fieldMap;
+    }
 }

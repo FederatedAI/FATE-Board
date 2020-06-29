@@ -112,4 +112,12 @@ public class Dict {
         logMap.put("componentInfo","INFO.log");
     }
 
+    //the fields for job search
+    static public final HashMap<String,List<String>> fieldMap= new HashMap<>();
+    static{
+        List<String> status = Arrays.asList("success", "running", "waiting", "failed", "canceled");
+        List<String> roles = Arrays.asList("guest", "host", "arbiter", "local");
+        fieldMap.put("status",status);
+        fieldMap.put("role",roles);
+    }
 }

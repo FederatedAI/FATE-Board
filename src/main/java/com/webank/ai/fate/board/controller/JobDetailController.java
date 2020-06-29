@@ -154,7 +154,8 @@ public class JobDetailController {
 
     @RequestMapping(value = "/pipeline/dag/dependencies", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseResult getDagDependencies(@RequestBody String param) {
+    public ResponseResult<JSONObject> getDagDependencies(@RequestBody String param) {
+        //check and get parameters
         JSONObject jsonObject = JSON.parseObject(param);
         String jobId = jsonObject.getString(Dict.JOBID);
         String role = jsonObject.getString(Dict.ROLE);
@@ -163,35 +164,37 @@ public class JobDetailController {
             Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId));
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+            logger.error("parameter error:", e);
+            return new ResponseResult<>(REQUEST_PARAMETER_ERROR);
         }
-
         jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
-        String result = null;
+
+        String result;
         try {
             result = httpClientPool.post(fateUrl + Dict.URL_DAG_DEPENDENCY, jsonObject.toJSONString());
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
+            logger.error("connect fate flow error:", e);
+            return new ResponseResult<>(FATEFLOW_ERROR_CONNECTION);
         }
-        if ((result == null) || ("".equals(result))) {
+        if ((result == null) || 0 == result.trim().length()) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
         }
 
         JSONObject resultObject = JSON.parseObject(result);
-        Integer retcode = resultObject.getInteger(Dict.RETCODE);
-        if (retcode == null) {
+        Integer retCode = resultObject.getInteger(Dict.RETCODE);
+        if (retCode == null) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_WRONG_RESULT);
         }
 
-        if (retcode == 0) {
+        if (retCode == 0) {
             JSONObject data = resultObject.getJSONObject(Dict.DATA);
             JSONArray components_list = data.getJSONArray(Dict.COMPONENT_LIST);
-            ArrayList<Map> componentList = new ArrayList<>();
+            ArrayList<Map<String,Object>> componentList = new ArrayList<>();
 
             for (Object o : components_list) {
                 HashMap<String, Object> component = new HashMap<>();
-                component.put(Dict.COMPONENT_NAME, (String) o);
+                component.put(Dict.COMPONENT_NAME, o);
                 Task task = taskManagerService.findTask(jobId, role, (String) o);
                 String taskStatus = null;
                 Long createTime = null;
@@ -209,7 +212,7 @@ public class JobDetailController {
             return new ResponseResult<>(ErrorCode.SUCCESS, data);
 
         } else {
-            return new ResponseResult<>(retcode, resultObject.getString(Dict.RETMSG));
+            return new ResponseResult<>(retCode, resultObject.getString(Dict.RETMSG));
         }
     }
 

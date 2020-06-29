@@ -35,20 +35,12 @@ import java.sql.SQLIntegrityConstraintViolationException;
 
 @RestController
 @ControllerAdvice
-
 public class GlobalExceptionHandler {
-
-
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-
     @ExceptionHandler(Throwable.class)
-    @ResponseBody
-    public ResponseResult defaultErrorHandler(HttpServletRequest req, Exception e) throws Exception {
-
-
+    public ResponseResult defaultErrorHandler(HttpServletRequest req, Exception e) {
         ResponseResult response = new ResponseResult();
-
         if (e instanceof ServletException) {
             logger.error("error ", e);
             response.setCode(ErrorCode.SERVLET_ERROR.getCode());
@@ -66,7 +58,7 @@ public class GlobalExceptionHandler {
             logger.error("error ", e);
             response.setCode(ErrorCode.DATABASE_ERROR_CONNECTION.getCode());
             response.setMsg(ErrorCode.DATABASE_ERROR_CONNECTION.getMsg());
-        } else if (e instanceof SocketException ||e instanceof ClientProtocolException) {
+        } else if (e instanceof SocketException || e instanceof ClientProtocolException) {
             logger.error("error ", e);
             response.setCode(ErrorCode.FATEFLOW_ERROR_CONNECTION.getCode());
             response.setMsg(ErrorCode.FATEFLOW_ERROR_CONNECTION.getMsg());
