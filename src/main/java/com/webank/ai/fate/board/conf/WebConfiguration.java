@@ -41,7 +41,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 @MapperScan(basePackages = "com.webank.ai.fate.board.dao", sqlSessionFactoryRef = "fateboardSqlSessionFactory")
-public class WebConfigration implements WebMvcConfigurer {
+public class WebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

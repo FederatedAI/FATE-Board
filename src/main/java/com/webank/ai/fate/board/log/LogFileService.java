@@ -105,7 +105,7 @@ public class LogFileService {
 
     }
 
-    public boolean checkPathParameters(String... parameters) {
+    public static boolean checkPathParameters(String... parameters) {
         String regex = "^\\w+$";
         for (String parameter : parameters) {
             if (!parameter.matches(regex)) {

@@ -278,4 +278,9 @@ public class JobManagerController {
         return jsonObject;
     }
 
+    @RequestMapping(value = "/query/fields", method = RequestMethod.POST)
+    public ResponseResult<Map<String,List<String>>> queryFields() {
+        Map<String, List<String>> fieldsMap = jobManagerService.queryFields();
+        return new ResponseResult<>(ErrorCode.SUCCESS, fieldsMap);
+    }
 }
