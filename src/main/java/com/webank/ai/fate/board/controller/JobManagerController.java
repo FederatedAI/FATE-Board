@@ -131,7 +131,7 @@ public class JobManagerController {
         if (jobWithBLOBs.getfStatus().equals(Dict.TIMEOUT)) {
             jobWithBLOBs.setfStatus(Dict.FAILED);
         }
-        Map params = Maps.newHashMap();
+        Map<String,Object> params = Maps.newHashMap();
         params.put(Dict.JOBID, jobId);
         params.put(Dict.ROLE, role);
         params.put(Dict.PARTY_ID, new Integer(partyId));
