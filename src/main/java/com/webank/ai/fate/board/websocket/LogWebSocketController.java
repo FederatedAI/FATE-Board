@@ -188,7 +188,7 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
             }
             //format result to push
             HashMap<String, Object> result = new HashMap<>();
-            result.put("type", "log");
+            result.put("type", type);
             result.put("data", logResults);
             try {
                 session.getBasicRemote().sendText(JSON.toJSONString(result));

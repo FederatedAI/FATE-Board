@@ -41,6 +41,7 @@ public class Dict {
     static public final String NOTES = "notes";
 
     static public final String DEPENDENCY_DATA = "dependency_data";
+    static public final String SUMMARY_DATA = "summary_date";
     static public final String DATAVIEW_DATA = "dataview_data";
 
 
