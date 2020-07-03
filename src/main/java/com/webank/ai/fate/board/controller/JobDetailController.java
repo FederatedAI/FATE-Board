@@ -24,7 +24,7 @@ import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.pojo.Task;
 import com.webank.ai.fate.board.services.TaskManagerService;
-import com.webank.ai.fate.board.utils.Dict;
+import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.utils.HttpClientPool;
 import com.webank.ai.fate.board.utils.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;

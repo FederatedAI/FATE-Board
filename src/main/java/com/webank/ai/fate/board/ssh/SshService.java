@@ -22,7 +22,7 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.webank.ai.fate.board.pojo.SshInfo;
-import com.webank.ai.fate.board.utils.Dict;
+import com.webank.ai.fate.board.global.Dict;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;

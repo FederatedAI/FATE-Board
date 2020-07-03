@@ -6,10 +6,8 @@
 </head>
 <body>
 
-<!--
-1、上传文件的表单enctype="multipart/form-data"
--->
-<form action="./model/upload" method="post" enctype="multipart/form-data">
+
+<form action="./file/upload" method="post" enctype="multipart/form-data">
     <input type="text" name="jobId">
     <input type="text" name="role"/>
     <input type="text" name="partyId"/>
@@ -19,7 +17,7 @@
     <input type="submit" value="上传"/>
 </form>
 
-<form action="./model/multDownloadZip" method="post" target="_blank">
+<form action="./file/download" method="post" target="_blank">
     <input type="text" name="jobId" value="a"/>
     <input type="text" name="role" value="b"/>
     <input type="text" name="partyId" value="c"/>
