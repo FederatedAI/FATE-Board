@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.webank.ai.fate.board.utils;
+package com.webank.ai.fate.board.global;
 
-import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +68,6 @@ public class Dict {
     static public final String URL_JOB_DATAVIEW = "/v1/tracking/job/data_view";
     static public final String URL_JOB_STOP = "/v1/job/stop";
     static public final String REMOTE_RETURN_MSG = "retmsg";
-    static public final String URL_JOB_CANCEL = "/v1/job/cancel";
     static public final String URL_JOB_UPDATE = "/v1/job/update";
 
     static public final String SSH_IP = "ip";
@@ -78,11 +75,6 @@ public class Dict {
     static public final String SSH_PASSWORD = "password";
     static public final String SSH_PORT = "port";
 
-    static public final String ORDERFIELD = "order_field";
-    static public final String ORDERTYPE = "order_type";
-    static public final String FILTERFIELD = "filter_field";
-    static public final String FILTERVALUE = "filter_value";
-    static public final String TOTALRECORD = "total_record";
     static public final String PAGENUM = "page_num";
     static public final String PAGESIZE = "page_size";
     static public final String FIELD_START_TIME = "f_start_time";
@@ -94,31 +86,24 @@ public class Dict {
 
     //for build log path
     static public final String DEFAULT = "default";
-    static public final List<String> ALGORITHM_LOG_TYPE = Arrays.asList("ERROR","WARNING","INFO","DEBUG");
-    static public final List<String> FLOW_LOG_TYPE = Arrays.asList("error","fate_flow_schedule");
-    static public final String COMPONENT_LOG_TYPE = "INFO";
 
-    static public final String ALGORITHM_LOG="ALGORITHM_LOG_";
-    static public final String FLOW_LOG="FLOW_LOG_";
-    static public final String COMPONENT_LOG="COMPONENT_LOG_";
-
-    static public final HashMap<String,String> logMap= new HashMap<>();
+    static public final HashMap<String, String> logMap = new HashMap<>();
     static {
-        logMap.put("jobSchedule","fate_flow_schedule.log");
-        logMap.put("jobError","error.log");
-        logMap.put("partyError","ERROR.log");
-        logMap.put("partyWarning","WARNING.log");
-        logMap.put("partyInfo","INFO.log");
-        logMap.put("partyDebug","DEBUG.log");
-        logMap.put("componentInfo","INFO.log");
+        logMap.put("jobSchedule", "fate_flow_schedule.log");
+        logMap.put("jobError", "error.log");
+        logMap.put("partyError", "ERROR.log");
+        logMap.put("partyWarning", "WARNING.log");
+        logMap.put("partyInfo", "INFO.log");
+        logMap.put("partyDebug", "DEBUG.log");
+        logMap.put("componentInfo", "INFO.log");
     }
 
     //the fields for job search
-    static public final HashMap<String,List<String>> fieldMap= new HashMap<>();
-    static{
+    static public final HashMap<String, List<String>> fieldMap = new HashMap<>();
+    static {
         List<String> status = Arrays.asList("success", "running", "waiting", "failed", "canceled");
         List<String> roles = Arrays.asList("guest", "host", "arbiter", "local");
-        fieldMap.put("status",status);
-        fieldMap.put("role",roles);
+        fieldMap.put("status", status);
+        fieldMap.put("role", roles);
     }
 }

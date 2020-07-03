@@ -16,7 +16,7 @@
 package com.webank.ai.fate.board.ssh;
 
 import com.google.common.collect.Maps;
-import com.webank.ai.fate.board.utils.Dict;
+import com.webank.ai.fate.board.global.Dict;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;

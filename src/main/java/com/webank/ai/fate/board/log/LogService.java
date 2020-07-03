@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.base.Preconditions;
 import com.webank.ai.fate.board.pojo.SshInfo;
 import com.webank.ai.fate.board.ssh.SshService;
-import com.webank.ai.fate.board.utils.Dict;
+import com.webank.ai.fate.board.global.Dict;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
