@@ -34,6 +34,9 @@ export default function(data, partyId) {
     hostHeader.push(finalHeader)
   })
   results.forEach(item => {
+    // if (item.filterName.toLowerCase().match('unique_value')) {
+    //   return void 0
+    // }
     const featureValues = item.featureValues
     const hostFeatureValues = item.hostFeatureValues
     const filterName = item.filterName.toLowerCase()
@@ -66,7 +69,7 @@ export default function(data, partyId) {
           const mid = hostBody[i]
           const fe = hostFeatureValues[i].featureValues
           for (const val of mid) {
-            val[filterName] = fe[val.variable] || '-'
+            val[filterName] = fe[val.variable] === undefined ? '-' : formatFloat(fe[val.variable])
           }
         }
       }

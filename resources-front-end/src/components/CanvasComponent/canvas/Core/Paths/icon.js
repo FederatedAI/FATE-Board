@@ -51,8 +51,9 @@ function here(point) {
   const y = lay.point.y || lay.point[1] || 0
   const w = lay.width
   const h = lay.height || w
-  const px = point.x || point[0]
-  const py = point.y || point[1]
+  const trans = lay.$meta.get('$translate') || { x: 0, y: 0 }
+  const px = (point.x || point[0]) - trans.x
+  const py = (point.y || point[1]) - trans.y
   if (px < x + w / 2 && px > x - w / 2) {
     if (py < y + h / 2 && py > y - h / 2) {
       return true

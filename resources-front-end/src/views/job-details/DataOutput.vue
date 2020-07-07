@@ -1,6 +1,10 @@
 <template>
   <section>
-    <div v-if="tBody.length>0 && tHeader.length>0">
+    <div v-if="showingTable" class="flex flex-col">
+      <span class="data-instance">
+        <span class="total-instance">Outputting {{ counts }} instance</span>
+        (only 100 instances among were shown in the table)
+      </span>
       <el-table
         :data="tBody"
         :cell-class-name="checkCellStyle"
@@ -89,16 +93,20 @@ export default {
   },
   props: {
     tHeader: {
-      type: Array,
+      type: Array | Object,
       default() {
         return []
       }
     },
     tBody: {
-      type: Array,
+      type: Array | Object,
       default() {
         return []
       }
+    },
+    counts: {
+      type: Number | Object,
+      default: 100
     },
     noData: {
       type: Boolean,
@@ -110,7 +118,8 @@ export default {
       page: 1,
       skip: '',
       pageSize: 10,
-      paginationPage: 1
+      paginationPage: 1,
+      currentTable: ''
     }
   },
   computed: {
@@ -126,6 +135,23 @@ export default {
     },
     header() {
       return this.sliceArray(this.tHeader)
+    },
+    showingTable() {
+      if (
+        Array.isArray(this.tHeader) &&
+				this.tHeader.length > 0 &&
+				this.tBody.length > 0
+      ) {
+        return true
+      } else if (
+        typeof this.tHeader === 'object' &&
+				Object.keys(this.tHeader).length > 0 &&
+				Object.keys(this.tBody).length > 0
+      ) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   mounted() {},
@@ -179,6 +205,16 @@ export default {
 </script>
 
 <style lang="scss">
+.data-instance {
+	font-size: 12px;
+	color: #999ba3;
+	margin-bottom: 12px;
+	.total-instance {
+		font-size: 14px;
+		color: #6a6c75;
+		padding-right: 12px;
+	}
+}
 .pagination {
 	margin-top: 24px;
 	font-size: 16px;
