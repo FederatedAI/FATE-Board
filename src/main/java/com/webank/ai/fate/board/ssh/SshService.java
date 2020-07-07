@@ -40,45 +40,43 @@ import java.util.concurrent.Executors;
 @Service
 public class SshService implements InitializingBean {
 
-    ExecutorService flushExecutor  = Executors.newSingleThreadExecutor();
+    ExecutorService flushExecutor = Executors.newSingleThreadExecutor();
 
-    private     Properties sshInfoToProperties(){
+    private Properties sshInfoToProperties() {
         Properties properties = new Properties();
 
         sshInfoMap.values().forEach(sshInfo -> {
-            StringBuilder  sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             String ip = sshInfo.getIp();
             String password = sshInfo.getPassword();
             Integer port = sshInfo.getPort();
-            String  user = sshInfo.getUser();
-            sb.append(user!=null?user:"").append("|").append(password!=null?password:"").append("|")
-                    .append(port!=null?port:"");
-            properties.put(ip,sb.toString());
+            String user = sshInfo.getUser();
+            sb.append(user != null ? user : "").append("|").append(password != null ? password : "").append("|")
+                    .append(port != null ? port : "");
+            properties.put(ip, sb.toString());
 
         });
 
-        return  properties;
+        return properties;
 
 
     }
 
-    public void addSShInfo(SshInfo  sshInfo){
-        if(sshInfo!=null)
-         sshInfoMap.put(sshInfo.getIp(),sshInfo);
+    public void addSShInfo(SshInfo sshInfo) {
+        if (sshInfo != null)
+            sshInfoMap.put(sshInfo.getIp(), sshInfo);
     }
 
 
-    public   void  flushToFile(){
+    public void flushToFile() {
 
-        Properties  properties = sshInfoToProperties();
+        Properties properties = sshInfoToProperties();
 
-        flushExecutor.execute(()->{
+        flushExecutor.execute(() -> {
 
             try {
-                OutputStream  outputStream = getOutputStream();
+                OutputStream outputStream = getOutputStream();
                 properties.store(outputStream, "store");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -91,8 +89,9 @@ public class SshService implements InitializingBean {
     Logger logger = LoggerFactory.getLogger(SshService.class);
     Map<String, SshInfo> sshInfoMap = Maps.newHashMap();
     private String pubKeyPath = "";
-    public     Map<String, SshInfo>   getAllsshInfo(){
-        return  sshInfoMap;
+
+    public Map<String, SshInfo> getAllsshInfo() {
+        return sshInfoMap;
     }
 
     public SshInfo getSSHInfo(String ip) {
@@ -119,7 +118,7 @@ public class SshService implements InitializingBean {
                 }
                 sshInfoMap.put(key, sshInfo);
 
-                logger.info("load new sshInfoMap {}",sshInfoMap);
+                logger.info("load new sshInfoMap {}", sshInfoMap);
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.error("parse ssh info error", e);
@@ -139,9 +138,9 @@ public class SshService implements InitializingBean {
                 Preconditions.checkArgument(file.exists() && file.isFile());
                 load(new FileInputStream(file));
             }
-            ;
-        }catch(Exception e){
-            logger.error("load ssh config file error",e);
+
+        } catch (Exception e) {
+            logger.error("load ssh config file error", e);
         }
     }
 
@@ -176,23 +175,20 @@ public class SshService implements InitializingBean {
     }
 
     public Session connect(SshInfo sshInfo) throws Exception {
-
-
-        return this.connect(sshInfo.getUser(), sshInfo.getPassword(), sshInfo.getIp(), new Integer(sshInfo.getPort()),5000);
-
+        return this.connect(sshInfo.getUser(), sshInfo.getPassword(), sshInfo.getIp(), new Integer(sshInfo.getPort()), 5000);
     }
 
-    public Session connect(SshInfo sshInfo,int timeout) throws Exception {
+    public Session connect(SshInfo sshInfo, int timeout) throws Exception {
 
         Preconditions.checkArgument(sshInfo != null, "sshInfo is null");
 
         String currentUser = System.getProperty("user.name");
 
-        return this.connect(sshInfo.getUser(), sshInfo.getPassword(), sshInfo.getIp(), new Integer(sshInfo.getPort()),timeout);
+        return this.connect(sshInfo.getUser(), sshInfo.getPassword(), sshInfo.getIp(), new Integer(sshInfo.getPort()), timeout);
 
     }
 
-    public Session connect(String user, String passwd, String host, int port,int  timeout) throws Exception {
+    public Session connect(String user, String passwd, String host, int port, int timeout) throws Exception {
 
 
         String sessionKey = new StringBuilder().append(user).append("_").append(host).append("_").append(port).toString();
@@ -212,7 +208,6 @@ public class SshService implements InitializingBean {
             if (session == null) {
                 throw new Exception("session is null");
             }
-
 
 
             session.setPassword(passwd);
