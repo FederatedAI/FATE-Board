@@ -1,11 +1,12 @@
 export default function(data, role) {
-  const final = { corr: {}, localHeader: [], otherHeader: [], anony: [], anonyHeader: [] }
+  const single = !(data.allNames.length > 1)
+  const final = { corr: {}, localHeader: [], otherHeader: [], anony: [], anonyHeader: [], single }
   if (role === 'guest') {
-    final.localHeader = data.allNames[0].names
-    final.otherHeader = data.allNames[1].names
+    final.localHeader = data.allNames.length > 1 ? data.allNames[0].names : data.allNames[0].names
+    final.otherHeader = data.allNames.length > 1 ? data.allNames[1].names : []
   } else {
-    final.localHeader = data.allNames[1].names
-    final.otherHeader = data.allNames[0].names
+    final.localHeader = data.allNames.length > 1 ? data.allNames[1].names : data.allNames[0].names
+    final.otherHeader = data.allNames.length > 1 ? data.allNames[0].names : []
   }
   // }
   final.anonyHeader = [
@@ -13,13 +14,15 @@ export default function(data, role) {
       label: 'variable',
       prop: 'name',
       width: 100
-    },
-    {
+    }
+  ]
+  if (!single) {
+    final.anonyHeader.push({
       label: 'anonym in ' + (role === 'guest' ? 'host' : 'guest'),
       prop: 'anonymous',
       width: 150
-    }
-  ]
+    })
+  }
   final.anony = data.anonymousMap
   // get local correlation
   for (let i = 0; i < final.localHeader.length; i++) {
@@ -41,7 +44,7 @@ export default function(data, role) {
       }
     }
   }
-  if (role === 'host') {
+  if (!single) {
     for (let i = 0; i < final.localHeader.length; i++) {
       for (const val of final.anony) {
         if (val.name === final.localHeader[i]) {

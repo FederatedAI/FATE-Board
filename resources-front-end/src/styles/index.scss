@@ -16,16 +16,16 @@ $primary: #4159D1;
   //font-size: 16px;
 }
 *::-webkit-scrollbar {
-  background-color: #E8E8EF;
-  width: 6px;
+  background-color: #F8F9FA;
+  width: 10px;
   height: 6px;
-  border-radius: 3px;
+  border-radius: 5px;
 }
 *::-webkit-scrollbar-thumb {
-  background: #BBBBC8;
-  width: 6px;
+  background: #DCDDE0;
+  width: 10px;
   height: 6px;
-  border-radius: 3px;
+  border-radius: 5px;
 }
 
 html {
@@ -39,14 +39,14 @@ body {
   // font-basic
   font-size: 14px;
   text-rendering: optimizeLegibility;
-  font-family: "roboto_regular", "roboto_bold", "roboto_medium", "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
+  font-family: Arial, sans-serif;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   
   background-color: $gray-light;
 }
 pre{
-  font-family: "roboto_regular", "roboto_bold", "roboto_medium", "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
+  font-family: Arial, sans-serif;
 }
 label {
   font-weight: 700;

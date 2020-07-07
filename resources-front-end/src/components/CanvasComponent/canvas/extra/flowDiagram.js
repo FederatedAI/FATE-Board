@@ -9,6 +9,7 @@ import { measureText } from '../Core/Paths/text'
 import { FONT_SIZE, FONT_FAMILY } from './modules'
 
 const LINE_STLYE = '#BBBBC8'
+const LINE_BRIGHT_STYLE = '#578FFF'
 const LINE_WIDTH_FOR_LINKING = 2
 const COMP_PADDING = 22
 const COMP_HEIGHT_PADDING = 5
@@ -85,6 +86,31 @@ const flowDiagram = {
       for (const key in obj) {
         Progress.animations.toNewType.call(lay.$children.get(key), obj[key].type, obj[key].props)
       }
+    },
+    lineBright(text) {
+      this._lineBright = text
+      const connection = []
+      this.$children.forEach((val, key) => {
+        if (text && key === text) {
+          val.$zindex = 2
+        } else if (text && key.match(text)) {
+          const name = key.split('|')
+          name.splice(name.indexOf(text), 1)
+          val.$zindex = 1
+          val.style.strokeStyle = LINE_BRIGHT_STYLE
+          val.style.lineWidth *= 1.5
+          this.$children.get(name[0]).containerLightUp = LINE_BRIGHT_STYLE
+          this.$children.get(name[0]).$struct()
+          connection.push(name[0])
+        } else if (key.match('line')) {
+          val.$zindex = 0
+          val.style.strokeStyle = LINE_STLYE
+          val.style.lineWidth = this.lineWidthForLinking
+        } else if (connection.indexOf(key) < 0) {
+          val.$zindex = 1
+          val.containerLightUp = ''
+        }
+      })
     }
   }
 }
@@ -133,7 +159,7 @@ class DiagramInfo {
   }
   componentBelone(obj) {
     for (const key in obj) {
-      this.components.get(key).setBelone(obj[key])
+      this.components.get(key).setBelone(obj[key], this.lay.images)
     }
   }
   componentLink(obj) {
@@ -214,11 +240,12 @@ class DiagramInfo {
     for (const key in this.linking) {
       this.linkPos[key] = this.linkPos[key] || []
       for (const val of this.linking[key]) {
-        const link = { line: [] }
-        link.line.push(this.lay.$children.get(val[0]).$meta.get('port').get(key + 'Output'))
-        link.line.push(this.lay.$children.get(val[1]).$meta.get('port').get(key + 'Input'))
+        const link = { line: [], name: '' }
+        link.line.push(this.lay.$children.get(val[0]).$meta.get('port').get(key + 'output'))
+        link.line.push(this.lay.$children.get(val[1]).$meta.get('port').get(key + 'input'))
         const p = this.components.get(val[0])
         const c = this.components.get(val[1])
+        link.name = p.name + '|' + c.name + '|' + key + '|line'
         link.corssLevel = ((c.level - p.level) >= 2)
         this.linkPos[key].push(link)
       }
@@ -238,11 +265,11 @@ class DiagramInfo {
             curve: true,
             stroke: true,
             style: {
-              lineWidth: this.lay.lineWidthForLinking,
-              strokeStyle: LINE_STLYE
+              lineWidth: this.lay.lineWidthForLinking * (this.lay._lineBright && val.name.match(this.lay._lineBright) ? 1.5 : 1),
+              strokeStyle: this.lay._lineBright && val.name.match(this.lay._lineBright) ? LINE_BRIGHT_STYLE : LINE_STLYE
             }
           }
-        }, this.lay)
+        }, this.lay, val.name)
       }
     }
   }
@@ -293,28 +320,42 @@ class CompExpression {
   setDisable(disable) {
     this.disable = disable
   }
-  setBelone(Belone) {
+  setBelone(Belone, ports) {
     this.belone = Belone
-    this.setPort()
+    this.setPort(ports)
   }
   setPos(point) {
     this.point = point
   }
-  setPort() {
-    this.dataInput = true
-    this.dataOutput = true
-    this.modelInput = true
-    this.modelOutput = true
-    this.specialDataInput = false
-    if (this.belone.toLowerCase().match(/(intersection|federatedsample|evaluation|upload|download|rsa)/i)) {
-      this.modelInput = false
-      this.modelOutput = false
+  setPort(ports) {
+    this.input = this.input || []
+    this.output = this.output || []
+    const DATAINPUT = { name: 'datainput', tooltip: 'Data Input', type: 'data' }
+    const DATAOUTPUT = { name: 'dataoutput', tooltip: 'Data Output', type: 'data' }
+    const MODELINPUT = { name: 'modelinput', tooltip: 'Model Input', type: 'model' }
+    const MODELOUTPUT = { name: 'modeloutput', tooltip: 'Model Output', type: 'model' }
+    this.input.push(DATAINPUT)
+    if (this.belone.toLowerCase().match(/evaluation/i)) {
+      this.input[0].mult = ports.get('mult_data_port')
     }
-    if (this.belone.toLowerCase().match(/(evaluation|upload|download|pearson)/i)) {
-      this.dataOutput = false
+    if (!this.belone.toLowerCase().match(/(evaluation|upload|download|pearson|datasplit)/i)) {
+      this.output.push(DATAOUTPUT)
     }
-    if (this.belone.toLowerCase().match(/(evaluation)/i)) {
-      this.specialDataInput = true
+    if (!this.belone.toLowerCase().match(/(intersection|federatedsample|evaluation|upload|download|rsa|datasplit)/i)) {
+      this.input.push(MODELINPUT)
+      this.output.push(MODELOUTPUT)
+      if (this.belone.toLowerCase().match(/(selection)/i)) {
+        this.input[1].mult = ports.get('mult_model_port')
+      }
+    }
+    if (this.belone.toLowerCase().match(/(datasplit)/i)) {
+      this.output.push(...[{
+        name: 'traindatainput', tooltip: 'Train Data Input', type: 'data'
+      }, {
+        name: 'validationdatainput', tooltip: 'Validation Data Input', type: 'data'
+      }, {
+        name: 'testdatainput', tooltip: 'Test Data Input', type: 'data'
+      }])
     }
   }
   getComponentInstance(lay) {
@@ -326,10 +367,8 @@ class CompExpression {
         height: this.height,
         type: lay.$children.get(this.name) ? lay.$children.get(this.name).type : this.type,
         disable: this.disable,
-        dataInput: this.dataInput,
-        dataOutput: this.dataOutput,
-        modelInput: this.modelInput,
-        modelOutput: this.modelOutput,
+        input: this.input,
+        output: this.output,
         specialDataInput: this.specialDataInput,
         contentFontSize: lay.fontSizeForContent,
         time: lay.$children.get(this.name) ? lay.$children.get(this.name).time : this.time

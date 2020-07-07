@@ -15,7 +15,7 @@ import { measureText } from '../Core/Paths/text'
 const CONTENT_PADDING = 0.1
 const CHOOSE_STYLE = '#000'
 
-const FONT_FAMILY = 'roboto_bold'
+const FONT_FAMILY = 'arial'
 const FONT_COLOR = '#000'
 
 const DISABLE_STLYE = 'rgba(62,64,82,0.6)'

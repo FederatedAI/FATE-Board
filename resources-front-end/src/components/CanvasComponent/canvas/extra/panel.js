@@ -6,7 +6,7 @@ const DEGREE_TO_NUM = 10
 const NUM_TO_BOTTOM = 25
 const LINE_TO_BOTTOM = 10
 const LINE_STYLE = '#e8e8ef'
-const FAMILY_FONT = 'roboto_regular'
+const FAMILY_FONT = 'Arial'
 
 const panelComp = {
   drawPanel(obj, parent, name) {

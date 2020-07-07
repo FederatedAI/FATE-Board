@@ -2,8 +2,9 @@
   <div class="flex flex-col flex-center correlation-container" @click="dialogClose">
     <div class="flex flex-row space-between flex-center correlation-title">
       <div class="flex flex-row flex-center">
-        <span>role:</span>
+        <span v-if="!single">role:</span>
         <el-select
+          v-if="!single"
           v-model="roleSelected"
           size="small"
           class="title-selection"
@@ -74,7 +75,14 @@
         />
       </div>
       <div class="flex flex-col space-between range-axis">
-        <span v-for="(item, index) in RangeAxis" :key="index" class="range-axis-item">- {{ item }}</span>
+        <span
+          v-for="(item, index) in RangeAxis"
+          :key="index"
+          class="range-axis-item flex flex-row flex-row"
+        >
+          <span class="range-axis-item-check" />
+          <span class="range-axis-item-num">{{ item }}</span>
+        </span>
       </div>
     </div>
   </div>
@@ -113,6 +121,10 @@ export default {
     role: {
       type: String,
       default: 'guest'
+    },
+    single: {
+      type: Boolean | String,
+      default: false
     }
   },
   data() {
@@ -405,6 +417,17 @@ export default {
 				width: 15px;
 				height: calc(100% - 15px);
 				background-image: linear-gradient(#3145a6, #deecfc, #0ec7a5);
+			}
+			.range-axis-item-check {
+				background-color: #dcdde0;
+				width: 6px;
+				height: 2px;
+				margin-top: 7px;
+				margin-right: 12px;
+			}
+			.range-axis-item-num {
+				color: #6a6c75;
+				font-size: 12px;
 			}
 		}
 	}
