@@ -415,6 +415,12 @@ public class LogFileService {
         return splits[0];
     }
 
+    public String getJobStatus(String jobId, String role, String partyId) {
+        JobWithBLOBs jobWithBLOBs = jobManagerService.queryJobByConditions(jobId, role, partyId);
+        Preconditions.checkArgument(jobWithBLOBs != null, "job " + jobId + "-" + role + "-" + partyId + "  does not exist");
+        return jobWithBLOBs.getfStatus();
+    }
+
 //    @Override
 //    public void afterPropertiesSet() throws Exception {
 //

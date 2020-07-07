@@ -88,6 +88,7 @@ public class Dict {
     static public final String DEFAULT = "default";
 
     static public final HashMap<String, String> logMap = new HashMap<>();
+
     static {
         logMap.put("jobSchedule", "fate_flow_schedule.log");
         logMap.put("jobError", "error.log");
@@ -100,10 +101,14 @@ public class Dict {
 
     //the fields for job search
     static public final HashMap<String, List<String>> fieldMap = new HashMap<>();
+
     static {
         List<String> status = Arrays.asList("success", "running", "waiting", "failed", "canceled");
         List<String> roles = Arrays.asList("guest", "host", "arbiter", "local");
         fieldMap.put("status", status);
         fieldMap.put("role", roles);
     }
+
+    static public final List<String> JOB_FINISHED_STATUS = Arrays.asList("success", "timeout", "failed", "canceled");
+
 }

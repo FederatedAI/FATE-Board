@@ -6,10 +6,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.jcraft.jsch.Channel;
 import com.webank.ai.fate.board.conf.Configurator;
+import com.webank.ai.fate.board.disruptor.LogFileTransferEventProducer;
+import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.log.LogFileService;
 import com.webank.ai.fate.board.log.LogService;
 import com.webank.ai.fate.board.pojo.SshInfo;
+import com.webank.ai.fate.board.services.JobManagerService;
 import com.webank.ai.fate.board.ssh.SshService;
+import com.webank.ai.fate.board.utils.GetSystemInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,6 +183,13 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
                                 e.printStackTrace();
                             }
                         }
+
+                        //pull logs to local
+                        String jobStatus = logFileService.getJobStatus(jobId, role, partyId);
+                        if (Dict.JOB_FINISHED_STATUS.contains(jobStatus)) {
+                            String jobDir = logFileService.getJobDir(jobId);
+                            logFileTransferEventProducer.onData(sshInfo, jobDir, jobDir);
+                        }
                     }
                 }
             }
@@ -219,6 +230,8 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
     public void afterPropertiesSet() {
         LogWebSocketController.logFileService = (LogFileService) applicationContext.getBean("logFileService");
         LogWebSocketController.sshService = (SshService) applicationContext.getBean("sshService");
+        LogWebSocketController.logFileTransferEventProducer = (LogFileTransferEventProducer) applicationContext.getBean("logFileTransferEventProducer");
+
     }
 
     @Override
@@ -229,4 +242,6 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
     private static ApplicationContext applicationContext;
     private static SshService sshService;
     private static LogFileService logFileService;
+    private static LogFileTransferEventProducer logFileTransferEventProducer;
+
 }

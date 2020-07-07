@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import com.jcraft.jsch.Session;
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
+import com.webank.ai.fate.board.pojo.SshDTO;
 import com.webank.ai.fate.board.pojo.SshInfo;
 import com.webank.ai.fate.board.ssh.SshService;
 import com.webank.ai.fate.board.global.Dict;
@@ -39,62 +40,62 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping(value = "/ssh")
 
-public class SshPropertiesController {
-    private final static Logger logger = LoggerFactory.getLogger(SshPropertiesController.class);
+public class SshController {
+    private final static Logger logger = LoggerFactory.getLogger(SshController.class);
 
     @Autowired
     SshService sshService;
 
-    @RequestMapping(value = "/checkStatus", method = RequestMethod.GET)
-    public ResponseResult checkSShStatus() throws IOException, InterruptedException {
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public ResponseResult findAll() throws InterruptedException {
 
-        Map<String ,SshInfo>  data = sshService.getAllsshInfo();
+        Map<String, SshInfo> data = sshService.getAllsshInfo();
 
-        CountDownLatch  countDownLatch  = new CountDownLatch(data.size());
+        CountDownLatch countDownLatch = new CountDownLatch(data.size());
 
-        data.forEach((k,v)->{
-            new  Thread(()->{
+        data.forEach((k, v) -> {
+            new Thread(() -> {
+                Session session;
                 try {
-                    Session session = null;
-                    try {
-                        session = sshService.connect(v,1000);
-                    } catch (Exception e) {
-                        v.setStatus("0");
-                    }
+                    session = sshService.connect(v, 1000);
                     if (session != null) {
                         v.setStatus("1");
+                    } else {
+                        v.setStatus("0");
                     }
-                }finally {
+                } catch (Exception e) {
+                    v.setStatus("0");
+                } finally {
                     countDownLatch.countDown();
                 }
             }).start();
         });
 
         countDownLatch.await(8, TimeUnit.SECONDS);
-
-
         return new ResponseResult<>(ErrorCode.SUCCESS, data);
     }
-    private  Map<String, SshInfo>  getAll(){
 
-       return   sshService.getAllsshInfo();
+//    private  Map<String, SshInfo>  getAll(){
+//
+//       return   sshService.getAllsshInfo();
+//
+//    }
 
-    }
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public ResponseResult readAll() throws Exception {
+//    @RequestMapping(value = "/all", method = RequestMethod.GET)
+//    public ResponseResult readAll() throws Exception {
+//
+//        return new ResponseResult<Map>(ErrorCode.SUCCESS, getAll());
+//    }
 
-        return new ResponseResult<Map>(ErrorCode.SUCCESS, getAll());
-    }
-
-    private String checkStatus( String ip)  {
+    private String checkStatus(String ip) {
         String status = null;
         SshInfo sshInfo = sshService.getSSHInfo(ip);
-        if(sshInfo==null) {
+        if (sshInfo == null) {
             return "0";
         }
         Session session = null;
         try {
-            session = sshService.connect(sshInfo,1000);
+            session = sshService.connect(sshInfo, 1000);
         } catch (Exception e) {
             e.printStackTrace();
             status = "0";
@@ -118,32 +119,48 @@ public class SshPropertiesController {
     }
 
     @RequestMapping(value = "/ssh", method = RequestMethod.DELETE)
-    public ResponseResult removeValue(@RequestBody String params) throws IOException {
-        JSONObject jsonObject = JSON.parseObject(params);
-        String ip = jsonObject.getString(Dict.SSH_IP);
-        Preconditions.checkArgument(StringUtils.isNoneEmpty(ip));
-        sshService.getAllsshInfo().remove(ip);
+    public ResponseResult removeValue(@RequestBody SshDTO sshDTO) throws IOException {
+//        JSONObject jsonObject = JSON.parseObject(params);
+//        String ip = jsonObject.getString(Dict.SSH_IP);
+        Preconditions.checkArgument(StringUtils.isNoneEmpty(sshDTO.getIp()));
+        sshService.getAllsshInfo().remove(sshDTO.getIp());
         sshService.flushToFile();
         return new ResponseResult(ErrorCode.SUCCESS);
     }
 
+//    @RequestMapping(value = "/ssh", method = RequestMethod.POST)
+//    public ResponseResult addProperties(@RequestBody String params) throws IOException {
+//        JSONObject jsonObject = JSON.parseObject(params);
+//        String ip = jsonObject.getString(Dict.SSH_IP);
+//        String user = jsonObject.getString(Dict.SSH_USER);
+//        String password = jsonObject.getString(Dict.SSH_PASSWORD);
+//        String port = jsonObject.getString(Dict.SSH_PORT);
+//        Preconditions.checkArgument(StringUtils.isNoneEmpty(ip, user, password, port));
+//        SshInfo sshInfo = new SshInfo();
+//        sshInfo.setPort(new Integer(port));
+//        sshInfo.setIp(ip);
+//        sshInfo.setUser(user);
+//        sshInfo.setPassword(password);
+//        sshService.addSShInfo(sshInfo);
+//        sshService.flushToFile();
+//        return new ResponseResult<Map>(ErrorCode.SUCCESS, sshService.getAllsshInfo());
+//
+//    }
+
     @RequestMapping(value = "/ssh", method = RequestMethod.POST)
-    public ResponseResult addProperties(@RequestBody String params) throws IOException {
-        JSONObject jsonObject = JSON.parseObject(params);
-        String ip = jsonObject.getString(Dict.SSH_IP);
-        String user = jsonObject.getString(Dict.SSH_USER);
-        String password = jsonObject.getString(Dict.SSH_PASSWORD);
-        String port = jsonObject.getString(Dict.SSH_PORT);
-        Preconditions.checkArgument(StringUtils.isNoneEmpty(ip, user, password, port));
-        SshInfo  sshInfo = new SshInfo();
-        sshInfo.setPort(new Integer(port));
+    public ResponseResult addProperties(@RequestBody SshDTO sshDTO) {
+        String ip = sshDTO.getIp();
+        String port = sshDTO.getPort();
+        String user = sshDTO.getUser();
+        String password = sshDTO.getPassword();
+        Preconditions.checkArgument(StringUtils.isNoneEmpty(ip, port, user, password));
+        SshInfo sshInfo = new SshInfo();
         sshInfo.setIp(ip);
+        sshInfo.setPort(new Integer(port));
         sshInfo.setUser(user);
         sshInfo.setPassword(password);
         sshService.addSShInfo(sshInfo);
         sshService.flushToFile();
-        return new ResponseResult<Map>(ErrorCode.SUCCESS, sshService.getAllsshInfo());
-
+        return new ResponseResult<>(ErrorCode.SUCCESS);
     }
-
 }
