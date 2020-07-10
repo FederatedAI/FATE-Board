@@ -24,9 +24,7 @@ import com.google.common.collect.Maps;
 import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
-import com.webank.ai.fate.board.pojo.Job;
-import com.webank.ai.fate.board.pojo.JobWithBLOBs;
-import com.webank.ai.fate.board.pojo.PagedJobQO;
+import com.webank.ai.fate.board.pojo.*;
 import com.webank.ai.fate.board.services.JobManagerService;
 import com.webank.ai.fate.board.utils.*;
 import org.apache.commons.lang3.StringUtils;
@@ -132,7 +130,7 @@ public class JobManagerController {
         if (jobWithBLOBs.getfStatus().equals(Dict.TIMEOUT)) {
             jobWithBLOBs.setfStatus(Dict.FAILED);
         }
-        Map<String,Object> params = Maps.newHashMap();
+        Map<String, Object> params = Maps.newHashMap();
         params.put(Dict.JOBID, jobId);
         params.put(Dict.ROLE, role);
         params.put(Dict.PARTY_ID, new Integer(partyId));
@@ -280,8 +278,27 @@ public class JobManagerController {
     }
 
     @RequestMapping(value = "/query/fields", method = RequestMethod.POST)
-    public ResponseResult<Map<String,List<String>>> queryFields() {
+    public ResponseResult<Map<String, List<String>>> queryFields() {
         Map<String, List<String>> fieldsMap = jobManagerService.queryFields();
         return new ResponseResult<>(ErrorCode.SUCCESS, fieldsMap);
+    }
+
+    @RequestMapping(value = "/restart", method = RequestMethod.POST)
+    public ResponseResult restartJob(@RequestBody JobRestartDTO jobRestartDTO) {
+        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobRestartDTO.getJobId(), jobRestartDTO.getRole(), jobRestartDTO.getPartyId()));
+
+        int i = jobManagerService.restartJob(jobRestartDTO);
+        if (i == 0) {
+            return new ResponseResult<>(ErrorCode.SUCCESS);
+        } else {
+            return new ResponseResult<>(ErrorCode.RESTART_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/componentCommand", method = RequestMethod.POST)
+    public ResponseResult<String> getComponentCommand(@RequestBody ComponentCommandDTO componentCommandDTO) {
+        Preconditions.checkArgument(StringUtils.isNoneEmpty(componentCommandDTO.getJobId(), componentCommandDTO.getRole(), componentCommandDTO.getPartyId()), componentCommandDTO.getComponentName());
+        String componentCommand = jobManagerService.getComponentCommand(componentCommandDTO);
+        return new ResponseResult<>(ErrorCode.SUCCESS, componentCommand);
     }
 }

@@ -19,10 +19,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.webank.ai.fate.board.dao.JobMapper;
-import com.webank.ai.fate.board.pojo.Job;
-import com.webank.ai.fate.board.pojo.JobExample;
-import com.webank.ai.fate.board.pojo.JobWithBLOBs;
-import com.webank.ai.fate.board.pojo.PagedJobQO;
+import com.webank.ai.fate.board.pojo.*;
 import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.utils.HttpClientPool;
 import com.webank.ai.fate.board.utils.PageBean;
@@ -289,7 +286,30 @@ public class JobManagerService {
         return jobMapper.countJob(pagedJobQO);
     }
 
-    public Map<String,List<String>> queryFields() {
+    public Map<String, List<String>> queryFields() {
         return Dict.fieldMap;
+    }
+
+    public int restartJob(JobRestartDTO jobRestartDTO) {
+        String result = null;
+        try {
+            result = httpClientPool.post(fateUrl + Dict.URL_JOB_RESTART, JSON.toJSONString(jobRestartDTO));
+            if (result != null) {
+                JSONObject jsonObject = JSON.parseObject(result);
+                if (0 == jsonObject.getInteger(Dict.RETCODE)) {
+                    return 0;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 1;
+        }
+        return 1;
+
+    }
+
+    public String getComponentCommand(ComponentCommandDTO componentCommandDTO) {
+        StringBuffer command = new StringBuffer().append("python fate_flow_client.py -f component_output_data -j ").append(componentCommandDTO.getJobId()).append(" -r ").append(componentCommandDTO.getRole()).append(" -p ").append(componentCommandDTO.getPartyId()).append(" -cpn ").append(componentCommandDTO.getComponentName()).append(" -o ").append("./");
+        return command.toString();
     }
 }
