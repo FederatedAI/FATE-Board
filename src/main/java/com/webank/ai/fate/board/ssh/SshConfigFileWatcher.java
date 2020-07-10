@@ -184,6 +184,16 @@ class SshConfigFileWatcher implements InitializingBean {
             } catch (IOException e) {
                 logger.error(" prepare watch file fail ! check Config Listening Path:{}", listeningPathString);
             }
+
+            //close the watcher
+            Thread hook = new Thread(() -> {
+                try {
+                    watcher.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            Runtime.getRuntime().addShutdownHook(hook);
         }
 
     }

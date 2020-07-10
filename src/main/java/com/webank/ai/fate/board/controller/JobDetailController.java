@@ -22,7 +22,9 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.base.Preconditions;
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
+import com.webank.ai.fate.board.pojo.BatchMetricDTO;
 import com.webank.ai.fate.board.pojo.Task;
+import com.webank.ai.fate.board.services.JobDetailService;
 import com.webank.ai.fate.board.services.TaskManagerService;
 import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.utils.HttpClientPool;
@@ -33,11 +35,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +60,8 @@ public class JobDetailController {
     HttpClientPool httpClientPool;
     @Autowired
     TaskManagerService taskManagerService;
+    @Autowired
+    JobDetailService jobDetailService;
 
     @Value("${fateflow.url}")
     String fateUrl;
@@ -190,7 +196,7 @@ public class JobDetailController {
         if (retCode == 0) {
             JSONObject data = resultObject.getJSONObject(Dict.DATA);
             JSONArray components_list = data.getJSONArray(Dict.COMPONENT_LIST);
-            ArrayList<Map<String,Object>> componentList = new ArrayList<>();
+            ArrayList<Map<String, Object>> componentList = new ArrayList<>();
 
             for (Object o : components_list) {
                 HashMap<String, Object> component = new HashMap<>();
@@ -265,4 +271,19 @@ public class JobDetailController {
         }
         return ResponseUtil.buildResponse(result, null);
     }
+
+    @RequestMapping(value = "/tracking/component/metric_data/batch", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseResult getBatchMetricInfo(@Valid @RequestBody BatchMetricDTO batchMetricDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER, bindingResult);
+        }
+
+        JSONObject batchMetricInfo = jobDetailService.getBatchMetricInfo(batchMetricDTO);
+        if (batchMetricInfo == null) {
+            return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
+        }
+        return new ResponseResult<>(ErrorCode.SUCCESS, batchMetricInfo);
+    }
+
 }

@@ -31,7 +31,8 @@ public enum ErrorCode {
     DATABASE_ERROR_CONNECTION(10009, "Database Connection Error!"),
     SYSTEM_ERROR(10010, "System error!"),
     DOWNLOAD_ERROR(10011, "File doesn't exist!"),
-    UPLOAD_ERROR(10012, "Upload Error!"),
+    UPLOAD_ERROR(10012, "Upload error!"),
+    RESTART_ERROR(10013, "Restart job error!"),
     ;
 
 
