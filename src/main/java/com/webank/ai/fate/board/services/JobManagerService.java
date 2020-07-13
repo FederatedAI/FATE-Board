@@ -91,8 +91,11 @@ public class JobManagerService {
         criteria.andFStatusIn(stringArrayList);
 
         jobExample.setOrderByClause("f_status, f_start_time desc");
-
-        return jobMapper.selectByExample(jobExample);
+        List<Job> jobs = jobMapper.selectByExample(jobExample);
+        for (Job job : jobs) {
+            job.setfRunIp(null);
+        }
+        return jobs;
 
     }
 
@@ -125,7 +128,9 @@ public class JobManagerService {
         List<JobWithBLOBs> jobWithBLOBsList = jobMapper.selectByExampleWithBLOBs(jobExample);
 
         if (jobWithBLOBsList.size() != 0) {
-            return jobWithBLOBsList.get(0);
+            JobWithBLOBs jobWithBLOBs = jobWithBLOBsList.get(0);
+//            jobWithBLOBs.setfRunIp(null);
+            return jobWithBLOBs;
         } else {
             return null;
         }
@@ -198,9 +203,12 @@ public class JobManagerService {
         }
         String limit = startIndex + "," + pageSize;
         jobExample.setLimitClause(limit);
+        List<JobWithBLOBs> jobWithBLOBs = jobMapper.selectByExampleWithBLOBs(jobExample);
+//        for (JobWithBLOBs jobWithBLOB : jobWithBLOBs) {
+//            jobWithBLOB.setfRunIp(null);
+//        }
 
-
-        return jobMapper.selectByExampleWithBLOBs(jobExample);
+        return jobWithBLOBs;
 
     }
 
@@ -270,6 +278,7 @@ public class JobManagerService {
 
                 return data;
             }, new int[]{500, 1000}, new int[]{3, 3});
+            jobWithBLOB.setfRunIp(null);
             jobDataMap.put(jobWithBLOB, future);
         }
         jobDataMap.forEach((k, v) -> {
