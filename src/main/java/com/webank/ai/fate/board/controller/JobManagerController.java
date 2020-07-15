@@ -23,6 +23,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
+import com.webank.ai.fate.board.log.LogFileService;
 import com.webank.ai.fate.board.pojo.Job;
 import com.webank.ai.fate.board.pojo.JobWithBLOBs;
 import com.webank.ai.fate.board.pojo.PagedJobQO;
@@ -61,6 +62,9 @@ public class JobManagerController {
     String fateUrl;
     @Autowired
     ThreadPoolTaskExecutor asyncServiceExecutor;
+
+    @Autowired
+    LogFileService logFileService;
 
     @RequestMapping(value = "/query/status", method = RequestMethod.GET)
     public ResponseResult queryJobStatus() {
@@ -129,6 +133,8 @@ public class JobManagerController {
             return new ResponseResult<>(ErrorCode.DATABASE_ERROR_RESULT_NULL);
         }
         jobWithBLOBs.setfRunIp(null);
+        jobWithBLOBs.setfDsl(null);
+        jobWithBLOBs.setfRuntimeConf(null);
         if (jobWithBLOBs.getfStatus().equals(Dict.TIMEOUT)) {
             jobWithBLOBs.setfStatus(Dict.FAILED);
         }
@@ -189,11 +195,19 @@ public class JobManagerController {
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public ResponseResult updateJobById(@RequestBody String parameters) {
 
-        JSONObject jsonObject = checkParameter(parameters, Dict.JOBID, Dict.ROLE, Dict.PARTY_ID);
-        if (jsonObject == null) {
+        JSONObject jsonObject = JSON.parseObject(parameters);
+        String jobId = jsonObject.getString(Dict.JOBID);
+        String role = jsonObject.getString(Dict.ROLE);
+        String partyId = jsonObject.getString(Dict.PARTY_ID);
+        String notes = jsonObject.getString(Dict.NOTES);
+        try {
+            Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, notes));
+            Preconditions.checkArgument(logFileService.checkPathParameters(jobId, role, partyId, notes));
+        } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseResult(REQUEST_PARAMETER_ERROR);
         }
-        String partyId = jsonObject.getString(Dict.PARTY_ID);
+
         jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
 
         String result = null;

@@ -279,6 +279,8 @@ public class JobManagerService {
                 return data;
             }, new int[]{500, 1000}, new int[]{3, 3});
             jobWithBLOB.setfRunIp(null);
+            jobWithBLOB.setfDsl(null);
+            jobWithBLOB.setfRuntimeConf(null);
             jobDataMap.put(jobWithBLOB, future);
         }
         jobDataMap.forEach((k, v) -> {

@@ -105,7 +105,8 @@ public class LogFileService implements InitializingBean {
     }
 
     public boolean checkPathParameters(String... parameters) {
-        String regex = "^\\w+$";
+//        String regex = "^\\w+$";
+        String regex = "^[0-9a-zA-Z_-\\u4e00-\\u9fa5]+$";
         for (String parameter : parameters) {
             if (!parameter.matches(regex)) {
                 return false;
