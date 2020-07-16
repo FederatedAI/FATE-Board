@@ -170,6 +170,7 @@
         :job-id="jobId"
         :party-id="partyId"
         :role="logs[name].role"
+        :component-id="logs[name].componentId"
         :status="jobStatus"
         :first-tip="logs[name].first"
         :style="{'z-index': currentLogTab === name ? 2 : 1}"/>
@@ -246,7 +247,7 @@ import IconHoverAndActive from '@/components/IconHoverAndActive'
 import BreadcrumbExt from '@/components/BreadcrumbExt'
 import Logger from './logger'
 
-import { getJobDetails, getDAGDpencencies, queryLog, killJob, queryLogSize } from '@/api/job'
+import { getJobDetails, getDAGDpencencies, queryLog, killJob } from '@/api/job'
 
 export default {
   components: {
@@ -307,12 +308,14 @@ export default {
         Algorithm: {
           tips: ['error', 'warning', 'info', 'debug'],
           first: 'info',
-          role: this.$route.query.role
+          role: this.$route.query.role,
+          componentId: 'default'
         },
         Schedule: {
           tips: ['error', 'info'],
           first: 'info',
-          role: 'fateFlow'
+          role: this.$route.query.role,
+          componentId: 'fateFlow'
         }
       },
       showDialog: false,
@@ -327,9 +330,6 @@ export default {
     ...mapGetters([
       'icons'
     ])
-  },
-  created() {
-    this.getLogSize()
   },
   mounted() {
     // console.log(process.env.BASE_API)
@@ -355,8 +355,6 @@ export default {
     }, 5000)
     this.getDatasetInfo()
     this.getDAGDpendencies()
-    this.getLogSize()
-    this.openLogsWebsocket()
     this.openJobWebsocket()
     // this.$refs.logView.addEventListener('scroll', vm.scrollChange)
   },
@@ -374,65 +372,6 @@ export default {
       getDAGDpencencies(para).then(res => {
         this.DAGData = res.data
       })
-    },
-    openLogsWebsocket() {
-      Object.keys(this.logsMap).forEach(item => {
-        this.logWebsocket[item] = initWebSocket(`/log/${this.jobId}/${this.role}/${this.partyId}/default/${item}`, res => {
-          // console.log(item, 'success')
-        }, res => {
-          const data = JSON.parse(res.data)
-          // console.log(item, data)
-          if (Array.isArray(data)) {
-            if (data.length > 0) {
-              this.logsMap[item].list = [...this.logsMap[item].list, ...data]
-              this.logsMap[item].length = data[data.length - 1].lineNum
-              this.$set(this.logsMap, item, this.logsMap[item])
-              this.checkHowManyLogGetForInited()
-            }
-          } else {
-            this.logsMap[item].list.push(data)
-            this.logsMap[item].length = data.lineNum
-            this.$set(this.logsMap, item, this.logsMap[item])
-            this.checkHowManyLogGetForInited()
-          }
-        })
-      })
-    },
-    checkHowManyLogGetForInited() {
-      const vm = this
-      if (!this.releaseLimit) {
-        this.releaseLimit = setTimeout(function() {
-          vm.initedLog = true
-          vm.logLoading = false
-        }, 5000)
-      }
-      if (!this.initedLog) {
-        let checkGet = true
-        for (const key in this.logsMap) {
-          if (this.logsMap[key].maxlength === undefined) {
-            checkGet = false
-            break
-          } else {
-            if (this.logsMap[key].list.length > 0 && parseInt(this.logsMap[key].list[this.logsMap[key].list.length - 1].lineNum) !== parseInt(this.logsMap[key].maxlength)) {
-              checkGet = false
-              break
-            }
-            if (this.logsMap[key].maxlength > 0 && this.logsMap[key].list.length === 0) {
-              checkGet = false
-              break
-            }
-          }
-        }
-        if (checkGet) {
-          this.$nextTick(() => {
-            vm.logLoading = false
-            if (vm.releaseLimit) {
-              clearTimeout(vm.releaseLimit)
-            }
-          })
-          this.initedLog = true
-        }
-      }
     },
     openJobWebsocket() {
       const vm = this
@@ -459,19 +398,6 @@ export default {
         if (this.gaugeInstance) {
           this.gaugeInstance.setOption(this.jobOptions, true)
         }
-      })
-    },
-    getLogSize() {
-      Object.keys(this.logsMap).forEach(item => {
-        queryLogSize({
-          job_id: this.jobId,
-          party_id: this.partyId,
-          role: this.role,
-          type: item
-        }).then(res => {
-          this.logsMap[item].maxlength = res.data
-          this.checkHowManyLogGetForInited()
-        })
       })
     },
     getDatasetInfo(isInterval = false) {
