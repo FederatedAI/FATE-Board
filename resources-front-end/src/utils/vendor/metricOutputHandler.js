@@ -4,6 +4,7 @@ import { deepClone, formatFloat } from '@/utils'
 import evaluationOptions from '@/utils/chart-options/evaluation-curve'
 import stepwiseDataHandler from './stepwiseDataHandler'
 // import { colorRgb } from '../tools/color'
+import PSIbar from '../chart-options/PSIbar'
 
 const { metricTypeMap } = store.state
 const curveColor = [
@@ -168,6 +169,13 @@ export default function(
     metric_type === metricTypeMap.PrecisionMulti ||
     metric_type === metricTypeMap.loss) {
     const typeArr = Object.keys(metricTypeMap)
+    // for (let i = 0; i < data.length; i++) {
+    //   if (data[i + 1] && data[i][0] === data[i + 1][0] && data[i][1] === data[i + 1][1]) {
+    //     data.splice(i + 1, 1)
+    //     i--
+    //   }
+    // }
+    // thresholds = [...new Set(thresholds)]
     for (let i = 0; i < typeArr.length; i++) {
       if (metric_type === metricTypeMap[typeArr[i]]) {
         if (metric_type === metricTypeMap.RecallMulti ||
@@ -367,8 +375,15 @@ export default function(
               // console.log(item.legendData)
               params.forEach((obj, index) => {
                 if (obj.seriesType !== 'line' || obj.color !== hideColor) {
-                  if (item.legendData[index].isActive !== false) {
-                    const xValue = item.thresholdsArr[index][obj.dataIndex]
+                  let items = null
+                  for (const val of item.legendData) {
+                    if (val.text === obj.seriesName) {
+                      items = val
+                      break
+                    }
+                  }
+                  if (items && items.isActive !== false) {
+                    const xValue = item.thresholdsArr[obj.seriesIndex][obj.dataIndex]
                     if (xValue || xValue === 0) {
                       str += `Threshold(${obj.seriesName}): ${xValue}<br>`
                     }
@@ -785,6 +800,29 @@ export default function(
       }
       return r
     })
+  } else if (metric_type === metricTypeMap.quantilePr) {
+    type = 'quantile_pr'
+    const tH = [{
+      label: 'precision',
+      prop: 'precision'
+    }, {
+      label: 'recall',
+      prop: 'recall'
+    }]
+    const precision = []
+    const recall = []
+    const threshold = []
+    meta.thresholds.forEach((item, index) => {
+      threshold.push(item)
+      precision.push(meta.p_scores[index][1])
+      recall.push(meta.r_scores[index][1])
+    })
+    outputData = {
+      theader: tH,
+      precision,
+      recall,
+      threshold
+    }
   } else if (metric_type === metricTypeMap.Union) {
     type = 'table'
     const tH = [{
@@ -834,6 +872,30 @@ export default function(
       })
     }
     stepwiseDataHandler(original, data, meta, role, party_id)
+  } else if (metric_type === metricTypeMap.F1Score || metric_type === metricTypeMap.ConfusionMat) {
+    type = 'ConfusionMatrix'
+    let obj = []
+    for (let i = 0; i < metricOutputList.length; i++) {
+      if (metricOutputList[i].type === type) {
+        obj = metricOutputList.splice(i, 1)[0]
+        break
+      }
+    }
+    obj = obj.data || []
+    obj = ConfusionMatExchange(obj, meta, metric_namespace, metric_name.replace(/(train_|validate_)/g, ''))
+    outputData = obj
+  } else if (metric_type === metricTypeMap.PSI) {
+    type = 'PSI_summary'
+    let obj = {}
+    for (let i = 0; i < metricOutputList.length; i++) {
+      if (metricOutputList[i].type === type) {
+        obj = metricOutputList.splice(i, 1)[0]
+        break
+      }
+    }
+    obj = obj.data || {}
+    obj = PSIExchange(obj, meta, metric_namespace, metric_name.replace(/(train_|validate_)/g, ''))
+    outputData = obj
   }
   if (metric_type !== metricTypeMap.Stepwise) {
     metricOutputList.push({
@@ -842,5 +904,300 @@ export default function(
       data: outputData,
       scaleMethod
     })
+  }
+}
+
+function ConfusionMatExchange(PSIinstance, meta, nameSpace, effect) {
+  const metric_type = meta.metric_type
+  effect = effect.replace('_f1_score', '')
+  if (metric_type === metricTypeMap.F1Score) {
+    PSIinstance = PSIinstance || []
+    const mat = PSIinstance
+    let effectList = null
+    for (let i = 0; i < mat.length; i++) {
+      if (mat[i].effect === effect) {
+        effectList = mat[i]
+        break
+      }
+    }
+    if (!effectList) {
+      effectList = effectList || { effect, nameSpace: {}}
+      mat.push(effectList)
+    }
+    const space = effectList.nameSpace
+    if (Object.keys(space).indexOf(nameSpace) < 0) {
+      space[nameSpace] = {}
+    }
+    const matRow = space[nameSpace]
+    matRow['f1score'] = matRow['f1score'] || {}
+    const checklist = []
+    const resultList = []
+    meta.thresholds.forEach((item, pos) => {
+      const index = checklist.indexOf(item)
+      if (index < 0) {
+        checklist.push(item)
+        resultList.push(meta.f1_scores[pos])
+      }
+    })
+    matRow['f1score'].thresholds = checklist
+    matRow['f1score'].f1score = resultList
+  }
+  if (metric_type === metricTypeMap.ConfusionMat) {
+    effect = effect.replace('_confusion_mat', '')
+    PSIinstance = PSIinstance || []
+    const mat = PSIinstance
+    let effectList = null
+    for (let i = 0; i < mat.length; i++) {
+      if (mat[i].effect === effect) {
+        effectList = mat[i]
+        break
+      }
+    }
+    if (!effectList) {
+      effectList = effectList || { effect, nameSpace: {}}
+      mat.push(effectList)
+    }
+    const space = effectList.nameSpace || {}
+    if (Object.keys(space).indexOf(nameSpace) < 0) {
+      space[nameSpace] = {}
+    }
+    const matRow = space[nameSpace]
+    matRow['label'] = matRow['label'] || { thresholds: [], fn: [], fp: [], tn: [], tp: [] }
+    meta.thresholds.forEach((item, index) => {
+      if (matRow['label'].thresholds.indexOf(item) < 0) {
+        matRow['label'].thresholds.push(item)
+        matRow['label'].fn.push(meta.fn[index])
+        matRow['label'].fp.push(meta.fp[index])
+        matRow['label'].tn.push(meta.tn[index])
+        matRow['label'].tp.push(meta.tp[index])
+      }
+    })
+  }
+  return PSIinstance
+}
+
+function PSIExchange(PSIinstance, meta, nameSpace, effect) {
+  effect = effect.replace('_psi', '')
+  PSIinstance[effect] = {}
+  const result = PSIinstance[effect]
+  result.totalPSI = meta.total_psi
+  result.list = []
+  for (let i = 0; i < meta.intervals.length; i++) {
+    result.list.push({
+      predict_score: meta.intervals[i],
+      expected: meta.expected_percentage[i],
+      expected_interval: meta.expected_interval[i],
+      actual_interval: meta.actual_interval[i],
+      actual: meta.actual_percentage[i],
+      psi: meta.psi_scores[i],
+      train_event: meta.train_pos_perc[i],
+      val_event: meta.validate_pos_perc[i]
+    })
+  }
+  result.summary = [{
+    label: 'predict_score',
+    prop: 'predict_score'
+  }, {
+    label: 'Expected %',
+    prop: 'expected'
+  }, {
+    label: 'Actual %',
+    prop: 'actual'
+  }, {
+    label: 'PSI',
+    prop: 'psi'
+  }]
+  result.quantile = [{
+    label: 'predict_score',
+    prop: 'predict_score'
+  }, {
+    label: 'train',
+    child: [{
+      label: 'instance_count(%total)',
+      prop: 'expected_interval'
+    }, {
+      label: 'event_ratio',
+      prop: 'train_event'
+    }]
+  }, {
+    label: 'validation',
+    child: [{
+      label: 'instance_count(%total)',
+      prop: 'actual_interval'
+    }, {
+      label: 'event_ratio',
+      prop: 'val_event'
+    }]
+  }]
+  // TODO 两张图表内容
+  const pic = JSON.parse(JSON.stringify(PSIbar))
+  pic.series.push({
+    name: 'Expected',
+    type: 'bar',
+    data: meta.expected_percentage,
+    itemStyle: {
+      color: '#5E7FEB'
+    },
+    barMaxWidth: 15
+  })
+  pic.series.push({
+    name: 'Actual',
+    type: 'bar',
+    data: meta.actual_percentage,
+    itemStyle: {
+      color: '#0Ec7a5'
+    },
+    barMaxWidth: 15
+  })
+  pic.series.push({
+    name: 'PSI',
+    type: 'line',
+    yAxisIndex: 1,
+    data: meta.psi_scores,
+    itemStyle: {
+      color: '#FF9E1F'
+    }
+  })
+  pic.legend.data = ['Expected', 'Actual', 'PSI']
+  pic.xAxis.data = meta.intervals
+  pic.yAxis[0].name = 'Expected, Actual'
+  const biggestY0 = getBiggest([...meta.expected_percentage, ...meta.actual_percentage])
+  pic.yAxis[0].max = biggestY0
+  pic.yAxis[0].interval = biggestY0 / 5
+  pic.yAxis[0].axisLabel.formatter = (value) => { return `${accMul(value, 100, biggestY0)} %` }
+  pic.yAxis[1].name = 'PSI'
+  const biggestY1 = getBiggest(meta.psi_scores)
+  pic.yAxis[1].max = biggestY1
+  pic.yAxis[1].interval = biggestY1 / 5
+  pic.yAxis[1].axisLabel.formatter = (value) => { return `${accMul(value, 1, biggestY1)}` }
+  pic.tooltip.formatter = (param) => {
+    let str = param[0].name + '<br/>'
+    param.forEach((item) => {
+      str += `${item.seriesName}: ${item.seriesName !== 'PSI' ? (item.data * 100).toFixed(4) + '%' : item.data}<br/>`
+    })
+    return str
+  }
+  result.summaryPic = pic
+
+  const quantilePic = JSON.parse(JSON.stringify(PSIbar))
+  quantilePic.series.push({
+    name: 'train_%total',
+    type: 'bar',
+    data: meta.expected_percentage,
+    itemStyle: {
+      color: '#5E7FEB'
+    },
+    barMaxWidth: 15
+  })
+  quantilePic.series.push({
+    name: 'val_%total',
+    type: 'bar',
+    data: meta.actual_percentage,
+    itemStyle: {
+      color: '#0Ec7a5'
+    },
+    barMaxWidth: 15
+  })
+  quantilePic.series.push({
+    name: 'train_event_ratio',
+    type: 'line',
+    yAxisIndex: 1,
+    data: meta.train_pos_perc,
+    itemStyle: {
+      color: '#FF9E1F'
+    }
+  })
+  quantilePic.series.push({
+    name: 'val_event_ratio',
+    type: 'line',
+    yAxisIndex: 1,
+    data: meta.validate_pos_perc,
+    itemStyle: {
+      color: '#FF4F38'
+    }
+  })
+  quantilePic.legend.data = ['train_%total', 'val_%total', 'train_event_ratio', 'val_event_ratio']
+  quantilePic.xAxis.data = meta.intervals
+  quantilePic.yAxis[0].name = '%total'
+  const biggest2Y0 = getBiggest([...meta.expected_percentage, ...meta.actual_percentage])
+  quantilePic.yAxis[0].max = biggest2Y0
+  quantilePic.yAxis[0].interval = accDivCoupon(biggest2Y0, 5)
+  quantilePic.yAxis[0].axisLabel.formatter = (value) => { return `${accMul(value, 100, biggest2Y0)} %` }
+  quantilePic.yAxis[1].name = 'event_ratio'
+  const biggest2Y1 = getBiggest([...meta.train_pos_perc, ...meta.validate_pos_perc])
+  quantilePic.yAxis[1].max = biggest2Y1
+  quantilePic.yAxis[1].interval = accDivCoupon(biggest2Y1, 5)
+  quantilePic.yAxis[1].axisLabel.formatter = (value) => {
+    return `${accMul(value, 100, biggest2Y1)} %`
+  }
+  quantilePic.tooltip.formatter = (param) => {
+    let str = param[0].name + '<br/>'
+    param.forEach((item) => {
+      str += `${item.seriesName}: ${(item.data * 100).toFixed(4) + '%'}<br/>`
+    })
+    return str
+  }
+  result.quantilePic = quantilePic
+  return PSIinstance
+}
+
+function getBiggest(vals) {
+  let biggest = 0
+  for (const val of vals) {
+    if (val > biggest) {
+      biggest = val
+    }
+  }
+  const fx = biggest.toString().split('.')
+  let FixedTo = fx.length > 1 ? (fx[1].match(/^0+/) ? fx[1].match(/^0+/)[0].length : 0) : 0
+  if (FixedTo) {
+    FixedTo += 2
+  } else {
+    FixedTo = 2
+  }
+  let midd = parseFloat(biggest.toFixed(FixedTo))
+  while (midd < biggest) {
+    midd = parseFloat((midd + accDivCoupon(1, Math.pow(10, FixedTo))).toFixed(FixedTo))
+  }
+  biggest = parseFloat(((Math.ceil((midd * Math.pow(10, FixedTo)) / 5) * 5) / Math.pow(10, FixedTo)).toFixed(FixedTo))
+  if (biggest === 0) {
+    biggest = 0.1
+  }
+  return biggest
+}
+
+function accDivCoupon(arg1, arg2) {
+  try {
+    let t1 = arg1.toString().split('.')
+    t1 = t1.length > 1 ? t1[1].length : 0
+    let t2 = arg2.toString().split('.')
+    t2 = t2.length > 1 ? t2[1].length : 0
+    const r1 = Number(arg1.toString().replace('.', ''))
+    const r2 = Number(arg2.toString().replace('.', ''))
+    return (r1 / r2) * Math.pow(10, t2 - t1)
+  } catch (e) {
+    // console.log()
+  }
+}
+
+function accMul(arg1, arg2, lens) {
+  try {
+    let m = 0
+    let len = lens.toString().split('.').length > 1 ? lens.toString().split('.')[1].length : 0
+    if (len < 2) len = 2
+    const s1 = arg1.toFixed(len)
+    const s2 = arg2.toFixed(len)
+    m += s1.split('.').length > 1 ? s1.split('.')[1].length : 0
+    m += s2.split('.').length > 1 ? s2.split('.')[1].length : 0
+    let result = Number(s1.replace('.', '')) * Number(s2.replace('.', '')) / Math.pow(10, m)
+    const reslist = result.toString().split('.')
+    if (result.toString().split('.').length > 1) {
+      if (!reslist[1].match(/([0-9])/)) {
+        result = parseInt(result)
+      }
+    }
+    return result
+  } catch (e) {
+    // TODO: console
   }
 }

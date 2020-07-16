@@ -15,6 +15,9 @@
  */
 package com.webank.ai.fate.board.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Dict {
 
     static public final String ID = "id";
@@ -83,5 +86,17 @@ public class Dict {
 
     static public final String TIMEOUT="timeout";
     static public final String FAILED="failed";
+
+    static public final List<String> ORDER_FIELDS =new ArrayList<>();
+    static {
+        ORDER_FIELDS.add("f_start_time");
+        ORDER_FIELDS.add("f_end_time");
+    }
+
+    static public final List<String> ORDER_RULES =new ArrayList<>();
+    static {
+        ORDER_RULES.add("desc");
+        ORDER_RULES.add("asc");
+    }
 
 }

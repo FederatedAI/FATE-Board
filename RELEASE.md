@@ -1,9 +1,19 @@
+# Release 1.4.2
+
+#### Major Features and Improvements
+- Pearson support unilateraly operation
+- Selection support sorting
+- Add field search function for job-list
+- Add fateflow dispatch log in dashboard
+- Optimize some forms of interaction
+
+
 # Release 1.4.1
 
 #### Major Features and Improvements
-- support PSI display in evaluation component
+- Support PSI display in evaluation component
 - Support confusion matrix display
-- update logs interface
+- Update logs interface
 - Firefox basic compatibility
 # Release 1.4.0
 

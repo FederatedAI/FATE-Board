@@ -33,18 +33,18 @@
         </svg>
       </span>
     </div>
-    <SSHConfig :show-config-modal="showConfigModal" @closeSSHConfigModal="showConfigModal = false" />
+    <!-- <SSHConfig :show-config-modal="showConfigModal" @closeSSHConfigModal="showConfigModal = false" /> -->
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import SSHConfig from './SSHConfig'
+// import SSHConfig from './SSHConfig'
 // import { getAllSSHConfig, getSSHConfig, removeSSHConfig, addSSHConfig } from '@/api/ssh'
 
 export default {
   components: {
-    SSHConfig
+    // SSHConfig
   },
   data() {
     return {

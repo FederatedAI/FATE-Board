@@ -73,6 +73,9 @@ export default {
 
   methods: {
     initing() {
+      if (!this.dagInfo) {
+        return false
+      }
       const can = document.getElementById(this.canvasId)
       if (!can) {
         return false
@@ -120,24 +123,38 @@ export default {
             {
               name: 'disable_Failed',
               url: require('./icons/disable_error.svg')
+            },
+            {
+              name: 'mult_data_port',
+              url: require('./icons/mult_data.svg')
+            },
+            {
+              name: 'mult_model_port',
+              url: require('./icons/mult_model.svg')
             }
           ],
-          () => {
-            that.drawComp(can)
+          images => {
+            that.drawComp(can, images)
           }
         )
       } else {
         that.drawComp(can)
       }
     },
-    drawComp(canvasDom) {
+    drawComp(canvasDom, images) {
       const that = this
       const diagramOperation = this.purePic
         ? { click: false }
         : {
           click: {
+            beforeClick: () => {
+              flowDiagram.events.lineBright.call(that.component)
+            },
             props: [
               (name, here) => {
+                if (here) {
+                  flowDiagram.events.lineBright.call(that.component, name)
+                }
                 let dataIndex = 0
                 that.dagInfo.component_list.map((item, index) => {
                   if (item.component_name === name) {
@@ -159,7 +176,7 @@ export default {
           // eslint-disable-next-line
 				  }
       that.canvas = new Layer.CanvasUtil(canvasDom, diagramOperation, can => {
-        that.getInstance(can)
+        that.getInstance(can, images)
         that.component.drawing()
         that.toSetting()
         if (that.thumbnail) {
@@ -168,13 +185,14 @@ export default {
         return that.component
       })
     },
-    getInstance(canvas) {
+    getInstance(canvas, images) {
       if (canvas) {
         this.component = flowDiagram.drawDiagram({
           canvas,
           props: {
             dagInfo: this.flowData,
-            thumbnail: this.thumbnail ? this.thumb : 1
+            thumbnail: this.thumbnail ? this.thumb : 1,
+            images: images
           },
           clear: flowDiagram.clear,
           events: flowDiagram.events
@@ -185,24 +203,28 @@ export default {
     },
     checkInfo() {
       const final = {}
-      for (const item of this.dagInfo.component_list) {
-        const status = item.status || 'unrun'
-        final[item.component_name] = {
-          status: status.charAt(0).toUpperCase() + status.slice(1),
-          time: item.time
+      if (this.dagInfo) {
+        for (const item of this.dagInfo.component_list) {
+          const status = item.status || 'unrun'
+          final[item.component_name] = {
+            status: status.charAt(0).toUpperCase() + status.slice(1),
+            time: item.time
+          }
         }
-      }
-      for (const key in this.dagInfo.component_need_run) {
-        final[key].disable = this.dagInfo.component_need_run[key]
+        for (const key in this.dagInfo.component_need_run) {
+          final[key].disable = this.dagInfo.component_need_run[key]
+        }
       }
       this.dagCheck = final
     },
     checkFlowData() {
-      const final = JSON.parse(JSON.stringify(this.dagInfo))
-      for (const item of final.component_list) {
-        item.status = 'unrun'
+      if (this.dagInfo) {
+        const final = JSON.parse(JSON.stringify(this.dagInfo))
+        for (const item of final.component_list) {
+          item.status = 'unrun'
+        }
+        this.flowData = final
       }
-      this.flowData = final
     },
     toSetting() {
       if (this.component) {

@@ -12,10 +12,11 @@ function formatFloatWithDefault(num, role) {
 export default function(data, header, type, partyId, role, Currentrole) {
   if (data && Object.keys(data).length > 0) {
     const sourceData = []
-    const options = []
+    let options = []
     const variableData = {}
     const stackBarData = {}
     const woeData = {}
+    let indexData = 0
     for (const key in data) {
       const tableData = []
       let min = -9999
@@ -27,7 +28,7 @@ export default function(data, header, type, partyId, role, Currentrole) {
           point = formatFloat(data[key].splitPoints[index - 1])
         }
         let binning = 'bin_' + index
-        let formatterBinning = '-'
+        let formatterBinning = 'bin_' + index
         if ((point || point === 0) && !(Currentrole === 'guest' && type === 'host')) {
           if (min === -9999) {
             binning = `${key} <= ${point}`
@@ -77,9 +78,9 @@ export default function(data, header, type, partyId, role, Currentrole) {
         }
         return str
       }
-      woeOptions.tooltip.trigger = 'item'
+      // woeOptions.tooltip.trigger = 'item'
       woeOptions.tooltip.formatter = (params) => {
-        const obj = formatterArr[params.dataIndex]
+        const obj = formatterArr[params[0].dataIndex]
         return `${obj.formatterBinning}<br>Woe: ${obj.woe}<br>`
       }
       eventOptions.series.push({
@@ -139,12 +140,12 @@ export default function(data, header, type, partyId, role, Currentrole) {
           if (Currentrole === role) {
             return key
           } else {
-            return role + '_' + partyId + '_' + key.match(/[0-9]+/)[0]
+            return role + '_' + partyId + '_' + indexData
           }
         })(),
         anonymInGuest: (() => {
           if (Currentrole === role) {
-            return role + '_' + partyId + '_' + key.match(/[0-9]+/)[0]
+            return role + '_' + partyId + '_' + indexData
           } else {
             return key
           }
@@ -174,21 +175,31 @@ export default function(data, header, type, partyId, role, Currentrole) {
           }
         })()
       })
+      indexData++
     }
     sourceData.sort((a, b) => {
-      if (parseInt(a.variable.match(/[0-9]+$/)[0]) > parseInt(b.variable.match(/[0-9]+$/)[0])) {
-        return 1
+      const matchIndexA = a.variable.match(/[0-9]+$/)
+      const matchIndexB = b.variable.match(/[0-9]+$/)
+      if (matchIndexA && matchIndexB) {
+        if (parseInt(a.variable.match(/[0-9]+$/)[0]) > parseInt(b.variable.match(/[0-9]+$/)[0])) {
+          return 1
+        } else {
+          return -1
+        }
       } else {
-        return -1
+        return 0
       }
     })
-    options.sort((a, b) => {
-      if (parseInt(a.value.match(/[0-9]+$/)[0]) > parseInt(b.value.match(/[0-9]+$/)[0])) {
-        return 1
-      } else {
-        return -1
+    const optionFinal = []
+    for (const val of sourceData) {
+      for (let i = 0; i < options.length; i++) {
+        if (val.variable === options[i].label || val.variable === options[i].value) {
+          optionFinal.push(...options.splice(i, 1))
+          break
+        }
       }
-    })
+    }
+    options = optionFinal
     return {
       sourceData,
       options,

@@ -24,6 +24,7 @@ import com.webank.ai.fate.board.pojo.FuzzyLogQO;
 import com.webank.ai.fate.board.pojo.SshInfo;
 import com.webank.ai.fate.board.ssh.SshService;
 import com.webank.ai.fate.board.utils.GetSystemInfo;
+import com.webank.ai.fate.board.utils.LogHandle;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,9 @@ public class LogController {
     LogFileService logFileService;
     @Autowired
     SshService sshService;
+
+//    @Autowired
+//    LogHandle logHandle;
 
     @RequestMapping(value = "/queryLogWithSizeSSH/{jobId}/{role}/{partyId}/{componentId}/{type}/{begin}/{end}", method = RequestMethod.GET)
     @ResponseBody
@@ -83,21 +87,23 @@ public class LogController {
                                        @PathVariable String partyId
     ) {
 
-        ResponseResult responseResult = new ResponseResult();
-        responseResult.setData(0);
+        ResponseResult responseResult = new ResponseResult(ErrorCode.SUCCESS);
+
         try {
             String filePath = logFileService.buildFilePath(jobId, componentId, type, role, partyId);
             Preconditions.checkArgument(StringUtils.isNotEmpty(filePath));
             if (LogFileService.checkFileIsExist(filePath)) {
                 Integer count = LogFileService.getLocalFileLineCount(new File(filePath));
                 responseResult.setData(count);
+
             } else {
                 String ip = logFileService.getJobTaskInfo(jobId, componentId, role, partyId).ip;
                 String localIp = GetSystemInfo.getLocalIp();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("local ip {} remote ip {}", localIp, ip);
-                }
+//                if (logger.isDebugEnabled()) {
+//                    logger.debug("local ip {} remote ip {}", localIp, ip);
+//                }
                 if (localIp.equals(ip) || "0.0.0.0".equals(ip) || "127.0.0.1".equals(ip)) {
+                    responseResult.setData(0);
                     return responseResult;
                 }
                 logFileService.checkSshInfo(ip);
@@ -177,7 +183,9 @@ public class LogController {
                     e.printStackTrace();
                 }
             }
-            return result;
+
+            List<Map> maps = LogHandle.handleLog(result);
+            return maps;
         } else {
             String ip = logFileService.getJobTaskInfo(jobId, componentId, role, partyId).ip;
             logFileService.checkSshInfo(ip);
@@ -185,7 +193,8 @@ public class LogController {
                 return null;
             }
             List<Map> logs = logFileService.getRemoteLogWithFixSize(jobId, componentId, type, role, partyId, begin, end - begin + 1);
-            return logs;
+            List<Map> maps = LogHandle.handleLog(logs);
+            return maps;
 
         }
 
