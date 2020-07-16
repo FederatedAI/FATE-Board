@@ -46,10 +46,9 @@ export default {
         can,
         {
           click: false,
-          mouseup: false,
           mousemove: false,
           mousedown: false,
-          mousewheel: false
+          mouseup: false
         },
         () => {
           vm.getInstance(can)

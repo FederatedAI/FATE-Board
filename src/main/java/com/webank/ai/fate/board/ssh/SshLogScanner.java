@@ -22,8 +22,10 @@ import com.jcraft.jsch.Channel;
 import com.webank.ai.fate.board.log.LogFileService;
 import com.webank.ai.fate.board.log.LogScanner;
 import com.webank.ai.fate.board.pojo.SshInfo;
+import com.webank.ai.fate.board.utils.LogHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -61,6 +63,9 @@ public class SshLogScanner implements Runnable, LogScanner {
     Integer beginLine;
 
     Integer batchSize = 100;
+
+//    @Autowired
+//    LogHandle logHandle;
 
     public SshLogScanner(javax.websocket.Session webSocketSession,
                          LogFileService logFileService,
@@ -111,7 +116,8 @@ public class SshLogScanner implements Runnable, LogScanner {
                         result.add(jsonContent);
                         if (result.size() >= batchSize) {
                             if (webSocketSession.isOpen()) {
-                                webSocketSession.getBasicRemote().sendText(JSON.toJSONString(result));
+                                List<Map> maps = LogHandle.handleLog(result);
+                                webSocketSession.getBasicRemote().sendText(JSON.toJSONString(maps));
                             }
                             result.clear();
 
@@ -120,7 +126,8 @@ public class SshLogScanner implements Runnable, LogScanner {
                     }
                     if (webSocketSession.isOpen()) {
                         if (result.size() != 0) {
-                            webSocketSession.getBasicRemote().sendText(JSON.toJSONString(result));
+                            List<Map> maps = LogHandle.handleLog(result);
+                            webSocketSession.getBasicRemote().sendText(JSON.toJSONString(maps));
                         }
                     }
 

@@ -27,7 +27,7 @@ public class Configurator extends ServerEndpointConfig.Configurator {
     public void modifyHandshake(ServerEndpointConfig sec, HandshakeRequest request,
                                 HandshakeResponse response) {
 
-        response.getHeaders().put("Access-Control-Allow-Origin", Collections.singletonList("*"));
+//        response.getHeaders().put("Access-Control-Allow-Origin", Collections.singletonList("*"));
         response.getHeaders().put("Access-Control-Allow-Methods", Collections.singletonList("POST, GET, OPTIONS, DELETE"));
         response.getHeaders().put("Access-Control-Max-Age", Collections.singletonList("3600"));
         response.getHeaders().put("Access-Control-Allow-Headers", Collections.singletonList("x-requested-with"));

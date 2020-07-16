@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
@@ -38,8 +40,8 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-@RestController
-@RequestMapping(value = "/ssh")
+@Component
+//@RequestMapping(value = "/ssh")
 
 public class SshPropertiesController {
     private final static Logger logger = LoggerFactory.getLogger(SshPropertiesController.class);
@@ -47,7 +49,7 @@ public class SshPropertiesController {
     @Autowired
     SshService sshService;
 
-    @RequestMapping(value = "/checkStatus", method = RequestMethod.GET)
+//    @RequestMapping(value = "/checkStatus", method = RequestMethod.GET)
     public ResponseResult checkSShStatus() throws IOException, InterruptedException {
 
         Map<String ,SshInfo>  data = sshService.getAllsshInfo();
@@ -82,7 +84,7 @@ public class SshPropertiesController {
        return   sshService.getAllsshInfo();
 
     }
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
+//    @RequestMapping(value = "/all", method = RequestMethod.GET)
     public ResponseResult readAll() throws Exception {
 
         return new ResponseResult<Map>(ErrorCode.SUCCESS, getAll());
@@ -108,7 +110,7 @@ public class SshPropertiesController {
     }
 
 
-    @RequestMapping(value = "/ssh", method = RequestMethod.GET)
+//    @RequestMapping(value = "/ssh", method = RequestMethod.GET)
     public ResponseResult readValue(@RequestBody String params) throws Exception {
         JSONObject jsonObject = JSON.parseObject(params);
         String ip = jsonObject.getString(Dict.SSH_IP);
@@ -119,7 +121,7 @@ public class SshPropertiesController {
         return new ResponseResult<>(ErrorCode.SUCCESS, data);
     }
 
-    @RequestMapping(value = "/ssh", method = RequestMethod.DELETE)
+//    @RequestMapping(value = "/ssh", method = RequestMethod.DELETE)
     public ResponseResult removeValue(@RequestBody String params) throws IOException {
         JSONObject jsonObject = JSON.parseObject(params);
         String ip = jsonObject.getString(Dict.SSH_IP);
@@ -129,7 +131,7 @@ public class SshPropertiesController {
         return new ResponseResult(ErrorCode.SUCCESS);
     }
 
-    @RequestMapping(value = "/ssh", method = RequestMethod.POST)
+//    @RequestMapping(value = "/ssh", method = RequestMethod.POST)
     public ResponseResult addProperties(@RequestBody String params) throws IOException {
         JSONObject jsonObject = JSON.parseObject(params);
         String ip = jsonObject.getString(Dict.SSH_IP);

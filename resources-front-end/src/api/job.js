@@ -9,7 +9,8 @@ export function getAllJobs({ total, pno, psize = 10 }) {
 }
 export function queryJobs(data) {
   return request({
-    url: '/job/query/page',
+    // url: '/job/query/page',
+    url: '/job/query/page/new',
     method: 'post',
     data
   })

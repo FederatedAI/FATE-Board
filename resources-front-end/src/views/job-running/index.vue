@@ -144,10 +144,21 @@ export default {
     },
     submitKillJob(para) {
       const vm = this
-      killJob(para).then(res => {
-        this.getJobList()
-        vm.closeDialog()
-      })
+      killJob(para)
+        .then(
+          res => {
+            this.getJobList()
+            vm.closeDialog()
+          },
+          err => {
+            vm.closeDialog()
+            throw err
+          }
+        )
+        .catch(err => {
+          vm.closeDialog()
+          throw err
+        })
     }
   }
 }
