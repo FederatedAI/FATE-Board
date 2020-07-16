@@ -17,8 +17,10 @@ package com.webank.ai.fate.board.log;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
+import com.webank.ai.fate.board.utils.LogHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.websocket.Session;
 import java.io.File;
@@ -34,6 +36,9 @@ public class RandomFileScanner implements Runnable, LogScanner {
     long flushNum;
     Session session;
     boolean needStop = false;
+
+//    @Autowired
+//    LogHandle logHandle;
 
     public RandomFileScanner(File file, Session session, long skipLine) {
 
@@ -106,7 +111,8 @@ public class RandomFileScanner implements Runnable, LogScanner {
 
                         });
                         if (session.isOpen()) {
-                            session.getBasicRemote().sendText(JSON.toJSONString(result));
+                            List<Map> maps = LogHandle.handleLog(result);
+                            session.getBasicRemote().sendText(JSON.toJSONString(maps));
                         }
                     }
                 } catch (Exception e) {

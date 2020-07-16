@@ -25,7 +25,13 @@ const app = {
       homoNN: 'HomoNN',
       heteroNN: 'HeteroNN',
       correlation: 'HeteroPearson',
-      homoBoost: 'HomoSecureboost'
+      homoBoost: 'HomoSecureboost',
+      heterofm: 'HeteroFM',
+      homofm: 'HomoFM',
+      heteroMF: 'HeteroMF',
+      heteroSVD: 'HeteroSVD',
+      heteroSVDPP: 'HeteroSVDPP',
+      heteroGMF: 'HeteroGMF'
     },
     metricTypeMap: {
       dataIOTable: 'DATAIO_TABLE',
@@ -49,7 +55,11 @@ const app = {
       Upload: 'UPLOAD',
       Download: 'DOWNLOAD',
       RSA: 'RSA',
-      Stepwise: 'STEPWISE'
+      Stepwise: 'STEPWISE',
+      F1Score: 'F1_SCORE',
+      ConfusionMat: 'CONFUSION_MAT',
+      quantilePr: 'QUANTILE_PR',
+      PSI: 'PSI'
     },
     icons: {
       normal: {

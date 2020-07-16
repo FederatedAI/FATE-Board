@@ -131,6 +131,9 @@ class canvasUtil {
           return
         } else {
           const point = that._getPos(ev)
+          if (that.interactive['click'].beforeClick) {
+            that.interactive['click'].beforeClick()
+          }
           if (that.interactive['click'].operation) {
             that.interactive['click'].operation(that.lay, point)
           } else if (that.interactive['click'] === true) {
@@ -149,11 +152,11 @@ class canvasUtil {
           that.interactive['mouseout'].operation(that.lay)
         }
       })
-      that.canvasDom.addEventListener('mousewheel', function(ev) {
+      const mouseWheel = function(ev) {
         ev.stopPropagation()
         ev.preventDefault()
         const point = that._getPos(ev)
-        const wheelDelta = ev.wheelDelta
+        const wheelDelta = ev.wheelDelta || (-ev.detail * 24)
         let nowTimes = that.scaleTime + (wheelDelta / 1500)
         nowTimes = nowTimes <= 0.1 ? 0.1 : nowTimes
         const scale = nowTimes / that.scaleTime
@@ -163,7 +166,12 @@ class canvasUtil {
         } else if (that.interactive['mousewheel']) {
           that.interactive['mousewheel'].operation(that.lay, scale, point)
         }
-      })
+      }
+      if (!/Firefox/i.test(window.navigator.userAgent)) {
+        that.canvasDom.addEventListener('mousewheel', mouseWheel)
+      } else {
+        that.canvasDom.addEventListener('DOMMouseScroll', mouseWheel)
+      }
       window.addEventListener('resize', function() {
         setTimeout(() => {
           if (that.interactive['resize']) {

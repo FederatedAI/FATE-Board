@@ -230,7 +230,7 @@ export default {
 .container-title {
 	font-size: 24px;
 	color: #3e4052;
-	font-family: 'Roboto';
+	// font-family: 'Roboto';
 	font-weight: bold;
 	margin-bottom: 12px;
 }

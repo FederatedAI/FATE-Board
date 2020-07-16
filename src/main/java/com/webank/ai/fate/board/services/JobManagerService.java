@@ -15,20 +15,32 @@
  */
 package com.webank.ai.fate.board.services;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import com.webank.ai.fate.board.dao.JobMapper;
+import com.webank.ai.fate.board.global.ErrorCode;
+import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.pojo.Job;
 import com.webank.ai.fate.board.pojo.JobExample;
 import com.webank.ai.fate.board.pojo.JobWithBLOBs;
+import com.webank.ai.fate.board.pojo.PagedJobQO;
 import com.webank.ai.fate.board.utils.Dict;
+import com.webank.ai.fate.board.utils.HttpClientPool;
+import com.webank.ai.fate.board.utils.PageBean;
+import com.webank.ai.fate.board.utils.ThreadPoolTaskExecutorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 
 @Service
@@ -45,6 +57,12 @@ public class JobManagerService {
     private final Logger logger = LoggerFactory.getLogger(JobManagerService.class);
     @Autowired
     JobMapper jobMapper;
+    @Autowired
+    HttpClientPool httpClientPool;
+    @Value("${fateflow.url}")
+    String fateUrl;
+    @Autowired
+    ThreadPoolTaskExecutor asyncServiceExecutor;
 
     public long count() {
 
@@ -73,8 +91,11 @@ public class JobManagerService {
         criteria.andFStatusIn(stringArrayList);
 
         jobExample.setOrderByClause("f_status, f_start_time desc");
-
-        return jobMapper.selectByExample(jobExample);
+        List<Job> jobs = jobMapper.selectByExample(jobExample);
+        for (Job job : jobs) {
+            job.setfRunIp(null);
+        }
+        return jobs;
 
     }
 
@@ -107,7 +128,9 @@ public class JobManagerService {
         List<JobWithBLOBs> jobWithBLOBsList = jobMapper.selectByExampleWithBLOBs(jobExample);
 
         if (jobWithBLOBsList.size() != 0) {
-            return jobWithBLOBsList.get(0);
+            JobWithBLOBs jobWithBLOBs = jobWithBLOBsList.get(0);
+//            jobWithBLOBs.setfRunIp(null);
+            return jobWithBLOBs;
         } else {
             return null;
         }
@@ -158,7 +181,7 @@ public class JobManagerService {
         if (!(roles == null || roles.size() == 0)) {
 
             criteria.andFRoleIn(roles);
-            logger.info("add roles "+ roles);
+            logger.info("add roles " + roles);
         }
 
         if (!(jobStatus == null || jobStatus.size() == 0)) {
@@ -180,9 +203,12 @@ public class JobManagerService {
         }
         String limit = startIndex + "," + pageSize;
         jobExample.setLimitClause(limit);
+        List<JobWithBLOBs> jobWithBLOBs = jobMapper.selectByExampleWithBLOBs(jobExample);
+//        for (JobWithBLOBs jobWithBLOB : jobWithBLOBs) {
+//            jobWithBLOB.setfRunIp(null);
+//        }
 
-
-        return jobMapper.selectByExampleWithBLOBs(jobExample);
+        return jobWithBLOBs;
 
     }
 
@@ -219,4 +245,60 @@ public class JobManagerService {
         return jobMapper.countByExample(jobExample);
     }
 
+    public PageBean<Map<String, Object>> queryPagedJobs(PagedJobQO pagedJobQO) {
+        if (pagedJobQO.getJobId() != null && 0 != pagedJobQO.getJobId().trim().length()) {
+            pagedJobQO.setJobId("%" + pagedJobQO.getJobId() + "%");
+        }
+        if (pagedJobQO.getPartyId() != null && 0 != pagedJobQO.getPartyId().trim().length()) {
+            pagedJobQO.setPartyId("%" + pagedJobQO.getPartyId() + "%");
+        }
+        if (pagedJobQO.getfDescription() != null && 0 != pagedJobQO.getfDescription().trim().length()) {
+            pagedJobQO.setfDescription("%" + pagedJobQO.getfDescription() + "%");
+        }
+        long jobSum = this.countJob(pagedJobQO);
+        PageBean<Map<String, Object>> listPageBean = new PageBean<>(pagedJobQO.getPageNum(), pagedJobQO.getPageSize(), jobSum);
+        long startIndex = listPageBean.getStartIndex();
+        List<JobWithBLOBs> jobWithBLOBs = jobMapper.queryPagedJobs(pagedJobQO, startIndex);
+        LinkedList<Map<String, Object>> jobList = new LinkedList<>();
+        Map<JobWithBLOBs, Future> jobDataMap = new LinkedHashMap<>();
+        for (JobWithBLOBs jobWithBLOB : jobWithBLOBs) {
+            ListenableFuture<?> future = ThreadPoolTaskExecutorUtil.submitListenable(this.asyncServiceExecutor, (Callable<JSONObject>) () -> {
+                String jobId1 = jobWithBLOB.getfJobId();
+                String role1 = jobWithBLOB.getfRole();
+                String partyId1 = jobWithBLOB.getfPartyId();
+                if (jobWithBLOB.getfStatus().equals(Dict.TIMEOUT)) {
+                    jobWithBLOB.setfStatus(Dict.FAILED);
+                }
+                HashMap<String, String> jobParams = Maps.newHashMap();
+                jobParams.put(Dict.JOBID, jobId1);
+                jobParams.put((Dict.ROLE), role1);
+                jobParams.put(Dict.PARTY_ID, partyId1);
+                String result = httpClientPool.post(fateUrl + Dict.URL_JOB_DATAVIEW, JSON.toJSONString(jobParams));
+                JSONObject data = JSON.parseObject(result).getJSONObject(Dict.DATA);
+
+                return data;
+            }, new int[]{500, 1000}, new int[]{3, 3});
+            jobWithBLOB.setfRunIp(null);
+            jobWithBLOB.setfDsl(null);
+            jobWithBLOB.setfRuntimeConf(null);
+            jobDataMap.put(jobWithBLOB, future);
+        }
+        jobDataMap.forEach((k, v) -> {
+            HashMap<String, Object> stringObjectHashMap = new HashMap<>();
+            stringObjectHashMap.put(Dict.JOB, k);
+            try {
+                stringObjectHashMap.put(Dict.DATASET, v.get());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+
+            }
+            jobList.add(stringObjectHashMap);
+        });
+        listPageBean.setList(jobList);
+        return listPageBean;
+    }
+
+    public long countJob(PagedJobQO pagedJobQO) {
+        return jobMapper.countJob(pagedJobQO);
+    }
 }

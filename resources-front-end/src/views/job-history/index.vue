@@ -9,7 +9,7 @@
         </div>
         <div class="tool-item">
           <span class="title">Party ID:</span>
-          <el-input v-model="condition.party_id" :size="'mini'" @keyup.native.enter="search" />
+          <el-input v-model="condition.party_id" :size="'mini'" clearable @keyup.native.enter="search" @clear="search" />
         </div>
         <span class="title">Role:</span>
         <el-select v-model="condition.role" :size="'mini'" collapse-tags multiple placeholder>
@@ -31,6 +31,10 @@
             :label="item.label"
           />
         </el-select>
+      </div>
+      <div class="tool-item">
+        <span class="title">Note:</span>
+        <el-input v-model="condition.note" :size="'mini'" clearable @keyup.native.enter="search" @clear="search" />
       </div>
       <el-button :size="'mini'" type="primary" round @click="search">Search</el-button>
     </div>
@@ -135,7 +139,8 @@ export default {
         role: '',
         status: '',
         job_id: '',
-        party_id: ''
+        party_id: '',
+        note: ''
       },
       currentRow: 1,
       saveCondition: {},
@@ -268,7 +273,8 @@ export default {
       search_job_id,
       search_party_id,
       search_role,
-      search_status
+      search_status,
+      search_note
     } = this.$route.params
 
     if (search_job_id) {
@@ -282,6 +288,9 @@ export default {
     }
     if (search_status && search_status.length > 0) {
       this.condition.status = search_status.split(',')
+    }
+    if (search_note) {
+      this.condition.note = search_note
     }
     this.saveCondition = deepClone(this.condition)
     // console.log(query)
@@ -325,20 +334,29 @@ export default {
     },
     queryList() {
       // console.log(this.condition)
+      const cond = Object.assign(this.condition, {
+        jobId: this.condition.job_id,
+        partyId: this.condition.party_id,
+        fDescription: this.condition.note
+      })
       const sortPara = {}
       if (this.startTimeSort) {
-        sortPara.start_time = this.startTimeSort
+        sortPara.orderRule = this.startTimeSort
+        sortPara.orderField = 'f_start_time'
       }
       if (this.endTimeSort) {
-        sortPara.end_time = this.endTimeSort
+        sortPara.orderRule = this.endTimeSort
+        sortPara.orderField = 'f_end_time'
       }
       const para = Object.assign(
         {
           // total_record: this.total,
-          page_num: this.page,
-          page_size: this.pageSize
+          pageNum: this.page,
+          pageSize: this.pageSize
+          // page_num: this.page,
+          // page_size: this.pageSize
         },
-        this.condition,
+        cond,
         sortPara
       )
 

@@ -159,6 +159,22 @@ $common-bg:#f8f8fa;
     border-radius: 4px;
     min-height: 400px;
     height: calc(100% - 410px);
+    width: 100%;
+    position: relative;
+    .log-type {
+      padding-top: 16px;
+      margin-bottom: 24px;
+      .type-name {
+        font-size: 16px;
+        margin-right: 20px;
+        color: $deep-gray;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .type-name-active {
+        color: #4159D1;
+      }
+    }
     .title {
       padding-top: 12px;
       margin-bottom: 15px;
@@ -246,9 +262,13 @@ $common-bg:#f8f8fa;
     .log-extend {
       height: 30px;
       align-items: center;
-      padding: 4px 0;
-      cursor: pointer;
+      padding: 4px 24px;
       margin-top: 8px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
     }
   }
   .suitable-button {
@@ -270,5 +290,49 @@ $common-bg:#f8f8fa;
         color: #fff;
       }
     }
+  }
+
+  .dialog-main-content {
+    font-family: 'Lato';
+    font-size: 18px;
+    color: #534c77;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 25px;
+  }
+  
+  .dialog-sub-content {
+    font-family: 'Lato';
+    font-size: 12px;
+    color: #bbbbc8;
+    text-align: center;
+  }
+  
+  .dialog-button {
+    width: 135px;
+    height: 32px;
+    border-radius: 2px;
+    border: 0px;
+    font-family: 'Lato';
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+    outline: none;
+  }
+  
+  .dialog-check-button {
+    color: #ffffff;
+    background-color: #494ece;
+  }
+  
+  .dialog-click-button {
+    color: #ffffff;
+    background-color: #3135a6;
+  }
+  
+  .dialog-uncheck-button {
+    color: #7f7d8e;
+    background-color: #e8e8ef;
   }
 }
