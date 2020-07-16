@@ -61,6 +61,10 @@ export default {
     firstTip: {
       type: String,
       default: 'info'
+    },
+    componentId: {
+      type: String,
+      default: 'default'
     }
   },
 
@@ -138,7 +142,8 @@ export default {
     async queryLogSize(type) {
       await this._request(
         {
-          type
+          type,
+          componentId: this.componentId
         },
         queryLogSize,
         (data, meta) => {
@@ -158,7 +163,7 @@ export default {
     async queryLog(type, begin, end, exchange) {
       await this._request(
         {
-          componentId: 'default',
+          componentId: this.componentId,
           begin,
           end,
           type
@@ -273,7 +278,7 @@ export default {
 
     initWebsocket(type) {
       this.websockets[type] = initWebSocket(
-        `/log/${this.jobId}/${this.role}/${this.partyId}/default/${type}`,
+        `/log/${this.jobId}/${this.role}/${this.partyId}/${this.componentId}/${type}`,
         res => {
           // console.log(item, 'success')
         },
