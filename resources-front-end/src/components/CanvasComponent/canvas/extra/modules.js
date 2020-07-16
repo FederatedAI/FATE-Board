@@ -8,11 +8,8 @@
  *  disable: Boolean,
  *  progress: Number,
  *  img: imageObject,
- *  dataInput: Boolean,
- *  dataOutput: Boolean,
- *  modelInput: Boolean,
- *  modelOutput: Boolean,
- *  specialDataInput: Boolean,
+ *  input: [{name: String, tooltip:String, mult: Boolean}]
+ *  output: [{text: String, tooltip:String, mult: Boolean}]
  *  time: string,
  *  text: String,
  *  radius: Number
@@ -25,7 +22,7 @@ import { measureText } from '../Core/Paths/text'
 const LINEWIDTH = 8
 const COMP_PADDING = 22
 const BACKGROUND = '#ffffff'
-const CHOOSE = '#494ece'
+const CHOOSE = '#4159D1'
 const SUCCESS = '#0EC7A5'
 const PROGRESS = 'rgba(36,182,139,0.6)'
 const DISABLE_PROGRESS = 'rgba(187,187,200,0.6)'
@@ -38,7 +35,7 @@ const BALCK_TEXT = '#6A6C75'
 const WHITE_TEXT = '#ffffff'
 const DISABLE_TEXT = '#534C77'
 export const FONT_SIZE = 16
-export const FONT_FAMILY = 'roboto_bold'
+export const FONT_FAMILY = 'arial'
 const TIME_TEXT = '#999BA3'
 
 const BETWEEN_ICON_WITH_CONTENT = 6
@@ -56,7 +53,7 @@ const TOOLTIP_RADIUS = 4
 const TOOLTIP_BACKGROUND = 'rgba(127,125,142,0.7)'
 const TOOLTIP_FONT_STYLE = 'rgba(255,255,255,1)'
 const DATA_PORT_COLOR = '#E6B258'
-const SPECIAL_DATA_PORT_COLOR = '#E6B258'
+// const SPECIAL_DATA_PORT_COLOR = '#E6B258'
 const MODEL_PORT_COLOR = '#00cbff'
 const DISABLE_INIT_COLOR = '#7F7D8E'
 const DISABLE_NO_INIT_COLOR = '#7F7D8E'
@@ -142,10 +139,16 @@ const progressComp = {
           }
         }
       }
-      check('dataInput')
-      check('dataOutput')
-      check('modelInput')
-      check('modelOutput')
+      if (lay.input.length > 0) {
+        for (const item of lay.input) {
+          check(item.name)
+        }
+      }
+      if (lay.output.length > 0) {
+        for (const item of lay.output) {
+          check(item.name)
+        }
+      }
     }
   },
   animations: {
@@ -344,14 +347,13 @@ function struct() {
     lay.time = Layer.exchangeTime(lay.time) || '00:00:00'
   }
 
-  const dataInput = !!lay.dataInput
-  const dataOutput = !!lay.dataOutput
-  const modelInput = !!lay.modelInput
-  const modelOutput = !!lay.modelOutput
+  const input = lay.input
+  const output = lay.output
   const x = lay.point.x || lay.point[0] || 0
   const y = lay.point.y || lay.point[1] || 0
   const drawingStyle = getStyle(lay.type, lay.choose, lay.disable, lay)
   const fontStyle = measureText(lay.$ctx, lay.text, drawingStyle.text)
+  drawingStyle.container.fillStyle = lay.containerLightUp || drawingStyle.container.fillStyle
   const w = lay.width || Math.ceil(fontStyle.width) + lay.padding * 2 + lay.lineWidth * 2
   const h = lay.height || lay.contentFontSize + lay.padding
   const type = lay.type
@@ -373,8 +375,8 @@ function struct() {
   Layer.component.rect.drawRect({
     props: {
       point: { x, y },
-      width: w - lay.lineWidth,
-      height: h - lay.lineWidth,
+      width: w - lay.lineWidth * 0.6,
+      height: h - lay.lineWidth * 0.6,
       radius: lay.radius,
       style: {
         fillStyle: BACKGROUND
@@ -420,196 +422,119 @@ function struct() {
     visiable: false
   }, lay, 'time')
 
-  // drawing in-out put stuff
-  if (dataInput) {
-    const point = { x: x - w / 4, y: y - h / 2 }
-    if (!modelOutput) {
-      point.x = x
-    }
-    if (!lay.specialDataInput) {
-      Layer.component.rect.drawRect({
+  // drawing in-out put port stuff
+  if (input.length > 0) {
+    const len = input.length
+    const ypos = y - h / 2
+    for (let i = 0; i < len; i++) {
+      const xpos = len === 1 ? x : x + w / 2 * (i / (len - 1) - 0.5)
+      const point = { x: xpos, y: ypos }
+      const portHeight = lay.portHeight
+      if (!input[i].mult) {
+        Layer.component.rect.drawRect({
+          props: {
+            point,
+            width: lay.portWidth,
+            height: portHeight,
+            radius: lay.portRadius,
+            style: {
+              fillStyle: lay.disable
+                ? (type !== progressComp.UNRUN
+                  ? DISABLE_INIT_COLOR
+                  : DISABLE_NO_INIT_COLOR)
+                : (input[i].type === 'data' ? DATA_PORT_COLOR : MODEL_PORT_COLOR)
+            },
+            fill: true
+          }
+        }, lay, input[i].name)
+      } else {
+        Layer.component.icon.drawIcon({
+          props: {
+            point,
+            width: lay.portWidth * 7 / 6,
+            height: portHeight * 3 / 2,
+            img: input[i].mult
+          }
+        }, lay, input[i].name)
+      }
+      inoutPutmap.set(input[i].name, point)
+      Layer.component.tooltip.drawTooltip({
         props: {
-          point,
-          width: lay.portWidth,
-          height: lay.portHeight,
-          radius: lay.portRadius,
-          style: {
-            fillStyle: lay.disable
-              ? (type !== progressComp.UNRUN
-                ? DISABLE_INIT_COLOR
-                : DISABLE_NO_INIT_COLOR)
-              : DATA_PORT_COLOR
+          point: { x: point.x, y: point.y - lay.portHeight / 2 - lay.betweenPortWidthTooltip },
+          position: Layer.component.tooltip.BOTTOM,
+          text: input[i].tooltip || input[i].name,
+          trangleSize: lay.tipTrangleSize,
+          radius: lay.tooltipRadius,
+          padding: lay.tooltipPadding,
+          containerStyle: {
+            fillStyle: TOOLTIP_BACKGROUND
           },
-          fill: true
-        }
-      }, lay, 'dataInput')
-    } else {
-      Layer.component.rect.drawRect({
+          textStyle: {
+            font: lay.tooltipFont + 'px ' + FONT_FAMILY,
+            fillStyle: TOOLTIP_FONT_STYLE
+          }
+        },
+        zindex: 1,
+        visiable: false
+      }, lay, input[i].name + 'Tooltip')
+    }
+  }
+
+  if (output.length > 0) {
+    const len = output.length
+    const ypos = y + h / 2
+    for (let i = 0; i < len; i++) {
+      const xpos = len === 1 ? x : x + w / 2 * (i / (len - 1) - 0.5)
+      const point = { x: xpos, y: ypos }
+      const portHeight = lay.portHeight
+      if (!output[i].mult) {
+        Layer.component.rect.drawRect({
+          props: {
+            point,
+            width: lay.portWidth,
+            height: portHeight,
+            radius: lay.portRadius,
+            style: {
+              fillStyle: lay.disable
+                ? (type !== progressComp.UNRUN
+                  ? DISABLE_INIT_COLOR
+                  : DISABLE_NO_INIT_COLOR)
+                : (input[i].type === 'data' ? DATA_PORT_COLOR : MODEL_PORT_COLOR)
+            },
+            fill: true
+          }
+        }, lay, output[i].name)
+      } else {
+        Layer.component.icon.drawIcon({
+          props: {
+            point,
+            width: lay.portWidth * 7 / 6,
+            height: portHeight * 3 / 2,
+            img: input[i].mult
+          }
+        }, lay, output[i].name)
+      }
+      inoutPutmap.set(output[i].name, point)
+      Layer.component.tooltip.drawTooltip({
         props: {
-          point,
-          width: lay.portWidth,
-          height: lay.portHeight,
-          radius: lay.portRadius,
-          style: {
-            fillStyle: lay.disable
-              ? (type !== progressComp.UNRUN
-                ? DISABLE_INIT_COLOR
-                : DISABLE_NO_INIT_COLOR)
-              : SPECIAL_DATA_PORT_COLOR
+          point: { x: point.x, y: point.y + lay.portHeight / 2 + lay.betweenPortWidthTooltip },
+          position: Layer.component.tooltip.UP,
+          text: output[i].tooltip || output[i].name,
+          trangleSize: lay.tipTrangleSize,
+          radius: lay.tooltipRadius,
+          padding: lay.tooltipPadding,
+          containerStyle: {
+            fillStyle: TOOLTIP_BACKGROUND
           },
-          fill: true
-        }
-      }, lay, 'dataInput')
+          textStyle: {
+            font: lay.tooltipFont + 'px ' + FONT_FAMILY,
+            fillStyle: TOOLTIP_FONT_STYLE
+          }
+        },
+        zindex: 1,
+        visiable: false
+      }, lay, output[i].name + 'Tooltip')
     }
-    inoutPutmap.set('dataInput', point)
-    Layer.component.tooltip.drawTooltip({
-      props: {
-        point: { x: point.x, y: point.y - lay.portHeight / 2 - lay.betweenPortWidthTooltip },
-        position: Layer.component.tooltip.BOTTOM,
-        text: 'Data Input',
-        trangleSize: lay.tipTrangleSize,
-        radius: lay.tooltipRadius,
-        padding: lay.tooltipPadding,
-        containerStyle: {
-          fillStyle: TOOLTIP_BACKGROUND
-        },
-        textStyle: {
-          font: lay.tooltipFont + 'px ' + FONT_FAMILY,
-          fillStyle: TOOLTIP_FONT_STYLE
-        }
-      },
-      zindex: 1,
-      visiable: false
-    }, lay, 'dataInputTooltip')
-  }
-
-  if (dataOutput) {
-    const point = { x: x - w / 4, y: y + h / 2 }
-    if (!modelOutput) {
-      point.x = x
-    }
-    Layer.component.rect.drawRect({
-      props: {
-        point,
-        width: lay.portWidth,
-        height: lay.portHeight,
-        radius: lay.portRadius,
-        style: {
-          fillStyle: lay.disable
-            ? (type !== progressComp.UNRUN
-              ? DISABLE_INIT_COLOR
-              : DISABLE_NO_INIT_COLOR)
-            : DATA_PORT_COLOR
-        },
-        fill: true
-      }
-    }, lay, 'dataOutput')
-    inoutPutmap.set('dataOutput', point)
-    Layer.component.tooltip.drawTooltip({
-      props: {
-        point: { x: point.x, y: point.y + lay.portHeight / 2 + lay.betweenPortWidthTooltip },
-        position: Layer.component.tooltip.UP,
-        text: 'Data Output',
-        trangleSize: lay.tipTrangleSize,
-        radius: lay.tooltipRadius,
-        padding: lay.tooltipPadding,
-        containerStyle: {
-          fillStyle: TOOLTIP_BACKGROUND
-        },
-        textStyle: {
-          font: lay.tooltipFont + 'px ' + FONT_FAMILY,
-          fillStyle: TOOLTIP_FONT_STYLE
-        }
-      },
-      zindex: 1,
-      visiable: false
-    }, lay, 'dataOutputTooltip')
-  }
-
-  if (modelInput) {
-    const point = { x: x + w / 4, y: y - h / 2 }
-    if (!dataInput) {
-      point.x = x
-    }
-    Layer.component.rect.drawRect({
-      props: {
-        point,
-        width: lay.portWidth,
-        height: lay.portHeight,
-        radius: lay.portRadius,
-        style: {
-          fillStyle: lay.disable
-            ? (type !== progressComp.UNRUN
-              ? DISABLE_INIT_COLOR
-              : DISABLE_NO_INIT_COLOR)
-            : MODEL_PORT_COLOR
-        },
-        fill: true
-      }
-    }, lay, 'modelInput')
-    inoutPutmap.set('modelInput', point)
-    Layer.component.tooltip.drawTooltip({
-      props: {
-        point: { x: point.x, y: y - h / 2 - lay.portHeight - lay.betweenPortWidthTooltip },
-        position: Layer.component.tooltip.BOTTOM,
-        text: 'Model Input',
-        trangleSize: lay.tipTrangleSize,
-        radius: lay.tooltipRadius,
-        padding: lay.tooltipPadding,
-        containerStyle: {
-          fillStyle: TOOLTIP_BACKGROUND
-        },
-        textStyle: {
-          font: lay.tooltipFont + 'px ' + FONT_FAMILY,
-          fillStyle: TOOLTIP_FONT_STYLE
-        }
-      },
-      zindex: 1,
-      visiable: false
-    }, lay, 'modelInputTooltip')
-  }
-
-  if (modelOutput) {
-    const point = { x: x + w / 4, y: y + h / 2 }
-    if (!dataOutput) {
-      point.x = x
-    }
-    Layer.component.rect.drawRect({
-      props: {
-        point,
-        width: lay.portWidth,
-        height: lay.portHeight,
-        radius: lay.portRadius,
-        style: {
-          fillStyle: lay.disable
-            ? (type !== progressComp.UNRUN
-              ? DISABLE_INIT_COLOR
-              : DISABLE_NO_INIT_COLOR)
-            : MODEL_PORT_COLOR
-        },
-        fill: true
-      }
-    }, lay, 'modelOutput')
-    inoutPutmap.set('modelOutput', point)
-    Layer.component.tooltip.drawTooltip({
-      props: {
-        point: { x: point.x, y: y + h / 2 + lay.portHeight + lay.betweenPortWidthTooltip },
-        position: Layer.component.tooltip.UP,
-        text: 'Model Output',
-        trangleSize: lay.tipTrangleSize,
-        radius: lay.tooltipRadius,
-        padding: lay.tooltipPadding,
-        containerStyle: {
-          fillStyle: TOOLTIP_BACKGROUND
-        },
-        textStyle: {
-          font: lay.tooltipFont + 'px ' + FONT_FAMILY,
-          fillStyle: TOOLTIP_FONT_STYLE
-        }
-      },
-      zindex: 1,
-      visiable: false
-    }, lay, 'modelOutputTooltip')
   }
   lay.$meta.set('port', inoutPutmap)
 }

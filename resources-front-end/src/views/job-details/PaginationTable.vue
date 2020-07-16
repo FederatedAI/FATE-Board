@@ -28,6 +28,7 @@
       :cell-class-name="cellClassNameRow"
       :header-cell-class-name="'header-section-style'"
       :size="tableSize"
+      :span-method="!!spanMethod ? (typeof spanMethod === 'function' ? spanMethod : defaultSpanMethod) : () => {}"
       v-bind="$attrs"
       highlight-current-row
       fit
@@ -61,7 +62,25 @@
         :sortable="item.sortable ? 'custom' : false"
         align="center"
         show-overflow-tooltip
-      />
+      >
+        <template slot="header" slot-scope="info">
+          <slot :name="'header' + item.prop" v-bind="info">
+            <span>{{ item.label }}</span>
+          </slot>
+        </template>
+        <template v-if="item.child && item.child.length > 0">
+          <el-table-column
+            v-for="(val, childIndex) in item.child"
+            :key="childIndex"
+            :label="val.label"
+            :prop="val.prop"
+            :min-width="val.width ? val.width : ''"
+            :sortable="val.sortable ? 'custom' : false"
+            align="center"
+            show-overflow-tooltip
+          />
+        </template>
+      </el-table-column>
     </el-table>
     <div v-if="hasPagination && !showingNoData" class="flex flex-end">
       <el-pagination
@@ -102,7 +121,7 @@ export default {
       default: 10
     },
     haveIndex: {
-      type: Boolean | String,
+      type: Boolean | Number,
       default: true
     },
     haveDefaultIndex: {
@@ -137,6 +156,14 @@ export default {
     tableSize: {
       type: String,
       default: 'mini'
+    },
+    summary: {
+      type: Array | Object,
+      default: () => {}
+    },
+    spanMethod: {
+      type: Function | Boolean,
+      default: false
     }
   },
   data() {
@@ -174,6 +201,16 @@ export default {
         }
       } else {
         data = currentTable
+        if (this.haveIndex) {
+          let index = Number(this.haveIndex)
+          for (const val of currentTable) {
+            val.tablePageIndex = index
+            index++
+          }
+        }
+      }
+      if (this.summary && Object.keys(this.summary).length > 0) {
+        data.push(this.summary)
       }
       if (this.filters.length > 0) {
         data = data.filter(item => {
@@ -323,15 +360,27 @@ export default {
             }
           }
           if (val.order === 'ascending') {
-            const sortF = vm.bigger(av, bv)
-            if (sortF === 0) return 0
-            else if (sortF) return 1
-            else return -1
+            if (bv === '-') {
+              return -1
+            } else if (av === '-') {
+              return 1
+            } else {
+              const sortF = vm.bigger(av, bv)
+              if (sortF === 0) return 0
+              else if (sortF) return 1
+              else return -1
+            }
           } else {
-            const sortF = vm.bigger(av, bv)
-            if (sortF === 0) return 0
-            else if (sortF) return -1
-            else return 1
+            if (bv === '-') {
+              return -1
+            } else if (av === '-') {
+              return 1
+            } else {
+              const sortF = vm.bigger(av, bv)
+              if (sortF === 0) return 0
+              else if (sortF) return -1
+              else return 1
+            }
           }
         })
       }
@@ -341,13 +390,15 @@ export default {
       if (a.toString() === b.toString()) {
         return 0
       }
-      if (typeof a === 'number') {
+      if (typeof a === 'number' && typeof b === 'number') {
         return a > b
       } else {
         const compare = function(ass, bss) {
           if (!ass || !bss) return true
-          ass = ass.replace(/[\.\-]/g, '_')
-          bss = bss.replace(/[\.\-]/g, '_')
+          else if (ass === '-') return false
+          else if (bss === '-') return true
+          ass = ass.toString().replace(/[\.\-]/g, '_')
+          bss = bss.toString().replace(/[\.\-]/g, '_')
           let aStart = ass.toString().match(/^([a-z]|[A-Z])+_?/)
           let bStart = bss.toString().match(/^([a-z]|[A-Z])+_?/)
           if (aStart && bStart && aStart[0] !== bStart[0]) {
@@ -412,7 +463,12 @@ export default {
         str += 'default-cell-style'
       }
       if (obj.column.label.match(/(index)/)) {
-        str += ' default-cell-first-col-style'
+        if (!this.summary || (Object.keys(this.summary).length > 0 && obj.rowIndex !== this.tablePageData.length - 1)) {
+          str += ' default-cell-first-col-style'
+        }
+      }
+      if (this.summary && Object.keys(this.summary).length > 0 && obj.rowIndex === this.tablePageData.length - 1) {
+        str += ' default-cell-summary-font'
       }
       if (this.currentRowInfo) {
         Object.keys(row).forEach(item => {
@@ -429,6 +485,9 @@ export default {
     },
     clearCurrentStuff() {
       this.showingNoData = false
+    },
+    defaultSpanMethod({ row, column, rowIndex, columnndex }) {
+      return [0, 0]
     }
   }
 }
@@ -521,6 +580,11 @@ export default {
 .default-cell-first-col-style {
   background-color: #EBEDF0 !important;
   color: #6A6C75;
+}
+
+.default-cell-summary-font {
+  color: #6a6c75;
+  font-weight: bold;
 }
 
 .selction-row-choosed {

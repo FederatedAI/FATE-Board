@@ -192,7 +192,7 @@
       </div>
       <div class="tab-bar flex">
         <div v-if="modelOutputShowing" :class="{'tab-btn-active':currentTab === 'model'}" class="tab-btn" @click="switchLogTab('model')">
-          <span class="text">model output</span>
+          <span class="text">{{ modelOutputName }}</span>
         </div>
         <div v-if="dataOutputShow" :class="{'tab-btn-active':currentTab === 'data'}" class="tab-btn" @click="switchLogTab('data')">
           <span class="text">data output</span>
@@ -210,7 +210,8 @@
         @mousedown="scrollHoldChange=true"
         @mouseup="scrollHoldChange=false"
         @mousemove="sectionMove"
-        @mousewheel="sectionWheel">
+        @mousewheel="sectionWheel"
+        @DOMMouseScroll="sectionWheel">
         <!-- scroll事件监听内容 -->
         <!--<h3 class="section-title">Visualization</h3>-->
         <div class="section-view" style="padding: 0">
@@ -233,13 +234,14 @@
             />
           </div>
           <div v-show="currentTab === 'data'">
-            <data-output ref="dataoutputdialog" :t-header="dataOutputHeader" :t-body="dataOutputBody" :no-data="dataOutputNoData"/>
+            <data-output ref="dataoutputdialog" :counts="dataOutputCount" :t-header="dataOutputHeader" :t-body="dataOutputBody" :no-data="dataOutputNoData"/>
           </div>
           <div v-show="currentTab === 'log'" ref="logView">
             <ul
               :style="{height:fullscreen?'75vh':'63vh'}"
               class="log-list"
               @mousewheel="logOnMousewheel"
+              @DOMMouseScroll="logOnMousewheel"
             >
               <li v-for="(log,index) in logList" :key="index" class="flex">
                 <span class="num">{{ log.lineNum }}</span>
@@ -317,6 +319,7 @@ export default {
       modelOutputData: null,
       dataOutputHeader: [],
       dataOutputBody: [],
+      dataOutputCount: 0,
       dataOutputNoData: false,
       isNoMetricOutput: false,
       metricLoading: false,
@@ -401,6 +404,32 @@ export default {
       } else {
         return final.slice(0, 3)
       }
+    },
+    modelOutputName() {
+      let name = 'summary'
+      const check = [
+        this.modelNameMap.boost,
+        this.modelNameMap.homoBoost,
+        this.modelNameMap.homoLR,
+        this.modelNameMap.heteroLR,
+        this.modelNameMap.heteroLinR,
+        this.modelNameMap.sklearnLR,
+        this.modelNameMap.poisson,
+        this.modelNameMap.homoNN,
+        this.modelNameMap.heteroNN,
+        this.modelNameMap.heterofm,
+        this.modelNameMap.homofm,
+        this.modelNameMap.heteroMF,
+        this.modelNameMap.heteroSVD,
+        this.modelNameMap.heteroSVDPP,
+        this.modelNameMap.heteroGMF
+      ]
+      if (this.modelOutputType === this.modelNameMap.evaluation) {
+        name = 'metrics'
+      } else if (check.join('|').match(this.modelOutputType)) {
+        name = 'model output'
+      }
+      return name
     }
   },
   mounted() {
@@ -415,13 +444,17 @@ export default {
     })
     this.timer = setInterval(() => {
       let finish = true
-      for (const item of this.DAGData.component_list) {
-        if (!item.status || !item.status.match(/success|failed/i)) {
-          finish = false
-          break
+      if (this.DAGData && this.DAGData.component_list) {
+        for (const item of this.DAGData.component_list) {
+          if (!item.status || !item.status.match(/success|failed/i)) {
+            finish = false
+            break
+          }
         }
+      } else {
+        finish = false
       }
-      if (!this.jobInfo.status.match(/success|failed/i) || !finish) {
+      if (!this.jobInfo.status.match(/success|failed|canceled/i) || !finish) {
         this.getDatasetInfo()
         getDAGDpencencies(para).then(res => {
           this.DAGData = res.data
@@ -458,7 +491,7 @@ export default {
     shouldShowPopover(item, id) {
       const ctx = document.getElementById('historyForDetail').getContext('2d')
       for (let i = 0; i < this.showingRoleList.length; i++) {
-        const width = this.measureText(ctx, this.showingRoleList[i] || '', { font: (12 * 1.14) + 'px roboto_regular' }).width
+        const width = this.measureText(ctx, this.showingRoleList[i] || '', { font: (12 * 1.14) + 'px Arial' }).width
         const acWidth = parseInt(getComputedStyle(document.getElementById('spanPopOver' + i)).width.replace('px', ''))
         this.popover.splice(i, 1, acWidth > width)
       }
@@ -855,33 +888,31 @@ export default {
               }
               getMetricData(metricDataPara).then(res => {
                 const { data, meta } = res.data
-                if (data && meta) {
-                  const { metric_type, unit_name, curve_name, pair_type, thresholds } = meta
-                  if (metric_type === this.metricTypeMap.RSA) {
-                    this.modelOutputShowing = false
-                    this.dataOutputShow = false
-                    this.switchLogTab('data')
-                  } else if (metric_type) {
-                    metricDataHandle({
-                      metricOutputList: this.metricOutputList,
-                      modelSummaryData: this.modelSummaryData,
-                      modelOutputType: this.modelOutputType,
-                      evaluationOutputList,
-                      data,
-                      meta,
-                      metric_type,
-                      metric_namespace,
-                      metric_name,
-                      unit_name,
-                      curve_name,
-                      pair_type,
-                      thresholds,
-                      role: this.role,
-                      party_id: this.partyId
-                    })
-                    vm.requested++
-                  }
+                const { metric_type, unit_name, curve_name, pair_type, thresholds } = meta
+                if (metric_type === this.metricTypeMap.RSA) {
+                  this.modelOutputShowing = false
+                  this.dataOutputShow = false
+                  this.switchLogTab('data')
+                } else if (metric_type) {
+                  metricDataHandle({
+                    metricOutputList: this.metricOutputList,
+                    modelSummaryData: this.modelSummaryData,
+                    modelOutputType: this.modelOutputType,
+                    evaluationOutputList,
+                    data,
+                    meta,
+                    metric_type,
+                    metric_namespace,
+                    metric_name,
+                    unit_name,
+                    curve_name,
+                    pair_type,
+                    thresholds,
+                    role: this.role,
+                    party_id: this.partyId
+                  })
                 }
+                vm.requested++
               })
               if (nameSpaceIndex === Object.keys(data).length - 1 && nameIndex === data[metric_namespace].length - 1) {
                 setTimeout(() => {
@@ -927,9 +958,9 @@ export default {
         const header = []
         const body = []
         if (res.data && res.data.meta && res.data.meta.header) {
-          res.data.meta.header.forEach(item => {
+          res.data.meta.header.forEach((item, index) => {
             header.push({
-              prop: item.replace('.', ''),
+              prop: item.replace('.', '') + index,
               label: item
             })
           })
@@ -937,10 +968,10 @@ export default {
             const newRow = {}
             header.forEach((item, index) => {
               let value = oldRow[index]
-              if (typeof value === 'object') {
+              if (value !== null && typeof value === 'object') {
                 value = JSON.stringify(value)
               }
-              newRow[item.prop] = value && value.toString()
+              newRow[item.prop] = value !== null ? (value && value.toString()) : '-'
             })
             body.push(newRow)
           })
@@ -949,6 +980,7 @@ export default {
           } else {
             this.dataOutputHeader = header
             this.dataOutputBody = body
+            this.dataOutputCount = res.data.meta.total
           }
         } else {
           this.dataOutputNoData = true
