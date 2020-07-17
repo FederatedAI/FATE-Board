@@ -105,7 +105,10 @@ public class LogFileService {
     }
 
     public static boolean checkPathParameters(String... parameters) {
-        String regex = "^\\w+$";
+//        String regex = "^\\w+$";
+//    public boolean checkPathParameters(String... parameters) {
+//        String regex = "^\\w+$";
+        String regex = "^[0-9a-zA-Z_-\\u4e00-\\u9fa5]+$";
         for (String parameter : parameters) {
             if (!parameter.matches(regex)) {
                 return false;
@@ -114,49 +117,74 @@ public class LogFileService {
         return true;
     }
 
+//    public String buildFilePath(String jobId, String componentId, String type, String role, String partyId) {
+//
+//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, componentId, type, role, partyId));
+//        Preconditions.checkArgument(checkPathParameters(jobId, componentId, type, role, partyId));
+//        String filePath = "";
+//        if (componentId == null || componentId.equals(DEFAULT_COMPONENT_ID)) {
+//
+//            filePath = JOB_LOG_PATH.replace("$job_id", jobId).replace("$role", role).replace("$party_id", partyId);
+//
+//        } else {
+//            filePath = TASK_LOG_PATH.replace("$job_id", jobId).replace("$component_id", componentId).replace("$role", role).replace("$party_id", partyId);
+//        }
+//
+//        if (type.equals(DEFAULT_LOG_TYPE)) {
+//            filePath = filePath.replace("$file_name", DEFAULT_FILE_NAME);
+//        } else {
+//
+//            switch (type) {
+//                case "error":
+//                    filePath = filePath.replace("$file_name", "ERROR.log");
+//                    break;
+//                case "debug":
+//                    filePath = filePath.replace("$file_name", "DEBUG.log");
+//                    break;
+//                case "info":
+//                    filePath = filePath.replace("$file_name", "INFO.log");
+//                    break;
+//                case "warning":
+//                    filePath = filePath.replace("$file_name", "WARNING.log");
+//                    break;
+//                default:
+//                    filePath = filePath.replace("$file_name", "INFO.log");
+//            }
+//
+//        }
+//        if ("fateFlow".equals(role)) {
+//            if ("error".equals(type)) {
+//                filePath = jobId + "/" + "error.log";
+//            } else {
+//                filePath = jobId + "/" + "fate_flow_schedule.log";
+//            }
+//        }
+//        String result = FATE_DEPLOY_PREFIX + filePath;
+//        logger.info("build filePath result {}", result);
+//        return result;
+//    }
+
     public String buildFilePath(String jobId, String componentId, String type, String role, String partyId) {
 
         Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, componentId, type, role, partyId));
         Preconditions.checkArgument(checkPathParameters(jobId, componentId, type, role, partyId));
+
         String filePath = "";
-        if (componentId == null || componentId.equals(DEFAULT_COMPONENT_ID)) {
+        if (DEFAULT_COMPONENT_ID.equals(componentId)) {
 
-            filePath = JOB_LOG_PATH.replace("$job_id", jobId).replace("$role", role).replace("$party_id", partyId);
+            filePath = jobId + "/" + role + "/" + partyId + "/" + type.toUpperCase();
 
-        } else {
-            filePath = TASK_LOG_PATH.replace("$job_id", jobId).replace("$component_id", componentId).replace("$role", role).replace("$party_id", partyId);
-        }
-
-        if (type.equals(DEFAULT_LOG_TYPE)) {
-            filePath = filePath.replace("$file_name", DEFAULT_FILE_NAME);
-        } else {
-
-            switch (type) {
-                case "error":
-                    filePath = filePath.replace("$file_name", "ERROR.log");
-                    break;
-                case "debug":
-                    filePath = filePath.replace("$file_name", "DEBUG.log");
-                    break;
-                case "info":
-                    filePath = filePath.replace("$file_name", "INFO.log");
-                    break;
-                case "warning":
-                    filePath = filePath.replace("$file_name", "WARNING.log");
-                    break;
-                default:
-                    filePath = filePath.replace("$file_name", "INFO.log");
-            }
-
-        }
-        if ("fateFlow".equals(role)) {
+        } else if ("fateFlow".equals(componentId)) {
             if ("error".equals(type)) {
-                filePath = jobId + "/" + "error.log";
+                filePath = jobId + "/" + "fate_flow_schedule_error";
             } else {
-                filePath = jobId + "/" + "fate_flow_schedule.log";
+                filePath = jobId + "/" + "fate_flow_schedule";
             }
+        } else {
+            filePath = jobId + "/" + role + "/" + partyId + "/" + componentId + "/" + "INFO";
         }
-        String result = FATE_DEPLOY_PREFIX + filePath;
+
+        String result = FATE_DEPLOY_PREFIX + filePath + ".log";
         logger.info("build filePath result {}", result);
         return result;
     }
@@ -383,7 +411,7 @@ public class LogFileService {
 
         jobTaskInfo.jobStatus = jobWithBLOBs.getfStatus();
 
-        if (componentId != null && !componentId.equals(DEFAULT_COMPONENT_ID)) {
+        if (componentId != null && !componentId.equals(DEFAULT_COMPONENT_ID)&&!componentId.equals("fateFlow")) {
 
             TaskExample taskExample = new TaskExample();
 

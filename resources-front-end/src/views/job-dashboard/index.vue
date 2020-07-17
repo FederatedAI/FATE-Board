@@ -49,7 +49,7 @@
         <div class="col job flex-center justify-center pos-r">
           <h3 class="list-title">Job</h3>
 
-          <div v-if="jobStatus==='failed' || jobStatus==='success'" class="job-end-container flex flex-col flex-center">
+          <div v-if="jobStatus==='failed' || jobStatus==='success' || jobStatus==='canceled'" class="job-end-container flex flex-col flex-center">
             <img
               :src="jobStatus === 'success' ? icons.normal.success : icons.normal.failed"
               alt=""
@@ -135,7 +135,7 @@
     </el-row>
 
     <div :style="logContainer" class="log-wrapper">
-      <div class="flex flex-center">
+      <!-- <div class="flex flex-center">
         <h3 class="title">Log</h3>
         <ul class="tab-bar flex">
           <li
@@ -150,7 +150,7 @@
           </li>
         </ul>
       </div>
-      <div v-loading="logLoading" ref="logView" :style="logLoading ? largestLog : ''" class="log-container" @mousewheel="logOnMousewheel">
+      <div v-loading="logLoading" ref="logView" :style="logLoading ? largestLog : ''" class="log-container" @mousewheel="logOnMousewheel" @DOMMouseScroll="logOnMousewheel">
         <ul class="log-list overflow-hidden">
           <li v-for="(log,index) in logsMap[currentLogTab].list" :key="index">
             <div class="flex flex-row flex-start">
@@ -159,7 +159,21 @@
             </div>
           </li>
         </ul>
+      </div> -->
+      <div class="log-type flex flex-row">
+        <span v-for="(name, index) in Object.keys(logs)" :key="index" :class="{'type-name-active': currentLogTab === name}" class="type-name" @click="changeLogTip(name)">{{ name + ' Log' }}</span>
       </div>
+      <logger
+        v-for="(name, index) in Object.keys(logs)"
+        :key="index"
+        :tips="logs[name].tips"
+        :job-id="jobId"
+        :party-id="partyId"
+        :role="logs[name].role"
+        :component-id="logs[name].componentId"
+        :status="jobStatus"
+        :first-tip="logs[name].first"
+        :style="{'z-index': currentLogTab === name ? 2 : 1}"/>
       <div ref="checklog" class="log-extend flex flex-center justify-center">
         <icon-hover-and-active
           v-if="showingAllLog"
@@ -193,6 +207,29 @@
         <dag ref="purePicBigerDag" :id="'dialogCanvas'" :dag-info="DAGData" :pure-pic="true"/>
       </div>
     </el-dialog>
+    <el-dialog :visible.sync="showDialog" width="510px">
+      <div class="dialog-main-content">{{ mainContent }}</div>
+      <div class="dialog-sub-content">{{ subContent }}</div>
+      <div class="flex justify-center" style="margin-top:72px;">
+        <button
+          :class="[checkSure === true? 'dialog-check-button':'dialog-uncheck-button', checkclick === true? 'dialog-click-button' : '']"
+          class="dialog-button"
+          @mouseover="checkSure=true"
+          @mouseout="checkSure=null;checkclick=null"
+          @mousedown="checkclick=true"
+          @click="sureKillJob"
+        >Sure</button>
+        <button
+          :class="[checkSure === false ? 'dialog-check-button':'dialog-uncheck-button', checkclick === false ? 'dialog-click-button' : '']"
+          class="dialog-button"
+          style="margin-left: 23px;"
+          @mouseover="checkSure=false"
+          @mouseout="checkSure=null;checkclick=null"
+          @mousedown="checkclick=false"
+          @click="closeDialog"
+        >cancel</button>
+      </div>
+    </el-dialog>
 
   </div>
 </template>
@@ -208,8 +245,9 @@ import Dag from '@/components/CanvasComponent/flowDiagram'
 import Panel from '@/components/CanvasComponent/panelDiagram'
 import IconHoverAndActive from '@/components/IconHoverAndActive'
 import BreadcrumbExt from '@/components/BreadcrumbExt'
+import Logger from './logger'
 
-import { getJobDetails, getDAGDpencencies, queryLog, killJob, queryLogSize } from '@/api/job'
+import { getJobDetails, getDAGDpencencies, queryLog, killJob } from '@/api/job'
 
 export default {
   components: {
@@ -217,7 +255,8 @@ export default {
     Dag,
     Panel,
     IconHoverAndActive,
-    BreadcrumbExt
+    BreadcrumbExt,
+    Logger
   },
   data() {
     return {
@@ -254,7 +293,7 @@ export default {
       count: '',
       AUC: '',
       elapsed: '',
-      currentLogTab: 'info',
+      currentLogTab: 'Algorithm',
       showGraph: false,
       butImage: require('@/icons/button.png'),
       butBackground: '',
@@ -264,7 +303,27 @@ export default {
       logContainer: '',
       scrollPos: '',
       initedLog: false,
-      releaseLimit: null
+      releaseLimit: null,
+      logs: {
+        Algorithm: {
+          tips: ['error', 'warning', 'info', 'debug'],
+          first: 'info',
+          role: this.$route.query.role,
+          componentId: 'default'
+        },
+        Schedule: {
+          tips: ['error', 'info'],
+          first: 'info',
+          role: this.$route.query.role,
+          componentId: 'fateFlow'
+        }
+      },
+      showDialog: false,
+      mainContent: '',
+      subContent: '',
+      checkSure: true,
+      willKillJob: null,
+      checkclick: true
     }
   },
   computed: {
@@ -272,21 +331,22 @@ export default {
       'icons'
     ])
   },
-  created() {
-    this.getLogSize()
-  },
   mounted() {
     // console.log(process.env.BASE_API)
     const vm = this
     this.jobTimer = setInterval(() => {
       let finish = true
-      for (const item of this.DAGData.component_list) {
-        if (!item.status || !item.status.match(/success|failed/i)) {
-          finish = false
-          break
+      if (this.DAGData && this.DAGData.component_list) {
+        for (const item of this.DAGData.component_list) {
+          if (!item.status || !item.status.match(/success|failed/i)) {
+            finish = false
+            break
+          }
         }
+      } else {
+        finish = false
       }
-      if (!vm.jobStatus.match(/success|failed/i) || !finish) {
+      if (!vm.jobStatus.match(/success|failed|canceled/i) || !finish) {
         vm.getDatasetInfo(true)
         vm.getDAGDpendencies()
       } else {
@@ -295,10 +355,8 @@ export default {
     }, 5000)
     this.getDatasetInfo()
     this.getDAGDpendencies()
-    this.getLogSize()
-    this.openLogsWebsocket()
     this.openJobWebsocket()
-    this.$refs.logView.addEventListener('scroll', vm.scrollChange)
+    // this.$refs.logView.addEventListener('scroll', vm.scrollChange)
   },
   beforeDestroy() {
     clearInterval(this.jobTimer)
@@ -314,65 +372,6 @@ export default {
       getDAGDpencencies(para).then(res => {
         this.DAGData = res.data
       })
-    },
-    openLogsWebsocket() {
-      Object.keys(this.logsMap).forEach(item => {
-        this.logWebsocket[item] = initWebSocket(`/log/${this.jobId}/${this.role}/${this.partyId}/default/${item}`, res => {
-          // console.log(item, 'success')
-        }, res => {
-          const data = JSON.parse(res.data)
-          // console.log(item, data)
-          if (Array.isArray(data)) {
-            if (data.length > 0) {
-              this.logsMap[item].list = [...this.logsMap[item].list, ...data]
-              this.logsMap[item].length = data[data.length - 1].lineNum
-              this.$set(this.logsMap, item, this.logsMap[item])
-              this.checkHowManyLogGetForInited()
-            }
-          } else {
-            this.logsMap[item].list.push(data)
-            this.logsMap[item].length = data.lineNum
-            this.$set(this.logsMap, item, this.logsMap[item])
-            this.checkHowManyLogGetForInited()
-          }
-        })
-      })
-    },
-    checkHowManyLogGetForInited() {
-      const vm = this
-      if (!this.releaseLimit) {
-        this.releaseLimit = setTimeout(function() {
-          vm.initedLog = true
-          vm.logLoading = false
-        }, 5000)
-      }
-      if (!this.initedLog) {
-        let checkGet = true
-        for (const key in this.logsMap) {
-          if (this.logsMap[key].maxlength === undefined) {
-            checkGet = false
-            break
-          } else {
-            if (this.logsMap[key].list.length > 0 && parseInt(this.logsMap[key].list[this.logsMap[key].list.length - 1].lineNum) !== parseInt(this.logsMap[key].maxlength)) {
-              checkGet = false
-              break
-            }
-            if (this.logsMap[key].maxlength > 0 && this.logsMap[key].list.length === 0) {
-              checkGet = false
-              break
-            }
-          }
-        }
-        if (checkGet) {
-          this.$nextTick(() => {
-            vm.logLoading = false
-            if (vm.releaseLimit) {
-              clearTimeout(vm.releaseLimit)
-            }
-          })
-          this.initedLog = true
-        }
-      }
     },
     openJobWebsocket() {
       const vm = this
@@ -399,19 +398,6 @@ export default {
         if (this.gaugeInstance) {
           this.gaugeInstance.setOption(this.jobOptions, true)
         }
-      })
-    },
-    getLogSize() {
-      Object.keys(this.logsMap).forEach(item => {
-        queryLogSize({
-          job_id: this.jobId,
-          party_id: this.partyId,
-          role: this.role,
-          type: item
-        }).then(res => {
-          this.logsMap[item].maxlength = res.data
-          this.checkHowManyLogGetForInited()
-        })
       })
     },
     getDatasetInfo(isInterval = false) {
@@ -496,23 +482,24 @@ export default {
       })
       // this.confirmKill(para)
     },
+
     killJob(para, method) {
       // console.log(this.jobWebsocket)
-      this.$confirm(`You can\'t undo this action', 'Are you sure you want to ${method} this job?`, {
-        confirmButtonText: 'Sure',
-        cancelButtonText: 'Cancel'
-      }).then(() => {
-        killJob(para).then(() => {
-          this.getDatasetInfo()
-          this.getDAGDpendencies()
-        })
-        // console.log('kill job:' + this.jobId, this.role, this.partyId)
-        // this.jobStatus = 'failed'
-      }).catch(() => {
-        // console.log('cancel kill')
+      this.mainContent = `Are you sure you want to ${method} this job?`
+      this.subContent = "You can't undo this action"
+      this.showDialog = true
+      this.willKillJob = para
+    },
+    sureKillJob() {
+      this.showDialog = false
+      killJob(this.willKillJob).then(() => {
+        this.getDatasetInfo()
+        this.getDAGDpendencies()
       })
     },
-
+    closeDialog() {
+      this.showDialog = false
+    },
     getGraphEchartInstance(echartInstance) {
       let fnInterval = null
       const fn = () => {
@@ -557,7 +544,7 @@ export default {
       const end = topLog.lineNum - 1
       if (end > 0) {
         const maxLoadingPage = 1000
-        if (this.$refs['logView'].scrollTop === 0 && (e.wheelDelta > 0 || e.detail > 0)) {
+        if (this.$refs['logView'].scrollTop === 0 && (e.wheelDelta > 0 || (-e.detail * 24) > 0)) {
           const begin = end - maxLoadingPage > 1 ? end - maxLoadingPage : 1
           if (!this.logLoading) {
             this.logLoading = true
@@ -658,6 +645,9 @@ export default {
     },
     clickForBigger() {
       this.showGraph = true
+    },
+    changeLogTip(name) {
+      this.currentLogTab = name
     }
   }
 }

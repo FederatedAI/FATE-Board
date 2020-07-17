@@ -25,6 +25,10 @@ import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.pojo.*;
+import com.webank.ai.fate.board.log.LogFileService;
+import com.webank.ai.fate.board.pojo.Job;
+import com.webank.ai.fate.board.pojo.JobWithBLOBs;
+import com.webank.ai.fate.board.pojo.PagedJobQO;
 import com.webank.ai.fate.board.services.JobManagerService;
 import com.webank.ai.fate.board.utils.*;
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +48,7 @@ import java.util.concurrent.Future;
 import static com.webank.ai.fate.board.global.ErrorCode.FATEFLOW_ERROR_CONNECTION;
 import static com.webank.ai.fate.board.global.ErrorCode.REQUEST_PARAMETER_ERROR;
 
-@CrossOrigin
+//@CrossOrigin
 @RestController
 @RequestMapping(value = "/job")
 public class JobManagerController {
@@ -60,6 +64,9 @@ public class JobManagerController {
     String fateUrl;
     @Autowired
     ThreadPoolTaskExecutor asyncServiceExecutor;
+
+    @Autowired
+    LogFileService logFileService;
 
     @RequestMapping(value = "/query/status", method = RequestMethod.GET)
     public ResponseResult queryJobStatus() {
@@ -127,6 +134,9 @@ public class JobManagerController {
         if (jobWithBLOBs == null) {
             return new ResponseResult<>(ErrorCode.DATABASE_ERROR_RESULT_NULL);
         }
+        jobWithBLOBs.setfRunIp(null);
+        jobWithBLOBs.setfDsl(null);
+        jobWithBLOBs.setfRuntimeConf(null);
         if (jobWithBLOBs.getfStatus().equals(Dict.TIMEOUT)) {
             jobWithBLOBs.setfStatus(Dict.FAILED);
         }
@@ -169,80 +179,37 @@ public class JobManagerController {
 
     @RequestMapping(value = "/query/page/new", method = RequestMethod.POST)
     public ResponseResult<PageBean<Map<String, Object>>> queryPagedJob(@RequestBody PagedJobQO pagedJobQO) {
+        boolean result = checkOrderRule(pagedJobQO);
+        if (!result) {
+            return new ResponseResult<>(REQUEST_PARAMETER_ERROR);
+        }
         PageBean<Map<String, Object>> listPageBean = jobManagerService.queryPagedJobs(pagedJobQO);
         return new ResponseResult<>(ErrorCode.SUCCESS, listPageBean);
     }
 
-    @RequestMapping(value = "/query/page", method = RequestMethod.POST)
-    public ResponseResult queryJobByPage(@RequestBody String pageParams) {
-        JSONObject pageObject = JSON.parseObject(pageParams);
-
-        Long pageNum = pageObject.getLong(Dict.PAGENUM);
-        Long pageSize = pageObject.getLong(Dict.PAGESIZE);
-
-        if (pageNum == null || pageSize == null) {
-            return new ResponseResult(REQUEST_PARAMETER_ERROR);
-        }
-        String jobId = pageObject.getString(Dict.JOBID);
-        String partyId = pageObject.getString(Dict.PARTY_ID);
-
-        JSONArray roleJsonArray = pageObject.getJSONArray(Dict.ROLE);
-        List<String> roles = roleJsonArray.toJavaList(String.class);
-        JSONArray jobJsonArray = pageObject.getJSONArray(Dict.JOB_STATUS);
-        List<String> jobStatus = jobJsonArray.toJavaList(String.class);
-
-        String startTime = pageObject.getString(Dict.START_TIME);
-        String endTime = pageObject.getString(Dict.END_TIME);
-
-        long totalRecord = jobManagerService.totalCount(jobId, roles, partyId, jobStatus);
-        PageBean<Map> listPageBean = new PageBean<>(pageNum, pageSize, totalRecord);
-        long startIndex = listPageBean.getStartIndex();
-        List<JobWithBLOBs> jobWithBLOBs = jobManagerService.queryPageByCondition(jobId, roles, partyId, jobStatus, startTime, endTime, startIndex, pageSize);
-        ArrayList<Map> jobList = new ArrayList<>();
-        Map<JobWithBLOBs, Future> jobDataMap = new LinkedHashMap<>();
-
-        for (JobWithBLOBs jobWithBLOB : jobWithBLOBs) {
-            ListenableFuture<?> future = ThreadPoolTaskExecutorUtil.submitListenable(this.asyncServiceExecutor, (Callable<JSONObject>) () -> {
-                String jobId1 = jobWithBLOB.getfJobId();
-                String role1 = jobWithBLOB.getfRole();
-                String partyId1 = jobWithBLOB.getfPartyId();
-                if (jobWithBLOB.getfStatus().equals(Dict.TIMEOUT)) {
-                    jobWithBLOB.setfStatus(Dict.FAILED);
-                }
-                HashMap<String, String> jobParams = Maps.newHashMap();
-                jobParams.put(Dict.JOBID, jobId1);
-                jobParams.put((Dict.ROLE), role1);
-                jobParams.put(Dict.PARTY_ID, partyId1);
-                String result = httpClientPool.post(fateUrl + Dict.URL_JOB_DATAVIEW, JSON.toJSONString(jobParams));
-                JSONObject data = JSON.parseObject(result).getJSONObject(Dict.DATA);
-
-                return data;
-            }, new int[]{500, 1000}, new int[]{3, 3});
-            jobDataMap.put(jobWithBLOB, future);
-        }
-        jobDataMap.forEach((k, v) -> {
-            HashMap<String, Object> stringObjectHashMap = new HashMap<>();
-            stringObjectHashMap.put(Dict.JOB, k);
-            try {
-                stringObjectHashMap.put(Dict.DATASET, v.get());
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-
-            }
-            jobList.add(stringObjectHashMap);
-        });
-        listPageBean.setList(jobList);
-        return new ResponseResult<>(ErrorCode.SUCCESS, listPageBean);
+    private boolean checkOrderRule(PagedJobQO pagedJobQO) {
+        String orderField = pagedJobQO.getOrderField();
+        String orderRule = pagedJobQO.getOrderRule();
+        return Dict.ORDER_FIELDS.contains(orderField) && Dict.ORDER_RULES.contains(orderRule);
     }
+
 
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public ResponseResult updateJobById(@RequestBody String parameters) {
 
-        JSONObject jsonObject = checkParameter(parameters, Dict.JOBID, Dict.ROLE, Dict.PARTY_ID);
-        if (jsonObject == null) {
+        JSONObject jsonObject = JSON.parseObject(parameters);
+        String jobId = jsonObject.getString(Dict.JOBID);
+        String role = jsonObject.getString(Dict.ROLE);
+        String partyId = jsonObject.getString(Dict.PARTY_ID);
+        String notes = jsonObject.getString(Dict.NOTES);
+        try {
+            Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, notes));
+            Preconditions.checkArgument(logFileService.checkPathParameters(jobId, role, partyId, notes));
+        } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseResult(REQUEST_PARAMETER_ERROR);
         }
-        String partyId = jsonObject.getString(Dict.PARTY_ID);
+
         jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
 
         String result = null;

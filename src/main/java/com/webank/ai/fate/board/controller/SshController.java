@@ -30,6 +30,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
@@ -37,8 +40,8 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-@RestController
-@RequestMapping(value = "/ssh")
+@Controller
+//@RequestMapping(value = "/ssh")
 
 public class SshController {
     private final static Logger logger = LoggerFactory.getLogger(SshController.class);
@@ -107,7 +110,7 @@ public class SshController {
     }
 
 
-    @RequestMapping(value = "/ssh", method = RequestMethod.GET)
+//    @RequestMapping(value = "/ssh", method = RequestMethod.GET)
     public ResponseResult readValue(@RequestBody String params) throws Exception {
         JSONObject jsonObject = JSON.parseObject(params);
         String ip = jsonObject.getString(Dict.SSH_IP);
@@ -118,7 +121,7 @@ public class SshController {
         return new ResponseResult<>(ErrorCode.SUCCESS, data);
     }
 
-    @RequestMapping(value = "/ssh", method = RequestMethod.DELETE)
+//    @RequestMapping(value = "/ssh", method = RequestMethod.DELETE)
     public ResponseResult removeValue(@RequestBody SshDTO sshDTO) throws IOException {
 //        JSONObject jsonObject = JSON.parseObject(params);
 //        String ip = jsonObject.getString(Dict.SSH_IP);
@@ -147,7 +150,7 @@ public class SshController {
 //
 //    }
 
-    @RequestMapping(value = "/ssh", method = RequestMethod.POST)
+//    @RequestMapping(value = "/ssh", method = RequestMethod.POST)
     public ResponseResult addProperties(@RequestBody SshDTO sshDTO) {
         String ip = sshDTO.getIp();
         String port = sshDTO.getPort();
