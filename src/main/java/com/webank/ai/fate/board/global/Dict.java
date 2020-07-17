@@ -20,6 +20,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Dict {
 
     static public final String ID = "id";
@@ -112,5 +115,17 @@ public class Dict {
     }
 
     static public final List<String> JOB_FINISHED_STATUS = Arrays.asList("success", "timeout", "failed", "canceled");
+
+    static public final List<String> ORDER_FIELDS =new ArrayList<>();
+    static {
+        ORDER_FIELDS.add("f_start_time");
+        ORDER_FIELDS.add("f_end_time");
+    }
+
+    static public final List<String> ORDER_RULES =new ArrayList<>();
+    static {
+        ORDER_RULES.add("desc");
+        ORDER_RULES.add("asc");
+    }
 
 }

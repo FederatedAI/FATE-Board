@@ -31,12 +31,12 @@ const scaleFunction = function(el, deltaY) {
 export default {
   bind: el => {
     const changeEl = el.children[0]
-    el.onmousewheel = e => {
+    const exchange = e => {
       e = e || window.event
       if (e.stopPropagation) {
         e.stopPropagation()
       } else {
-        e.cancelBubble
+        e.cancelBubble()
       }
       if (e.preventDefault) {
         e.preventDefault()
@@ -44,6 +44,11 @@ export default {
         e.returnValue = false
       }
       scaleFunction(changeEl, e.deltaY)
+    }
+    if (window && /Firefox/i.test(window.navigator.userAgent)) {
+      el.addEventListener('DOMMouseScroll', exchange)
+    } else {
+      el.addEventListener('mousewheel', exchange)
     }
   },
   update: setScale

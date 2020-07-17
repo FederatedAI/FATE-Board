@@ -21,7 +21,7 @@
           >
             <template slot="form">
               <div v-if="modelOutputType === modelNameMap.sample" class="flex flex-row flex-start flex-center">
-                <el-select v-model="sampleSelection" :clearable="true" size="small" placeholder="请选择label">
+                <el-select v-model="sampleSelection" :clearable="true" size="small" placeholder="select">
                   <el-option v-for="(data,index) in sampleLabels(output.data.tBody)" :key="index" :label="data.label" :value="data.value"/>
                 </el-select>
               </div>
@@ -34,7 +34,7 @@
       <!--boost-->
       <div v-if="modelOutputType===modelNameMap.boost || modelOutputType===modelNameMap.homoBoost">
         <!--<pre class="boost-json"> {{ modelOutput.formatString }} </pre>-->
-        <p v-if="bestIterationCheck" class="model-text model-text-big" style="color: #3e4052;font-family: 'Roboto';font-weight: bold;margin-bottom: 12px;">The final model: iter {{ modelOutput.bestIteration }}</p>
+        <p v-if="bestIterationCheck" class="model-text model-text-big" style="color: #3e4052;font-weight: bold;margin-bottom: 12px;">The final model: iter {{ modelOutput.bestIteration }}</p>
         <div class="boost-wrapper">
           <div class="boost-top flex flex-center space-between">
             <!--top-left-->
@@ -113,36 +113,39 @@
         <!--variable importance-->
         <div v-if="modelOutput.variableImportanceOptions" class="boost-wrapper" style="position:relative;">
           <div class="flex flex-col variable-importance-wrapper" style="overflow:hidden;">
-            <div class="flex flex-row space-between" style="margin-bottom:24px">
-              <h3 class="feature-title h3-style">Feature Importance</h3>
-              <div v-if="(role==='guest' && featureSelectedColors.length > 0) && modelOutputType !== modelNameMap.homoBoost" class="flex flex-end flex-center feature-check">
-                <el-checkbox v-model="featureGuest" label="guest" size="small" @change="featureSelectedChange">guest</el-checkbox>
-                <el-checkbox v-model="featureHost" label="host" size="small" @change="featureSelectedChange">host</el-checkbox>
-                <span class="feature-select" @click.stop="hiddenFeatreSelected">select</span>
-                <div v-show="!featureHidden" class="flex flex-col flex-center feature-detail-choose-dialog">
-                  <div class="flex flex-row flex-center space-between feature-detail-title" @click.stop>
-                    <div class="flex flex-row flex-start feature-detail-title-hint">
-                      <span class="feature-title-hint-content">
-                        Total:
-                        <span class="feature-content-font">{{ featureTotal }}</span>
-                      </span>
-                      <span class="feature-title-hint-content">
-                        Selected:
-                        <span class="feature-content-font">{{ featureSelectedTotal }}</span>
-                      </span>
-                      <span class="feature-title-hint-content feature-title-operation" @click.stop="featureSelectedClear">Clear</span>
+            <div class="flex flex-col" style="margin-bottom:24px">
+              <div class="flex flex-row space-between">
+                <h3 class="feature-title h3-style">Feature Importance</h3>
+                <div v-if="(role==='guest' && featureSelectedColors.length > 0) && modelOutputType !== modelNameMap.homoBoost" class="flex flex-end flex-center feature-check">
+                  <el-checkbox v-model="featureGuest" label="guest" size="small" @change="featureSelectedChange">guest</el-checkbox>
+                  <el-checkbox v-model="featureHost" label="host" size="small" @change="featureSelectedChange">host</el-checkbox>
+                  <span class="feature-select" @click.stop="hiddenFeatreSelected">select</span>
+                  <div v-show="!featureHidden" class="flex flex-col flex-center feature-detail-choose-dialog">
+                    <div class="flex flex-row flex-center space-between feature-detail-title" @click.stop>
+                      <div class="flex flex-row flex-start feature-detail-title-hint">
+                        <span class="feature-title-hint-content">
+                          Total:
+                          <span class="feature-content-font">{{ featureTotal }}</span>
+                        </span>
+                        <span class="feature-title-hint-content">
+                          Selected:
+                          <span class="feature-content-font">{{ featureSelectedTotal }}</span>
+                        </span>
+                        <span class="feature-title-hint-content feature-title-operation" @click.stop="featureSelectedClear">Clear</span>
+                      </div>
+                      <i class="el-icon-close page-arrow" style="cursor:pointer;" @click="hiddenFeatreSelected"/>
                     </div>
-                    <i class="el-icon-close page-arrow" style="cursor:pointer;" @click="hiddenFeatreSelected"/>
-                  </div>
-                  <div class="flex flex-row flex-wrap flex-start feature-detail-content">
-                    <div v-for="(item, index) in featureSelectedColors" :key="index" class="flex flex-row flex-center feature-detail-item" @click.stop="chooseOneFeature(item)">
-                      <div :style="'background-color:' + item.bgColor + ';'" class="flex flex-row flex-center justify-center feature-detail-content">
-                        <span :style="'color:' + item.color + ';'" class="feature-hint-text-deltail">{{ item.text }}</span>
+                    <div class="flex flex-row flex-wrap flex-start feature-detail-content">
+                      <div v-for="(item, index) in featureSelectedColors" :key="index" class="flex flex-row flex-center feature-detail-item" @click.stop="chooseOneFeature(item)">
+                        <div :style="'background-color:' + item.bgColor + ';'" class="flex flex-row flex-center justify-center feature-detail-content">
+                          <span :style="'color:' + item.color + ';'" class="feature-hint-text-deltail">{{ item.text }}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+              <span class="total-span">{{ featureTableBody.length }} features involved in model splitting</span>
             </div>
             <div v-if="role==='guest' || modelOutputType === modelNameMap.homoBoost" class="feature-table">
               <el-table
@@ -155,13 +158,12 @@
                 size="small"
                 @current-change="featureImportanceCurrentChange"
               >
-                <el-table-column :label="'FEATURE'" width="100">
-                  <template slot-scope="scope">
+                <el-table-column :label="'FEATURE'" :prop="'name'" :show-overflow-tooltip="true" width="110" >
+                  <!-- <template slot-scope="scope">
                     <span class="fearture-span" style="padding-right:20px;">
-                      <!-- {{ modelOutputType !== modelNameMap.homoBoost ? (scope.row.sitename.indexOf('guest') >=0 ? scope.row.name : scope.row.fid) : scope.row.name }} -->
                       {{ scope.row.name }}
                     </span>
-                  </template>
+                  </template> -->
                 </el-table-column>
                 <el-table-column :label="''">
                   <template slot-scope="scope">
@@ -229,7 +231,7 @@
           modelOutputType===modelNameMap.homoNN ||
         modelOutputType===modelNameMap.poisson"
         class="line-height-between">
-        <p v-if="bestIterationCheck" class="model-text model-text-big" style="color: #3e4052;font-family: 'Roboto';font-weight: bold;margin-bottom: 12px;">The Final Model: iter {{ modelOutput.bestIteration }}</p>
+        <p v-if="bestIterationCheck" class="model-text model-text-big" style="color: #3e4052;font-weight: bold;margin-bottom: 12px;">The Final Model: iter {{ modelOutput.bestIteration }}</p>
         <div v-if="LRSelect.length > 0" class="flex flex-row flex-center">
           <span class="model-text lr-span-label" style="padding-right:5px;margin-bottom: 0px;">one_vs_rest model:</span>
           <el-select :value="lrModelChooseItem" size="mini" @change="LrSelection">
@@ -240,7 +242,7 @@
               :value="item"/>
           </el-select>
         </div>
-        <p v-if="filterForStepwise" class="model-text" style="color: #3e4052;font-family: 'Roboto';font-weight: bold;margin-bottom: 12px;">The Final Model Information:</p>
+        <p v-if="filterForStepwise" class="model-text" style="color: #3e4052;font-weight: bold;margin-bottom: 12px;">The Final Model Information:</p>
         <p v-if="LRSelect.length > 0 && role === 'guest'" class="model-text" style="margin-bottom: 0">model label: {{ lrModelChooseItem.replace(/^.+\:/, '') }}</p>
         <p class="model-text" style="margin-bottom: 0">iterations: {{ LRIters }}</p>
         <p class="model-text">converged: {{ LRisConverged }}</p>
@@ -251,7 +253,7 @@
       </div>
       <!-- heteroNN -->
       <div v-else-if="modelOutputType===modelNameMap.heteroNN">
-        <p v-if="bestIterationCheck" class="model-text model-text-big" style="color: #3e4052;font-family: 'Roboto';font-weight: bold;margin-bottom: 12px;">The Final Model: iter {{ modelOutput.bestIteration }}</p>
+        <p v-if="bestIterationCheck" class="model-text model-text-big" style="color: #3e4052;font-weight: bold;margin-bottom: 12px;">The Final Model: iter {{ modelOutput.bestIteration }}</p>
       </div>
       <!--selection-->
       <div v-else-if="modelOutputType===modelNameMap.selection">
@@ -270,7 +272,7 @@
               style="margin-left:40px;">
               <el-radio v-model="selectionType" size="small" label="guest">guest</el-radio>
               <el-radio v-model="selectionType" :disabled="!(modelOutput.hostBody && modelOutput.hostBody.length>0)" label="host" size="small" @change="hostSelectionRadio">host</el-radio>
-              <el-select :disabled="!(selectionType === 'host')" v-model="selectionSelection" size="small" placeholder="请选择">
+              <el-select :disabled="!(selectionType === 'host')" v-model="selectionSelection" size="small" placeholder="select">
                 <el-option v-for="(item, index) in selectionHostType" :key="index" :label="item.label" :value="item.value"/>
               </el-select>
             </div>
@@ -310,7 +312,7 @@
             <div v-if="role==='guest'" class="flex flex-end flex-center" style="margin-left:40px;" >
               <el-checkbox v-model="binningType" size="small" label="guest">guest</el-checkbox>
               <el-checkbox v-model="binningHostType" :disabled="countingModel['hostData'].id.length === 0" size="small" label="host">host</el-checkbox>
-              <el-select :disabled="!binningHostType" v-model="binningSelection" multiple collapse-tags size="small" placeholder="请选择">
+              <el-select :disabled="!binningHostType" v-model="binningSelection" multiple collapse-tags size="small" placeholder="select">
                 <el-option v-for="(item, index) in binningHostSelections" :key="index" :label="item" :value="item"/>
               </el-select>
             </div>
@@ -339,7 +341,7 @@
                 <div v-if="role==='guest'" class="flex flex-end flex-center">
                   <el-radio v-model="binningSelectValueType" label="guest" size="small" @change="changeToHost">guest</el-radio>
                   <el-radio v-model="binningSelectValueType" :disabled="binningHostSelections.length === 0" size="small" label="host" @change="changeToHost">host</el-radio>
-                  <el-select :disabled="binningSelectValueType !== 'host'" v-model="binningSelectHostContent" placeholder="请选择" size="small" @change="changeToHost">
+                  <el-select :disabled="binningSelectValueType !== 'host'" v-model="binningSelectHostContent" placeholder="select" size="small" @change="changeToHost">
                     <el-option v-for="(item, index) in binningHostSelections" :key="index" :label="item" :value="item"/>
                   </el-select>
                 </div>
@@ -364,6 +366,7 @@
             :variable="modelOutput.correlation.localHeader"
             :other-variable="modelOutput.correlation.otherHeader"
             :nums="modelOutput.correlation.corr"
+            :single="modelOutput.correlation.single"
             :role="role"
             :class="{'fullscreen-canvas':isFullScreen}"
             class="correlation-relationship-canvas"
@@ -385,7 +388,7 @@
             <div class="flex flex-center">
               <h3 class="h3-style" style="margin-right: 20px;">{{ output.type }}</h3>
               <p class="name_space_for_h3_style">{{ output.nameSpace }}</p>
-              <div v-if="showFresh" class="flex flex-row flex-center refresh-pointer loss-refresh" @click="refreshNew">
+              <div class="flex flex-row flex-center refresh-pointer loss-refresh" @click="refreshNew">
                 <i class="el-icon-refresh-right refresh-content"/>
                 <span>refresh</span>
               </div>
@@ -438,10 +441,67 @@
         :has-pagination="false"
         :have-index="false"
       >
-        <h3 slot="form" class="h3-style">{{ modelSummaryTitle }}</h3>
+        <div slot="form" class="filter-table-form flex flex-col">
+          <h3 class="h3-style">{{ modelSummaryTitle }}</h3>
+          <div v-if="modelOutputType === modelNameMap.evaluation && showingSlider" class="flex flex-row flex-center">
+            <span class="slider-span">Quantile</span>
+            <el-slider v-model="quantileSlider" :max="1" :min="0" :step="0.05" :input-size="'mini'" show-input class="slider-container" @change="quantileSlider=nearby(quantileSlider, 0.05);quantile = quantileSlider"/>
+            <!-- <div :class="{'regenerate-active': quantileActive}" class="regenerate" @click="; quantileActive = false;">regenerate</div> -->
+            <el-tooltip effect="dark" placement="right">
+              <div slot="content">
+                <span v-for="(item, index) in quantileTooltip" :key="index">
+                  {{ item }}
+                </span>
+              </div>
+              <i class="el-icon-question icon-style"/>
+            </el-tooltip>
+          </div>
+        </div>
       </pagination-table>
       <div class="border-spliter" />
     </div>
+    <div v-if="confusionMat.tHeader && confusionMat.tHeader.length > 0 && confusionMat.tBody && confusionMat.tBody.length > 0" style="margin-bottom:24px;">
+      <pagination-table
+        :header="confusionMat.tHeader"
+        :table-data="confusionMat.tBody"
+        :has-search="false"
+        :has-pagination="false"
+        :have-index="false"
+        :span-method="confusionSpan"
+      >
+        <div slot="form" class="filter-table-form flex flex-col">
+          <h3 class="h3-style">Confusion Matrix</h3>
+          <div class="flex flex-row flex-center">
+            <span class="slider-span">Classification Threshold</span>
+            <el-slider v-model="confusionMatholdSlider" :max="1" :min="0" :step="0.01" :input-size="'mini'" show-input class="slider-container" @change="confusionMatholdSlider=nearby(confusionMatholdSlider, 0.01);confusionMathold = confusionMatholdSlider"/>
+            <!-- <div :class="{'regenerate-active': confusionMatholdActive}" class="regenerate" @click="confusionMathold = confusionMatholdSlider; confusionMatholdActive = false;">regenerate</div> -->
+            <el-tooltip effect="dark" placement="right">
+              <div slot="content">
+                <span v-for="(item, index) in confusionMatholdTooltip" :key="index">
+                  {{ item }}
+                </span>
+              </div>
+              <i class="el-icon-question icon-style"/>
+            </el-tooltip>
+          </div>
+        </div>
+        <template slot="headerlabels" slot-scope="info">
+          <p class="mult-title">
+            <span class="true-label">{{ getPartOfTitle(info, 0) }}</span>
+            <span class="split-inline"/>
+            <span class="predict-label">{{ getPartOfTitle(info, 1) }}</span>
+          </p>
+        </template>
+      </pagination-table>
+    </div>
+    <evaluation-psi
+      v-if="evaluationPSI"
+      :ref="'evaluation_psi'"
+      :summary="metricOutputList"
+      :topline="true"
+      :requested="requested"
+      :need-request="needRequest"
+      :is-full-screen="isFullScreen"/>
     <!--cv-->
     <div class="flex flex-row flex-center space-between">
       <ul v-if="evaluationOutputTypeList.length > 1" class="cv-tab-list flex flex-center line-height-between">
@@ -514,6 +574,7 @@ import Correlation from '@/components/CanvasComponent/pearsonDiagram'
 import BoostTreeHint from './BoostTreeHint'
 import { mapGetters } from 'vuex'
 import stepwise from './stepwise'
+import evaluationPsi from './evaluationPsi'
 
 export default {
   name: 'ModelOutput',
@@ -525,7 +586,8 @@ export default {
     IconHoverAndActive,
     Correlation,
     BoostTreeHint,
-    stepwise
+    stepwise,
+    evaluationPsi
   },
   props: {
     metricOutputList: {
@@ -733,7 +795,15 @@ export default {
       treeSuitables: {},
       treeScale: '',
       featureImportCurrentRow: '',
-      lrModelChoose: 0
+      lrModelChoose: 0,
+      confusionMathold: 0.5,
+      confusionMatholdSlider: 0.5,
+      confusionMatholdActive: false,
+      confusionMatholdTooltip: ['Update the confusion matrix information under the new threshold condition'],
+      quantile: 1,
+      quantileSlider: 1,
+      quantileActive: false,
+      quantileTooltip: ['Update Precision and Recall under the new quantile condition']
     }
   },
   computed: {
@@ -1077,6 +1147,29 @@ export default {
       for (const index in final) {
         f = Array.concat(f, final[index])
       }
+      const pr_list = []
+      for (const val of this.metricOutputList) {
+        if (val.type === 'quantile_pr') {
+          pr_list.push(val)
+        }
+      }
+      if (pr_list.length > 0) {
+        for (const val of f) {
+          let check = null
+          for (const item of pr_list) {
+            if (item.nameSpace === val.metric_namespace) {
+              check = item
+              break
+            }
+          }
+          if (check) {
+            check = check.data
+            const index = Math.round(this.quantile / 0.05)
+            val.precision = check.precision[index]
+            val.recall = check.recall[index]
+          }
+        }
+      }
       return f
     },
     modelSummaryCollapsedHeader() {
@@ -1087,8 +1180,37 @@ export default {
             val.sortable = true
           }
         }
+      } else {
+        let has = false
+        for (const val of this.metricOutputList) {
+          if (val.type === 'quantile_pr') {
+            has = val
+            break
+          }
+        }
+        if (has) {
+          header.push(...has.data.theader)
+        }
       }
       return header
+    },
+    showingSlider() {
+      const pr_list = []
+      for (const val of this.metricOutputList) {
+        if (val.type === 'quantile_pr') {
+          pr_list.push(val)
+        }
+      }
+      return pr_list.length > 0
+    },
+    evaluationPSI() {
+      let result = null
+      for (const val of this.metricOutputList) {
+        if (val.type === 'PSI_summary') {
+          result = val
+        }
+      }
+      return result ? result.data : result
     },
     haveDataTypeList() {
       return this.evaluationOutputTypeList.filter((item, index) => {
@@ -1104,6 +1226,71 @@ export default {
       return this.modelOutputType === this.modelNameMap.evaluation
         // ? 'Evaluation scores' : 'Cross Performance scores'
         ? 'Evaluation scores' : 'Performance scores'
+    },
+    confusionMat() {
+      let result = {}
+      let tableData = null
+      for (const val of this.metricOutputList) {
+        if (val.type === 'ConfusionMatrix') {
+          tableData = val.data
+          break
+        }
+      }
+      if (tableData) {
+        const tHeader = [{
+          label: '',
+          prop: 'effect'
+        }, {
+          label: 'dataset',
+          prop: 'dataset'
+        }, {
+          label: 'F1-score',
+          prop: 'f1score'
+        }, {
+          label: 'true label/predict label',
+          prop: 'labels'
+        }, {
+          label: '0',
+          prop: '0'
+        }, {
+          label: '1',
+          prop: '1'
+        }]
+        result = { tHeader }
+        const tBody = []
+        for (const val of tableData) {
+          const list = Object.keys(val.nameSpace)
+          if (list.length > 1) {
+            list.sort()
+          }
+          for (const key of list) {
+            if (val.nameSpace[key] && val.nameSpace[key].f1score && val.nameSpace[key].label && val.nameSpace[key].f1score.thresholds && val.nameSpace[key].label.thresholds) {
+              const fp = this.filterContent(this.confusionMathold, val.nameSpace[key].label.thresholds, val.nameSpace[key].label.fp)
+              const tp = this.filterContent(this.confusionMathold, val.nameSpace[key].label.thresholds, val.nameSpace[key].label.tp)
+              const tn = this.filterContent(this.confusionMathold, val.nameSpace[key].label.thresholds, val.nameSpace[key].label.tn)
+              const fn = this.filterContent(this.confusionMathold, val.nameSpace[key].label.thresholds, val.nameSpace[key].label.fn)
+              tBody.push({
+                effect: val.effect,
+                dataset: key,
+                f1score: this.filterContent(this.confusionMathold, val.nameSpace[key].f1score.thresholds, val.nameSpace[key].f1score.f1score),
+                labels: 0,
+                '0': tn + '(' + (tn / (fp + tp + tn + fn) * 100).toFixed(4) + '%)',
+                '1': fp + '(' + (fp / (fp + tp + tn + fn) * 100).toFixed(4) + '%)'
+              })
+              tBody.push({
+                effect: val.effect,
+                dataset: key,
+                f1score: this.filterContent(this.confusionMathold, val.nameSpace[key].f1score.thresholds, val.nameSpace[key].f1score.f1score),
+                labels: 1,
+                '0': fn + '(' + (fn / (fp + tp + tn + fn) * 100).toFixed(4) + '%)',
+                '1': tp + '(' + (tp / (fp + tp + tn + fn) * 100).toFixed(4) + '%)'
+              })
+            }
+          }
+        }
+        result.tBody = tBody
+      }
+      return result
     },
     filterScaleHeader() {
       const isHideCol = this.metricOutputList[0] && this.metricOutputList[0].scaleMethod === 'min_max_scale'
@@ -1156,15 +1343,30 @@ export default {
       if (this.selectionType === 'guest') {
         return this.countingModel[this.selectionType + 'Body']
       } else {
-        return this.countingModel[this.selectionType + 'Body'][this.selectionSelection]
+        return this.countingModel[this.selectionType + 'Body'][this.selectionSelection || 0]
       }
     },
     selectionHeader() {
+      let headers = null
+      const content = this.selectionContent
       if (this.selectionType === 'guest') {
-        return this.countingModel[this.selectionType + 'Header']
+        headers = this.countingModel[this.selectionType + 'Header']
       } else {
-        return this.countingModel[this.selectionType + 'Header'][this.selectionSelection]
+        headers = this.countingModel[this.selectionType + 'Header'][this.selectionSelection || 0]
       }
+      for (const val of headers) {
+        if (val.label !== 'variable') {
+          const all = []
+          content.forEach((item) => {
+            all.push(item[val.prop])
+          })
+          const matchs = all.join('|').match(/\|?[0-9\.]+\|?/g)
+          if (matchs && matchs.length > 1) {
+            val.sortable = true
+          }
+        }
+      }
+      return headers
     }
   },
   watch: {
@@ -1628,6 +1830,7 @@ export default {
       this.treeInstance && this.treeInstance.resize()
       this.treesLineInstance && this.treesLineInstance.resize()
       this.variableImportanceInstance && this.variableImportanceInstance.resize()
+      this.$refs['evaluation_psi'].resize()
     },
     summarySpanMethod({ row, column, rowIndex, columnIndex }) {
       // console.log(column, rowIndex, columnIndex)
@@ -2062,8 +2265,8 @@ export default {
       } else {
         const compare = function(ass, bss) {
           if (!ass || !bss) return true
-          ass = ass.replace(/[\.\-]/g, '_')
-          bss = bss.replace(/[\.\-]/g, '_')
+          ass = ass.replace(/[\W\s_]+/g, '_')
+          bss = bss.replace(/[\W\s_]+/g, '_')
           let aStart = ass.toString().match(/^([a-z]|[A-Z])+_?/)
           let bStart = bss.toString().match(/^([a-z]|[A-Z])+_?/)
           if (aStart && bStart && aStart[0] !== bStart[0]) {
@@ -2099,6 +2302,63 @@ export default {
         }
         return compare(a, b)
       }
+    },
+    filterContent(check, thresholds, list) {
+      for (let i = thresholds.length - 1; i >= 0; i--) {
+        if (thresholds[i] - check >= 0) {
+          return list[i]
+        }
+      }
+      return list[0]
+    },
+    getPartOfTitle(info, index) {
+      return info.column.label.split('/')[index]
+    },
+    nearby(val, bet) {
+      const distance = Math.round(val * 100) % (bet * 100)
+      if (distance <= Math.floor(bet * 100 / 2)) {
+        return (Math.round(val * 100) - distance) / 100
+      } else {
+        return (Math.round(val * 100) - distance + (bet * 100)) / 100
+      }
+    },
+    confusionSpan({ row, column, rowIndex, columnIndex }) {
+      // eslint-disable-next-line no-unused-vars
+      const rows = this.confusionMat.tBody
+      if (columnIndex === 0) {
+        if (rowIndex >= 1 && rows[rowIndex].effect === rows[rowIndex - 1].effect) {
+          return [0, 0]
+        } else {
+          let count = 1
+          while (rows[rowIndex + count] && rows[rowIndex + count].effect === rows[rowIndex].effect) {
+            count++
+          }
+          return [count, 1]
+        }
+      }
+      if (columnIndex === 1) {
+        if (rowIndex >= 1 && rows[rowIndex].dataset === rows[rowIndex - 1].dataset && rows[rowIndex - 1].effect === rows[rowIndex].effect) {
+          return [0, 0]
+        } else {
+          let count = 1
+          while (rows[rowIndex + count] && rows[rowIndex + count].dataset === rows[rowIndex].dataset && rows[rowIndex + count].effect === rows[rowIndex].effect) {
+            count++
+          }
+          return [count, 1]
+        }
+      }
+      if (columnIndex === 2) {
+        if (rowIndex >= 1 && rows[rowIndex].dataset === rows[rowIndex - 1].dataset && rows[rowIndex].f1score === rows[rowIndex - 1].f1score && rows[rowIndex - 1].effect === rows[rowIndex].effect) {
+          return [0, 0]
+        } else {
+          let count = 1
+          while (rows[rowIndex + count] && rows[rowIndex + count].dataset === rows[rowIndex].dataset && rows[rowIndex + count].f1score === rows[rowIndex].f1score && rows[rowIndex + count].effect === rows[rowIndex].effect) {
+            count++
+          }
+          return [count, 1]
+        }
+      }
+      return [1, 1]
     }
   }
 }
@@ -2317,5 +2577,81 @@ export default {
     margin: 24px 0px;
     border: 0px;
     background-color: #DCDDE0;
+  }
+  .filter-table-form {
+    min-width: 60%;
+    max-width: 70%;
+    .slider-span {
+      margin-right: 24px;
+    }
+    .slider-container {
+      min-width: 40%;
+      max-width: 50%;
+    }
+    .regenerate{
+      width: 114px;
+      height: 24px;
+      background: rgba(198,200,204,1);
+      color: #fff;
+      border-radius:2px;
+      text-align: center;
+      line-height: 24px;
+      margin-left: 24px;
+      margin-right: 12px;
+    }
+    .regenerate-active{
+      background: #4159D1;
+      cursor: pointer;
+      &:hover{
+        background: #5E7FEB;
+      }
+      &:active {
+        background:#494ece;
+      }
+    }
+    .icon-style {
+      font-size: 18px;
+      color: #5E7FEB;
+      margin-left: 24px;
+    }
+  }
+  .mult-title {
+    position: relative;
+    width: 100%;
+    height: 23px;
+    display: block;
+    .true-label {
+      position: absolute;
+      bottom: 0px;
+      left: 0px;
+      line-height: 12px;
+      z-index: 2;
+    }
+    .predict-label {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      line-height: 12px;
+      z-index: 2;
+    }
+    .split-inline {
+      border: 23px solid transparent;
+      border-left: 23px solid #fff;
+      border-bottom: 23px solid #fff;
+      width: 0px;
+      height: 0px;
+      margin-left: 42%;
+      position: relative;
+      display:block;
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0px;
+        left: -45px;
+        border: 21px solid transparent;
+        border-left: 21px solid #DEECFC;
+        border-bottom: 21px solid #DEECFC;
+      }
+    }
   }
 </style>
