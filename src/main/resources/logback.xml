@@ -95,26 +95,26 @@
     </appender>
 
 
-    <appender name="FLOW" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <encoder charset="utf-8">
-            <pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n
-            </pattern>
-        </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-        <rollingPolicy
-                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${ROOT}%d/flow.%d.log</fileNamePattern>
-            <maxHistory>${MAXHISTORY}</maxHistory>
-<!--            <timeBasedFileNamingAndTriggeringPolicy-->
-<!--                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
-<!--                <maxFileSize>${FILESIZE}</maxFileSize>-->
-<!--            </timeBasedFileNamingAndTriggeringPolicy>-->
-        </rollingPolicy>
-    </appender>
+<!--    <appender name="FLOW" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+<!--        <encoder charset="utf-8">-->
+<!--            <pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n-->
+<!--            </pattern>-->
+<!--        </encoder>-->
+<!--        <filter class="ch.qos.logback.classic.filter.LevelFilter">-->
+<!--            <level>INFO</level>-->
+<!--            <onMatch>ACCEPT</onMatch>-->
+<!--            <onMismatch>DENY</onMismatch>-->
+<!--        </filter>-->
+<!--        <rollingPolicy-->
+<!--                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+<!--            <fileNamePattern>${ROOT}%d/flow.%d.log</fileNamePattern>-->
+<!--            <maxHistory>${MAXHISTORY}</maxHistory>-->
+<!--&lt;!&ndash;            <timeBasedFileNamingAndTriggeringPolicy&ndash;&gt;-->
+<!--&lt;!&ndash;                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">&ndash;&gt;-->
+<!--&lt;!&ndash;                <maxFileSize>${FILESIZE}</maxFileSize>&ndash;&gt;-->
+<!--&lt;!&ndash;            </timeBasedFileNamingAndTriggeringPolicy>&ndash;&gt;-->
+<!--        </rollingPolicy>-->
+<!--    </appender>-->
 
 
     <appender name="httpclient" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -138,45 +138,46 @@
         </rollingPolicy>
     </appender>
 
-    <appender name="services" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <encoder charset="utf-8">
-            <pattern>%d{yyyy-MM-dd}|%m%n
-            </pattern>
-        </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-        <rollingPolicy
-                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${ROOT}%d/services.%d.log</fileNamePattern>
-            <maxHistory>${MAXHISTORY}</maxHistory>
-<!--            <timeBasedFileNamingAndTriggeringPolicy-->
-<!--                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
-<!--                <maxFileSize>${FILESIZE}</maxFileSize>-->
-<!--            </timeBasedFileNamingAndTriggeringPolicy>-->
-        </rollingPolicy>
-    </appender>
+<!--    <appender name="services" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+<!--        <encoder charset="utf-8">-->
+<!--            <pattern>%d{yyyy-MM-dd}|%m%n-->
+<!--            </pattern>-->
+<!--        </encoder>-->
+<!--        <filter class="ch.qos.logback.classic.filter.LevelFilter">-->
+<!--            <level>INFO</level>-->
+<!--            <onMatch>ACCEPT</onMatch>-->
+<!--            <onMismatch>DENY</onMismatch>-->
+<!--        </filter>-->
+<!--        <rollingPolicy-->
+<!--                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+<!--            <fileNamePattern>${ROOT}%d/services.%d.log</fileNamePattern>-->
+<!--            <maxHistory>${MAXHISTORY}</maxHistory>-->
+<!--&lt;!&ndash;            <timeBasedFileNamingAndTriggeringPolicy&ndash;&gt;-->
+<!--&lt;!&ndash;                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">&ndash;&gt;-->
+<!--&lt;!&ndash;                <maxFileSize>${FILESIZE}</maxFileSize>&ndash;&gt;-->
+<!--&lt;!&ndash;            </timeBasedFileNamingAndTriggeringPolicy>&ndash;&gt;-->
+<!--        </rollingPolicy>-->
+<!--    </appender>-->
 
 
     <logger name="com.webank.ai.fate.board.utils.HttpClientPool" level="INFO" additivity="true">
         <appender-ref ref="httpclient"/>
     </logger>
 
-    <logger name="org.mybatis.spring" level="INFO" additivity="false"/>
+<!--    <logger name="org.mybatis.spring" level="INFO" additivity="false"/>-->
 
-    <logger name="com.webank.ai.fate.board.services.JobManagerService" level="INFO" additivity="true">
-        <appender-ref ref="services"/>
-    </logger>
+<!--    <logger name="com.webank.ai.fate.board.services.JobManagerService" level="INFO" additivity="true">-->
+<!--        <appender-ref ref="services"/>-->
+<!--    </logger>-->
 
-    <logger name="com.webank.ai.fate.board.services.TaskManagerService" level="INFO" additivity="true">
-        <appender-ref ref="services"/>
-    </logger>
+<!--    <logger name="com.webank.ai.fate.board.services.TaskManagerService" level="INFO" additivity="true">-->
+<!--        <appender-ref ref="services"/>-->
+<!--    </logger>-->
 
     <root level="DEBUG">
-        <appender-ref ref="STDOUT"/>
+<!--        <appender-ref ref="STDOUT"/>-->
         <appender-ref ref="ERROR"/>
+        <appender-ref ref="WARN"/>
         <appender-ref ref="INFO"/>
         <appender-ref ref="DEBUG"/>
     </root>

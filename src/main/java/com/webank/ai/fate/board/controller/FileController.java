@@ -53,28 +53,28 @@ public class FileController {
         return new ResponseResult<>(ErrorCode.SUCCESS);
     }
 
-    /**
-     * upload multiple files
-     */
-    @RequestMapping("/download")
-    public ResponseResult download(@RequestParam("jobId") String jobId,
-                                   @RequestParam("role") String role,
-                                   @RequestParam("partyId") String partyId,
-                                   @RequestParam("componentId") String componentId,
-                                   HttpServletResponse httpServletResponse
-    ) throws IOException {
-        logger.info("{},{},{},{}", jobId, role, partyId, componentId);
-
-        if (!CheckPathUtil.checkPath(jobId, role, partyId, componentId)) {
-            return new ResponseResult<>(ErrorCode.REQUEST_PARAMETER_ERROR);
-        }
-        int result = fileService.download(jobId, role, partyId, componentId, httpServletResponse);
-        if (0 != result) {
-            logger.info("return code for download:{}", result);
-            return new ResponseResult<>(ErrorCode.DOWNLOAD_ERROR);
-        }
-        return new ResponseResult<>(ErrorCode.SUCCESS);
-    }
+//    /**
+//     * upload multiple files
+//     */
+//    @RequestMapping("/download")
+//    public ResponseResult download(@RequestParam("jobId") String jobId,
+//                                   @RequestParam("role") String role,
+//                                   @RequestParam("partyId") String partyId,
+//                                   @RequestParam("componentId") String componentId,
+//                                   HttpServletResponse httpServletResponse
+//    ) throws IOException {
+//        logger.info("{},{},{},{}", jobId, role, partyId, componentId);
+//
+//        if (!CheckPathUtil.checkPath(jobId, role, partyId, componentId)) {
+//            return new ResponseResult<>(ErrorCode.REQUEST_PARAMETER_ERROR);
+//        }
+//        int result = fileService.download(jobId, role, partyId, componentId, httpServletResponse);
+//        if (0 != result) {
+//            logger.info("return code for download:{}", result);
+//            return new ResponseResult<>(ErrorCode.DOWNLOAD_ERROR);
+//        }
+//        return new ResponseResult<>(ErrorCode.SUCCESS);
+//    }
 
 
     /**

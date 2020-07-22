@@ -7,14 +7,16 @@ public class JobRestartDTO implements Serializable {
     private String jobId;
     private String role;
     private String partyId;
+    private String componentId;
 
     public JobRestartDTO() {
     }
 
-    public JobRestartDTO(String jobId, String role, String partyId) {
+    public JobRestartDTO(String jobId, String role, String partyId, String componentId) {
         this.jobId = jobId;
         this.role = role;
         this.partyId = partyId;
+        this.componentId = componentId;
     }
 
     public String getJobId() {
@@ -41,27 +43,11 @@ public class JobRestartDTO implements Serializable {
         this.partyId = partyId;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof JobRestartDTO)) return false;
-        JobRestartDTO that = (JobRestartDTO) o;
-        return Objects.equals(jobId, that.jobId) &&
-                Objects.equals(role, that.role) &&
-                Objects.equals(partyId, that.partyId);
+    public String getComponentId() {
+        return componentId;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(jobId, role, partyId);
-    }
-
-    @Override
-    public String toString() {
-        return "JobRestartDTO{" +
-                "jobId='" + jobId + '\'' +
-                ", role='" + role + '\'' +
-                ", partyId='" + partyId + '\'' +
-                '}';
+    public void setComponentId(String componentId) {
+        this.componentId = componentId;
     }
 }

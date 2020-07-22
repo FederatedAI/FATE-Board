@@ -46,6 +46,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static com.webank.ai.fate.board.global.ErrorCode.FATEFLOW_ERROR_CONNECTION;
 import static com.webank.ai.fate.board.global.ErrorCode.REQUEST_PARAMETER_ERROR;
@@ -68,9 +69,6 @@ public class JobDetailController {
     @Value("${fateflow.url}")
     String fateUrl;
 
-    @Autowired
-    LogFileService logFileService;
-
     @ResponseBody
     @RequestMapping(value = "/tracking/component/metrics", method = RequestMethod.POST)
     public ResponseResult getMetaInfo(@RequestBody String param) {
@@ -81,7 +79,7 @@ public class JobDetailController {
         String componentName = jsonObject.getString(Dict.COMPONENT_NAME);
         try {
             Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentName));
-            Preconditions.checkArgument(logFileService.checkPathParameters(jobId, role, partyId, componentName));
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentName));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseResult(REQUEST_PARAMETER_ERROR);
@@ -111,7 +109,7 @@ public class JobDetailController {
         String metricName = jsonObject.getString(Dict.METRIC_NAME);
         try {
             Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentName, metricName, metricNamespace));
-            Preconditions.checkArgument(logFileService.checkPathParameters(jobId, role, partyId, componentName, metricNamespace, metricName));
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentName, metricNamespace, metricName));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseResult(REQUEST_PARAMETER_ERROR);
@@ -138,7 +136,7 @@ public class JobDetailController {
         String componentName = jsonObject.getString(Dict.COMPONENT_NAME);
         try {
             Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentName));
-            Preconditions.checkArgument(logFileService.checkPathParameters(jobId, role, partyId, componentName));
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentName));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseResult(REQUEST_PARAMETER_ERROR);
@@ -176,7 +174,7 @@ public class JobDetailController {
         String partyId = jsonObject.getString(Dict.PARTY_ID);
         try {
             Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId));
-            Preconditions.checkArgument(logFileService.checkPathParameters(jobId, role, partyId));
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId));
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("parameter error:", e);
@@ -241,7 +239,7 @@ public class JobDetailController {
         String componentName = jsonObject.getString(Dict.COMPONENT_NAME);
         try {
             Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentName));
-            Preconditions.checkArgument(logFileService.checkPathParameters(jobId, role, partyId, componentName));
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentName));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseResult(REQUEST_PARAMETER_ERROR);
@@ -267,7 +265,7 @@ public class JobDetailController {
         String componentName = jsonObject.getString(Dict.COMPONENT_NAME);
         try {
             Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentName));
-            Preconditions.checkArgument(logFileService.checkPathParameters(jobId, role, partyId, componentName));
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentName));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseResult(REQUEST_PARAMETER_ERROR);
@@ -287,9 +285,30 @@ public class JobDetailController {
     @ResponseBody
     public ResponseResult getBatchMetricInfo(@Valid @RequestBody BatchMetricDTO batchMetricDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return new ResponseResult(ErrorCode.ERROR_PARAMETER, bindingResult);
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
         }
+        try {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(
+                    batchMetricDTO.getJobId(),
+                    batchMetricDTO.getRole(),
+                    batchMetricDTO.getPartyId(),
+                    batchMetricDTO.getComponentName()
+            ));
+            Map<String, String[]> metrics = batchMetricDTO.getMetrics();
+            Set<Map.Entry<String, String[]>> entries = metrics.entrySet();
+            for (Map.Entry<String, String[]> entry : entries) {
+                String key = entry.getKey();
+                Preconditions.checkArgument(LogFileService.checkPathParameters(key));
+                String[] values = entry.getValue();
+                for (String value : values) {
+                    Preconditions.checkArgument(LogFileService.checkPathParameters(value));
+                }
+            }
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+        }
         JSONObject batchMetricInfo = jobDetailService.getBatchMetricInfo(batchMetricDTO);
         if (batchMetricInfo == null) {
             return new ResponseResult(FATEFLOW_ERROR_CONNECTION);

@@ -302,9 +302,11 @@ public class JobManagerService {
     }
 
     public int restartJob(JobRestartDTO jobRestartDTO) {
+        HashMap<String, String> stringStringHashMap = new HashMap<>();
+        stringStringHashMap.put("taskId", jobRestartDTO.getJobId() + "_" + jobRestartDTO.getComponentId());
         String result = null;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_RESTART, JSON.toJSONString(jobRestartDTO));
+            result = httpClientPool.post(fateUrl + Dict.URL_JOB_RESTART, JSON.toJSONString(stringStringHashMap));
             if (result != null) {
                 JSONObject jsonObject = JSON.parseObject(result);
                 if (0 == jsonObject.getInteger(Dict.RETCODE)) {

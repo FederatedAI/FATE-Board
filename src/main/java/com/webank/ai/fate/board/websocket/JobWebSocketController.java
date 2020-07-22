@@ -50,6 +50,7 @@ import java.util.concurrent.*;
 @ServerEndpoint(value = "/websocket/progress/{jobId}/{role}/{partyId}", configurator = Configurator.class)
 @Component
 public class JobWebSocketController implements InitializingBean, ApplicationContextAware {
+
     private static Logger logger = LoggerFactory.getLogger(JobWebSocketController.class);
 
     private static JobManagerService jobManagerService;
@@ -80,7 +81,7 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
         //check parameters
         if (LogFileService.checkPathParameters(jobId, role, String.valueOf(partyId))) {
             String jobKey = jobId + ":" + role + ":" + partyId;
-            JobWebSocketController.jobSessionMap.put(session, jobKey);
+            jobSessionMap.put(session, jobKey);
             logger.info("websocket job id {} open ,session {},session size{}", jobKey, session, jobSessionMap.size());
         } else {
             logger.error("websocket input parameter error: jobId {},role {},partyId {}", jobId, role, partyId);
@@ -114,15 +115,17 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
     @OnError
     public void onError(Session session, Throwable error) {
         logger.error("there is a error in websocket connection!", error);
-        try {
-            session.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.error("session {} close error~", session);
-        } finally {
-            jobSessionMap.remove(session);
-            sessionPushMap.remove(session);
-        }
+        jobSessionMap.remove(session);
+        sessionPushMap.remove(session);
+//        try {
+//            session.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            logger.error("session {} close error~", session);
+//        } finally {
+//            jobSessionMap.remove(session);
+//            sessionPushMap.remove(session);
+//        }
     }
 
 
