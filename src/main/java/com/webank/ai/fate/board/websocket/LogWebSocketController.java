@@ -14,6 +14,7 @@ import com.webank.ai.fate.board.pojo.SshInfo;
 import com.webank.ai.fate.board.services.JobManagerService;
 import com.webank.ai.fate.board.ssh.SshService;
 import com.webank.ai.fate.board.utils.GetSystemInfo;
+import com.webank.ai.fate.board.utils.LogHandle;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,13 +62,6 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
 
         logger.info("websocket session {} closed", session);
 
-//        LogScanner logScanner = sessionMap.get(session);
-//
-//        if (logScanner != null) {
-//            logScanner.setNeedStop(true);
-//        }
-//
-//        sessionMap.remove(session);
     }
 
 
@@ -86,15 +80,20 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
         synchronized (session) {
             //check input parameters
             logger.info("receive websocket parameter:{} {} {} {} {}", jobId, role, partyId, componentId, message);
+
             Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentId, message));
             JSONObject messageObject = JSON.parseObject(message);
             String type = messageObject.getString("type");
             Integer begin = messageObject.getInteger("begin");
             Integer end = messageObject.getInteger("end");
 
-            if (type == null || 0 == type.trim().length() || begin == null || end == null) {
-                session.getBasicRemote().sendText("parameter error");
+            Preconditions.checkArgument(StringUtils.isNoneEmpty(type, String.valueOf(begin), String.valueOf(end)));
+            if (begin > end) {
+                return;
             }
+
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentId, type));
+
 
             //build log path
             String logPath = logFileService.buildLogPath(jobId, role, partyId, componentId, type);
@@ -119,7 +118,9 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
                             int i = content.indexOf(":");
                             String lineNumber = content.substring(0, i);
                             String lineContent = content.substring(i + 1);
-                            logResults.add(LogFileService.toLogMap(lineContent, Long.parseLong(lineNumber)));
+                            //replace sensitive information
+                            String finalLog = LogHandle.handleLog(lineContent);
+                            logResults.add(LogFileService.toLogMap(finalLog, Long.parseLong(lineNumber)));
                         }
                     } while (content != null);
                     logger.info("execute  cmd : {} ", (Object) cmd);
@@ -163,7 +164,9 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
                                     int i = content.indexOf(":");
                                     String lineNumber = content.substring(0, i);
                                     String lineContent = content.substring(i + 1);
-                                    logResults.add(LogFileService.toLogMap(lineContent, Long.parseLong(lineNumber)));
+                                    //replace sensitive information
+                                    String finalLog = LogHandle.handleLog(lineContent);
+                                    logResults.add(LogFileService.toLogMap(finalLog, Long.parseLong(lineNumber)));
                                 }
                             } while (content != null);
                         } finally {

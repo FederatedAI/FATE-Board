@@ -105,9 +105,7 @@ public class LogFileService {
     }
 
     public static boolean checkPathParameters(String... parameters) {
-//        String regex = "^\\w+$";
-//    public boolean checkPathParameters(String... parameters) {
-//        String regex = "^\\w+$";
+        //String regex = "^\\w+$";
         String regex = "^[0-9a-zA-Z_-\\u4e00-\\u9fa5]+$";
         for (String parameter : parameters) {
             if (!parameter.matches(regex)) {
@@ -117,52 +115,6 @@ public class LogFileService {
         return true;
     }
 
-//    public String buildFilePath(String jobId, String componentId, String type, String role, String partyId) {
-//
-//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, componentId, type, role, partyId));
-//        Preconditions.checkArgument(checkPathParameters(jobId, componentId, type, role, partyId));
-//        String filePath = "";
-//        if (componentId == null || componentId.equals(DEFAULT_COMPONENT_ID)) {
-//
-//            filePath = JOB_LOG_PATH.replace("$job_id", jobId).replace("$role", role).replace("$party_id", partyId);
-//
-//        } else {
-//            filePath = TASK_LOG_PATH.replace("$job_id", jobId).replace("$component_id", componentId).replace("$role", role).replace("$party_id", partyId);
-//        }
-//
-//        if (type.equals(DEFAULT_LOG_TYPE)) {
-//            filePath = filePath.replace("$file_name", DEFAULT_FILE_NAME);
-//        } else {
-//
-//            switch (type) {
-//                case "error":
-//                    filePath = filePath.replace("$file_name", "ERROR.log");
-//                    break;
-//                case "debug":
-//                    filePath = filePath.replace("$file_name", "DEBUG.log");
-//                    break;
-//                case "info":
-//                    filePath = filePath.replace("$file_name", "INFO.log");
-//                    break;
-//                case "warning":
-//                    filePath = filePath.replace("$file_name", "WARNING.log");
-//                    break;
-//                default:
-//                    filePath = filePath.replace("$file_name", "INFO.log");
-//            }
-//
-//        }
-//        if ("fateFlow".equals(role)) {
-//            if ("error".equals(type)) {
-//                filePath = jobId + "/" + "error.log";
-//            } else {
-//                filePath = jobId + "/" + "fate_flow_schedule.log";
-//            }
-//        }
-//        String result = FATE_DEPLOY_PREFIX + filePath;
-//        logger.info("build filePath result {}", result);
-//        return result;
-//    }
 
     public String buildFilePath(String jobId, String componentId, String type, String role, String partyId) {
 
@@ -208,38 +160,6 @@ public class LogFileService {
             default:
                 logRelativePath = jobId + "/" + role + "/" + partyId + "/" + componentId + "/";
         }
-
-//        String logPath = Dict.logMap.get(type);
-
-//        if (Dict.DEFAULT.equals(role)) {
-//            switch (type) {
-//                case "error":
-//                    logRelativePath = jobId + "/" + "error.log";
-//                    break;
-//                default:
-//                    logRelativePath = jobId + "/" + "fate_flow_schedule.log";
-//            }
-//            logRelativePath = jobId + "/" + type + ".log";
-//        } else {
-//            if (Dict.DEFAULT.equals(componentId)) {
-//                switch (type) {
-//                    case "error":
-//                        logRelativePath = jobId + "/" + role + "/" + partyId + "/" + "ERROR.log";
-//                        break;
-//                    case "warning":
-//                        logRelativePath = jobId + "/" + role + "/" + partyId + "/" + "WARNING.log";
-//                        break;
-//                    case "info":
-//                        logRelativePath = jobId + "/" + role + "/" + partyId + "/" + "INFO.log";
-//                        break;
-//                    default:
-//                        logRelativePath = jobId + "/" + role + "/" + partyId + "/" + "DEBUG.log";
-//                }
-//                logRelativePath = jobId + "/" + role + "/" + partyId + "/" + type + ".log";
-//            } else {
-//                logRelativePath = jobId + "/" + role + "/" + partyId + "/" + componentId + type + ".log";
-//            }
-//        }
 
         String logPath = FATE_DEPLOY_PREFIX + logRelativePath + Dict.logMap.get(type);
         return logPath;

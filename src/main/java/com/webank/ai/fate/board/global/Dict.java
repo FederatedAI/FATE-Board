@@ -27,7 +27,6 @@ public class Dict {
 
     static public final String ID = "id";
     static public final String NAME = "name";
-    static public final String DESC = "desc";
     static public final String JOBID = "job_id";
     static public final String RETCODE = "retcode";
     static public final String DATA = "data";
@@ -36,31 +35,23 @@ public class Dict {
     static public final String COMPONENT_NAME = "component_name";
     static public final String ROLE = "role";
     static public final String PARTY_ID = "party_id";
-    static public final String START_TIME = "start_time";
-    static public final String END_TIME = "end_time";
     static public final String RETMSG = "retmsg";
     static public final String NOTES = "notes";
 
     static public final String DEPENDENCY_DATA = "dependency_data";
     static public final String SUMMARY_DATA = "summary_date";
-    static public final String DATAVIEW_DATA = "dataview_data";
-
 
     static public final String METRIC_NAMESPACE = "metric_namespace";
     static public final String METRIC_NAME = "metric_name";
     static public final String STATUS = "status";
     static public final String COMPONENT_LIST = "component_list";
-    static public final String TASK_ECLAPSED_TIME = "task_elapsed_time";
 
-
-    static public final String CREATE_TIME = "create_time";
     static public final String SSH_CONFIG_FILE = "ssh_config_file";
     static public final String LOG_LINE_NUM = "lineNum";
     static public final String LOG_CONTENT = "content";
     static public final String JOB_PROCESS = "process";
     static public final String JOB_DURATION = "duration";
     static public final String JOB_STATUS = "status";
-
 
     static public final String URL_COPONENT_METRIC_DATA = "/v1/tracking/component/metric_data";
     static public final String URL_COPONENT_METRIC = "/v1/tracking/component/metrics";
@@ -80,8 +71,6 @@ public class Dict {
     static public final String SSH_PASSWORD = "password";
     static public final String SSH_PORT = "port";
 
-    static public final String PAGENUM = "page_num";
-    static public final String PAGESIZE = "page_size";
     static public final String FIELD_START_TIME = "f_start_time";
     static public final String FILED_END_TIME = "f_end_time";
     static public final String TIME = "time";

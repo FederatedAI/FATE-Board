@@ -83,6 +83,7 @@ public class JobManagerController {
         String partyId = jsonObject.getString(Dict.PARTY_ID);
         try {
             Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId));
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseResult(REQUEST_PARAMETER_ERROR);
@@ -107,6 +108,7 @@ public class JobManagerController {
         String partyId = jsonObject.getString(Dict.PARTY_ID);
         try {
             Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId));
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseResult(REQUEST_PARAMETER_ERROR);
@@ -129,6 +131,12 @@ public class JobManagerController {
                                        @PathVariable("role") String role,
                                        @PathVariable("partyId") String partyId
     ) {
+        try {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+        }
         HashMap<String, Object> resultMap = new HashMap<>();
         JobWithBLOBs jobWithBLOBs = jobManagerService.queryJobByConditions(jobId, role, partyId);
         if (jobWithBLOBs == null) {
@@ -179,10 +187,27 @@ public class JobManagerController {
 
     @RequestMapping(value = "/query/page/new", method = RequestMethod.POST)
     public ResponseResult<PageBean<Map<String, Object>>> queryPagedJob(@RequestBody PagedJobQO pagedJobQO) {
+
+        try {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getJobId(), pagedJobQO.getPartyId(), pagedJobQO.getfDescription()));
+            List<String> roles = pagedJobQO.getRole();
+            List<String> status = pagedJobQO.getStatus();
+            for (String role : roles) {
+                Preconditions.checkArgument(LogFileService.checkPathParameters(role));
+            }
+            for (String s : status) {
+                Preconditions.checkArgument(LogFileService.checkPathParameters(s));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+        }
+
         boolean result = checkOrderRule(pagedJobQO);
         if (!result) {
             return new ResponseResult<>(REQUEST_PARAMETER_ERROR);
         }
+
         PageBean<Map<String, Object>> listPageBean = jobManagerService.queryPagedJobs(pagedJobQO);
         return new ResponseResult<>(ErrorCode.SUCCESS, listPageBean);
     }
@@ -204,7 +229,7 @@ public class JobManagerController {
         String notes = jsonObject.getString(Dict.NOTES);
         try {
             Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, notes));
-            Preconditions.checkArgument(logFileService.checkPathParameters(jobId, role, partyId, notes));
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, notes));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseResult(REQUEST_PARAMETER_ERROR);
@@ -252,8 +277,13 @@ public class JobManagerController {
 
     @RequestMapping(value = "/restart", method = RequestMethod.POST)
     public ResponseResult restartJob(@RequestBody JobRestartDTO jobRestartDTO) {
-        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobRestartDTO.getJobId(), jobRestartDTO.getRole(), jobRestartDTO.getPartyId()));
-
+        try {
+            Preconditions.checkArgument(StringUtils.isNoneEmpty(jobRestartDTO.getJobId(), jobRestartDTO.getRole(), jobRestartDTO.getPartyId()), jobRestartDTO.getComponentId());
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobRestartDTO.getJobId(), jobRestartDTO.getRole(), jobRestartDTO.getPartyId()), jobRestartDTO.getComponentId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+        }
         int i = jobManagerService.restartJob(jobRestartDTO);
         if (i == 0) {
             return new ResponseResult<>(ErrorCode.SUCCESS);
@@ -264,7 +294,13 @@ public class JobManagerController {
 
     @RequestMapping(value = "/componentCommand", method = RequestMethod.POST)
     public ResponseResult<String> getComponentCommand(@RequestBody ComponentCommandDTO componentCommandDTO) {
-        Preconditions.checkArgument(StringUtils.isNoneEmpty(componentCommandDTO.getJobId(), componentCommandDTO.getRole(), componentCommandDTO.getPartyId()), componentCommandDTO.getComponentName());
+        try {
+            Preconditions.checkArgument(StringUtils.isNoneEmpty(componentCommandDTO.getJobId(), componentCommandDTO.getRole(), componentCommandDTO.getPartyId()), componentCommandDTO.getComponentName());
+            Preconditions.checkArgument(LogFileService.checkPathParameters(componentCommandDTO.getJobId(), componentCommandDTO.getRole(), componentCommandDTO.getPartyId()), componentCommandDTO.getComponentName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+        }
         String componentCommand = jobManagerService.getComponentCommand(componentCommandDTO);
         return new ResponseResult<>(ErrorCode.SUCCESS, componentCommand);
     }
