@@ -23,7 +23,7 @@ public class LogHandle {
             String relativePath = log.replaceAll(fatePath, "./fate/");
 
 //            String ipRule = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}";
-            String ipRule="(127\\.0)|(localhost)|(10\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01])))|(192\\.168)";
+            String ipRule="(127\\.0)|(10\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01])))|(192\\.168)";
 
             String finalLog = relativePath.replaceAll(ipRule, "xxx.xxx");
             stringObjectMap.put(Dict.LOG_CONTENT, finalLog);
