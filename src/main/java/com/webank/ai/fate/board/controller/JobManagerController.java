@@ -17,7 +17,6 @@
 package com.webank.ai.fate.board.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -36,19 +35,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
-import static com.webank.ai.fate.board.global.ErrorCode.FATEFLOW_ERROR_CONNECTION;
-import static com.webank.ai.fate.board.global.ErrorCode.REQUEST_PARAMETER_ERROR;
 
-//@CrossOrigin
 @RestController
 @RequestMapping(value = "/job")
 public class JobManagerController {
@@ -62,11 +56,7 @@ public class JobManagerController {
 
     @Value("${fateflow.url}")
     String fateUrl;
-    @Autowired
-    ThreadPoolTaskExecutor asyncServiceExecutor;
 
-    @Autowired
-    LogFileService logFileService;
 
     @RequestMapping(value = "/query/status", method = RequestMethod.GET)
     public ResponseResult queryJobStatus() {
@@ -75,53 +65,58 @@ public class JobManagerController {
     }
 
     @RequestMapping(value = "/v1/pipeline/job/stop", method = RequestMethod.POST)
-    public ResponseResult stopJob(@RequestBody String param) {
+    public ResponseResult stopJob(@Valid @RequestBody JobQueryDTO jobQueryDTO,BindingResult bindingResult) {
 
-        JSONObject jsonObject = JSON.parseObject(param);
-        String jobId = jsonObject.getString(Dict.JOBID);
-        String role = jsonObject.getString(Dict.ROLE);
-        String partyId = jsonObject.getString(Dict.PARTY_ID);
-        try {
-            Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId));
-            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+//        JSONObject jsonObject = JSON.parseObject(param);
+//        String jobId = jsonObject.getString(Dict.JOBID);
+//        String role = jsonObject.getString(Dict.ROLE);
+//        String partyId = jsonObject.getString(Dict.PARTY_ID);
+//
+//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId));
+        if (bindingResult.hasErrors()) {
+            FieldError errors = bindingResult.getFieldError();
+            return  new ResponseResult<>(ErrorCode.ERROR_PARAMETER,errors.getDefaultMessage());
         }
-        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
-        String result = null;
+
+        Preconditions.checkArgument(LogFileService.checkPathParameters(jobQueryDTO.getJob_id(), jobQueryDTO.getRole(), jobQueryDTO.getParty_id()));
+
+//        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
+        String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_STOP, jsonObject.toJSONString());
+            result = httpClientPool.post(fateUrl + Dict.URL_JOB_STOP, JSON.toJSONString(jobQueryDTO));
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
+            logger.error("connect fateflow error:", e);
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
         }
+
         return ResponseUtil.buildResponse(result, null);
 
     }
 
     @RequestMapping(value = "/tracking/job/data_view", method = RequestMethod.POST)
-    public ResponseResult queryJobDataset(@RequestBody String param) {
-        JSONObject jsonObject = JSON.parseObject(param);
-        String jobId = jsonObject.getString(Dict.JOBID);
-        String role = jsonObject.getString(Dict.ROLE);
-        String partyId = jsonObject.getString(Dict.PARTY_ID);
-        try {
-            Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId));
-            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+    public ResponseResult queryJobDataset(@Valid @RequestBody JobQueryDTO jobQueryDTO,BindingResult bindingResult) {
+//        JSONObject jsonObject = JSON.parseObject(param);
+//        String jobId = jsonObject.getString(Dict.JOBID);
+//        String role = jsonObject.getString(Dict.ROLE);
+//        String partyId = jsonObject.getString(Dict.PARTY_ID);
+        if (bindingResult.hasErrors()) {
+            FieldError errors = bindingResult.getFieldError();
+            return  new ResponseResult<>(ErrorCode.ERROR_PARAMETER,errors.getDefaultMessage());
+        }
 
-        }
-        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
-        String result = null;
+//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId));
+
+        Preconditions.checkArgument(LogFileService.checkPathParameters(jobQueryDTO.getJob_id(), jobQueryDTO.getRole(), jobQueryDTO.getParty_id()));
+
+//        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
+        String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_DATAVIEW, jsonObject.toJSONString());
+            result = httpClientPool.post(fateUrl + Dict.URL_JOB_DATAVIEW, JSON.toJSONString(jobQueryDTO));
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
+            logger.error("connect fateflow error:", e);
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
         }
+
         return ResponseUtil.buildResponse(result, Dict.DATA);
     }
 
@@ -131,44 +126,44 @@ public class JobManagerController {
                                        @PathVariable("role") String role,
                                        @PathVariable("partyId") String partyId
     ) {
-        try {
-            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseResult(REQUEST_PARAMETER_ERROR);
-        }
+        Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId));
+
         HashMap<String, Object> resultMap = new HashMap<>();
         JobWithBLOBs jobWithBLOBs = jobManagerService.queryJobByConditions(jobId, role, partyId);
+
         if (jobWithBLOBs == null) {
             return new ResponseResult<>(ErrorCode.DATABASE_ERROR_RESULT_NULL);
         }
+
         jobWithBLOBs.setfRunIp(null);
         jobWithBLOBs.setfDsl(null);
         jobWithBLOBs.setfRuntimeConf(null);
         if (jobWithBLOBs.getfStatus().equals(Dict.TIMEOUT)) {
             jobWithBLOBs.setfStatus(Dict.FAILED);
         }
+
         Map<String, Object> params = Maps.newHashMap();
         params.put(Dict.JOBID, jobId);
         params.put(Dict.ROLE, role);
         params.put(Dict.PARTY_ID, new Integer(partyId));
-        String result = null;
+
+        String result;
         try {
             result = httpClientPool.post(fateUrl + Dict.URL_JOB_DATAVIEW, JSON.toJSONString(params));
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
+            logger.error("connect fateflow error:", e);
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
         }
         if ((result == null) || (0 == result.trim().length())) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
         }
+
         JSONObject resultObject = JSON.parseObject(result);
         Integer retcode = resultObject.getInteger(Dict.RETCODE);
         if (retcode == null) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_WRONG_RESULT);
         }
         if (retcode == 0) {
-
             JSONObject data = resultObject.getJSONObject(Dict.DATA);
             resultMap.put(Dict.JOB, jobWithBLOBs);
             resultMap.put(Dict.DATASET, data);
@@ -188,24 +183,20 @@ public class JobManagerController {
     @RequestMapping(value = "/query/page/new", method = RequestMethod.POST)
     public ResponseResult<PageBean<Map<String, Object>>> queryPagedJob(@RequestBody PagedJobQO pagedJobQO) {
 
-        try {
-            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getJobId(), pagedJobQO.getPartyId(), pagedJobQO.getfDescription()));
-            List<String> roles = pagedJobQO.getRole();
-            List<String> status = pagedJobQO.getStatus();
-            for (String role : roles) {
-                Preconditions.checkArgument(LogFileService.checkPathParameters(role));
-            }
-            for (String s : status) {
-                Preconditions.checkArgument(LogFileService.checkPathParameters(s));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+        Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getJobId(), pagedJobQO.getPartyId(), pagedJobQO.getfDescription()));
+
+        List<String> roles = pagedJobQO.getRole();
+        List<String> status = pagedJobQO.getStatus();
+        for (String role : roles) {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(role));
+        }
+        for (String s : status) {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(s));
         }
 
         boolean result = checkOrderRule(pagedJobQO);
         if (!result) {
-            return new ResponseResult<>(REQUEST_PARAMETER_ERROR);
+            return new ResponseResult<>(ErrorCode.REQUEST_PARAMETER_ERROR);
         }
 
         PageBean<Map<String, Object>> listPageBean = jobManagerService.queryPagedJobs(pagedJobQO);
@@ -220,29 +211,31 @@ public class JobManagerController {
 
 
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public ResponseResult updateJobById(@RequestBody String parameters) {
+    public ResponseResult updateJobById(@Valid @RequestBody UpdateNotesDTO updateNotesDTO,BindingResult bindingResult) {
 
-        JSONObject jsonObject = JSON.parseObject(parameters);
-        String jobId = jsonObject.getString(Dict.JOBID);
-        String role = jsonObject.getString(Dict.ROLE);
-        String partyId = jsonObject.getString(Dict.PARTY_ID);
-        String notes = jsonObject.getString(Dict.NOTES);
-        try {
-            Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, notes));
-            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, notes));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+//        JSONObject jsonObject = JSON.parseObject(parameters);
+//        String jobId = jsonObject.getString(Dict.JOBID);
+//        String role = jsonObject.getString(Dict.ROLE);
+//        String partyId = jsonObject.getString(Dict.PARTY_ID);
+//        String notes = jsonObject.getString(Dict.NOTES);
+//
+//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, notes));
+
+        if (bindingResult.hasErrors()) {
+            FieldError errors = bindingResult.getFieldError();
+            return  new ResponseResult<>(ErrorCode.ERROR_PARAMETER,errors.getDefaultMessage());
         }
 
-        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
+        Preconditions.checkArgument(LogFileService.checkPathParameters(updateNotesDTO.getJob_id(), updateNotesDTO.getRole(), updateNotesDTO.getParty_id(), updateNotesDTO.getNotes()));
 
-        String result = null;
+//        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
+
+        String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_UPDATE, jsonObject.toJSONString());
+            result = httpClientPool.post(fateUrl + Dict.URL_JOB_UPDATE, JSON.toJSONString(updateNotesDTO));
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseResult(FATEFLOW_ERROR_CONNECTION);
+            logger.error("connect fateflow error:", e);
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
         }
         if ((result == null) || (0 == result.trim().length())) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
@@ -251,23 +244,6 @@ public class JobManagerController {
 
     }
 
-    private JSONObject checkParameter(String parameters, String... parametersNeedCheck) {
-        JSONObject jsonObject = JSON.parseObject(parameters);
-        ArrayList<String> results = new ArrayList<>();
-        for (String parameter : parametersNeedCheck) {
-            String result = jsonObject.getString(parameter);
-            results.add(result);
-        }
-        String[] results_Array = new String[results.size()];
-        results.toArray(results_Array);
-        try {
-            Preconditions.checkArgument(StringUtils.isNoneEmpty(results_Array));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        return jsonObject;
-    }
 
     @RequestMapping(value = "/query/fields", method = RequestMethod.POST)
     public ResponseResult<Map<String, List<String>>> queryFields() {
@@ -276,15 +252,15 @@ public class JobManagerController {
     }
 
     @RequestMapping(value = "/restart", method = RequestMethod.POST)
-    public ResponseResult restartJob(@RequestBody JobRestartDTO jobRestartDTO) {
-        try {
-            Preconditions.checkArgument(StringUtils.isNoneEmpty(jobRestartDTO.getJobId(), jobRestartDTO.getRole(), jobRestartDTO.getPartyId()), jobRestartDTO.getComponentId());
-            Preconditions.checkArgument(LogFileService.checkPathParameters(jobRestartDTO.getJobId(), jobRestartDTO.getRole(), jobRestartDTO.getPartyId()), jobRestartDTO.getComponentId());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+    public ResponseResult restartJob(@Valid @RequestBody ComponentQueryDTO componentQueryDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            FieldError errors = bindingResult.getFieldError();
+            return  new ResponseResult<>(ErrorCode.ERROR_PARAMETER,errors.getDefaultMessage());
         }
-        int i = jobManagerService.restartJob(jobRestartDTO);
+//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobRestartDTO.getJobId(), jobRestartDTO.getRole(), jobRestartDTO.getPartyId()), jobRestartDTO.getComponentId());
+        Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id()), componentQueryDTO.getComponent_name());
+
+        int i = jobManagerService.restartJob(componentQueryDTO);
         if (i == 0) {
             return new ResponseResult<>(ErrorCode.SUCCESS);
         } else {
@@ -293,15 +269,14 @@ public class JobManagerController {
     }
 
     @RequestMapping(value = "/componentCommand", method = RequestMethod.POST)
-    public ResponseResult<String> getComponentCommand(@RequestBody ComponentCommandDTO componentCommandDTO) {
-        try {
-            Preconditions.checkArgument(StringUtils.isNoneEmpty(componentCommandDTO.getJobId(), componentCommandDTO.getRole(), componentCommandDTO.getPartyId()), componentCommandDTO.getComponentName());
-            Preconditions.checkArgument(LogFileService.checkPathParameters(componentCommandDTO.getJobId(), componentCommandDTO.getRole(), componentCommandDTO.getPartyId()), componentCommandDTO.getComponentName());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseResult(REQUEST_PARAMETER_ERROR);
+    public ResponseResult<String> getComponentCommand(@Valid @RequestBody ComponentQueryDTO componentQueryDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            FieldError errors = bindingResult.getFieldError();
+            return  new ResponseResult<>(ErrorCode.ERROR_PARAMETER,errors.getDefaultMessage());
         }
-        String componentCommand = jobManagerService.getComponentCommand(componentCommandDTO);
+        Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id()), componentQueryDTO.getComponent_name());
+
+        String componentCommand = jobManagerService.getComponentCommand(componentQueryDTO);
         return new ResponseResult<>(ErrorCode.SUCCESS, componentCommand);
     }
 }

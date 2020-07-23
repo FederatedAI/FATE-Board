@@ -51,9 +51,9 @@ public class LogFileService {
     final static String DEFAULT_COMPONENT_ID = "default";
     final static String DEFAULT_LOG_TYPE = "default";
     String JOB_LOG_PATH = "$job_id/$role/$party_id/$file_name";
-        @Value("${FATE_DEPLOY_PREFIX:/data/projects/fate/python/logs/}")
+    @Value("${FATE_DEPLOY_PREFIX:/data/projects/fate/python/logs/}")
 //    @Value("${FATE_DEPLOY_PREFIX:C:\\Users\\v_wbymxu\\Downloads\\}")
-    String FATE_DEPLOY_PREFIX;
+            String FATE_DEPLOY_PREFIX;
 
     @Autowired
     SshService sshService;
@@ -106,8 +106,11 @@ public class LogFileService {
 
     public static boolean checkPathParameters(String... parameters) {
         //String regex = "^\\w+$";
-        String regex = "^[0-9a-zA-Z_-\\u4e00-\\u9fa5]+$";
+        String regex = "^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5]+$";
         for (String parameter : parameters) {
+            if ("".equals(parameter)) {
+                continue;
+            }
             if (!parameter.matches(regex)) {
                 return false;
             }
@@ -331,7 +334,7 @@ public class LogFileService {
 
         jobTaskInfo.jobStatus = jobWithBLOBs.getfStatus();
 
-        if (componentId != null && !componentId.equals(DEFAULT_COMPONENT_ID)&&!componentId.equals("fateFlow")) {
+        if (componentId != null && !componentId.equals(DEFAULT_COMPONENT_ID) && !componentId.equals("fateFlow")) {
 
             TaskExample taskExample = new TaskExample();
 

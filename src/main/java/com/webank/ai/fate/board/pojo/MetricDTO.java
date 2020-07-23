@@ -1,11 +1,8 @@
 package com.webank.ai.fate.board.pojo;
 
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.util.Map;
-import java.util.Objects;
 
-public class BatchMetricDTO implements Serializable {
+public class MetricDTO {
     @NotNull(message = "Job id can't be null!")
     private String job_id;
     @NotNull(message = "Role cant't be null!")
@@ -14,18 +11,21 @@ public class BatchMetricDTO implements Serializable {
     private String party_id;
     @NotNull(message = "Component name cant't be null!")
     private String component_name;
-    @NotNull(message = "Metric data can't be null!")
-    private Map<String,String[]> metrics;
+    @NotNull(message = "Metric namespace can't be null!")
+    private String metric_namespace;
+    @NotNull(message = "Metric name can't be null!")
+    private String metric_name;
 
-    public BatchMetricDTO() {
+    public MetricDTO() {
     }
 
-    public BatchMetricDTO(@NotNull(message = "Job id can't be null!") String job_id, @NotNull(message = "Role cant't be null!") String role, @NotNull(message = "Party id can't be null!") String party_id, @NotNull(message = "Component name cant't be null!") String component_name, @NotNull(message = "Metric data can't be null!") Map<String, String[]> metrics) {
+    public MetricDTO(@NotNull(message = "Job id can't be null!") String job_id, @NotNull(message = "Role cant't be null!") String role, @NotNull(message = "Party id can't be null!") String party_id, @NotNull(message = "Component name cant't be null!") String component_name, @NotNull(message = "Metric namespace can't be null!") String metric_namespace, @NotNull(message = "Metric name can't be null!") String metric_name) {
         this.job_id = job_id;
         this.role = role;
         this.party_id = party_id;
         this.component_name = component_name;
-        this.metrics = metrics;
+        this.metric_namespace = metric_namespace;
+        this.metric_name = metric_name;
     }
 
     public String getJob_id() {
@@ -60,12 +60,19 @@ public class BatchMetricDTO implements Serializable {
         this.component_name = component_name;
     }
 
-    public Map<String, String[]> getMetrics() {
-        return metrics;
+    public String getMetric_namespace() {
+        return metric_namespace;
     }
 
-    public void setMetrics(Map<String, String[]> metrics) {
-        this.metrics = metrics;
+    public void setMetric_namespace(String metric_namespace) {
+        this.metric_namespace = metric_namespace;
+    }
+
+    public String getMetric_name() {
+        return metric_name;
+    }
+
+    public void setMetric_name(String metric_name) {
+        this.metric_name = metric_name;
     }
 }
-

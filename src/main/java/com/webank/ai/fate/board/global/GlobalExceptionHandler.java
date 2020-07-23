@@ -22,10 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -34,35 +31,28 @@ import java.net.SocketException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 
-@RestController
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(Throwable.class)
     public ResponseResult defaultErrorHandler(HttpServletRequest req, Exception e) {
-        ResponseResult response = new ResponseResult();
 
         logger.error("error ", e);
         if (e instanceof ServletException) {
-            response.setCode(ErrorCode.SERVLET_ERROR.getCode());
-            response.setMsg(ErrorCode.SERVLET_ERROR.getMsg());
-        } else if (e instanceof HttpMessageNotReadableException) {
-            response.setCode(ErrorCode.REQUESTBODY_ERROR.getCode());
-            response.setMsg(ErrorCode.REQUESTBODY_ERROR.getMsg());
-        } else if (e instanceof IllegalArgumentException) {
-            response.setCode(ErrorCode.ERROR_PARAMETER.getCode());
-            response.setMsg(ErrorCode.ERROR_PARAMETER.getMsg());
+            return new ResponseResult<>(ErrorCode.SERVLET_ERROR);
         } else if (e instanceof SQLIntegrityConstraintViolationException) {
-            response.setCode(ErrorCode.DATABASE_ERROR_CONNECTION.getCode());
-            response.setMsg(ErrorCode.DATABASE_ERROR_CONNECTION.getMsg());
+            return new ResponseResult<>(ErrorCode.DATABASE_ERROR_CONNECTION);
         } else if (e instanceof SocketException || e instanceof ClientProtocolException) {
-            response.setCode(ErrorCode.FATEFLOW_ERROR_CONNECTION.getCode());
-            response.setMsg(ErrorCode.FATEFLOW_ERROR_CONNECTION.getMsg());
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
         } else {
-            response.setCode(ErrorCode.SYSTEM_ERROR.getCode());
-            response.setMsg(ErrorCode.SYSTEM_ERROR.getMsg());
+            return new ResponseResult<>(ErrorCode.SYSTEM_ERROR);
         }
-        return response;
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseResult handleParameters(HttpServletRequest req, IllegalArgumentException e) {
+        logger.error("error ", e);
+        return new ResponseResult<>(ErrorCode.ERROR_PARAMETER);
     }
 }
