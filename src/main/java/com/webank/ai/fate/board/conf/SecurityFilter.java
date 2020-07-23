@@ -21,7 +21,6 @@ public class SecurityFilter implements Filter {
 
         HttpServletResponse rep = (HttpServletResponse) servletResponse;
         rep.addHeader("X-Frame-Options","DENY");
-//        rep.addHeader("Content-Type","application/json;charset=utf-8");
         filterChain.doFilter(servletRequest,servletResponse);
 
     }

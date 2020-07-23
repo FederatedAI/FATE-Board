@@ -301,10 +301,11 @@ public class JobManagerService {
         return Dict.fieldMap;
     }
 
-    public int restartJob(JobRestartDTO jobRestartDTO) {
+    public int restartJob(ComponentQueryDTO componentQueryDTO) {
         HashMap<String, String> stringStringHashMap = new HashMap<>();
-        stringStringHashMap.put("taskId", jobRestartDTO.getJobId() + "_" + jobRestartDTO.getComponentId());
-        String result = null;
+        stringStringHashMap.put("taskId", componentQueryDTO.getJob_id() + "_" + componentQueryDTO.getComponent_name());
+
+        String result;
         try {
             result = httpClientPool.post(fateUrl + Dict.URL_JOB_RESTART, JSON.toJSONString(stringStringHashMap));
             if (result != null) {
@@ -314,15 +315,15 @@ public class JobManagerService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("connect fateflow error:", e);
             return 1;
         }
         return 1;
 
     }
 
-    public String getComponentCommand(ComponentCommandDTO componentCommandDTO) {
-        StringBuffer command = new StringBuffer().append("python fate_flow_client.py -f component_output_data -j ").append(componentCommandDTO.getJobId()).append(" -r ").append(componentCommandDTO.getRole()).append(" -p ").append(componentCommandDTO.getPartyId()).append(" -cpn ").append(componentCommandDTO.getComponentName()).append(" -o ").append("./");
+    public String getComponentCommand(ComponentQueryDTO componentQueryDTO) {
+        StringBuffer command = new StringBuffer().append("python fate_flow_client.py -f component_output_data -j ").append(componentQueryDTO.getJob_id()).append(" -r ").append(componentQueryDTO.getRole()).append(" -p ").append(componentQueryDTO.getParty_id()).append(" -cpn ").append(componentQueryDTO.getComponent_name()).append(" -o ").append("./");
         return command.toString();
     }
 }

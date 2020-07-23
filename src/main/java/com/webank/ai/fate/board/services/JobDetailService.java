@@ -36,10 +36,10 @@ public class JobDetailService {
 
     public JSONObject getBatchMetricInfo(BatchMetricDTO batchMetricDTO) {
 
-        String jobId = batchMetricDTO.getJobId();
+        String jobId = batchMetricDTO.getJob_id();
         String role = batchMetricDTO.getRole();
-        String partyId = batchMetricDTO.getPartyId();
-        String componentName = batchMetricDTO.getComponentName();
+        String partyId = batchMetricDTO.getParty_id();
+        String componentName = batchMetricDTO.getComponent_name();
         Map<String, String[]> metrics = batchMetricDTO.getMetrics();
         Set<Map.Entry<String, String[]>> entries = metrics.entrySet();
 

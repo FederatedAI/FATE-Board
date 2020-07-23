@@ -45,10 +45,10 @@ import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 @MapperScan(basePackages = "com.webank.ai.fate.board.dao", sqlSessionFactoryRef = "fateboardSqlSessionFactory")
 public class WebConfiguration implements WebMvcConfigurer {
 
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry) {
-//        registry.addMapping("/**").allowedMethods("*").allowedOrigins("*").allowCredentials(true);
-//    }
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**").allowedMethods("*").allowedOrigins("*").allowCredentials(true);
+    }
 
     @Bean("fateboardDataSource")
     @ConfigurationProperties(prefix = "fateboard.datasource")
