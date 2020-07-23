@@ -16,14 +16,12 @@ public class LogHandle {
         String boardPath = jarF.getParentFile().toString();
         int fateboard = boardPath.lastIndexOf("fateboard");
         String fatePath = boardPath.substring(0, fateboard);
+        String ipRule="(127\\.0)|(10\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01])))|(192\\.168)";
 
         for (Map stringObjectMap : result) {
             Object o = stringObjectMap.get(Dict.LOG_CONTENT);
             String log = (String) o;
             String relativePath = log.replaceAll(fatePath, "./fate/");
-
-//            String ipRule = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}";
-            String ipRule="(127\\.0)|(10\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01])))|(192\\.168)";
 
             String finalLog = relativePath.replaceAll(ipRule, "xxx.xxx");
             stringObjectMap.put(Dict.LOG_CONTENT, finalLog);
