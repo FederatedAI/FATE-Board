@@ -105,7 +105,7 @@ public class JobDetailController {
         String metricName = jsonObject.getString(Dict.METRIC_NAME);
         try {
             Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentName, metricName, metricNamespace));
-            Preconditions.checkArgument(logFileService.checkPathParameters(jobId, role, partyId, componentName));
+            Preconditions.checkArgument(logFileService.checkPathParameters2(jobId, role, partyId, componentName,metricName,metricNamespace));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseResult(REQUEST_PARAMETER_ERROR);
