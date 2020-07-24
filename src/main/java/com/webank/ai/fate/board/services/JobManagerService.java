@@ -17,8 +17,10 @@ package com.webank.ai.fate.board.services;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.webank.ai.fate.board.dao.JobMapper;
+import com.webank.ai.fate.board.log.LogFileService;
 import com.webank.ai.fate.board.pojo.*;
 import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.utils.HttpClientPool;
@@ -242,12 +244,15 @@ public class JobManagerService {
 
     public PageBean<Map<String, Object>> queryPagedJobs(PagedJobQO pagedJobQO) {
         if (pagedJobQO.getJobId() != null && 0 != pagedJobQO.getJobId().trim().length()) {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getJobId()));
             pagedJobQO.setJobId("%" + pagedJobQO.getJobId() + "%");
         }
         if (pagedJobQO.getPartyId() != null && 0 != pagedJobQO.getPartyId().trim().length()) {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getPartyId()));
             pagedJobQO.setPartyId("%" + pagedJobQO.getPartyId() + "%");
         }
         if (pagedJobQO.getfDescription() != null && 0 != pagedJobQO.getfDescription().trim().length()) {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getfDescription()));
             pagedJobQO.setfDescription("%" + pagedJobQO.getfDescription() + "%");
         }
         long jobSum = this.countJob(pagedJobQO);

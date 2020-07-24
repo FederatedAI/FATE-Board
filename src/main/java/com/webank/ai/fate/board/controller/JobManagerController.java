@@ -65,7 +65,7 @@ public class JobManagerController {
     }
 
     @RequestMapping(value = "/v1/pipeline/job/stop", method = RequestMethod.POST)
-    public ResponseResult stopJob(@Valid @RequestBody JobQueryDTO jobQueryDTO,BindingResult bindingResult) {
+    public ResponseResult stopJob(@Valid @RequestBody JobQueryDTO jobQueryDTO, BindingResult bindingResult) {
 
 //        JSONObject jsonObject = JSON.parseObject(param);
 //        String jobId = jsonObject.getString(Dict.JOBID);
@@ -75,7 +75,7 @@ public class JobManagerController {
 //        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId));
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
-            return  new ResponseResult<>(ErrorCode.ERROR_PARAMETER,errors.getDefaultMessage());
+            return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
 
         Preconditions.checkArgument(LogFileService.checkPathParameters(jobQueryDTO.getJob_id(), jobQueryDTO.getRole(), jobQueryDTO.getParty_id()));
@@ -94,14 +94,14 @@ public class JobManagerController {
     }
 
     @RequestMapping(value = "/tracking/job/data_view", method = RequestMethod.POST)
-    public ResponseResult queryJobDataset(@Valid @RequestBody JobQueryDTO jobQueryDTO,BindingResult bindingResult) {
+    public ResponseResult queryJobDataset(@Valid @RequestBody JobQueryDTO jobQueryDTO, BindingResult bindingResult) {
 //        JSONObject jsonObject = JSON.parseObject(param);
 //        String jobId = jsonObject.getString(Dict.JOBID);
 //        String role = jsonObject.getString(Dict.ROLE);
 //        String partyId = jsonObject.getString(Dict.PARTY_ID);
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
-            return  new ResponseResult<>(ErrorCode.ERROR_PARAMETER,errors.getDefaultMessage());
+            return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
 
 //        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId));
@@ -183,15 +183,17 @@ public class JobManagerController {
     @RequestMapping(value = "/query/page/new", method = RequestMethod.POST)
     public ResponseResult<PageBean<Map<String, Object>>> queryPagedJob(@RequestBody PagedJobQO pagedJobQO) {
 
-        Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getJobId(), pagedJobQO.getPartyId(), pagedJobQO.getfDescription()));
-
         List<String> roles = pagedJobQO.getRole();
         List<String> status = pagedJobQO.getStatus();
-        for (String role : roles) {
-            Preconditions.checkArgument(LogFileService.checkPathParameters(role));
+        if (roles != null) {
+            for (String role : roles) {
+                Preconditions.checkArgument(LogFileService.checkPathParameters(role));
+            }
         }
-        for (String s : status) {
-            Preconditions.checkArgument(LogFileService.checkPathParameters(s));
+        if (status != null) {
+            for (String s : status) {
+                Preconditions.checkArgument(LogFileService.checkPathParameters(s));
+            }
         }
 
         boolean result = checkOrderRule(pagedJobQO);
@@ -211,7 +213,7 @@ public class JobManagerController {
 
 
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public ResponseResult updateJobById(@Valid @RequestBody UpdateNotesDTO updateNotesDTO,BindingResult bindingResult) {
+    public ResponseResult updateJobById(@Valid @RequestBody UpdateNotesDTO updateNotesDTO, BindingResult bindingResult) {
 
 //        JSONObject jsonObject = JSON.parseObject(parameters);
 //        String jobId = jsonObject.getString(Dict.JOBID);
@@ -223,7 +225,7 @@ public class JobManagerController {
 
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
-            return  new ResponseResult<>(ErrorCode.ERROR_PARAMETER,errors.getDefaultMessage());
+            return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
 
         Preconditions.checkArgument(LogFileService.checkPathParameters(updateNotesDTO.getJob_id(), updateNotesDTO.getRole(), updateNotesDTO.getParty_id(), updateNotesDTO.getNotes()));
@@ -255,7 +257,7 @@ public class JobManagerController {
     public ResponseResult restartJob(@Valid @RequestBody ComponentQueryDTO componentQueryDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
-            return  new ResponseResult<>(ErrorCode.ERROR_PARAMETER,errors.getDefaultMessage());
+            return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
 //        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobRestartDTO.getJobId(), jobRestartDTO.getRole(), jobRestartDTO.getPartyId()), jobRestartDTO.getComponentId());
         Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id()), componentQueryDTO.getComponent_name());
@@ -272,7 +274,7 @@ public class JobManagerController {
     public ResponseResult<String> getComponentCommand(@Valid @RequestBody ComponentQueryDTO componentQueryDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
-            return  new ResponseResult<>(ErrorCode.ERROR_PARAMETER,errors.getDefaultMessage());
+            return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
         Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id()), componentQueryDTO.getComponent_name());
 
