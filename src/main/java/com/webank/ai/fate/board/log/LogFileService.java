@@ -114,6 +114,16 @@ public class LogFileService implements InitializingBean {
         }
         return true;
     }
+    public boolean checkPathParameters2(String... parameters) {
+//        String regex = "^\\w+$";
+        String regex = "^[\\.0-9a-zA-Z_-\\u4e00-\\u9fa5]+$";
+        for (String parameter : parameters) {
+            if (!parameter.matches(regex)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 //    public String buildFilePath(String jobId, String componentId, String type, String role, String partyId) {
 //
