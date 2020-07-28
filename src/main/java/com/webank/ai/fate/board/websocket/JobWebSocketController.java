@@ -33,6 +33,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -67,11 +68,11 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
 
     private static ThreadPoolTaskExecutor asyncServiceExecutor;
 
-    private static ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+//    private static ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-    static {
-        executorService.scheduleAtFixedRate(JobWebSocketController::schedule, 1000, 1000, TimeUnit.MILLISECONDS);
-    }
+//    static {
+//        executorService.scheduleAtFixedRate(JobWebSocketController::schedule, 1000, 1000, TimeUnit.MILLISECONDS);
+//    }
 
     /**
      * call method when building connection
@@ -81,7 +82,7 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
         //check parameters
         if (LogFileService.checkPathParameters(jobId, role, String.valueOf(partyId))) {
             String jobKey = jobId + ":" + role + ":" + partyId;
-            jobSessionMap.put(session, jobKey);
+            JobWebSocketController.jobSessionMap.put(session, jobKey);
             logger.info("websocket job id {} open ,session {},session size{}", jobKey, session, jobSessionMap.size());
         } else {
             logger.error("websocket input parameter error: jobId {},role {},partyId {}", jobId, role, partyId);
@@ -105,7 +106,7 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
      */
     @OnMessage
     public void onMessage(String message, Session session) {
-
+        schedule();
     }
 
     /**
@@ -128,28 +129,29 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
 //        }
     }
 
-
+    @Scheduled(cron = "*/1 * * * * ? ")
     private static void schedule() {
+        long start = System.currentTimeMillis();
         logger.info("job schedule start");
         logger.debug("job process schedule start,session map size {}", jobSessionMap.size());
 
         //get job map to push
         Map<String, Set<Session>> jobMaps = Maps.newHashMap();
-        JobWebSocketController.jobSessionMap.forEach((k, v) -> {
-            Set<Session> sessions = jobMaps.get(v);
+        JobWebSocketController.jobSessionMap.forEach((session, job) -> {
+            Set<Session> sessions = jobMaps.get(job);
             if (sessions == null) {
                 sessions = new HashSet<>();
-                sessions.add(k);
-                jobMaps.put(v, sessions);
+                sessions.add(session);
+                jobMaps.put(job, sessions);
             }
-            sessions.add(k);
+            sessions.add(session);
         });
 
         //if job map exist data, then push
         if (jobMaps.size() > 0) {
             logger.info("job websocket job size {}", jobMaps.size());
-            jobMaps.forEach((k, v) -> {
-                        String[] args = k.split(":");
+            jobMaps.forEach((jobParam, v) -> {
+                        String[] args = jobParam.split(":");
                         Preconditions.checkArgument(3 == args.length);
                         String jobId = args[0];
                         String role = args[1];
@@ -227,13 +229,13 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
                                             dependency.remove("component_module");
                                             dependency.remove("component_need_run");
                                             dependency.remove("dependencies");
-
-                                            JSONObject summary = (JSONObject) flushToWebData.get(Dict.SUMMARY_DATA);
+                                            logger.warn("summary:{}",flushToWebData.get(Dict.SUMMARY_DATA));
+                                            Map<String,Object> summary = (Map<String, Object>) flushToWebData.get(Dict.SUMMARY_DATA);
                                             summary.remove("dataset");
                                         }
 
                                         session.getBasicRemote().sendText(JSON.toJSONString(flushToWebData));
-                                        logger.info("data to push:{}", JSON.toJSONString(flushToWebData));
+                                        logger.info("session:{}, data to push:{}", session, JSON.toJSONString(flushToWebData));
 
                                         if (flushToWebData.get(Dict.DEPENDENCY_DATA) != null && flushToWebData.get(Dict.SUMMARY_DATA) != null && sessionPushMap.get(session) == null) {
                                             sessionPushMap.put(session, true);
@@ -256,12 +258,14 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
                             }
 
                         } else {
-                            logger.error("job {} is not exist", k);
+                            logger.error("job {} to push is not exist", jobParam);
                         }
                     }
             );
         }
 
+        long end = System.currentTimeMillis();
+        logger.warn("cost:{} start:{} end:{}", end - start, start, end);
     }
 
     @Override
