@@ -229,8 +229,8 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
                                             dependency.remove("component_module");
                                             dependency.remove("component_need_run");
                                             dependency.remove("dependencies");
-                                            logger.warn("summary:{}",flushToWebData.get(Dict.SUMMARY_DATA));
-                                            Map<String,Object> summary = (Map<String, Object>) flushToWebData.get(Dict.SUMMARY_DATA);
+                                            logger.warn("summary:{}", flushToWebData.get(Dict.SUMMARY_DATA));
+                                            Map<String, Object> summary = (Map<String, Object>) flushToWebData.get(Dict.SUMMARY_DATA);
                                             summary.remove("dataset");
                                         }
 

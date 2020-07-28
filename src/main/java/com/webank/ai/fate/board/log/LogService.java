@@ -79,7 +79,7 @@ public class LogService implements Runnable {
                     logger.info("local file path {} is not exist,try to find remote file", file);
                     SshInfo sshInfo = sshService.getSSHInfo(jobIp);
                     if (sshInfo == null) {
-                        logger.error("remote {} connection info doesn't exist", jobIp);
+                        logger.info("remote {} connection info doesn't exist,file {} doesn't exist", jobIp,file);
                     } else {
                         try {
                             lineSum = logFileService.getRemoteFileLineCount(sshInfo, logPath);
