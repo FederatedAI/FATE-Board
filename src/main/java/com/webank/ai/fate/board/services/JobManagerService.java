@@ -320,15 +320,14 @@ public class JobManagerService {
                 }
             }
         } catch (Exception e) {
-            logger.error("connect fateflow error:", e);
-            return 1;
+            logger.error("connect fate flow error:", e);
         }
         return 1;
 
     }
 
     public String getComponentCommand(ComponentQueryDTO componentQueryDTO) {
-        StringBuffer command = new StringBuffer().append("python fate_flow_client.py -f component_output_data -j ").append(componentQueryDTO.getJob_id()).append(" -r ").append(componentQueryDTO.getRole()).append(" -p ").append(componentQueryDTO.getParty_id()).append(" -cpn ").append(componentQueryDTO.getComponent_name()).append(" -o ").append("./");
+        StringBuffer command = new StringBuffer().append("flow component output-data -j ").append(componentQueryDTO.getJob_id()).append(" -r ").append(componentQueryDTO.getRole()).append(" -p ").append(componentQueryDTO.getParty_id()).append(" -cpn ").append(componentQueryDTO.getComponent_name()).append(" --output-path ").append("./");
         return command.toString();
     }
 }

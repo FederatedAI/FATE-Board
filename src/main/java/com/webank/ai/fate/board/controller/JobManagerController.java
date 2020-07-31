@@ -228,7 +228,8 @@ public class JobManagerController {
             return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
 
-        Preconditions.checkArgument(LogFileService.checkPathParameters(updateNotesDTO.getJob_id(), updateNotesDTO.getRole(), updateNotesDTO.getParty_id(), updateNotesDTO.getNotes()));
+        Preconditions.checkArgument(LogFileService.checkPathParameters(updateNotesDTO.getJob_id(), updateNotesDTO.getRole(), updateNotesDTO.getParty_id()));
+        Preconditions.checkArgument(LogFileService.checkParameters( "^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5]+$",updateNotesDTO.getNotes()));
 
 //        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
 
