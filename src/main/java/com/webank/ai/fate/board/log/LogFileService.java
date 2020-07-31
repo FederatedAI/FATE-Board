@@ -106,7 +106,20 @@ public class LogFileService {
 
     public static boolean checkPathParameters(String... parameters) {
         //String regex = "^\\w+$";
-        String regex = "^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5]+$";
+//        String regex = "^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5]+$";
+        String regex = "^[\\.0-9a-zA-Z\\-_]+$";
+        for (String parameter : parameters) {
+            if ("".equals(parameter)) {
+                continue;
+            }
+            if (!parameter.matches(regex)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean checkParameters(String regex,String... parameters) {
         for (String parameter : parameters) {
             if ("".equals(parameter)) {
                 continue;
