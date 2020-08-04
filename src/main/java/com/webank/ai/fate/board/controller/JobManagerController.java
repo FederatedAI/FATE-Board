@@ -60,7 +60,7 @@ public class JobManagerController {
 
     @RequestMapping(value = "/query/status", method = RequestMethod.GET)
     public ResponseResult queryJobStatus() {
-        List<Job> jobs = jobManagerService.queryJobStatus();
+        List<JobDO> jobs = jobManagerService.queryJobStatus();
         return new ResponseResult<>(ErrorCode.SUCCESS, jobs);
     }
 
@@ -129,13 +129,13 @@ public class JobManagerController {
         Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId));
 
         HashMap<String, Object> resultMap = new HashMap<>();
-        JobWithBLOBs jobWithBLOBs = jobManagerService.queryJobByConditions(jobId, role, partyId);
+        JobDO jobWithBLOBs = jobManagerService.queryJobByConditions(jobId, role, partyId);
 
         if (jobWithBLOBs == null) {
             return new ResponseResult<>(ErrorCode.DATABASE_ERROR_RESULT_NULL);
         }
 
-        jobWithBLOBs.setfRunIp(null);
+//        jobWithBLOBs.setfRunIp(null);
         jobWithBLOBs.setfDsl(null);
         jobWithBLOBs.setfRuntimeConf(null);
         if (jobWithBLOBs.getfStatus().equals(Dict.TIMEOUT)) {

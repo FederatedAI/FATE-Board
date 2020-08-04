@@ -583,4 +583,20 @@
             limit #{startIndex}, #{pagedJobQO.pageSize}
         </if>
     </select>
+
+
+    <select id="queryJobStatus" resultType="com.webank.ai.fate.board.pojo.JobDO">
+
+        select * from t_job where f_status in ('waiting','running') order by f_status, f_start_time desc;
+
+    </select>
+
+    <select id="queryJobByConditions"  resultType="com.webank.ai.fate.board.pojo.JobDO">
+
+        select * from t_job where f_job_id = #{jobId} and f_role = #{role} and f_party_id =#{partyId];
+
+    </select>
+
+
+
 </mapper>

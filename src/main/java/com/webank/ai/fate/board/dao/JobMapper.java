@@ -56,4 +56,8 @@ public interface JobMapper {
     long countJob(PagedJobQO pagedJobQO);
 
     List<JobWithBLOBs> queryPagedJobs(@Param("pagedJobQO") PagedJobQO pagedJobQO, @Param("startIndex") long startIndex);
+
+    List<JobDO> queryJobStatus();
+
+    JobDO queryJobByConditions(@Param("jobId") String jobId, @Param("role") String role, @Param("partyId") String partyId);
 }
