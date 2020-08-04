@@ -73,26 +73,29 @@ public class JobManagerService {
     }
 
 
-    public List<Job> queryJobStatus() {
+    public List<JobDO> queryJobStatus() {
 
-        JobExample jobExample = new JobExample();
+//        JobExample jobExample = new JobExample();
+//
+//        JobExample.Criteria criteria = jobExample.createCriteria();
+//
+//        ArrayList<String> stringArrayList = new ArrayList<String>();
+//
+//        stringArrayList.add("waiting");
+//
+//        stringArrayList.add("running");
+//
+//        criteria.andFStatusIn(stringArrayList);
+//
+//        jobExample.setOrderByClause("f_status, f_start_time desc");
+//        List<Job> jobs = jobMapper.selectByExample(jobExample);
+//        for (Job job : jobs) {
+//            job.setfRunIp(null);
+//        }
+//        return jobs;
 
-        JobExample.Criteria criteria = jobExample.createCriteria();
-
-        ArrayList<String> stringArrayList = new ArrayList<String>();
-
-        stringArrayList.add("waiting");
-
-        stringArrayList.add("running");
-
-        criteria.andFStatusIn(stringArrayList);
-
-        jobExample.setOrderByClause("f_status, f_start_time desc");
-        List<Job> jobs = jobMapper.selectByExample(jobExample);
-        for (Job job : jobs) {
-            job.setfRunIp(null);
-        }
-        return jobs;
+        List<JobDO> jobDOS = jobMapper.queryJobStatus();
+        return jobDOS;
 
     }
 
@@ -110,27 +113,30 @@ public class JobManagerService {
     }
 
 
-    public JobWithBLOBs queryJobByConditions(String jobId, String role, String partyId) {
+    public JobDO queryJobByConditions(String jobId, String role, String partyId) {
 
-        JobExample jobExample = new JobExample();
+//        JobExample jobExample = new JobExample();
+//
+//        JobExample.Criteria criteria = jobExample.createCriteria();
+//
+//        criteria.andFJobIdEqualTo(jobId);
+//
+//        criteria.andFRoleEqualTo(role);
+//
+//        criteria.andFPartyIdEqualTo(partyId);
+//
+//        List<JobWithBLOBs> jobWithBLOBsList = jobMapper.selectByExampleWithBLOBs(jobExample);
+//
+//        if (jobWithBLOBsList.size() != 0) {
+//            JobWithBLOBs jobWithBLOBs = jobWithBLOBsList.get(0);
+////            jobWithBLOBs.setfRunIp(null);
+//            return jobWithBLOBs;
+//        } else {
+//            return null;
+//        }
 
-        JobExample.Criteria criteria = jobExample.createCriteria();
-
-        criteria.andFJobIdEqualTo(jobId);
-
-        criteria.andFRoleEqualTo(role);
-
-        criteria.andFPartyIdEqualTo(partyId);
-
-        List<JobWithBLOBs> jobWithBLOBsList = jobMapper.selectByExampleWithBLOBs(jobExample);
-
-        if (jobWithBLOBsList.size() != 0) {
-            JobWithBLOBs jobWithBLOBs = jobWithBLOBsList.get(0);
-//            jobWithBLOBs.setfRunIp(null);
-            return jobWithBLOBs;
-        } else {
-            return null;
-        }
+        JobDO jobDO = jobMapper.queryJobByConditions(jobId, role, partyId);
+        return jobDO;
     }
 
 
