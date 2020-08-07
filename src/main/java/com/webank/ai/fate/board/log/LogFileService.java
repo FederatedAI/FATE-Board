@@ -297,12 +297,12 @@ public class LogFileService {
         return results;
     }
 
-    public Channel getRemoteLogStream(String jobId, String componentId, String role, String partyId, String cmd) throws Exception {
-        JobTaskInfo jobTaskInfo = this.getJobTaskInfo(jobId, componentId, role, partyId);
-        Preconditions.checkArgument(StringUtils.isNotEmpty(jobTaskInfo.ip), "remote ip is null");
-        SshInfo sshInfo = this.sshService.getSSHInfo(jobTaskInfo.ip);
-        return getRemoteLogStream(sshInfo, cmd);
-    }
+//    public Channel getRemoteLogStream(String jobId, String componentId, String role, String partyId, String cmd) throws Exception {
+//        JobTaskInfo jobTaskInfo = this.getJobTaskInfo(jobId, componentId, role, partyId);
+//        Preconditions.checkArgument(StringUtils.isNotEmpty(jobTaskInfo.ip), "remote ip is null");
+//        SshInfo sshInfo = this.sshService.getSSHInfo(jobTaskInfo.ip);
+//        return getRemoteLogStream(sshInfo, cmd);
+//    }
 
     public Channel getRemoteLogStream(SshInfo sshInfo, String cmd) throws Exception {
         Preconditions.checkArgument(sshInfo != null, "remote ssh info is null");
@@ -312,12 +312,12 @@ public class LogFileService {
         return channel;
     }
 
-    public Channel getRemoteLogStream(String jobId, String componentId, String type, String role, String partyId, int endNum) throws Exception {
-        String filePath = this.buildFilePath(jobId, componentId, type, role, partyId);
-        String cmd = this.buildCommand(endNum, filePath);
-        Channel channel = getRemoteLogStream(jobId, componentId, role, partyId, cmd);
-        return channel;
-    }
+//    public Channel getRemoteLogStream(String jobId, String componentId, String type, String role, String partyId, int endNum) throws Exception {
+//        String filePath = this.buildFilePath(jobId, componentId, type, role, partyId);
+//        String cmd = this.buildCommand(endNum, filePath);
+//        Channel channel = getRemoteLogStream(jobId, componentId, role, partyId, cmd);
+//        return channel;
+//    }
 
     public String buildCommand(int endNum, String filePath) {
         Preconditions.checkArgument(filePath != null && !filePath.equals(""));
@@ -325,52 +325,56 @@ public class LogFileService {
         return command;
     }
 
-    public JobTaskInfo getJobTaskInfo(String jobId, String componentId, String role, String partyId) {
-
-        JobTaskInfo jobTaskInfo = new JobTaskInfo();
-
-        jobTaskInfo.jobId = jobId;
-
-        jobTaskInfo.componentId = componentId;
-
-        JobDO jobWithBLOBs = jobManagerService.queryJobByConditions(jobId, role, partyId);
-
-        Preconditions.checkArgument(jobWithBLOBs != null, "job info " + jobId + " is not exist");
-
-//        String ip = jobWithBLOBs.getfRunIp();
-        Preconditions.checkArgument(StringUtils.isNoneEmpty(ip));
-        String[] splits = ip.split(":");
-        ip = splits[0];
-
-        jobTaskInfo.jobStatus = jobWithBLOBs.getfStatus();
-
-        if (componentId != null && !componentId.equals(DEFAULT_COMPONENT_ID) && !componentId.equals("fateFlow")) {
-
-            TaskExample taskExample = new TaskExample();
-
-            taskExample.createCriteria().andFJobIdEqualTo(jobId).andFComponentNameEqualTo(componentId).andFRoleEqualTo(role).andFPartyIdEqualTo(partyId);
-
-            List<Task> tasks = taskMapper.selectByExample(taskExample);
-
-            Preconditions.checkArgument(tasks != null && tasks.size() > 0, "task info " + jobId + "," + componentId + " is not exist");
-
-            Task task = tasks.get(0);
-
-            ip = task.getfRunIp();
-            logger.info("task ip:{}", ip);
-
-            jobTaskInfo.taskStatus = task.getfStatus();
-
-        }
-        logger.info("ssh ip:{}", ip);
-        jobTaskInfo.ip = ip;
-        return jobTaskInfo;
-    }
+//    public JobTaskInfo getJobTaskInfo(String jobId, String componentId, String role, String partyId) {
+//
+//        JobTaskInfo jobTaskInfo = new JobTaskInfo();
+//
+//        jobTaskInfo.jobId = jobId;
+//
+//        jobTaskInfo.componentId = componentId;
+//
+//        JobDO jobWithBLOBs = jobManagerService.queryJobByConditions(jobId, role, partyId);
+//
+//        Preconditions.checkArgument(jobWithBLOBs != null, "job info " + jobId + " is not exist");
+//
+////        String ip = jobWithBLOBs.getfRunIp();
+//        Preconditions.checkArgument(StringUtils.isNoneEmpty(ip));
+//        String[] splits = ip.split(":");
+//        ip = splits[0];
+//
+//        jobTaskInfo.jobStatus = jobWithBLOBs.getfStatus();
+//
+//        if (componentId != null && !componentId.equals(DEFAULT_COMPONENT_ID) && !componentId.equals("fateFlow")) {
+//
+//            TaskExample taskExample = new TaskExample();
+//
+//            taskExample.createCriteria().andFJobIdEqualTo(jobId).andFComponentNameEqualTo(componentId).andFRoleEqualTo(role).andFPartyIdEqualTo(partyId);
+//
+//            List<Task> tasks = taskMapper.selectByExample(taskExample);
+//
+//            Preconditions.checkArgument(tasks != null && tasks.size() > 0, "task info " + jobId + "," + componentId + " is not exist");
+//
+//            Task task = tasks.get(0);
+//
+//            ip = task.getfRunIp();
+//            logger.info("task ip:{}", ip);
+//
+//            jobTaskInfo.taskStatus = task.getfStatus();
+//
+//        }
+//        logger.info("ssh ip:{}", ip);
+//        jobTaskInfo.ip = ip;
+//        return jobTaskInfo;
+//    }
 
     public String getJobIp(String jobId, String role, String partyId) {
         JobDO jobWithBLOBs = jobManagerService.queryJobByConditions(jobId, role, partyId);
         Preconditions.checkArgument(jobWithBLOBs != null, "job " + jobId + "-" + role + "-" + partyId + "  does not exist");
-        String ips = jobWithBLOBs.getfRunIp();
+
+        //todo
+//        String ips = jobWithBLOBs.getfRunIp();
+        String ips = "127.0.0.1";
+
         Preconditions.checkArgument(StringUtils.isNoneEmpty(ips));
         String[] splits = ips.split(":");
         return splits[0];
@@ -392,48 +396,48 @@ public class LogFileService {
 //        }
 //    }
 
-    public long queryFuzzyLogSize(String componentId, String jobId, String type, String role, String partyId, String condition) throws Exception {
-        String filePath = this.buildFilePath(jobId, componentId, type, role, partyId);
-        Preconditions.checkArgument(StringUtils.isNoneEmpty(condition, filePath));
-        long size;
-        if (LogFileService.checkFileIsExist(filePath)) {
-            String[] cmd = {"sh", "-c", "grep -c " + condition + " " + filePath};
-            Process process = Runtime.getRuntime().exec(cmd);
-            InputStream inputStream = process.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            try {
-                String content = reader.readLine();
-                size = Long.parseLong(content);
-                logger.info("execute  cmd : {} ----result : {}", (Object) cmd, content);
-            } finally {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    process.destroyForcibly();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            return size;
-        } else {
-            String ip = this.getJobTaskInfo(jobId, componentId, role, partyId).ip;
-            if (StringUtils.isEmpty(ip)) {
-                return 0;
-            }
-            this.checkSshInfo(ip);
-            size = this.getRemoteFuzzyLogSize(filePath, ip, condition);
-            return size;
-
-        }
-    }
+//    public long queryFuzzyLogSize(String componentId, String jobId, String type, String role, String partyId, String condition) throws Exception {
+//        String filePath = this.buildFilePath(jobId, componentId, type, role, partyId);
+//        Preconditions.checkArgument(StringUtils.isNoneEmpty(condition, filePath));
+//        long size;
+//        if (LogFileService.checkFileIsExist(filePath)) {
+//            String[] cmd = {"sh", "-c", "grep -c " + condition + " " + filePath};
+//            Process process = Runtime.getRuntime().exec(cmd);
+//            InputStream inputStream = process.getInputStream();
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+//            try {
+//                String content = reader.readLine();
+//                size = Long.parseLong(content);
+//                logger.info("execute  cmd : {} ----result : {}", (Object) cmd, content);
+//            } finally {
+//                try {
+//                    reader.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                try {
+//                    inputStream.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                try {
+//                    process.destroyForcibly();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            return size;
+//        } else {
+//            String ip = this.getJobTaskInfo(jobId, componentId, role, partyId).ip;
+//            if (StringUtils.isEmpty(ip)) {
+//                return 0;
+//            }
+//            this.checkSshInfo(ip);
+//            size = this.getRemoteFuzzyLogSize(filePath, ip, condition);
+//            return size;
+//
+//        }
+//    }
 
     private long getRemoteFuzzyLogSize(String filePath, String ip, String condition) throws Exception {
         SshInfo sshInfo = this.sshService.getSSHInfo(ip);

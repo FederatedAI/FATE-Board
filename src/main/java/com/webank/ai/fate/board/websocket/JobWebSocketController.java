@@ -25,6 +25,7 @@ import com.webank.ai.fate.board.controller.JobManagerController;
 import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.log.LogFileService;
 import com.webank.ai.fate.board.pojo.Job;
+import com.webank.ai.fate.board.pojo.JobDO;
 import com.webank.ai.fate.board.services.JobManagerService;
 import com.webank.ai.fate.board.global.Dict;
 import org.slf4j.Logger;
@@ -68,11 +69,6 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
 
     private static ThreadPoolTaskExecutor asyncServiceExecutor;
 
-//    private static ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
-//    static {
-//        executorService.scheduleAtFixedRate(JobWebSocketController::schedule, 1000, 1000, TimeUnit.MILLISECONDS);
-//    }
 
     /**
      * call method when building connection
@@ -84,6 +80,7 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
             String jobKey = jobId + ":" + role + ":" + partyId;
             JobWebSocketController.jobSessionMap.put(session, jobKey);
             logger.info("websocket job id {} open ,session {},session size{}", jobKey, session, jobSessionMap.size());
+            logger.warn("session to join:{}",session);
         } else {
             logger.error("websocket input parameter error: jobId {},role {},partyId {}", jobId, role, partyId);
         }
@@ -118,26 +115,20 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
         logger.error("there is a error in websocket connection!", error);
         jobSessionMap.remove(session);
         sessionPushMap.remove(session);
-//        try {
-//            session.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            logger.error("session {} close error~", session);
-//        } finally {
-//            jobSessionMap.remove(session);
-//            sessionPushMap.remove(session);
-//        }
+
+
     }
 
     @Scheduled(cron = "*/1 * * * * ? ")
     private static void schedule() {
         long start = System.currentTimeMillis();
         logger.info("job schedule start");
-        logger.debug("job process schedule start,session map size {}", jobSessionMap.size());
+        logger.warn("job process schedule start,session map size {}", jobSessionMap.size());
 
         //get job map to push
         Map<String, Set<Session>> jobMaps = Maps.newHashMap();
         JobWebSocketController.jobSessionMap.forEach((session, job) -> {
+            logger.warn("session in map :{}",session);
             Set<Session> sessions = jobMaps.get(job);
             if (sessions == null) {
                 sessions = new HashSet<>();
@@ -156,7 +147,7 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
                         String jobId = args[0];
                         String role = args[1];
                         Integer partyId = new Integer(args[2]);
-                        Job job = jobManagerService.queryJobByConditions(args[0], args[1], args[2]);
+                        JobDO job = jobManagerService.queryJobByConditions(args[0], args[1], args[2]);
                         if (job != null) {
                             HashMap<String, Object> flushToWebData = new HashMap<>(16);
                             //get process
