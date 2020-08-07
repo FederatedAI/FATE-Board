@@ -61,16 +61,16 @@ public class JobManagerService {
     @Autowired
     ThreadPoolTaskExecutor asyncServiceExecutor;
 
-    public long count() {
+//    public long count() {
+//
+//        JobExample jobExample = new JobExample();
+//        return jobMapper.countByExample(jobExample);
+//    }
 
-        JobExample jobExample = new JobExample();
-        return jobMapper.countByExample(jobExample);
-    }
-
-    public List<JobWithBLOBs> queryJobByPage(long startIndex, long pageSize) {
-        List<JobWithBLOBs> jobWithBLOBs = jobMapper.selectByPage(startIndex, pageSize);
-        return jobWithBLOBs;
-    }
+//    public List<JobWithBLOBs> queryJobByPage(long startIndex, long pageSize) {
+//        List<JobWithBLOBs> jobWithBLOBs = jobMapper.selectByPage(startIndex, pageSize);
+//        return jobWithBLOBs;
+//    }
 
 
     public List<JobDO> queryJobStatus() {
@@ -100,17 +100,17 @@ public class JobManagerService {
     }
 
 
-    public List<JobWithBLOBs> queryJob() {
-
-        JobExample jobExample = new JobExample();
-
-        jobExample.setOrderByClause("f_start_time desc");
-
-        List<JobWithBLOBs> jobWithBLOBsList = jobMapper.selectByExampleWithBLOBs(jobExample);
-
-        return jobWithBLOBsList;
-
-    }
+//    public List<JobWithBLOBs> queryJob() {
+//
+//        JobExample jobExample = new JobExample();
+//
+//        jobExample.setOrderByClause("f_start_time desc");
+//
+//        List<JobWithBLOBs> jobWithBLOBsList = jobMapper.selectByExampleWithBLOBs(jobExample);
+//
+//        return jobWithBLOBsList;
+//
+//    }
 
 
     public JobDO queryJobByConditions(String jobId, String role, String partyId) {
@@ -140,113 +140,113 @@ public class JobManagerService {
     }
 
 
-    public List<JobWithBLOBs> queryPagedJobsByCondition(long startIndex, long pageSize, Object orderField, String orderType, String jobId) {
-        String order = orderField + " " + orderType;
-        String limit = startIndex + "," + pageSize;
-
-        JobExample jobExample = new JobExample();
-        jobExample.setOrderByClause(order);
-        jobExample.setLimitClause(limit);
-        if (jobId != null) {
-            JobExample.Criteria criteria = jobExample.createCriteria();
-            jobId = "%" + jobId + "%";
-            criteria.andFJobIdLike(jobId);
-
-        }
-        List<JobWithBLOBs> jobWithBLOBs = jobMapper.selectByExampleWithBLOBs(jobExample);
-
-        return jobWithBLOBs;
-    }
-
-    public List<JobWithBLOBs> queryPageByCondition(String jobId,
-                                                   List<String> roles,
-                                                   String partyId,
-                                                   List<String> jobStatus,
-                                                   String startTime,
-                                                   String endTime,
-                                                   long startIndex,
-                                                   long pageSize) {
-        JobExample jobExample = new JobExample();
-        JobExample.Criteria criteria = jobExample.createCriteria();
-        logger.info("start create criteria");
-
-        if (!(jobId == null || jobId.equals(""))) {
-            jobId = "%" + jobId + "%";
-            criteria.andFJobIdLike(jobId);
-            logger.info("add jobid " + jobId);
-        }
-        if (!(partyId == null || partyId.equals(""))) {
-
-            partyId = "%" + partyId + "%";
-            criteria.andFPartyIdLike(partyId);
-            logger.info("add partyid " + partyId);
-        }
-        if (!(roles == null || roles.size() == 0)) {
-
-            criteria.andFRoleIn(roles);
-            logger.info("add roles " + roles);
-        }
-
-        if (!(jobStatus == null || jobStatus.size() == 0)) {
-
-            criteria.andFStatusIn(jobStatus);
-            logger.info("add status" + jobStatus);
-        }
-
-        if (!(startTime == null || startTime.equals(""))) {
-            String order = Dict.FIELD_START_TIME + " " + startTime;
-            jobExample.setOrderByClause(order);
-            logger.info("add start" + order);
-        }
-
-        if (!(endTime == null || endTime.equals(""))) {
-            String order = Dict.FILED_END_TIME + " " + endTime;
-            jobExample.setOrderByClause(order);
-            logger.warn("add end" + order);
-        }
-        String limit = startIndex + "," + pageSize;
-        jobExample.setLimitClause(limit);
-        List<JobWithBLOBs> jobWithBLOBs = jobMapper.selectByExampleWithBLOBs(jobExample);
-//        for (JobWithBLOBs jobWithBLOB : jobWithBLOBs) {
-//            jobWithBLOB.setfRunIp(null);
+//    public List<JobWithBLOBs> queryPagedJobsByCondition(long startIndex, long pageSize, Object orderField, String orderType, String jobId) {
+//        String order = orderField + " " + orderType;
+//        String limit = startIndex + "," + pageSize;
+//
+//        JobExample jobExample = new JobExample();
+//        jobExample.setOrderByClause(order);
+//        jobExample.setLimitClause(limit);
+//        if (jobId != null) {
+//            JobExample.Criteria criteria = jobExample.createCriteria();
+//            jobId = "%" + jobId + "%";
+//            criteria.andFJobIdLike(jobId);
+//
 //        }
+//        List<JobWithBLOBs> jobWithBLOBs = jobMapper.selectByExampleWithBLOBs(jobExample);
+//
+//        return jobWithBLOBs;
+//    }
 
-        return jobWithBLOBs;
+//    public List<JobWithBLOBs> queryPageByCondition(String jobId,
+//                                                   List<String> roles,
+//                                                   String partyId,
+//                                                   List<String> jobStatus,
+//                                                   String startTime,
+//                                                   String endTime,
+//                                                   long startIndex,
+//                                                   long pageSize) {
+//        JobExample jobExample = new JobExample();
+//        JobExample.Criteria criteria = jobExample.createCriteria();
+//        logger.info("start create criteria");
+//
+//        if (!(jobId == null || jobId.equals(""))) {
+//            jobId = "%" + jobId + "%";
+//            criteria.andFJobIdLike(jobId);
+//            logger.info("add jobid " + jobId);
+//        }
+//        if (!(partyId == null || partyId.equals(""))) {
+//
+//            partyId = "%" + partyId + "%";
+//            criteria.andFPartyIdLike(partyId);
+//            logger.info("add partyid " + partyId);
+//        }
+//        if (!(roles == null || roles.size() == 0)) {
+//
+//            criteria.andFRoleIn(roles);
+//            logger.info("add roles " + roles);
+//        }
+//
+//        if (!(jobStatus == null || jobStatus.size() == 0)) {
+//
+//            criteria.andFStatusIn(jobStatus);
+//            logger.info("add status" + jobStatus);
+//        }
+//
+//        if (!(startTime == null || startTime.equals(""))) {
+//            String order = Dict.FIELD_START_TIME + " " + startTime;
+//            jobExample.setOrderByClause(order);
+//            logger.info("add start" + order);
+//        }
+//
+//        if (!(endTime == null || endTime.equals(""))) {
+//            String order = Dict.FILED_END_TIME + " " + endTime;
+//            jobExample.setOrderByClause(order);
+//            logger.warn("add end" + order);
+//        }
+//        String limit = startIndex + "," + pageSize;
+//        jobExample.setLimitClause(limit);
+//        List<JobWithBLOBs> jobWithBLOBs = jobMapper.selectByExampleWithBLOBs(jobExample);
+////        for (JobWithBLOBs jobWithBLOB : jobWithBLOBs) {
+////            jobWithBLOB.setfRunIp(null);
+////        }
+//
+//        return jobWithBLOBs;
+//
+//    }
 
-    }
-
-    public long totalCount(String jobId,
-                           List<String> roles,
-                           String partyId,
-                           List<String> jobStatus
-    ) {
-
-        JobExample jobExample = new JobExample();
-        JobExample.Criteria criteria = jobExample.createCriteria();
-
-        if (!(jobId == null || jobId.equals(""))) {
-            jobId = "%" + jobId + "%";
-            criteria.andFJobIdLike(jobId);
-            logger.info("jobid ok");
-        }
-
-        if (!(partyId == null || partyId.equals(""))) {
-            partyId = "%" + partyId + "%";
-            criteria.andFPartyIdLike(partyId);
-            logger.info("partyid ok");
-        }
-
-        if (!(roles == null || roles.size() == 0)) {
-            criteria.andFRoleIn(roles);
-            logger.info("role ok");
-        }
-        if (!(jobStatus == null || jobStatus.size() == 0)) {
-            criteria.andFStatusIn(jobStatus);
-            logger.info("status ok");
-        }
-
-        return jobMapper.countByExample(jobExample);
-    }
+//    public long totalCount(String jobId,
+//                           List<String> roles,
+//                           String partyId,
+//                           List<String> jobStatus
+//    ) {
+//
+//        JobExample jobExample = new JobExample();
+//        JobExample.Criteria criteria = jobExample.createCriteria();
+//
+//        if (!(jobId == null || jobId.equals(""))) {
+//            jobId = "%" + jobId + "%";
+//            criteria.andFJobIdLike(jobId);
+//            logger.info("jobid ok");
+//        }
+//
+//        if (!(partyId == null || partyId.equals(""))) {
+//            partyId = "%" + partyId + "%";
+//            criteria.andFPartyIdLike(partyId);
+//            logger.info("partyid ok");
+//        }
+//
+//        if (!(roles == null || roles.size() == 0)) {
+//            criteria.andFRoleIn(roles);
+//            logger.info("role ok");
+//        }
+//        if (!(jobStatus == null || jobStatus.size() == 0)) {
+//            criteria.andFStatusIn(jobStatus);
+//            logger.info("status ok");
+//        }
+//
+//        return jobMapper.countByExample(jobExample);
+//    }
 
     public PageBean<Map<String, Object>> queryPagedJobs(PagedJobQO pagedJobQO) {
         if (pagedJobQO.getJobId() != null && 0 != pagedJobQO.getJobId().trim().length()) {
@@ -264,10 +264,10 @@ public class JobManagerService {
         long jobSum = this.countJob(pagedJobQO);
         PageBean<Map<String, Object>> listPageBean = new PageBean<>(pagedJobQO.getPageNum(), pagedJobQO.getPageSize(), jobSum);
         long startIndex = listPageBean.getStartIndex();
-        List<JobWithBLOBs> jobWithBLOBs = jobMapper.queryPagedJobs(pagedJobQO, startIndex);
+        List<JobDO> jobWithBLOBs = jobMapper.queryPagedJobs(pagedJobQO, startIndex);
         LinkedList<Map<String, Object>> jobList = new LinkedList<>();
-        Map<JobWithBLOBs, Future> jobDataMap = new LinkedHashMap<>();
-        for (JobWithBLOBs jobWithBLOB : jobWithBLOBs) {
+        Map<JobDO, Future> jobDataMap = new LinkedHashMap<>();
+        for (JobDO jobWithBLOB : jobWithBLOBs) {
             ListenableFuture<?> future = ThreadPoolTaskExecutorUtil.submitListenable(this.asyncServiceExecutor, (Callable<JSONObject>) () -> {
                 String jobId1 = jobWithBLOB.getfJobId();
                 String role1 = jobWithBLOB.getfRole();
@@ -284,7 +284,7 @@ public class JobManagerService {
 
                 return data;
             }, new int[]{500, 1000}, new int[]{3, 3});
-            jobWithBLOB.setfRunIp(null);
+//            jobWithBLOB.setfRunIp(null);
             jobWithBLOB.setfDsl(null);
             jobWithBLOB.setfRuntimeConf(null);
             jobDataMap.put(jobWithBLOB, future);

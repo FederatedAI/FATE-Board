@@ -174,15 +174,14 @@ public class JobManagerController {
     }
 
 
-    @RequestMapping(value = "/query/totalrecord", method = RequestMethod.GET)
-    public ResponseResult queryTotalRecord() {
-        long count = jobManagerService.count();
-        return new ResponseResult<>(ErrorCode.SUCCESS, count);
-    }
+//    @RequestMapping(value = "/query/totalrecord", method = RequestMethod.GET)
+//    public ResponseResult queryTotalRecord() {
+//        long count = jobManagerService.count();
+//        return new ResponseResult<>(ErrorCode.SUCCESS, count);
+//    }
 
     @RequestMapping(value = "/query/page/new", method = RequestMethod.POST)
     public ResponseResult<PageBean<Map<String, Object>>> queryPagedJob(@RequestBody PagedJobQO pagedJobQO) {
-
         List<String> roles = pagedJobQO.getRole();
         List<String> status = pagedJobQO.getStatus();
         if (roles != null) {

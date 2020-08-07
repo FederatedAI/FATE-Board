@@ -216,7 +216,7 @@ public class JobDetailController {
             for (Object o : components_list) {
                 HashMap<String, Object> component = new HashMap<>();
                 component.put(Dict.COMPONENT_NAME, o);
-                Task task = taskManagerService.findTask(jobQueryDTO.getJob_id(), jobQueryDTO.getRole(), (String) o);
+                TaskDO task = taskManagerService.findTask(jobQueryDTO.getJob_id(), jobQueryDTO.getRole(),jobQueryDTO.getParty_id(), (String) o);
                 String taskStatus = null;
                 Long createTime = null;
                 if (task != null) {
@@ -270,7 +270,7 @@ public class JobDetailController {
             for (Object o : components_list) {
                 HashMap<String, Object> component = new HashMap<>();
                 component.put(Dict.COMPONENT_NAME, o);
-                Task task = taskManagerService.findTask(jobId, role, (String) o);
+                TaskDO task = taskManagerService.findTask(jobId, role,partyId, (String) o);
                 String taskStatus = null;
                 Long createTime = null;
                 if (task != null) {
