@@ -105,22 +105,26 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
             File file = new File(logPath);
             if (file.exists()) {
 
-                String[] cmd = {"sh", "-c", "grep -n " + "'.'" + " " + logPath + " | tail -n +" + begin + " | head -n " + (end - begin + 1)};
+//                String[] cmd = {"sh", "-c", "grep -n " + "'.'" + " " + logPath + " | tail -n +" + begin + " | head -n " + (end - begin + 1)};
+                String[] cmd = {"sh", "-c", "tail -n +" + begin + " " + logPath + " | head -n " + (end - begin + 1)};
 
                 Process process = Runtime.getRuntime().exec(cmd);
                 InputStream inputStream = process.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 try {
                     String content = null;
+                    int lineNumber = begin;
                     do {
                         content = reader.readLine();
                         if (content != null) {
-                            int i = content.indexOf(":");
-                            String lineNumber = content.substring(0, i);
-                            String lineContent = content.substring(i + 1);
+//                            int i = content.indexOf(":");
+//                            String lineNumber = content.substring(0, i);
+//                            String lineContent = content.substring(i + 1);
+
                             //replace sensitive information
-                            String finalLog = LogHandle.handleLog(lineContent);
-                            logResults.add(LogFileService.toLogMap(finalLog, Long.parseLong(lineNumber)));
+                            String finalLog = LogHandle.handleLog(content);
+                            logResults.add(LogFileService.toLogMap(finalLog, lineNumber));
+                            lineNumber++;
                         }
                     } while (content != null);
                     logger.info("execute  cmd : {} ", (Object) cmd);
@@ -151,22 +155,25 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
                     if (sshInfo != null) {
                         com.jcraft.jsch.Session jschSession = sshService.connect(sshInfo);
 
-                        String cmd = "grep -n " + "'.'" + " " + logPath + " | tail -n +" + begin + " | head -n " + (end - begin + 1);
+//                        String cmd = "grep -n " + "'.'" + " " + logPath + " | tail -n +" + begin + " | head -n " + (end - begin + 1);
+                        String cmd = "tail -n +" + begin + " " + logPath + " | head -n " + (end - begin + 1);
                         Channel channel = sshService.executeCmd(jschSession, cmd);
 
                         InputStream inputStream = channel.getInputStream();
                         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                         try {
                             String content;
+                            int lineNumber = begin;
                             do {
                                 content = reader.readLine();
                                 if (content != null) {
-                                    int i = content.indexOf(":");
-                                    String lineNumber = content.substring(0, i);
-                                    String lineContent = content.substring(i + 1);
+//                                    int i = content.indexOf(":");
+//                                    String lineNumber = content.substring(0, i);
+//                                    String lineContent = content.substring(i + 1);
                                     //replace sensitive information
-                                    String finalLog = LogHandle.handleLog(lineContent);
-                                    logResults.add(LogFileService.toLogMap(finalLog, Long.parseLong(lineNumber)));
+                                    String finalLog = LogHandle.handleLog(content);
+                                    logResults.add(LogFileService.toLogMap(finalLog, lineNumber));
+                                    lineNumber++;
                                 }
                             } while (content != null);
                         } finally {

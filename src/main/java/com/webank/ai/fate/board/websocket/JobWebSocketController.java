@@ -28,6 +28,7 @@ import com.webank.ai.fate.board.pojo.Job;
 import com.webank.ai.fate.board.pojo.JobDO;
 import com.webank.ai.fate.board.services.JobManagerService;
 import com.webank.ai.fate.board.global.Dict;
+import com.webank.ai.fate.board.services.JobWebSocketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -77,10 +78,15 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
     public void onOpen(Session session, @PathParam("jobId") String jobId, @PathParam("role") String role, @PathParam("partyId") Integer partyId) {
         //check parameters
         if (LogFileService.checkPathParameters(jobId, role, String.valueOf(partyId))) {
-            String jobKey = jobId + ":" + role + ":" + partyId;
-            JobWebSocketController.jobSessionMap.put(session, jobKey);
-            logger.info("websocket job id {} open ,session {},session size{}", jobKey, session, jobSessionMap.size());
-            logger.warn("session to join:{}",session);
+//            String jobKey = jobId + ":" + role + ":" + partyId;
+//            JobWebSocketController.jobSessionMap.put(session, jobKey);
+//            logger.info("websocket job id {} open ,session {},session size{}", jobKey, session, jobSessionMap.size());
+            logger.warn("session to join:{}", session);
+
+            JobWebSocketService jobWebSocketService = new JobWebSocketService(session, jobId, role, partyId, jobDetailController, jobManagerController, jobManagerService, asyncServiceExecutor, false);
+            new Thread(jobWebSocketService).start();
+
+
         } else {
             logger.error("websocket input parameter error: jobId {},role {},partyId {}", jobId, role, partyId);
         }
@@ -92,8 +98,8 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
     @OnClose
     public void onClose(Session session) {
         logger.info("websocket session {} closed", session);
-        jobSessionMap.remove(session);
-        sessionPushMap.remove(session);
+//        jobSessionMap.remove(session);
+//        sessionPushMap.remove(session);
     }
 
     /**
@@ -103,7 +109,7 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
      */
     @OnMessage
     public void onMessage(String message, Session session) {
-        schedule();
+//        schedule();
     }
 
     /**
@@ -113,22 +119,21 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
     @OnError
     public void onError(Session session, Throwable error) {
         logger.error("there is a error in websocket connection!", error);
-        jobSessionMap.remove(session);
-        sessionPushMap.remove(session);
+//        jobSessionMap.remove(session);
+//        sessionPushMap.remove(session);
 
 
     }
 
-    @Scheduled(cron = "*/1 * * * * ? ")
+    //    @Scheduled(cron = "*/1 * * * * ? ")
     private static void schedule() {
         long start = System.currentTimeMillis();
-        logger.info("job schedule start");
         logger.warn("job process schedule start,session map size {}", jobSessionMap.size());
 
         //get job map to push
         Map<String, Set<Session>> jobMaps = Maps.newHashMap();
         JobWebSocketController.jobSessionMap.forEach((session, job) -> {
-            logger.warn("session in map :{}",session);
+//            logger.warn("session in map :{}",session);
             Set<Session> sessions = jobMaps.get(job);
             if (sessions == null) {
                 sessions = new HashSet<>();
@@ -210,6 +215,8 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
                                 logger.error("GET JOB SUMMARY ERROR", e);
                                 flushToWebData.put(Dict.SUMMARY_DATA, null);
                             }
+//                            logger.warn("summary:{}",flushToWebData.get(Dict.SUMMARY_DATA));
+
 
                             //send job information to sessions
                             v.forEach(session -> {
@@ -220,17 +227,17 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
                                             dependency.remove("component_module");
                                             dependency.remove("component_need_run");
                                             dependency.remove("dependencies");
-                                            logger.warn("summary:{}", flushToWebData.get(Dict.SUMMARY_DATA));
+//                                            logger.warn("summary:{}", flushToWebData.get(Dict.SUMMARY_DATA));
                                             Map<String, Object> summary = (Map<String, Object>) flushToWebData.get(Dict.SUMMARY_DATA);
                                             summary.remove("dataset");
                                         }
 
                                         session.getBasicRemote().sendText(JSON.toJSONString(flushToWebData));
-                                        logger.info("session:{}, data to push:{}", session, JSON.toJSONString(flushToWebData));
+                                        logger.warn("session:{}, data to push:{}", session, JSON.toJSONString(flushToWebData));
 
-                                        if (flushToWebData.get(Dict.DEPENDENCY_DATA) != null && flushToWebData.get(Dict.SUMMARY_DATA) != null && sessionPushMap.get(session) == null) {
-                                            sessionPushMap.put(session, true);
-                                        }
+//                                        if (flushToWebData.get(Dict.DEPENDENCY_DATA) != null && flushToWebData.get(Dict.SUMMARY_DATA) != null && sessionPushMap.get(session) == null) {
+                                        sessionPushMap.put(session, true);
+//                                        }
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                         logger.error("websocket send IOException", e);
@@ -241,7 +248,7 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
                                 }
                             });
 
-                            if (JobManagerService.jobFinishStatus.contains(status)) {
+                            if (Dict.JOB_FINISHED_STATUS.contains(status)) {
                                 v.forEach(session -> {
                                     jobSessionMap.remove(session);
                                     sessionPushMap.remove(session);
