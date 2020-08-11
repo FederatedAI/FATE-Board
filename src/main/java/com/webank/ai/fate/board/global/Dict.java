@@ -71,8 +71,6 @@ public class Dict {
     static public final String SSH_PASSWORD = "password";
     static public final String SSH_PORT = "port";
 
-    static public final String FIELD_START_TIME = "f_start_time";
-    static public final String FILED_END_TIME = "f_end_time";
     static public final String TIME = "time";
 
     static public final String TIMEOUT = "timeout";
@@ -97,13 +95,13 @@ public class Dict {
     static public final HashMap<String, List<String>> fieldMap = new HashMap<>();
 
     static {
-        List<String> status = Arrays.asList("success", "running", "waiting", "failed", "canceled");
+        List<String> status = Arrays.asList("complete", "running", "waiting", "failed", "canceled");
         List<String> roles = Arrays.asList("guest", "host", "arbiter", "local");
         fieldMap.put("status", status);
         fieldMap.put("role", roles);
     }
 
-    static public final List<String> JOB_FINISHED_STATUS = Arrays.asList("success", "timeout", "failed", "canceled");
+    static public final List<String> JOB_FINISHED_STATUS = Arrays.asList("complete", "timeout", "failed", "canceled");
 
     static public final List<String> ORDER_FIELDS =new ArrayList<>();
     static {
