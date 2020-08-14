@@ -151,6 +151,7 @@ public class JobWebSocketService implements Runnable {
                         session.close();
                         break;
                     }
+                    Thread.sleep(500);
 
                 } else {
                     session.getBasicRemote().sendText("this job doesn't exist");
@@ -161,6 +162,7 @@ public class JobWebSocketService implements Runnable {
 
             }
         } catch (Exception e) {
+            logger.error("web socket error",e);
             try {
                 session.getBasicRemote().sendText("this job socket has error");
             } catch (IOException ioException) {
