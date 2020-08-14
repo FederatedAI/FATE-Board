@@ -105,7 +105,7 @@ public class LogService implements Runnable {
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("thread sleep error",e);
             }
         }
     }

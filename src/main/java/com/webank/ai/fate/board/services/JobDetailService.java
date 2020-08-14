@@ -18,9 +18,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
-import static com.webank.ai.fate.board.global.ErrorCode.FATEFLOW_ERROR_CONNECTION;
 
 @Service
 public class JobDetailService {
