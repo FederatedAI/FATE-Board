@@ -108,6 +108,7 @@ public class Dict {
         ORDER_FIELDS.add("f_start_time");
         ORDER_FIELDS.add("f_end_time");
         ORDER_FIELDS.add("f_elapsed");
+        ORDER_FIELDS.add("f_job_id");
     }
 
     static public final List<String> ORDER_RULES =new ArrayList<>();
