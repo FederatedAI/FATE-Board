@@ -26,7 +26,7 @@ public class JobDO {
 
     private String fStatus;
 
-    private Long fStatusLevel;
+//    private Long fStatusLevel;
 
     private String fRole;
 
@@ -47,31 +47,6 @@ public class JobDO {
     private Long fElapsed;
 
     public JobDO() {
-    }
-
-    public JobDO(String fJobId, String fName, String fDescription, String fTag, String fDsl, String fRuntimeConf, String fTrainRuntimeConf, String fRoles, Integer fWorkMode, String fInitiatorRole, String fInitiatorPartyId, String fStatus, Long fStatusLevel, String fRole, String fPartyId, Integer fIsInitiator, Integer fProgress, Long fCreateTime, Long fUpdateTime, Long fStartTime, Long fEndTime, Long fElapsed) {
-        this.fJobId = fJobId;
-        this.fName = fName;
-        this.fDescription = fDescription;
-        this.fTag = fTag;
-        this.fDsl = fDsl;
-        this.fRuntimeConf = fRuntimeConf;
-        this.fTrainRuntimeConf = fTrainRuntimeConf;
-        this.fRoles = fRoles;
-        this.fWorkMode = fWorkMode;
-        this.fInitiatorRole = fInitiatorRole;
-        this.fInitiatorPartyId = fInitiatorPartyId;
-        this.fStatus = fStatus;
-        this.fStatusLevel = fStatusLevel;
-        this.fRole = fRole;
-        this.fPartyId = fPartyId;
-        this.fIsInitiator = fIsInitiator;
-        this.fProgress = fProgress;
-        this.fCreateTime = fCreateTime;
-        this.fUpdateTime = fUpdateTime;
-        this.fStartTime = fStartTime;
-        this.fEndTime = fEndTime;
-        this.fElapsed = fElapsed;
     }
 
     public String getfJobId() {
@@ -168,14 +143,6 @@ public class JobDO {
 
     public void setfStatus(String fStatus) {
         this.fStatus = fStatus;
-    }
-
-    public Long getfStatusLevel() {
-        return fStatusLevel;
-    }
-
-    public void setfStatusLevel(Long fStatusLevel) {
-        this.fStatusLevel = fStatusLevel;
     }
 
     public String getfRole() {
