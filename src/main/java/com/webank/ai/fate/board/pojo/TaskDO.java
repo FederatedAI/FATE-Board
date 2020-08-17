@@ -32,7 +32,7 @@ public class TaskDO implements Serializable {
 
     private String fPartyStatus;
 
-    private Long fPartyStatusLevel;
+//    private Long fPartyStatusLevel;
 
     private Long fCreateTime;
 
@@ -47,28 +47,7 @@ public class TaskDO implements Serializable {
     public TaskDO() {
     }
 
-    public TaskDO(String fJobId, Long fTaskSetId, String fComponentName, String fTaskId, Long fTaskVersion, String fInitiatorRole, String fInitiatorPartyId, String fStatus, Long fStatusLevel, String fRole, String fPartyId, String fRunIp, Integer fRunPid, String fPartyStatus, Long fPartyStatusLevel, Long fCreateTime, Long fUpdateTime, Long fStartTime, Long fEndTime, Long fElapsed) {
-        this.fJobId = fJobId;
-        this.fTaskSetId = fTaskSetId;
-        this.fComponentName = fComponentName;
-        this.fTaskId = fTaskId;
-        this.fTaskVersion = fTaskVersion;
-        this.fInitiatorRole = fInitiatorRole;
-        this.fInitiatorPartyId = fInitiatorPartyId;
-        this.fStatus = fStatus;
-        this.fStatusLevel = fStatusLevel;
-        this.fRole = fRole;
-        this.fPartyId = fPartyId;
-        this.fRunIp = fRunIp;
-        this.fRunPid = fRunPid;
-        this.fPartyStatus = fPartyStatus;
-        this.fPartyStatusLevel = fPartyStatusLevel;
-        this.fCreateTime = fCreateTime;
-        this.fUpdateTime = fUpdateTime;
-        this.fStartTime = fStartTime;
-        this.fEndTime = fEndTime;
-        this.fElapsed = fElapsed;
-    }
+
 
     public String getfJobId() {
         return fJobId;
@@ -180,14 +159,6 @@ public class TaskDO implements Serializable {
 
     public void setfPartyStatus(String fPartyStatus) {
         this.fPartyStatus = fPartyStatus;
-    }
-
-    public Long getfPartyStatusLevel() {
-        return fPartyStatusLevel;
-    }
-
-    public void setfPartyStatusLevel(Long fPartyStatusLevel) {
-        this.fPartyStatusLevel = fPartyStatusLevel;
     }
 
     public Long getfCreateTime() {
