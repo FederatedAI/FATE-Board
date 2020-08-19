@@ -253,16 +253,16 @@ public class JobManagerController {
         return new ResponseResult<>(ErrorCode.SUCCESS, fieldsMap);
     }
 
-    @RequestMapping(value = "/restart", method = RequestMethod.POST)
-    public ResponseResult restartJob(@Valid @RequestBody ComponentQueryDTO componentQueryDTO, BindingResult bindingResult) {
+    @RequestMapping(value = "/rerun", method = RequestMethod.POST)
+    public ResponseResult reRun(@Valid @RequestBody ReRunDTO reRunDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
             return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
-//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobRestartDTO.getJobId(), jobRestartDTO.getRole(), jobRestartDTO.getPartyId()), jobRestartDTO.getComponentId());
-        Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id()), componentQueryDTO.getComponent_name());
+//        Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id()), componentQueryDTO.getComponent_name());
+        Preconditions.checkArgument(LogFileService.checkPathParameters(reRunDTO.getJob_id(),  reRunDTO.getComponent_name()));
 
-        int i = jobManagerService.restartJob(componentQueryDTO);
+        int i = jobManagerService.reRun(reRunDTO);
         if (i == 0) {
             return new ResponseResult<>(ErrorCode.SUCCESS);
         } else {

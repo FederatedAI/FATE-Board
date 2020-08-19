@@ -312,13 +312,13 @@ public class JobManagerService {
         return Dict.fieldMap;
     }
 
-    public int restartJob(ComponentQueryDTO componentQueryDTO) {
-        HashMap<String, String> stringStringHashMap = new HashMap<>();
-        stringStringHashMap.put("taskId", componentQueryDTO.getJob_id() + "_" + componentQueryDTO.getComponent_name());
+    public int reRun(ReRunDTO reRunDTO) {
+//        HashMap<String, String> stringStringHashMap = new HashMap<>();
+//        stringStringHashMap.put("taskId", componentQueryDTO.getJob_id() + "_" + componentQueryDTO.getComponent_name());
 
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_RESTART, JSON.toJSONString(stringStringHashMap));
+            result = httpClientPool.post(fateUrl + Dict.URL_JOB_RERUN, JSON.toJSONString(reRunDTO));
             if (result != null) {
                 JSONObject jsonObject = JSON.parseObject(result);
                 if (0 == jsonObject.getInteger(Dict.RETCODE)) {
@@ -336,4 +336,6 @@ public class JobManagerService {
         StringBuffer command = new StringBuffer().append("flow component output-data -j ").append(componentQueryDTO.getJob_id()).append(" -r ").append(componentQueryDTO.getRole()).append(" -p ").append(componentQueryDTO.getParty_id()).append(" -cpn ").append(componentQueryDTO.getComponent_name()).append(" --output-path ").append("./");
         return command.toString();
     }
+
+
 }
