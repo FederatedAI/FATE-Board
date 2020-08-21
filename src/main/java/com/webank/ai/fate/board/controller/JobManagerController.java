@@ -253,7 +253,7 @@ public class JobManagerController {
         return new ResponseResult<>(ErrorCode.SUCCESS, fieldsMap);
     }
 
-    @RequestMapping(value = "/rerun", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/rerun", method = RequestMethod.POST)
     public ResponseResult reRun(@Valid @RequestBody ReRunDTO reRunDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
@@ -266,7 +266,7 @@ public class JobManagerController {
         if (i == 0) {
             return new ResponseResult<>(ErrorCode.SUCCESS);
         } else {
-            return new ResponseResult<>(ErrorCode.RESTART_ERROR);
+            return new ResponseResult<>(ErrorCode.RERUN_ERROR);
         }
     }
 
