@@ -33,7 +33,7 @@ public enum ErrorCode {
     SYSTEM_ERROR(10010, "System error!"),
     DOWNLOAD_ERROR(10011, "File doesn't exist!"),
     UPLOAD_ERROR(10012, "Upload error!"),
-    RESTART_ERROR(10013, "Restart job error!"),
+    RERUN_ERROR(10013, "Rerun job error!"),
     ;
 
 

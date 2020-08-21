@@ -28,7 +28,7 @@
     <select id="findTask" resultMap="BaseResultMap">
 
         select * from t_task where f_job_id = #{jobId} and f_role = #{role} and f_party_id =#{partyId} and
-        f_component_name =#{componentName};
+        f_component_name =#{componentName} order by f_task_version desc;
 
     </select>
 
