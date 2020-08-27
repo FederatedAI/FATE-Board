@@ -65,25 +65,19 @@ public class JobManagerController {
     }
 
     @RequestMapping(value = "/v1/pipeline/job/stop", method = RequestMethod.POST)
-    public ResponseResult stopJob(@Valid @RequestBody JobQueryDTO jobQueryDTO, BindingResult bindingResult) {
+    public ResponseResult stopJob(@Valid @RequestBody JobStopDTO jobStopDTO, BindingResult bindingResult) {
 
-//        JSONObject jsonObject = JSON.parseObject(param);
-//        String jobId = jsonObject.getString(Dict.JOBID);
-//        String role = jsonObject.getString(Dict.ROLE);
-//        String partyId = jsonObject.getString(Dict.PARTY_ID);
-//
-//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId));
+
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
             return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
 
-        Preconditions.checkArgument(LogFileService.checkPathParameters(jobQueryDTO.getJob_id(), jobQueryDTO.getRole(), jobQueryDTO.getParty_id()));
+        Preconditions.checkArgument(LogFileService.checkPathParameters(jobStopDTO.getJob_id()));
 
-//        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_STOP, JSON.toJSONString(jobQueryDTO));
+            result = httpClientPool.post(fateUrl + Dict.URL_JOB_STOP, JSON.toJSONString(jobStopDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
