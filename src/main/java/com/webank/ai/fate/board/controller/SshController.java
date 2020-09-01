@@ -78,17 +78,7 @@ public class SshController {
         return new ResponseResult<>(ErrorCode.SUCCESS, data);
     }
 
-//    private  Map<String, SshInfo>  getAll(){
-//
-//       return   sshService.getAllsshInfo();
-//
-//    }
 
-//    @RequestMapping(value = "/all", method = RequestMethod.GET)
-//    public ResponseResult readAll() throws Exception {
-//
-//        return new ResponseResult<Map>(ErrorCode.SUCCESS, getAll());
-//    }
 
     private String checkStatus(String ip) {
         String status = null;
@@ -131,24 +121,7 @@ public class SshController {
         return new ResponseResult(ErrorCode.SUCCESS);
     }
 
-//    @RequestMapping(value = "/ssh", method = RequestMethod.POST)
-//    public ResponseResult addProperties(@RequestBody String params) throws IOException {
-//        JSONObject jsonObject = JSON.parseObject(params);
-//        String ip = jsonObject.getString(Dict.SSH_IP);
-//        String user = jsonObject.getString(Dict.SSH_USER);
-//        String password = jsonObject.getString(Dict.SSH_PASSWORD);
-//        String port = jsonObject.getString(Dict.SSH_PORT);
-//        Preconditions.checkArgument(StringUtils.isNoneEmpty(ip, user, password, port));
-//        SshInfo sshInfo = new SshInfo();
-//        sshInfo.setPort(new Integer(port));
-//        sshInfo.setIp(ip);
-//        sshInfo.setUser(user);
-//        sshInfo.setPassword(password);
-//        sshService.addSShInfo(sshInfo);
-//        sshService.flushToFile();
-//        return new ResponseResult<Map>(ErrorCode.SUCCESS, sshService.getAllsshInfo());
-//
-//    }
+
 
 //    @RequestMapping(value = "/ssh", method = RequestMethod.POST)
     public ResponseResult addProperties(@RequestBody SshDTO sshDTO) {

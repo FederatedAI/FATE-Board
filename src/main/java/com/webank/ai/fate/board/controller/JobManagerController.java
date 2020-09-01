@@ -89,10 +89,7 @@ public class JobManagerController {
 
     @RequestMapping(value = "/tracking/job/data_view", method = RequestMethod.POST)
     public ResponseResult queryJobDataset(@Valid @RequestBody JobQueryDTO jobQueryDTO, BindingResult bindingResult) {
-//        JSONObject jsonObject = JSON.parseObject(param);
-//        String jobId = jsonObject.getString(Dict.JOBID);
-//        String role = jsonObject.getString(Dict.ROLE);
-//        String partyId = jsonObject.getString(Dict.PARTY_ID);
+
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
             return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
@@ -168,11 +165,6 @@ public class JobManagerController {
     }
 
 
-//    @RequestMapping(value = "/query/totalrecord", method = RequestMethod.GET)
-//    public ResponseResult queryTotalRecord() {
-//        long count = jobManagerService.count();
-//        return new ResponseResult<>(ErrorCode.SUCCESS, count);
-//    }
 
     @RequestMapping(value = "/query/page/new", method = RequestMethod.POST)
     public ResponseResult<PageBean<Map<String, Object>>> queryPagedJob(@RequestBody PagedJobQO pagedJobQO) {
@@ -208,13 +200,7 @@ public class JobManagerController {
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public ResponseResult updateJobById(@Valid @RequestBody UpdateNotesDTO updateNotesDTO, BindingResult bindingResult) {
 
-//        JSONObject jsonObject = JSON.parseObject(parameters);
-//        String jobId = jsonObject.getString(Dict.JOBID);
-//        String role = jsonObject.getString(Dict.ROLE);
-//        String partyId = jsonObject.getString(Dict.PARTY_ID);
-//        String notes = jsonObject.getString(Dict.NOTES);
-//
-//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, notes));
+
 
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
@@ -222,7 +208,7 @@ public class JobManagerController {
         }
 
         Preconditions.checkArgument(LogFileService.checkPathParameters(updateNotesDTO.getJob_id(), updateNotesDTO.getRole(), updateNotesDTO.getParty_id()));
-        Preconditions.checkArgument(LogFileService.checkParameters( "^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5]+$",updateNotesDTO.getNotes()));
+        Preconditions.checkArgument(LogFileService.checkParameters( "^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5\\s]+$",updateNotesDTO.getNotes()));
 
 //        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
 
