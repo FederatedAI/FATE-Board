@@ -69,16 +69,7 @@ public class JobDetailController {
     @ResponseBody
     @RequestMapping(value = "/tracking/component/metrics", method = RequestMethod.POST)
     public ResponseResult getMetaInfo(@Valid @RequestBody ComponentQueryDTO componentQueryDTO, BindingResult bindingResult) {
-//        JSONObject jsonObject = JSON.parseObject(param);
-//        String jobId = jsonObject.getString(Dict.JOBID);
-//        String role = jsonObject.getString(Dict.ROLE);
-//        String partyId = jsonObject.getString(Dict.PARTY_ID);
-//        String componentName = jsonObject.getString(Dict.COMPONENT_NAME);
-//
-//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentName));
-//        Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentName));
 
-//        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
             return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
@@ -99,18 +90,6 @@ public class JobDetailController {
     @RequestMapping(value = "/tracking/component/metric_data", method = RequestMethod.POST)
     @ResponseBody
     public ResponseResult getMetricInfo(@Valid @RequestBody MetricDTO metricDTO, BindingResult bindingResult) {
-//        JSONObject jsonObject = JSON.parseObject(param);
-//        String jobId = jsonObject.getString(Dict.JOBID);
-//        String role = jsonObject.getString(Dict.ROLE);
-//        String partyId = jsonObject.getString(Dict.PARTY_ID);
-//        String componentName = jsonObject.getString(Dict.COMPONENT_NAME);
-//        String metricNamespace = jsonObject.getString(Dict.METRIC_NAMESPACE);
-//        String metricName = jsonObject.getString(Dict.METRIC_NAME);
-//
-//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentName, metricName, metricNamespace));
-//        Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentName, metricNamespace, metricName));
-//
-//        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
 
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
@@ -132,14 +111,6 @@ public class JobDetailController {
     @RequestMapping(value = "/tracking/component/parameters", method = RequestMethod.POST)
     @ResponseBody
     public ResponseResult getDetailInfo(@Valid @RequestBody ComponentQueryDTO componentQueryDTO, BindingResult bindingResult) {
-//        JSONObject jsonObject = JSON.parseObject(param);
-//        String jobId = jsonObject.getString(Dict.JOBID);
-//        String role = jsonObject.getString(Dict.ROLE);
-//        String partyId = jsonObject.getString(Dict.PARTY_ID);
-//        String componentName = jsonObject.getString(Dict.COMPONENT_NAME);
-//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentName));
-//        Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentName));
-//        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
 
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
@@ -173,15 +144,6 @@ public class JobDetailController {
     @ResponseBody
     public ResponseResult getDagDependencies(@Valid @RequestBody JobQueryDTO jobQueryDTO, BindingResult bindingResult) {
         //check and get parameters
-//        JSONObject jsonObject = JSON.parseObject(param);
-//        String jobId = jsonObject.getString(Dict.JOBID);
-//        String role = jsonObject.getString(Dict.ROLE);
-//        String partyId = jsonObject.getString(Dict.PARTY_ID);
-//
-//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId));
-//        Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId));
-//
-//        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
 
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
@@ -294,16 +256,7 @@ public class JobDetailController {
     @RequestMapping(value = "/tracking/component/output/model", method = RequestMethod.POST)
     @ResponseBody
     public ResponseResult getModel(@Valid @RequestBody ComponentQueryDTO componentQueryDTO, BindingResult bindingResult) {
-//        JSONObject jsonObject = JSON.parseObject(param);
-//        String jobId = jsonObject.getString(Dict.JOBID);
-//        String role = jsonObject.getString(Dict.ROLE);
-//        String partyId = jsonObject.getString(Dict.PARTY_ID);
-//        String componentName = jsonObject.getString(Dict.COMPONENT_NAME);
-//
-//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentName));
-//        Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentName));
-//
-//        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
+
 
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
@@ -325,14 +278,6 @@ public class JobDetailController {
     @RequestMapping(value = "/tracking/component/output/data", method = RequestMethod.POST)
     @ResponseBody
     public ResponseResult getData(@Valid @RequestBody ComponentQueryDTO componentQueryDTO, BindingResult bindingResult) {
-//        JSONObject jsonObject = JSON.parseObject(param);
-//        String jobId = jsonObject.getString(Dict.JOBID);
-//        String role = jsonObject.getString(Dict.ROLE);
-//        String partyId = jsonObject.getString(Dict.PARTY_ID);
-//        String componentName = jsonObject.getString(Dict.COMPONENT_NAME);
-//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentName));
-//        Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentName));
-//        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
 
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
@@ -355,12 +300,6 @@ public class JobDetailController {
     @ResponseBody
     public ResponseResult getBatchMetricInfo(@Valid @RequestBody BatchMetricDTO batchMetricDTO, BindingResult bindingResult) {
 
-//        Preconditions.checkArgument(LogFileService.checkPathParameters(
-//                batchMetricDTO.getJobId(),
-//                batchMetricDTO.getRole(),
-//                batchMetricDTO.getPartyId(),
-//                batchMetricDTO.getComponentName()
-//        ));
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
             return new ResponseResult(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());

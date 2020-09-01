@@ -98,36 +98,23 @@ public class JobWebSocketService implements Runnable {
                     param.put(Dict.PARTY_ID, partyId);
                     //Future<?> dependencyFuture = ThreadPoolTaskExecutorUtil.submitListenable(asyncServiceExecutor, () -> jobDetailController.getDagDependencies(JSON.toJSONString(param)), new int[]{500}, new int[]{3});
                     ListenableFuture<ResponseResult<JSONObject>> dependencyFuture = asyncServiceExecutor.submitListenable(() -> jobDetailController.getDagDependencies(JSON.toJSONString(param)));
-                    //                    try {
                     ResponseResult<JSONObject> responseResult = dependencyFuture.get();
                     if (0 == responseResult.getCode()) {
                         flushToWebData.put(Dict.DEPENDENCY_DATA, responseResult.getData());
                     } else {
-                        //                            flushToWebData.put(Dict.DEPENDENCY_DATA, null);
                         throw new IllegalArgumentException("dependency parameter error");
                     }
-                    //                    } catch (Exception e) {
-                    //                        logger.error("GET DEPENDENCY_DATA ERROR", e);
-                    //                        flushToWebData.put(Dict.DEPENDENCY_DATA, null);
-                    //                    }
+
 
                     //get job summary
                     ListenableFuture<ResponseResult<Map<String, Object>>> responseResultListenableFuture = asyncServiceExecutor.submitListenable(() -> jobManagerController.queryJobById(jobId, role, String.valueOf(partyId)));
-                    //                    try {
                     ResponseResult<Map<String, Object>> mapResponseResult = responseResultListenableFuture.get();
                     if (0 == mapResponseResult.getCode()) {
                         flushToWebData.put(Dict.SUMMARY_DATA, mapResponseResult.getData());
                     } else {
-                        //                            flushToWebData.put(Dict.SUMMARY_DATA, null);
                         throw new IllegalArgumentException("summary parameter error");
                     }
-                    //                    } catch (Exception e) {
-                    //                        logger.error("GET JOB SUMMARY ERROR", e);
-                    //                        flushToWebData.put(Dict.SUMMARY_DATA, null);
-                    //                    }
 
-
-                    //                try {
                     if (pushStatus) {
                         JSONObject dependency = (JSONObject) flushToWebData.get(Dict.DEPENDENCY_DATA);
                         dependency.remove("component_module");
@@ -141,10 +128,6 @@ public class JobWebSocketService implements Runnable {
                     logger.warn("session:{}, data to push:{}", session, JSON.toJSONString(flushToWebData));
 
                     pushStatus = true;
-
-                    //                } catch (IOException e) {
-                    //                    logger.error("websocket send IOException", e);
-                    //                }
 
 
                     if (Dict.JOB_FINISHED_STATUS.contains(status)) {
