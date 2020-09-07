@@ -82,7 +82,7 @@ public class Dict {
 
     static {
         logMap.put("jobSchedule", "fate_flow_schedule.log");
-        logMap.put("jobError", "error.log");
+        logMap.put("jobError", "fate_flow_schedule_error.log");
         logMap.put("partyError", "ERROR.log");
         logMap.put("partyWarning", "WARNING.log");
         logMap.put("partyInfo", "INFO.log");
