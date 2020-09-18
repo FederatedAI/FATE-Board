@@ -30,28 +30,7 @@ public class TaskManagerService {
     TaskMapper taskMapper;
 
 
-//    public String findTaskStatus(String jobId,String role, String componentName) {
-//        TaskExample taskExample = new TaskExample();
-//        TaskExample.Criteria criteria = taskExample.createCriteria();
-//        criteria.andFJobIdEqualTo(jobId);
-//        criteria.andFComponentNameEqualTo(componentName);
-//        criteria.andFRoleEqualTo(role);
-//        List<Task> tasks = taskMapper.selectByExample(taskExample);
-//        if (tasks.size() != 0) {
-//            Task task = tasks.get(0);
-//            return task.getfStatus();
-//        }
-//        return null;
-//    }
-
-
     public TaskDO findTask(String jobId,String role,String partyId, String componentName) {
-//        TaskExample taskExample = new TaskExample();
-//        TaskExample.Criteria criteria = taskExample.createCriteria();
-//        criteria.andFJobIdEqualTo(jobId);
-//        criteria.andFComponentNameEqualTo(componentName);
-//        criteria.andFRoleEqualTo(role);
-//        List<Task> tasks = taskMapper.selectByExample(taskExample);
 
         List<TaskDO> tasks = taskMapper.findTask(jobId, role,partyId, componentName);
 

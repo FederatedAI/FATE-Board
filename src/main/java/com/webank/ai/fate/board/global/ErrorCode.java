@@ -18,7 +18,6 @@ package com.webank.ai.fate.board.global;
 
 public enum ErrorCode {
 
-    //COMMON CODE
     SUCCESS(0, "OK"),
     SERVLET_ERROR(10000, "Request parameters error!"),
     REQUESTBODY_ERROR(10001,"Request body error!"),

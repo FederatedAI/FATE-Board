@@ -113,8 +113,6 @@ public class SshController {
 
 //    @RequestMapping(value = "/ssh", method = RequestMethod.DELETE)
     public ResponseResult removeValue(@RequestBody SshDTO sshDTO) throws IOException {
-//        JSONObject jsonObject = JSON.parseObject(params);
-//        String ip = jsonObject.getString(Dict.SSH_IP);
         Preconditions.checkArgument(StringUtils.isNoneEmpty(sshDTO.getIp()));
         sshService.getAllsshInfo().remove(sshDTO.getIp());
         sshService.flushToFile();

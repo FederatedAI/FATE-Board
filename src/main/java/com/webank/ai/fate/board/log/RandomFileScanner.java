@@ -37,8 +37,6 @@ public class RandomFileScanner implements Runnable, LogScanner {
     Session session;
     boolean needStop = false;
 
-//    @Autowired
-//    LogHandle logHandle;
 
     public RandomFileScanner(File file, Session session, long skipLine) {
 

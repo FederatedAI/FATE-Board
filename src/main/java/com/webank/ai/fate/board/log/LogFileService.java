@@ -214,9 +214,7 @@ public class LogFileService {
 
     public List<Map> getRemoteFuzzyLog(String filePath, String ip, String condition, Integer begin, Integer end) throws Exception {
         List<Map> results = Lists.newArrayList();
-//        JobTaskInfo jobTaskInfo = this.getJobTaskInfo(jobId, componentId, role, partyId);
         SshInfo sshInfo = this.sshService.getSSHInfo(ip);
-//        String filePath = this.buildFilePath(jobId, componentId, type, role, partyId);
         Session session = this.sshService.connect(sshInfo);
         String cmd = "grep -n " + condition + " " + filePath + " | tail -n +" + begin + " | head -n " + (end - begin + 1);
         Channel channel = this.sshService.executeCmd(session, cmd);

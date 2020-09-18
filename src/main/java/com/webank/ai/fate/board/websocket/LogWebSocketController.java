@@ -105,7 +105,6 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
             File file = new File(logPath);
             if (file.exists()) {
 
-//                String[] cmd = {"sh", "-c", "grep -n " + "'.'" + " " + logPath + " | tail -n +" + begin + " | head -n " + (end - begin + 1)};
                 String[] cmd = {"sh", "-c", "tail -n +" + begin + " " + logPath + " | head -n " + (end - begin + 1)};
 
                 Process process = Runtime.getRuntime().exec(cmd);
@@ -117,9 +116,6 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
                     do {
                         content = reader.readLine();
                         if (content != null) {
-//                            int i = content.indexOf(":");
-//                            String lineNumber = content.substring(0, i);
-//                            String lineContent = content.substring(i + 1);
 
                             //replace sensitive information
                             String finalLog = LogHandle.handleLog(content);
@@ -155,7 +151,6 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
                     if (sshInfo != null) {
                         com.jcraft.jsch.Session jschSession = sshService.connect(sshInfo);
 
-//                        String cmd = "grep -n " + "'.'" + " " + logPath + " | tail -n +" + begin + " | head -n " + (end - begin + 1);
                         String cmd = "tail -n +" + begin + " " + logPath + " | head -n " + (end - begin + 1);
                         Channel channel = sshService.executeCmd(jschSession, cmd);
 
@@ -167,9 +162,6 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
                             do {
                                 content = reader.readLine();
                                 if (content != null) {
-//                                    int i = content.indexOf(":");
-//                                    String lineNumber = content.substring(0, i);
-//                                    String lineContent = content.substring(i + 1);
                                     //replace sensitive information
                                     String finalLog = LogHandle.handleLog(content);
                                     logResults.add(LogFileService.toLogMap(finalLog, lineNumber));

@@ -95,11 +95,8 @@ public class JobManagerController {
             return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
 
-//        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId));
-
         Preconditions.checkArgument(LogFileService.checkPathParameters(jobQueryDTO.getJob_id(), jobQueryDTO.getRole(), jobQueryDTO.getParty_id()));
 
-//        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
         String result;
         try {
             result = httpClientPool.post(fateUrl + Dict.URL_JOB_DATAVIEW, JSON.toJSONString(jobQueryDTO));
@@ -210,8 +207,6 @@ public class JobManagerController {
         Preconditions.checkArgument(LogFileService.checkPathParameters(updateNotesDTO.getJob_id(), updateNotesDTO.getRole(), updateNotesDTO.getParty_id()));
         Preconditions.checkArgument(LogFileService.checkParameters( "^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5\\s]+$",updateNotesDTO.getNotes()));
 
-//        jsonObject.put(Dict.PARTY_ID, new Integer(partyId));
-
         String result;
         try {
             result = httpClientPool.post(fateUrl + Dict.URL_JOB_UPDATE, JSON.toJSONString(updateNotesDTO));
@@ -239,7 +234,6 @@ public class JobManagerController {
             FieldError errors = bindingResult.getFieldError();
             return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
-//        Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id()), componentQueryDTO.getComponent_name());
         Preconditions.checkArgument(LogFileService.checkPathParameters(reRunDTO.getJob_id(),  reRunDTO.getComponent_name()));
 
         int i = jobManagerService.reRun(reRunDTO);
