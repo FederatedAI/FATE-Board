@@ -22,13 +22,6 @@ import java.util.List;
 
 public interface JobMapper {
 
-//    List<JobWithBLOBs> selectByPage(@Param(value = "startIndex") long startIndex, @Param(value = "pageSize") long pageSize);
-
-//    long countByExample(JobExample example);
-
-//    int insert(JobWithBLOBs record);
-
-    //    List<JobWithBLOBs> selectByExampleWithBLOBs(JobExample example);
 
     List<JobDO> queryTodayCompletedJobs(@Param("timeTodayStart") long timeTodayStart,@Param("timeStampNow")long timeStampNow);
 

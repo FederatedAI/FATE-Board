@@ -78,8 +78,6 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
     public void onOpen(Session session, @PathParam("jobId") String jobId, @PathParam("role") String role, @PathParam("partyId") Integer partyId) {
         //check parameters
         if (LogFileService.checkPathParameters(jobId, role, String.valueOf(partyId))) {
-//            String jobKey = jobId + ":" + role + ":" + partyId;
-//            JobWebSocketController.jobSessionMap.put(session, jobKey);
 //            logger.info("websocket job id {} open ,session {},session size{}", jobKey, session, jobSessionMap.size());
             logger.warn("session to join:{}", session);
 
@@ -98,8 +96,6 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
     @OnClose
     public void onClose(Session session) {
         logger.info("websocket session {} closed", session);
-//        jobSessionMap.remove(session);
-//        sessionPushMap.remove(session);
     }
 
     /**
@@ -109,7 +105,6 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
      */
     @OnMessage
     public void onMessage(String message, Session session) {
-//        schedule();
     }
 
     /**
@@ -119,9 +114,6 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
     @OnError
     public void onError(Session session, Throwable error) {
         logger.error("there is a error in websocket connection!", error);
-//        jobSessionMap.remove(session);
-//        sessionPushMap.remove(session);
-
 
     }
 

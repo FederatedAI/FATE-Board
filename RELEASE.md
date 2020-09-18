@@ -7,7 +7,6 @@
 - Support the sort for job duration
 
 
-
 # Release 1.4.2
 
 #### Major Features and Improvements

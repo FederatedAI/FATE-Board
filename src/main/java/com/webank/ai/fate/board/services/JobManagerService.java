@@ -61,192 +61,21 @@ public class JobManagerService {
     @Autowired
     ThreadPoolTaskExecutor asyncServiceExecutor;
 
-//    public long count() {
-//
-//        JobExample jobExample = new JobExample();
-//        return jobMapper.countByExample(jobExample);
-//    }
-
-//    public List<JobWithBLOBs> queryJobByPage(long startIndex, long pageSize) {
-//        List<JobWithBLOBs> jobWithBLOBs = jobMapper.selectByPage(startIndex, pageSize);
-//        return jobWithBLOBs;
-//    }
-
 
     public List<JobDO> queryJobStatus() {
-
-//        JobExample jobExample = new JobExample();
-//
-//        JobExample.Criteria criteria = jobExample.createCriteria();
-//
-//        ArrayList<String> stringArrayList = new ArrayList<String>();
-//
-//        stringArrayList.add("waiting");
-//
-//        stringArrayList.add("running");
-//
-//        criteria.andFStatusIn(stringArrayList);
-//
-//        jobExample.setOrderByClause("f_status, f_start_time desc");
-//        List<Job> jobs = jobMapper.selectByExample(jobExample);
-//        for (Job job : jobs) {
-//            job.setfRunIp(null);
-//        }
-//        return jobs;
 
         List<JobDO> jobDOS = jobMapper.queryJobStatus();
         return jobDOS;
 
     }
 
-
-//    public List<JobWithBLOBs> queryJob() {
-//
-//        JobExample jobExample = new JobExample();
-//
-//        jobExample.setOrderByClause("f_start_time desc");
-//
-//        List<JobWithBLOBs> jobWithBLOBsList = jobMapper.selectByExampleWithBLOBs(jobExample);
-//
-//        return jobWithBLOBsList;
-//
-//    }
-
-
     public JobDO queryJobByConditions(String jobId, String role, String partyId) {
-
-//        JobExample jobExample = new JobExample();
-//
-//        JobExample.Criteria criteria = jobExample.createCriteria();
-//
-//        criteria.andFJobIdEqualTo(jobId);
-//
-//        criteria.andFRoleEqualTo(role);
-//
-//        criteria.andFPartyIdEqualTo(partyId);
-//
-//        List<JobWithBLOBs> jobWithBLOBsList = jobMapper.selectByExampleWithBLOBs(jobExample);
-//
-//        if (jobWithBLOBsList.size() != 0) {
-//            JobWithBLOBs jobWithBLOBs = jobWithBLOBsList.get(0);
-////            jobWithBLOBs.setfRunIp(null);
-//            return jobWithBLOBs;
-//        } else {
-//            return null;
-//        }
 
         JobDO jobDO = jobMapper.queryJobByConditions(jobId, role, partyId);
         return jobDO;
     }
 
 
-//    public List<JobWithBLOBs> queryPagedJobsByCondition(long startIndex, long pageSize, Object orderField, String orderType, String jobId) {
-//        String order = orderField + " " + orderType;
-//        String limit = startIndex + "," + pageSize;
-//
-//        JobExample jobExample = new JobExample();
-//        jobExample.setOrderByClause(order);
-//        jobExample.setLimitClause(limit);
-//        if (jobId != null) {
-//            JobExample.Criteria criteria = jobExample.createCriteria();
-//            jobId = "%" + jobId + "%";
-//            criteria.andFJobIdLike(jobId);
-//
-//        }
-//        List<JobWithBLOBs> jobWithBLOBs = jobMapper.selectByExampleWithBLOBs(jobExample);
-//
-//        return jobWithBLOBs;
-//    }
-
-//    public List<JobWithBLOBs> queryPageByCondition(String jobId,
-//                                                   List<String> roles,
-//                                                   String partyId,
-//                                                   List<String> jobStatus,
-//                                                   String startTime,
-//                                                   String endTime,
-//                                                   long startIndex,
-//                                                   long pageSize) {
-//        JobExample jobExample = new JobExample();
-//        JobExample.Criteria criteria = jobExample.createCriteria();
-//        logger.info("start create criteria");
-//
-//        if (!(jobId == null || jobId.equals(""))) {
-//            jobId = "%" + jobId + "%";
-//            criteria.andFJobIdLike(jobId);
-//            logger.info("add jobid " + jobId);
-//        }
-//        if (!(partyId == null || partyId.equals(""))) {
-//
-//            partyId = "%" + partyId + "%";
-//            criteria.andFPartyIdLike(partyId);
-//            logger.info("add partyid " + partyId);
-//        }
-//        if (!(roles == null || roles.size() == 0)) {
-//
-//            criteria.andFRoleIn(roles);
-//            logger.info("add roles " + roles);
-//        }
-//
-//        if (!(jobStatus == null || jobStatus.size() == 0)) {
-//
-//            criteria.andFStatusIn(jobStatus);
-//            logger.info("add status" + jobStatus);
-//        }
-//
-//        if (!(startTime == null || startTime.equals(""))) {
-//            String order = Dict.FIELD_START_TIME + " " + startTime;
-//            jobExample.setOrderByClause(order);
-//            logger.info("add start" + order);
-//        }
-//
-//        if (!(endTime == null || endTime.equals(""))) {
-//            String order = Dict.FILED_END_TIME + " " + endTime;
-//            jobExample.setOrderByClause(order);
-//            logger.warn("add end" + order);
-//        }
-//        String limit = startIndex + "," + pageSize;
-//        jobExample.setLimitClause(limit);
-//        List<JobWithBLOBs> jobWithBLOBs = jobMapper.selectByExampleWithBLOBs(jobExample);
-////        for (JobWithBLOBs jobWithBLOB : jobWithBLOBs) {
-////            jobWithBLOB.setfRunIp(null);
-////        }
-//
-//        return jobWithBLOBs;
-//
-//    }
-
-//    public long totalCount(String jobId,
-//                           List<String> roles,
-//                           String partyId,
-//                           List<String> jobStatus
-//    ) {
-//
-//        JobExample jobExample = new JobExample();
-//        JobExample.Criteria criteria = jobExample.createCriteria();
-//
-//        if (!(jobId == null || jobId.equals(""))) {
-//            jobId = "%" + jobId + "%";
-//            criteria.andFJobIdLike(jobId);
-//            logger.info("jobid ok");
-//        }
-//
-//        if (!(partyId == null || partyId.equals(""))) {
-//            partyId = "%" + partyId + "%";
-//            criteria.andFPartyIdLike(partyId);
-//            logger.info("partyid ok");
-//        }
-//
-//        if (!(roles == null || roles.size() == 0)) {
-//            criteria.andFRoleIn(roles);
-//            logger.info("role ok");
-//        }
-//        if (!(jobStatus == null || jobStatus.size() == 0)) {
-//            criteria.andFStatusIn(jobStatus);
-//            logger.info("status ok");
-//        }
-//
-//        return jobMapper.countByExample(jobExample);
-//    }
 
     public PageBean<Map<String, Object>> queryPagedJobs(PagedJobQO pagedJobQO) {
         if (pagedJobQO.getJobId() != null && 0 != pagedJobQO.getJobId().trim().length()) {
@@ -313,8 +142,6 @@ public class JobManagerService {
     }
 
     public int reRun(ReRunDTO reRunDTO) {
-//        HashMap<String, String> stringStringHashMap = new HashMap<>();
-//        stringStringHashMap.put("taskId", componentQueryDTO.getJob_id() + "_" + componentQueryDTO.getComponent_name());
 
         String result;
         try {

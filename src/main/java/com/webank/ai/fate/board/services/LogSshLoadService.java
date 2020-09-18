@@ -48,35 +48,11 @@ public class LogSshLoadService {
     @Autowired
     LogFileTransferEventProducer logFileTransferEventProducer;
 
-//todo
-//    @Scheduled(cron = "0 0/1 * * * ? ")
-//    public void loadLog() {
-//        List<JobDO> jobWithBLOBs = queryJobSuccessToday();
-//        jobWithBLOBs.forEach(job -> {
-//            String jobId = job.getfJobId();
-//            String runIp = job.getfRunIp();
-//            Preconditions.checkArgument(StringUtils.isNoneEmpty(runIp));
-//            String[] splits = runIp.split(":");
-//            runIp=splits[0];
-//
-//            Preconditions.checkArgument(StringUtils.isNotEmpty(jobId));
-//            String jobDir = logFileService.getJobDir(jobId);
-//            if (!new File(jobDir).exists()) {
-//                SshInfo sshInfo = sshService.getSSHInfo(runIp);
-//                logFileTransferEventProducer.onData(sshInfo, jobDir, jobDir);
-//            }
-//
-//        });
-//
-//    }
 
     private List<JobDO> queryJobSuccessToday() {
         long timeStampNow = System.currentTimeMillis();
         long timeTodayStart = timeStampNow / (24 * 60 * 60 * 1000) * (24 * 60 * 60 * 1000) - 8 * 60 * 60 * 1000;
 
-//        JobExample jobExample = new JobExample();
-//        JobExample.Criteria criteria = jobExample.createCriteria();
-//        criteria.andFEndTimeBetween(timeTodayStart, timeStampNow);
 
         return jobMapper.queryTodayCompletedJobs(timeTodayStart,timeStampNow);
     }
