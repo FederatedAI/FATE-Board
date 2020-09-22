@@ -43,7 +43,7 @@ import java.util.Map;
 public class LogFileService {
 
     final static String DEFAULT_COMPONENT_ID = "default";
-    @Value("${FATE_DEPLOY_PREFIX:/data/projects/fate/python/logs/}")
+    @Value("${FATE_DEPLOY_PREFIX:/data/projects/fate/logs/}")
     String FATE_DEPLOY_PREFIX;
 
     @Autowired
