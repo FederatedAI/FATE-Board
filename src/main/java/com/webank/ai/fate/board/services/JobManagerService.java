@@ -87,7 +87,8 @@ public class JobManagerService {
             pagedJobQO.setPartyId("%" + pagedJobQO.getPartyId() + "%");
         }
         if (pagedJobQO.getfDescription() != null && 0 != pagedJobQO.getfDescription().trim().length()) {
-            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getfDescription()));
+            Preconditions.checkArgument(LogFileService.checkParameters( "^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5\\s]+$",pagedJobQO.getfDescription()));
+//            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getfDescription()));
             pagedJobQO.setfDescription("%" + pagedJobQO.getfDescription() + "%");
         }
         long jobSum = this.countJob(pagedJobQO);
