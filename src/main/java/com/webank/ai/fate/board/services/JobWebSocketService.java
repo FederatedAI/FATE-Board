@@ -77,7 +77,11 @@ public class JobWebSocketService implements Runnable {
                         duration = endTime - startTime;
 
                     } else {
-                        duration = now - startTime;
+                        if (startTime == null) {
+                            duration = 0;
+                        } else {
+                            duration = now - startTime;
+                        }
                     }
                     logger.info("time now:{} start:{} end:{} duration:{}", now, startTime, endTime, duration);
 
@@ -123,29 +127,32 @@ public class JobWebSocketService implements Runnable {
                         Map<String, Object> summary = (Map<String, Object>) flushToWebData.get(Dict.SUMMARY_DATA);
                         summary.remove("dataset");
                     }
-
-                    session.getBasicRemote().sendText(JSON.toJSONString(flushToWebData));
-                    logger.warn("session:{}, data to push:{}", session, JSON.toJSONString(flushToWebData));
-
-                    pushStatus = true;
-
-
-                    if (Dict.JOB_FINISHED_STATUS.contains(status)) {
-                        session.close();
+                    if (session.isOpen()) {
+                        session.getBasicRemote().sendText(JSON.toJSONString(flushToWebData));
+                        logger.warn("session:{}, data to push:{}", session, JSON.toJSONString(flushToWebData));
+                        pushStatus = true;
+                        if (Dict.JOB_FINISHED_STATUS.contains(status)) {
+                            session.close();
+                            break;
+                        }
+                        Thread.sleep(500);
+                    } else {
                         break;
                     }
-                    Thread.sleep(500);
+
 
                 } else {
-                    session.getBasicRemote().sendText("this job doesn't exist");
-                    session.close();
-                    logger.error("jobId {}, role {}, partyId {} to push is not exist", jobId, role, partyId);
+                    if (session.isOpen()) {
+                        session.getBasicRemote().sendText("this job doesn't exist");
+                        session.close();
+                        logger.error("jobId {}, role {}, partyId {} to push is not exist", jobId, role, partyId);
+                    }
                     break;
                 }
 
             }
         } catch (Exception e) {
-            logger.error("web socket error",e);
+            logger.error("web socket error", e);
             try {
                 session.getBasicRemote().sendText("this job socket has error");
             } catch (IOException ioException) {
