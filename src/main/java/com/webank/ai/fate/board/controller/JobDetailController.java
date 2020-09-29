@@ -237,7 +237,7 @@ public class JobDetailController {
                 Long createTime = null;
                 if (task != null) {
                     taskStatus = task.getfStatus();
-                    createTime = task.getfCreateTime();
+                    createTime = task.getfStartTime();
                 }
 
                 component.put(Dict.STATUS, taskStatus);
