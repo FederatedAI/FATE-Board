@@ -31,6 +31,7 @@ public class LogHandle {
         return result;
     }
 
+    //replace ip and address in logs for security
     public static String handleLog(String log) {
         ApplicationHome h = new ApplicationHome(LogHandle.class);
         File jarF = h.getSource();
@@ -38,7 +39,8 @@ public class LogHandle {
         int fateboard = boardPath.lastIndexOf("fateboard");
         String fateRule = boardPath.substring(0, fateboard);
         String tmpRule= "/tmp/";
-        String ipRule = "(127\\.0)|(10\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01])))|(192\\.168)";
+//        String ipRule = "(127\\.0)|(10\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01])))|(192\\.168)";
+        String ipRule = "(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01]))\\.\\d{1,3}\\.\\d{1,3})|(192\\.168\\.\\d{1,3}\\.\\d{1,3})";
 
         String fatePath = log.replaceAll(fateRule, "./fate/");
         String tempPath = fatePath.replaceAll(tmpRule, "./");
