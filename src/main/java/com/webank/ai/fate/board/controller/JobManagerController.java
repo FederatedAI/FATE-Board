@@ -250,7 +250,7 @@ public class JobManagerController {
             FieldError errors = bindingResult.getFieldError();
             return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
-        Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id()), componentQueryDTO.getComponent_name());
+        Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id(), componentQueryDTO.getComponent_name()));
 
         String componentCommand = jobManagerService.getComponentCommand(componentQueryDTO);
         return new ResponseResult<>(ErrorCode.SUCCESS, componentCommand);
