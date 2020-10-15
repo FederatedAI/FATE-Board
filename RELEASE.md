@@ -3,7 +3,7 @@
 #### Major Features and Improvements
 **Major Features**
 
-1. Add model visualization of new algorithm components：Hetero/Homo Data Split, Table reader, Data Statistic, PSI，Hetero Fastsecureboost，Hetero Kmeans
+- Add model visualization of new algorithm components：Hetero/Homo Data Split, Table reader, Data Statistic, PSI，Hetero Fastsecureboost，Hetero Kmeans
 
    - Hetero/Homo Data Split：Visualize dataset split results (training/validate/test)
 
@@ -17,13 +17,13 @@
 
    - Hetero Kmeans：visualization of sample clustering results
 
-2. Support downloading model and data of algorithm components from FATEBoard（Feature Binning，Feature Selection，Secureboost，LR，Evaluation）
+- Support downloading model and data of algorithm components from FATEBoard（Feature Binning，Feature Selection，Secureboost，LR，Evaluation）
 
-3. The page supports partial data refresh and global data refresh to update the data in the iteration
+- The page supports partial data refresh and global data refresh to update the data in the iteration
 
-4. Support retry for failed or cancelled job
+- Support retry for failed or cancelled job
 
-5. Data input port of component supports separate access according to train/validate
+- Data input port of component supports separate access according to train/validate
 
 **Features improvement**
 
