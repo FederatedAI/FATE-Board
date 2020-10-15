@@ -3,7 +3,7 @@
 #### Major Features and Improvements
 **Major Features**
 
-1.  Add model visualization of new algorithm components：Hetero/Homo Data Split, Table reader, Data Statistic, PSI，Hetero Fastsecureboost，Hetero Kmeans
+1. Add model visualization of new algorithm components：Hetero/Homo Data Split, Table reader, Data Statistic, PSI，Hetero Fastsecureboost，Hetero Kmeans
   - Hetero/Homo Data Split：Visualize dataset split results (training/validate/test)
   - Table reader：read in the original modeling data and output data overview
   - Data Statistic：display statistical indicators of each variable
