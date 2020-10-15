@@ -4,16 +4,25 @@
 **Major Features**
 
 1. Add model visualization of new algorithm components：Hetero/Homo Data Split, Table reader, Data Statistic, PSI，Hetero Fastsecureboost，Hetero Kmeans
-  - Hetero/Homo Data Split：Visualize dataset split results (training/validate/test)
-  - Table reader：read in the original modeling data and output data overview
-  - Data Statistic：display statistical indicators of each variable
-  - PSI：PSI detailed data display for each variable
-  - Hetero Fastsecureboost：fast secureboost model visualization in layered mode and mixed mode
-  - Hetero Kmeans：visualization of sample clustering results
+
+   - Hetero/Homo Data Split：Visualize dataset split results (training/validate/test)
+
+   - Table reader：read in the original modeling data and output data overview
+
+   - Data Statistic：display statistical indicators of each variable
+
+   - PSI：PSI detailed data display for each variable
+
+   - Hetero Fastsecureboost：fast secureboost model visualization in layered mode and mixed mode
+
+   - Hetero Kmeans：visualization of sample clustering results
 
 2. Support downloading model and data of algorithm components from FATEBoard（Feature Binning，Feature Selection，Secureboost，LR，Evaluation）
+
 3. The page supports partial data refresh and global data refresh to update the data in the iteration
+
 4. Support retry for failed or cancelled job
+
 5. Data input port of component supports separate access according to train/validate
 
 **Features improvement**
