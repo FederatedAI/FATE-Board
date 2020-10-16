@@ -1,4 +1,22 @@
 /**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
+/**
  * state: {
  *  point: {x, y}
  *  width: Number,
@@ -37,6 +55,7 @@ const DISABLE_TEXT = '#534C77'
 export const FONT_SIZE = 16
 export const FONT_FAMILY = 'arial'
 const TIME_TEXT = '#999BA3'
+const LINK_TEXT = '#494ECE'
 
 const BETWEEN_ICON_WITH_CONTENT = 6
 const ICON_PADDING = 10
@@ -62,37 +81,59 @@ const progressComp = {
   drawProgress(obj, parent, name) {
     obj.canvas = parent ? parent.$canvas : obj.canvas
     obj.struct = struct
+    let newLayer = true
+    let currentlay = null
     if (parent) {
       if (!name) {
         name = Layer.getUUID('progress')
       }
-      parent.drawLayer(name, obj)
+      const mid = parent.drawLayer(name, obj)
+      newLayer = !mid.old
+      currentlay = mid.node
+      if (newLayer && progressComp.type.RUNNING.match(currentlay.type.toUpperCase())) {
+        progressComp.animations.tictok.call(currentlay)
+        progressComp.animations.loading.call(currentlay)
+      }
       return name
     } else {
-      return new Layer(obj)
+      currentlay = new Layer(obj)
+      if (progressComp.type.RUNNING.match(currentlay.type.toUpperCase())) {
+        progressComp.animations.tictok.call(currentlay)
+        progressComp.animations.loading.call(currentlay)
+      }
+      return currentlay
     }
   },
   clear,
   type: {
-    UNRUN: 'UNRUN',
+    UNRUN: 'UNRUN|WAITING',
     RUNNING: 'RUNNING',
-    FAIL: 'FAILED|ERROR',
+    FAIL: 'FAILED|ERROR|CANCELED',
     SUCCESS: 'SUCCESS|COMPLETE'
   },
   events: {
     choose(point, afterChoose, ...props) {
       const lay = this
+      if (lay.$here(point)) {
+        lay.choose = true
+      } else {
+        lay.choose = false
+      }
       lay.setCus('choose', () => {
-        if (lay.$here(point)) {
-          lay.choose = true
-        } else {
-          lay.choose = false
-        }
         lay.containerStyle = _getContainerColor(lay.type, !!lay.choose, lay.disable)
         lay.contentStyle = _getContainerColor(lay.type, !!lay.choose, lay.disable, 'content')
         lay.fontStyle = _getTextColor(lay.type, !!lay.choose, lay.disable)
         if (afterChoose && typeof afterChoose === 'function') afterChoose(lay.text, lay.$here(point))
       })
+    },
+    linkChoose(point, afterChoose, ...props) {
+      const lay = this
+      if (lay.$here(point)) {
+        lay.setCus('choose', () => {
+          if (afterChoose && typeof afterChoose === 'function') afterChoose(lay.$parent.text, lay.$here(point), true)
+        })
+        return 'finish'
+      }
     },
     scale(time, point = { x: 0, y: 0 }) {
       const lay = this
@@ -177,7 +218,7 @@ const progressComp = {
         min = (min.toString().length < 2 ? '0' : '') + min
         sec = (sec.toString().length < 2 ? '0' : '') + sec
         lay.time = hou + ':' + min + ':' + sec
-      }, 1000))
+      }, 900))
     },
     loading() {
       const lay = this
@@ -232,6 +273,11 @@ const progressComp = {
           if (lay.$children.get('icon').$visiable) {
             lay.$children.get('icon').emit('$hide')
           }
+        }
+        if (type === progressComp.type.FAIL && !lay.$children.get('retryBtn').$visiable) {
+          lay.$children.get('retryBtn').emit('$showing')
+        } else if (lay.$children.get('retryBtn').$visiable) {
+          lay.$children.get('retryBtn').emit('$hide')
         }
       }))
       const toContainerColor = _getContainerColor(type, !!lay.choose, lay.disable)
@@ -320,6 +366,11 @@ function getStyle(type, choose, disable, lay) {
     }, time: {
       font: lay.contentFontSize * 0.8 + 'px ' + FONT_FAMILY,
       fillStyle: TIME_TEXT
+    }, link: {
+      font: lay.contentFontSize * 0.8 + 'px ' + FONT_FAMILY,
+      fillStyle: LINK_TEXT,
+      cursor: 'pointer',
+      underline: true
     }
   }
   lay.style = style
@@ -403,7 +454,6 @@ function struct() {
       position: Layer.component.text.CENTER
     }
   }, lay, 'text')
-
   // drawing appendix
   Layer.component.icon.drawIcon({
     props: {
@@ -411,7 +461,7 @@ function struct() {
       width: iconW,
       img: lay.img
     },
-    visiable: false
+    visiable: !!lay.img
   }, lay, 'icon')
   Layer.component.text.drawText({
     props: {
@@ -419,8 +469,21 @@ function struct() {
       text: lay.time,
       style: drawingStyle.time
     },
-    visiable: false
+    visiable: type === progressComp.type.RUNNING
   }, lay, 'time')
+
+  // drawing retry
+  Layer.component.text.drawText({
+    props: {
+      point: { x: x + w / 2 + betweenIconWithContent * 2 + iconW, y },
+      text: 'retry',
+      style: drawingStyle.link
+    },
+    visiable: type === progressComp.type.FAIL,
+    events: {
+      choose: progressComp.events.linkChoose
+    }
+  }, lay, 'retryBtn')
 
   // drawing in-out put port stuff
   if (input.length > 0) {
@@ -439,7 +502,7 @@ function struct() {
             radius: lay.portRadius,
             style: {
               fillStyle: lay.disable
-                ? (type !== progressComp.UNRUN
+                ? (type !== progressComp.type.UNRUN
                   ? DISABLE_INIT_COLOR
                   : DISABLE_NO_INIT_COLOR)
                 : (input[i].type === 'data' ? DATA_PORT_COLOR : MODEL_PORT_COLOR)
@@ -499,7 +562,7 @@ function struct() {
                 ? (type !== progressComp.UNRUN
                   ? DISABLE_INIT_COLOR
                   : DISABLE_NO_INIT_COLOR)
-                : (input[i].type === 'data' ? DATA_PORT_COLOR : MODEL_PORT_COLOR)
+                : (output[i].type === 'data' ? DATA_PORT_COLOR : MODEL_PORT_COLOR)
             },
             fill: true
           }
@@ -510,7 +573,7 @@ function struct() {
             point,
             width: lay.portWidth * 7 / 6,
             height: portHeight * 3 / 2,
-            img: input[i].mult
+            img: output[i].mult
           }
         }, lay, output[i].name)
       }

@@ -1,14 +1,32 @@
 /**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
+/**
  * state: {
- *  point: {x, y}, // 绘制位置
- *  text: String, // 展示内容
+ *  point: {x, y},
+ *  text: String,
  *
- *  width: Number, // 可以不传递
- *  height: Number, // 最大高度               |  breakLine: Number, // 最大行数
+ *  width: Number,
+ *  height: Number, |  breakLine: Number,
  *
- *  betweenEachLine: Number, // 两行之间的间距
- *  angle: Number, // 弧度制角度， 旋转角度（0-2PI）
- *  position: ENUM:[] // 通过对象传递的参数内容
+ *  betweenEachLine: Number,
+ *  angle: Number,（0-2PI）
+ *  position: ENUM:[]
  *  style: Object,
  * }
  */
@@ -20,6 +38,7 @@ const textComp = {
   drawText(obj, parent, name) {
     obj.canvas = parent ? parent.$canvas : obj.canvas
     obj.path = path
+    obj.here = here
     if (parent) {
       if (!name) {
         name = Layer.getUUID('text')
@@ -50,6 +69,32 @@ const textComp = {
 //     p = { x: ''}
 //   }
 // }
+
+function here(point) {
+  const lay = this
+  const width = lay.$ctx.measureText(lay.text).width
+  const trans = lay.$meta.get('$translate') || { x: 0, y: 0 }
+  const x = lay.point.x || lay.point[0] || 0
+  const y = lay.point.y || lay.point[1] || 0
+  const cx = (point.x || point[0] || 0) - trans.x
+  const cy = (point.y || point[1] || 0) - trans.y
+  const height = parseInt(lay.style.font)
+  let res = false
+  if (lay.position === textComp.RIGHT) {
+    if (cx >= x - width && cx <= x && cy >= y - height / 2 && cy <= y + height / 2) {
+      res = true
+    }
+  } else if (lay.position === textComp.CENTER) {
+    if (cx >= x - width / 2 && cx <= x + width / 2 && cy >= y - height / 2 && cy <= y + height / 2) {
+      res = true
+    }
+  } else {
+    if (cx >= x && cx <= x + width && cy >= y - height / 2 && cy <= y + height / 2) {
+      res = true
+    }
+  }
+  return res
+}
 
 function path() {
   const lay = this
