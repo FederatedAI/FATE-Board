@@ -32,12 +32,14 @@
 - Ealuation：Supports visualization of cluster model evaluation results
 - Hetero secureboost：Supports visualization of Completely SecureBoost models
 - Evaluation：Supports visualization of cluster model evaluation results
-- Job list optimization, search, filter, and sort optimization
+- Job list optimization：search, filter, and sort optimization
 - Significantly improve page fluency when the amount of data is large
-- Optimized log pull method and improved efficiency
-- Enhanced safety check
+- Optimize log pull method and improve efficiency
+- Enhance safety check
 - Interface optimization
-
+- Data decoupling：separate the relationship between presentation, interaction and data of the page
+- Interaction logic decoupling：Disassembly and refinement of complex functional logic
+- Improve the cohesion and reusability of components and tools
 # Release 1.4.2
 
 #### Major Features and Improvements

@@ -1,0 +1,13 @@
+@import "~@/styles/common/color";
+.dialog {
+  /deep/ .el-dialog__title {
+    font-size: 24px;
+    font-weight: 700;
+    color: $gray-deep;
+  }
+}
+.wrap {
+  overflow: auto;
+  height: 60vh;
+  margin-top: -10px;
+}

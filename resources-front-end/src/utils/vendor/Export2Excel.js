@@ -1,3 +1,22 @@
+
+/**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 /* eslint-disable */
 require('script-loader!file-saver')
 import XLSX from 'xlsx'
@@ -18,7 +37,7 @@ function generateArray(table) {
       if (cellValue !== '' && cellValue == +cellValue) cellValue = +cellValue
 
       //Skip ranges
-      ranges.forEach(function(range) {
+      ranges.forEach(function (range) {
         if (R >= range.s.r && R <= range.e.r && outRow.length >= range.s.c && outRow.length <= range.e.c) {
           for (var i = 0; i <= range.e.c - range.s.c; ++i) outRow.push(null)
         }
@@ -150,14 +169,14 @@ export function export_table_to_excel(id) {
 }
 
 export function export_json_to_excel({
-                                       multiHeader = [],
-                                       header,
-                                       data,
-                                       filename,
-                                       merges = [],
-                                       autoWidth = true,
-                                       bookType = 'xlsx'
-                                     } = {}) {
+  multiHeader = [],
+  header,
+  data,
+  filename,
+  merges = [],
+  autoWidth = true,
+  bookType = 'xlsx'
+} = {}) {
   /* original data */
   filename = filename || 'excel-list'
   data = [...data]

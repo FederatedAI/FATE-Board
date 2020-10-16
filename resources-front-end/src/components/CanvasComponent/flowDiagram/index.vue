@@ -16,6 +16,24 @@
 </template>
 
 <script>
+/**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 import flowDiagram from '../canvas/extra/flowDiagram'
 import Layer from '../canvas/Core'
 
@@ -43,10 +61,79 @@ export default {
     return {
       dagCheck: null,
       flowData: null,
-      images: null,
+      images: new Map(),
       thumb: 0.6,
       canvasId: 'flowDiagramCanvas',
-      canvas: null
+      canvas: null,
+
+      needToSet: [],
+      originalSetting: null,
+      imageSetting: [
+        {
+          name: 'COMPLETE',
+          url: require('./icons/complete.svg')
+        },
+        {
+          name: 'DISABLE_COMPLETE',
+          url: require('./icons/disable_complete.svg')
+        },
+        {
+          name: 'SUCCESS',
+          url: require('./icons/complete.svg')
+        },
+        {
+          name: 'DISABLE_SUCCESS',
+          url: require('./icons/disable_complete.svg')
+        },
+        {
+          name: 'FAIL',
+          url: require('./icons/error.svg')
+        },
+        {
+          name: 'DISABLE_FAIL',
+          url: require('./icons/disable_error.svg')
+        },
+        {
+          name: 'CANCEL',
+          url: require('./icons/error.svg')
+        },
+        {
+          name: 'DISABLE_CANCEL',
+          url: require('./icons/disable_error.svg')
+        },
+        {
+          name: 'CANCELED',
+          url: require('./icons/error.svg')
+        },
+        {
+          name: 'DISABLE_CANCELED',
+          url: require('./icons/disable_error.svg')
+        },
+        {
+          name: 'ERROR',
+          url: require('./icons/error.svg')
+        },
+        {
+          name: 'DISABLE_ERROR',
+          url: require('./icons/disable_error.svg')
+        },
+        {
+          name: 'FAILED',
+          url: require('./icons/error.svg')
+        },
+        {
+          name: 'DISABLE_FAILED',
+          url: require('./icons/disable_error.svg')
+        },
+        {
+          name: 'MULT_DATA_PORT',
+          url: require('./icons/mult_data.svg')
+        },
+        {
+          name: 'MULT_MODEL_PORT',
+          url: require('./icons/mult_model.svg')
+        }
+      ]
     }
   },
   watch: {
@@ -68,78 +155,22 @@ export default {
     this.checkFlowData()
   },
   mounted() {
-    this.initing()
+    this.addedImages(this.imageSetting).then(() => {
+      this.initing()
+    })
   },
 
   methods: {
     initing() {
       if (!this.dagInfo) {
-        return false
+        throw new TypeError('Daginfo param need to be an Object')
       }
       const can = document.getElementById(this.canvasId)
       if (!can) {
-        return false
+        throw new Error('Can not found canvas-element')
       }
-      const that = this
-      if (!that.images || that.images.size === 0) {
-        this.initImage(
-          [
-            {
-              name: 'Complete',
-              url: require('./icons/complete.svg')
-            },
-            {
-              name: 'disable_Complete',
-              url: require('./icons/disable_complete.svg')
-            },
-            {
-              name: 'Success',
-              url: require('./icons/complete.svg')
-            },
-            {
-              name: 'disable_Success',
-              url: require('./icons/disable_complete.svg')
-            },
-            {
-              name: 'Fail',
-              url: require('./icons/error.svg')
-            },
-            {
-              name: 'disable_Fail',
-              url: require('./icons/disable_error.svg')
-            },
-            {
-              name: 'Error',
-              url: require('./icons/error.svg')
-            },
-            {
-              name: 'disable_Error',
-              url: require('./icons/disable_error.svg')
-            },
-            {
-              name: 'Failed',
-              url: require('./icons/error.svg')
-            },
-            {
-              name: 'disable_Failed',
-              url: require('./icons/disable_error.svg')
-            },
-            {
-              name: 'mult_data_port',
-              url: require('./icons/mult_data.svg')
-            },
-            {
-              name: 'mult_model_port',
-              url: require('./icons/mult_model.svg')
-            }
-          ],
-          images => {
-            that.drawComp(can, images)
-          }
-        )
-      } else {
-        that.drawComp(can)
-      }
+      this.originalSetting = this.dagInfo
+      this.drawComp(can, this.images)
     },
     drawComp(canvasDom, images) {
       const that = this
@@ -151,7 +182,11 @@ export default {
               flowDiagram.events.lineBright.call(that.component)
             },
             props: [
-              (name, here) => {
+              (name, here, retry) => {
+                if (retry) {
+                  this.$emit('retry', name)
+                  return void 0
+                }
                 if (here) {
                   flowDiagram.events.lineBright.call(that.component, name)
                 }
@@ -178,7 +213,6 @@ export default {
       that.canvas = new Layer.CanvasUtil(canvasDom, diagramOperation, can => {
         that.getInstance(can, images)
         that.component.drawing()
-        that.toSetting()
         if (that.thumbnail) {
           that.checkThumbnail()
         }
@@ -202,17 +236,27 @@ export default {
       }
     },
     checkInfo() {
-      const final = {}
+      const final = this.dagCheck || {}
       if (this.dagInfo) {
         for (const item of this.dagInfo.component_list) {
           const status = item.status || 'unrun'
-          final[item.component_name] = {
-            status: status.charAt(0).toUpperCase() + status.slice(1),
-            time: item.time
+          if (!final[item.component_name]) {
+            final[item.component_name] = {
+              status: status.charAt(0).toUpperCase() + status.slice(1),
+              time: item.time
+            }
+          } else {
+            if (status !== final[item.component_name].status) {
+              this.needToSet.push(item.component_name)
+              final[item.component_name].status = status
+              final[item.component_name].time = item.time
+            }
           }
         }
-        for (const key in this.dagInfo.component_need_run) {
-          final[key].disable = this.dagInfo.component_need_run[key]
+        if (this.dagInfo.component_need_run) {
+          for (const key in this.dagInfo.component_need_run) {
+            final[key].disable = this.dagInfo.component_need_run[key]
+          }
         }
       }
       this.dagCheck = final
@@ -221,55 +265,62 @@ export default {
       if (this.dagInfo) {
         const final = JSON.parse(JSON.stringify(this.dagInfo))
         for (const item of final.component_list) {
-          item.status = 'unrun'
+          item.status = (item.status || 'unrun').toUpperCase()
         }
-        this.flowData = final
+        if (!this.flowData) {
+          this.flowData = final
+        } else {
+          this.flowData = Object.assign(this.flowData, final)
+        }
       }
     },
     toSetting() {
       if (this.component) {
-        for (const key in this.dagCheck) {
+        for (const item of this.needToSet) {
           const props = flowDiagram.RUNNING.match(
-            this.dagCheck[key].status.toUpperCase()
+            this.dagCheck[item].status.toUpperCase()
           )
-            ? this.dagCheck[key].time
+            ? this.dagCheck[item].time
             : this.images.get(
-              (!this.dagCheck[key].disable ? 'disable_' : '') +
-									this.dagCheck[key].status
+              (!this.dagCheck[item].disable ? 'DISABLE_' : '') +
+									this.dagCheck[item].status.toUpperCase()
               // eslint-disable-next-line
 						  )
-          this.component.emit('to' + this.dagCheck[key].status, key, props)
+          this.component.emit(
+            'to' +
+							(this.dagCheck[item].status.charAt(0).toUpperCase() +
+								this.dagCheck[item].status.slice(1)),
+            item,
+            props
+          )
         }
+        this.needToSet = []
       }
     },
     checkThumbnail() {
       this.component.emit('scale', this.thumb, this.component.toppest)
       this.component._inited = false
     },
-    initImage(arr, callback) {
-      const that = this
-      return new Promise(function(resolve, reject) {
-        let complete = 0
-        const images = new Map()
-        for (const val of arr) {
-          // eslint-disable-next-line
-					;(() => {
-            const v = val
-            const img = new Image()
-            img.onload = function() {
-              images.set(v.name, img)
-              complete += 1
-              if (complete === arr.length) {
-                that.images = images
-                callback(images)
-                resolve(images)
-              }
-            }
-            img.src = v.url
-          })()
+
+    initImage(name, src) {
+      const _that = this
+      return new Promise((resolve, reject) => {
+        const img = new Image()
+        img.onload = function() {
+          _that.images.set(name, img)
+          resolve()
         }
+        img.src = src
       })
     },
+    addedImages(arr) {
+      const res = []
+      for (const val of arr) {
+        res.push(this.initImage(val.name, val.url))
+      }
+      return Promise.all(res)
+    },
+
     suitableWhole() {
       const that = this
       this.canvas.suitableForWhole(

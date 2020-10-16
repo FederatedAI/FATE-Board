@@ -1,9 +1,13 @@
 <template>
   <div v-if="!item.hidden" class="menu-wrapper">
-
-    <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow">
+    <template
+      v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow"
+    >
       <app-link :to="resolvePath(onlyOneChild.path)">
-        <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">
+        <el-menu-item
+          :index="resolvePath(onlyOneChild.path)"
+          :class="{'submenu-title-noDropdown':!isNest}"
+        >
           <item :meta="Object.assign({},item.meta,onlyOneChild.meta)" />
         </el-menu-item>
       </app-link>
@@ -19,13 +23,31 @@
         :item="child"
         :key="child.path"
         :base-path="resolvePath(child.path)"
-        class="nest-menu" />
+        class="nest-menu"
+      />
     </el-submenu>
-
   </div>
 </template>
 
 <script>
+/**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 import path from 'path'
 import { isExternal } from '@/utils/validate'
 import Item from './Item'
@@ -74,7 +96,7 @@ export default {
 
       // Show parent if there are no child router to display
       if (showingChildren.length === 0) {
-        this.onlyOneChild = { ... parent, path: '', noShowingChildren: true }
+        this.onlyOneChild = { ...parent, path: '', noShowingChildren: true }
         return true
       }
 

@@ -1,16 +1,18 @@
 <template>
   <div class="app-container flex flex-col history-container bg-dark" @click="uploadEditor($event)">
-    <breadcrumb-ext :breads="[{type:'content', val:'Job Overview'}]"/>
+    <breadcrumb-ext :breads="[{type:'content', val:'Job Overview'}]" />
     <div class="tool-bar flex flex-center flex-end">
       <div class="tool-item">
-        <div class="tool-item">
-          <span class="title">Job ID:</span>
-          <el-input v-model="condition.job_id" :size="'mini'" clearable @keyup.native.enter="search" @clear="search" />
-        </div>
-        <div class="tool-item">
-          <span class="title">Party ID:</span>
-          <el-input v-model="condition.party_id" :size="'mini'" clearable @keyup.native.enter="search" @clear="search" />
-        </div>
+        <span class="title">Job ID:</span>
+        <el-input
+          v-model="condition.job_id"
+          :size="'mini'"
+          clearable
+          @keyup.native.enter="search"
+          @clear="search"
+        />
+      </div>
+      <div class="tool-item">
         <span class="title">Role:</span>
         <el-select v-model="condition.role" :size="'mini'" collapse-tags multiple placeholder>
           <el-option
@@ -20,6 +22,16 @@
             :label="item.label"
           />
         </el-select>
+      </div>
+      <div class="tool-item">
+        <span class="title">Party ID:</span>
+        <el-input
+          v-model="condition.party_id"
+          :size="'mini'"
+          clearable
+          @keyup.native.enter="search"
+          @clear="search"
+        />
       </div>
       <div class="tool-item">
         <span class="title">Status:</span>
@@ -34,7 +46,13 @@
       </div>
       <div class="tool-item">
         <span class="title">Note:</span>
-        <el-input v-model="condition.note" :size="'mini'" clearable @keyup.native.enter="search" @clear="search" />
+        <el-input
+          v-model="condition.note"
+          :size="'mini'"
+          clearable
+          @keyup.native.enter="search"
+          @clear="search"
+        />
       </div>
       <el-button :size="'mini'" type="primary" round @click="search">Search</el-button>
     </div>
@@ -50,6 +68,7 @@
         empty-text="NO DATA"
         height="100%"
         @current-change="setCurrentRow"
+        @sort-change="sortChange"
       >
         <template v-for="item in tHead">
           <el-table-column
@@ -81,8 +100,13 @@
                 <div v-else>{{ scope.row[item.key] }}</div>
               </div>
               <div v-else-if="item.key==='notes'">
-                <div v-if="!scope.row.notesEdit" class="flex flex-row flex-end flex-center">
-                  <el-tooltip :content="scope.row[item.key]" :disabled="willshowingToolTip(scope)" effect="dark" placement="top-end">
+                <div v-if="!scope.row.notesEdit" class="flex flex-row flex-start flex-center">
+                  <el-tooltip
+                    :content="scope.row[item.key]"
+                    :disabled="willshowingToolTip(scope)"
+                    effect="dark"
+                    placement="top-end"
+                  >
                     <span class="notes-showing">{{ scope.row[item.key] }}</span>
                   </el-tooltip>
                   <icon-hover-and-active
@@ -92,11 +116,28 @@
                     @clickFn="editorNoteForJob(scope)"
                   />
                 </div>
-                <div v-else-if="scope.row.notesEdit" class="flex flex-row flex-end flex-center" @click.stop="stopToTop($event)">
-                  <el-input v-model="editorText" :ref="scope.column.id+'_'+scope.$index" placeholder="请输入" class="notes-editor" @keyup.native.enter="uploadEditor($event)"/>
-                  <i class="el-icon-check" @click.self="uploadEditor($event)"/>
-                  <i class="el-icon-close" @click.self="closeEditor(scope)"/>
+                <div
+                  v-else-if="scope.row.notesEdit"
+                  class="flex flex-row flex-start flex-center"
+                  @click.stop="stopToTop($event)"
+                >
+                  <el-input
+                    v-model="editorText"
+                    :ref="scope.column.id+'_'+scope.$index"
+                    placeholder="please enter"
+                    class="notes-editor"
+                    @keyup.native.enter="uploadEditor($event)"
+                  />
+                  <i class="el-icon-check" @click.self="uploadEditor($event)" />
+                  <i class="el-icon-close" @click.self="closeEditor(scope)" />
                 </div>
+              </div>
+              <div v-else-if="item.key === 'action'">
+                <el-button
+                  class="action-button"
+                  type="text"
+                  @click="onRetry(scope.row)"
+                >{{ scope.row.status === 'failed' || scope.row.status === 'canceled' ? 'retry' : scope.row.status === 'waiting' || scope.row.status === 'running' ? 'cancel' : '' }}</el-button>
               </div>
               <span v-else>{{ scope.row[item.key] }}</span>
             </template>
@@ -113,23 +154,44 @@
       />
       <!--<header-select :options="roleOptions"/>-->
     </div>
+    <confirm ref="confirm" />
   </div>
 </template>
 
 <script>
+/**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 import Pagination from '@/components/Pagination'
 import { parseTime, formatSeconds, deepClone } from '@/utils'
 import { mapGetters } from 'vuex'
-import { queryJobs, addNotes } from '@/api/job'
+import { queryJobs, addNotes, killJob, retryJob, queryFileds } from '@/api/job'
 import IconHoverAndActive from '@/components/IconHoverAndActive'
 import BreadcrumbExt from '@/components/BreadcrumbExt'
+import Confirm from '@/views/job-dashboard/board/Confirm'
 
 export default {
   name: 'Job',
   components: {
     Pagination,
     IconHoverAndActive,
-    BreadcrumbExt
+    BreadcrumbExt,
+    Confirm
   },
   filters: {},
   data() {
@@ -140,7 +202,10 @@ export default {
         status: '',
         job_id: '',
         party_id: '',
-        note: ''
+        note: '',
+        orderRule: 'desc',
+        // orderField: 'f_start_time'
+        orderField: 'f_job_id'
       },
       currentRow: 1,
       saveCondition: {},
@@ -164,18 +229,19 @@ export default {
           key: 'start_time',
           label: 'Start Time',
           width: 200,
-          sortable: true
+          sortable: 'custom'
         },
         {
           key: 'end_time',
           label: 'End Time',
           width: 200,
-          sortable: true
+          sortable: 'custom'
         },
         {
           key: 'duration',
           label: 'Duration',
-          width: 120
+          width: 130,
+          sortable: 'custom'
         },
         {
           key: 'status',
@@ -185,13 +251,18 @@ export default {
         {
           key: 'notes',
           label: 'Notes',
-          minWidth: 200
+          minWidth: 170
         },
         {
           key: 'progress',
           hidden: true
           // scope: true
           // width: 150
+        },
+        {
+          key: 'action',
+          label: 'Action',
+          width: 100
         }
       ],
       startTimeSort: 'desc',
@@ -200,8 +271,8 @@ export default {
       pageSize: 20,
       total: 0,
       page:
-				(this.$route.params.page && Number.parseInt(this.$route.params.page)) ||
-				1,
+        (this.$route.params.page && Number.parseInt(this.$route.params.page)) ||
+        1,
       dialogVisible: false,
       formLoading: false,
       form: {
@@ -224,49 +295,22 @@ export default {
           }
         ]
       },
-      roleOptions: [
-        {
-          value: 'guest',
-          label: 'guest'
-        },
-        {
-          value: 'host',
-          label: 'host'
-        },
-        {
-          value: 'arbiter',
-          label: 'arbiter'
-        }
-      ],
-      statusOptions: [
-        {
-          value: 'success',
-          label: 'success'
-        },
-        {
-          value: 'running',
-          label: 'running'
-        },
-        {
-          value: 'waiting',
-          label: 'waiting'
-        },
-        {
-          value: 'failed',
-          label: 'failed'
-        },
-        {
-          value: 'canceled',
-          label: 'canceled'
-        }
-      ],
+      roleOptions: [],
+      statusOptions: [],
       editorText: '',
       editorScope: '',
       willopenScope: ''
     }
   },
   computed: {
-    ...mapGetters(['lastJob', 'icons'])
+    ...mapGetters(['lastJob', 'icons']),
+    sortKeys() {
+      return {
+        start_time: 'f_start_time',
+        end_time: 'f_end_time',
+        duration: 'f_elapsed'
+      }
+    }
   },
   beforeMount() {
     const {
@@ -297,6 +341,7 @@ export default {
   },
   mounted() {
     this.queryList()
+    this.queryFileds()
   },
   methods: {
     // getTotal() {
@@ -332,22 +377,23 @@ export default {
       }
       this.queryList()
     },
-    queryList() {
+    queryList(filterOperation) {
       // console.log(this.condition)
       const cond = Object.assign(this.condition, {
         jobId: this.condition.job_id,
         partyId: this.condition.party_id,
         fDescription: this.condition.note
       })
+      let times = 0
       const sortPara = {}
-      if (this.startTimeSort) {
-        sortPara.orderRule = this.startTimeSort
-        sortPara.orderField = 'f_start_time'
-      }
-      if (this.endTimeSort) {
-        sortPara.orderRule = this.endTimeSort
-        sortPara.orderField = 'f_end_time'
-      }
+      // if (this.startTimeSort) {
+      //   sortPara.orderRule = this.startTimeSort
+      //   sortPara.orderField = 'f_start_time'
+      // }
+      // if (this.endTimeSort) {
+      //   sortPara.orderRule = this.endTimeSort
+      //   sortPara.orderField = 'f_end_time'
+      // }
       const para = Object.assign(
         {
           // total_record: this.total,
@@ -359,69 +405,84 @@ export default {
         cond,
         sortPara
       )
+      if (!filterOperation) {
+        this.listLoading = true
+      }
+      const req = () => {
+        return queryJobs(para)
+          .then(res => {
+            this.saveCondition = deepClone(this.condition)
+            let willUpdated = true
+            const data = []
+            this.total = res.data.totalRecord
+            res.data.list.forEach(item => {
+              let jobId = ''
+              let role = ''
+              let partyId = ''
+              // let _dataset = ''
+              // let partner = ''
+              // let pnr_dataset = ''
+              let start_time = ''
+              let end_time = ''
+              let duration = ''
+              let status = ''
+              let progress = ''
+              let notes = ''
 
-      this.listLoading = true
-      queryJobs(para)
-        .then(res => {
-          this.saveCondition = deepClone(this.condition)
-          this.listLoading = false
-          const data = []
-          this.total = res.data.totalRecord
-          res.data.list.forEach(item => {
-            let jobId = ''
-            let role = ''
-            let partyId = ''
-            // let _dataset = ''
-            // let partner = ''
-            // let pnr_dataset = ''
-            let start_time = ''
-            let end_time = ''
-            let duration = ''
-            let status = ''
-            let progress = ''
-            let notes = ''
+              const { job } = item
 
-            const { job } = item
-
-            if (job) {
-              jobId = job.fJobId || ''
-              role = job.fRole || ''
-              partyId = job.fPartyId || ''
-              start_time = job.fStartTime
-                ? parseTime(new Date(job.fStartTime))
-                : ''
-              end_time = job.fEndTime ? parseTime(job.fEndTime) : ''
-              duration = job.fElapsed ? formatSeconds(job.fElapsed) : ''
-              status = job.fStatus || ''
-              progress = job.fStatus === 'running' ? job.fProgress || 0 : null
-              notes = job.fDescription || ''
-            }
-            // if (dataset) {
-            //   _dataset = dataset.dataset || ''
-            //   partner = dataset.partner || ''
-            //   pnr_dataset = dataset.pnr_dataset || ''
-            // }
-            data.push({
-              jobId,
-              role,
-              partyId,
-              // dataset: _dataset,
-              // partner,
-              // pnr_dataset,
-              start_time,
-              end_time,
-              duration,
-              status,
-              progress,
-              notes,
-              notesEdit: false
+              if (job) {
+                if (filterOperation && !filterOperation(job)) {
+                  willUpdated = false
+                  return false
+                }
+                jobId = job.fJobId || ''
+                role = job.fRole || ''
+                partyId = job.fPartyId || ''
+                start_time = job.fStartTime
+                  ? parseTime(new Date(job.fStartTime))
+                  : ''
+                end_time = job.fEndTime ? parseTime(job.fEndTime) : ''
+                duration = job.fElapsed ? formatSeconds(job.fElapsed) : ''
+                status = job.fStatus || ''
+                progress = job.fStatus === 'running' ? job.fProgress || 0 : null
+                notes = job.fDescription || ''
+              }
+              // if (dataset) {
+              //   _dataset = dataset.dataset || ''
+              //   partner = dataset.partner || ''
+              //   pnr_dataset = dataset.pnr_dataset || ''
+              // }
+              data.push({
+                jobId,
+                role,
+                partyId,
+                // dataset: _dataset,
+                // partner,
+                // pnr_dataset,
+                start_time,
+                end_time,
+                duration,
+                status,
+                progress,
+                notes,
+                notesEdit: false
+              })
             })
+            if (willUpdated) {
+              this.list = data
+              this.listLoading = false
+            } else {
+              if (times < 10) {
+                setTimeout(() => {
+                  req()
+                }, 4000)
+                times += 1
+              }
+            }
           })
-          this.list = data
-        })
-        .catch(res => {
-          this.listLoading = false
-        })
+      }
+      req()
     },
     search() {
       this.page = 1
@@ -473,9 +534,9 @@ export default {
       }
       if (
         this.lastJob &&
-				row.jobId === this.lastJob.job_id &&
-				row.role === this.lastJob.role &&
-				row.partyId === this.lastJob.party_id
+        row.jobId === this.lastJob.job_id &&
+        row.role === this.lastJob.role &&
+        row.partyId === this.lastJob.party_id
       ) {
         final += ' history-stripe'
       }
@@ -508,12 +569,15 @@ export default {
     uploadEditor(ev) {
       const that = this
       const scope = this.editorScope
-      if (this.editorScope && this.editorText !== that.list[scope.$index].notes) {
+      if (
+        this.editorScope &&
+        this.editorText !== that.list[scope.$index].notes
+      ) {
         const params = {
-          'job_id': scope.row.jobId,
-          'role': scope.row.role,
-          'party_id': scope.row.partyId,
-          'notes': this.editorText
+          job_id: scope.row.jobId,
+          role: scope.row.role,
+          party_id: scope.row.partyId,
+          notes: this.editorText
         }
         addNotes(params).then(res => {
           that.list[scope.$index].notes = that.editorText
@@ -554,6 +618,55 @@ export default {
     },
     stopToTop(ev) {
       ev.stopPropagation()
+    },
+    onRetry(row) {
+      const status = row.status
+      if (status === 'complete') {
+        return
+      }
+      const isDone = status === 'failed' || status === 'canceled'
+      const isDoing = status === 'running' || status === 'waiting'
+      const callback = isDone ? retryJob : isDoing ? killJob : () => {}
+      const confirmText =
+        isDone
+          ? [`The job will continue from where it ${status}`, 'it may take few seconds to  update job status.']
+          : isDoing
+            ? [`Are you sure you want to cancel this job?`, 'You can\'t undo this action，it may take few seconds to  update job status.']
+            : ['', '']
+
+      this.$refs.confirm
+        .confirm(...confirmText)
+        .then(() => {
+          const mid = {
+            job_id: row.jobId
+          }
+          if (isDone) {
+            mid.component_name = 'pipeline'
+          }
+          callback(mid).then(() => {
+            this.queryList((job) => {
+              return job.fJobId !== row.jobId || (isDone
+                ? job.fStatus.toLowerCase().match(new RegExp(`(${['waiting', 'running'].join('|')})`))
+                : isDoing
+                  ? job.fStatus.toLowerCase().match(new RegExp(`(${['failed', 'canceled', 'success'].join('|')})`))
+                  : false)
+            })
+          })
+        })
+    },
+    queryFileds() {
+      queryFileds().then(response => {
+        const { role, status } = response.data
+        const mapFunc = item => ({ value: item, label: item })
+        this.roleOptions = role.map(mapFunc)
+        this.statusOptions = status.map(mapFunc)
+      })
+    },
+    sortChange({ prop, order }) {
+      order = order === 'descending' ? 'desc' : 'asc'
+      this.condition.orderRule = order
+      this.condition.orderField = this.sortKeys[prop] || 'f_start_time'
+      this.queryList()
     }
   }
 }
