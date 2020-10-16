@@ -22,38 +22,14 @@ import java.util.List;
 
 public interface JobMapper {
 
-    List<JobWithBLOBs> selectByPage(@Param(value = "startIndex") long startIndex,
-                                    @Param(value = "pageSize") long pageSize);
 
-    long countByExample(JobExample example);
-
-    int deleteByExample(JobExample example);
-
-    int deleteByPrimaryKey(JobKey key);
-
-    int insert(JobWithBLOBs record);
-
-    int insertSelective(JobWithBLOBs record);
-
-    List<JobWithBLOBs> selectByExampleWithBLOBs(JobExample example);
-
-    List<Job> selectByExample(JobExample example);
-
-    JobWithBLOBs selectByPrimaryKey(JobKey key);
-
-    int updateByExampleSelective(@Param("record") JobWithBLOBs record, @Param("example") JobExample example);
-
-    int updateByExampleWithBLOBs(@Param("record") JobWithBLOBs record, @Param("example") JobExample example);
-
-    int updateByExample(@Param("record") Job record, @Param("example") JobExample example);
-
-    int updateByPrimaryKeySelective(JobWithBLOBs record);
-
-    int updateByPrimaryKeyWithBLOBs(JobWithBLOBs record);
-
-    int updateByPrimaryKey(Job record);
+    List<JobDO> queryTodayCompletedJobs(@Param("timeTodayStart") long timeTodayStart,@Param("timeStampNow")long timeStampNow);
 
     long countJob(PagedJobQO pagedJobQO);
 
-    List<JobWithBLOBs> queryPagedJobs(@Param("pagedJobQO") PagedJobQO pagedJobQO, @Param("startIndex") long startIndex);
+    List<JobDO> queryPagedJobs(@Param("pagedJobQO") PagedJobQO pagedJobQO, @Param("startIndex") long startIndex);
+
+    List<JobDO> queryJobStatus();
+
+    JobDO queryJobByConditions(@Param("jobId") String jobId, @Param("role") String role, @Param("partyId") String partyId);
 }

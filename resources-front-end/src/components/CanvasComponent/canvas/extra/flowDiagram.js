@@ -1,4 +1,22 @@
 /**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
+/**
  * dagInfo : api data
  *
  */
@@ -8,6 +26,7 @@ import { calculation } from '../Core/Paths/line'
 import { measureText } from '../Core/Paths/text'
 import { FONT_SIZE, FONT_FAMILY } from './modules'
 
+let newPort = false
 const LINE_STLYE = '#BBBBC8'
 const LINE_BRIGHT_STYLE = '#578FFF'
 const LINE_WIDTH_FOR_LINKING = 2
@@ -73,6 +92,14 @@ const flowDiagram = {
       const lay = this
       Progress.animations.toNewType.call(lay.$children.get(name), Progress.type.FAIL, img)
     },
+    toCanceled(name, img) {
+      const lay = this
+      Progress.animations.toNewType.call(lay.$children.get(name), Progress.type.FAIL, img)
+    },
+    toCancel(name, img) {
+      const lay = this
+      Progress.animations.toNewType.call(lay.$children.get(name), Progress.type.FAIL, img)
+    },
     toError(name, img) {
       const lay = this
       Progress.animations.toNewType.call(lay.$children.get(name), Progress.type.FAIL, img)
@@ -80,6 +107,14 @@ const flowDiagram = {
     toRunning(name, time) {
       const lay = this
       Progress.animations.toNewType.call(lay.$children.get(name), Progress.type.RUNNING, time)
+    },
+    toWaiting(name) {
+      const lay = this
+      Progress.animations.toNewType.call(lay.$children.get(name), Progress.type.UNRUN)
+    },
+    toUnrun(name) {
+      const lay = this
+      Progress.animations.toNewType.call(lay.$children.get(name), Progress.type.UNRUN)
     },
     toType(obj) {
       const lay = this
@@ -93,7 +128,7 @@ const flowDiagram = {
       this.$children.forEach((val, key) => {
         if (text && key === text) {
           val.$zindex = 2
-        } else if (text && key.match(text)) {
+        } else if (text && key.match(text) && !key.match('_' + text) && !key.match(text + '_')) {
           const name = key.split('|')
           name.splice(name.indexOf(text), 1)
           val.$zindex = 1
@@ -118,6 +153,7 @@ const flowDiagram = {
 function struct() {
   const lay = this
   const dagInfo = lay.dagInfo
+  const images = lay.images
   lay.lineWidthForLinking = lay.lineWidthForLinking || LINE_WIDTH_FOR_LINKING
   lay.padding = lay.padding || COMP_PADDING
   lay.paddingHeight = lay.paddingHeight || COMP_HEIGHT_PADDING
@@ -126,7 +162,7 @@ function struct() {
   lay.componentBetween = (lay.componentBetween || COMP_BETWEEN)
   lay.innerBetween = (lay.innerBetween || INNER_BETWEEN)
   lay.levelBetween = (lay.levelBetween || LEVEL_BETWEEN)
-  lay.info = new DiagramInfo(lay, dagInfo)
+  lay.info = new DiagramInfo(lay, dagInfo, images)
   lay.info.resetting()
   lay.$meta.set('clear', lay.info.getStyleOfDag())
   lay._inited = true
@@ -142,10 +178,14 @@ class DiagramInfo {
     this.components = new Map()
     this.size = 0
     this.lay = lay
-    this.componentInfo(obj.component_list) // 组件基本信息设置
-    this.componentDisable(obj.component_need_run) // 组件非运行状态核对设置
-    this.componentBelone(obj.component_module) // 组件类型设置
-    this.componentLink(obj.dependencies) // 组件关联关系设置
+    this.checkNewPort(obj.dependencies)
+    this.componentInfo(obj.component_list)
+    this.componentDisable(obj.component_need_run)
+    this.componentBelone(obj.component_module, obj.dependencies)
+    this.componentLink(obj.dependencies)
+  }
+  checkNewPort(obj) {
+    newPort = Object.keys(obj).length > 0 ? !!obj[Object.keys(obj)[0]][0]['up_output_info'] : true
   }
   componentInfo(list) {
     for (const val of list) {
@@ -155,23 +195,24 @@ class DiagramInfo {
   componentDisable(obj) {
     for (const key in obj) {
       this.components.get(key).setDisable(!obj[key])
+      this.components.get(key).setImage(this.lay.images)
     }
   }
-  componentBelone(obj) {
+  componentBelone(obj, dep) {
     for (const key in obj) {
-      this.components.get(key).setBelone(obj[key], this.lay.images)
+      this.components.get(key).setBelone(obj[key], this.lay.images, dep)
     }
   }
   componentLink(obj) {
     const setChild = (name) => {
       for (const key in this.linking) {
         for (const item of this.linking[key]) {
-          if (item[0] === name) {
-            const parent = this.components.get(item[0])
-            const child = this.components.get(item[1])
+          if (item.components[0] === name) {
+            const parent = this.components.get(item.components[0])
+            const child = this.components.get(item.components[1])
             if (child.level <= parent.level) {
               child.level = parent.level + 1
-              setChild(item[1])
+              setChild(item.components[1])
             }
           }
         }
@@ -180,7 +221,10 @@ class DiagramInfo {
     for (const name in obj) {
       for (const item of obj[name]) {
         this.linking[item.type] = this.linking[item.type] || []
-        this.linking[item.type].push([item.component_name, name])
+        this.linking[item.type].push({
+          components: [item.component_name, name],
+          outputType: item.up_output_info ? item.up_output_info.join('') : (item.type + '0')
+        })
         setChild(item.component_name)
       }
     }
@@ -241,11 +285,11 @@ class DiagramInfo {
       this.linkPos[key] = this.linkPos[key] || []
       for (const val of this.linking[key]) {
         const link = { line: [], name: '' }
-        link.line.push(this.lay.$children.get(val[0]).$meta.get('port').get(key + 'output'))
-        link.line.push(this.lay.$children.get(val[1]).$meta.get('port').get(key + 'input'))
-        const p = this.components.get(val[0])
-        const c = this.components.get(val[1])
-        link.name = p.name + '|' + c.name + '|' + key + '|line'
+        link.line.push(this.lay.$children.get(val.components[0]).$meta.get('port').get(val.outputType + 'output'))
+        link.line.push(this.lay.$children.get(val.components[1]).$meta.get('port').get(key + 'input'))
+        const p = this.components.get(val.components[0])
+        const c = this.components.get(val.components[1])
+        link.name = p.name + '|' + c.name + '|' + val.outputType + '|' + key + '|line'
         link.corssLevel = ((c.level - p.level) >= 2)
         this.linkPos[key].push(link)
       }
@@ -288,11 +332,11 @@ class DiagramInfo {
     return { width: dagWidth, height: dagHeight }
   }
   resetting() {
-    this.componentCheckWidthAndHeight() // 组件展示长宽计算
-    this.checkPos() // 组件位置计算
-    this.componentGetInstance() // 组件实例化
-    this.getLinking() // 获取链接曲线
-    this.getLinkInstance() // 链接曲线实例化
+    this.componentCheckWidthAndHeight()
+    this.checkPos()
+    this.componentGetInstance()
+    this.getLinking()
+    this.getLinkInstance()
   }
 }
 
@@ -300,6 +344,7 @@ class CompExpression {
   constructor(obj) {
     this.name = obj.component_name
     this.time = obj.time
+    this.images = null
     this.type = this.getStatus(obj.status || 'unrun')
     this.level = 0
     this.width = 0
@@ -320,42 +365,75 @@ class CompExpression {
   setDisable(disable) {
     this.disable = disable
   }
-  setBelone(Belone, ports) {
+  setImage(imgs) {
+    this.img = imgs.get((this.disable ? 'DISABLE_' : '') + this.type.split('|')[0])
+  }
+  setBelone(Belone, ports, dep) {
     this.belone = Belone
-    this.setPort(ports)
+    this.setPort(ports, dep)
   }
   setPos(point) {
     this.point = point
   }
-  setPort(ports) {
+  checkSetPort(name, model, dep) {
+    const split = !newPort ? ['none']
+      : ['secureboost', 'linr', 'lr', 'poisson', 'heteronn', 'homonn', 'localbaseline', 'fm', 'mf', 'svd', 'scdpp', 'gmf', 'ftl', 'psi', 'kmeans']
+    const deps = dep[name]
+    if (dep[name] && dep[name].length > 0) {
+      for (const val of deps) {
+        if (['model', 'data'].indexOf(val.type) < 0) {
+          return true
+        }
+      }
+      return false
+    } else {
+      return model.toLowerCase().match(new RegExp('(' + split.join('|') + ')', 'i'))
+    }
+  }
+  setPort(ports, dep) {
     this.input = this.input || []
     this.output = this.output || []
+    const TRAINDATA = { name: 'train_datainput', tooltip: 'Train Data Input', type: 'data' }
+    const VALDATA = { name: 'validate_datainput', tooltip: 'Validation Data Input', type: 'data' }
     const DATAINPUT = { name: 'datainput', tooltip: 'Data Input', type: 'data' }
-    const DATAOUTPUT = { name: 'dataoutput', tooltip: 'Data Output', type: 'data' }
+    const DATAOUTPUT = { name: 'data0output', tooltip: 'Data Output', type: 'data' }
     const MODELINPUT = { name: 'modelinput', tooltip: 'Model Input', type: 'model' }
-    const MODELOUTPUT = { name: 'modeloutput', tooltip: 'Model Output', type: 'model' }
-    this.input.push(DATAINPUT)
-    if (this.belone.toLowerCase().match(/evaluation/i)) {
-      this.input[0].mult = ports.get('mult_data_port')
+    const MODELOUTPUT = { name: 'model0output', tooltip: 'Model Output', type: 'model' }
+    if (this.checkSetPort(this.name, this.belone, dep)) {
+      this.input.push(...[TRAINDATA, VALDATA])
+    } else if (!this.belone.toLowerCase().match('reader')) {
+      this.input.push(DATAINPUT)
     }
-    if (!this.belone.toLowerCase().match(/(evaluation|upload|download|pearson|datasplit)/i)) {
+    if (this.belone.toLowerCase().match(/evaluation|union/i)) {
+      this.input[0].mult = ports.get('MULT_DATA_PORT')
+    }
+    if (!this.belone.toLowerCase().match(/(evaluation|upload|download|pearson|datasplit|statistics|psi|kmeans)/i)) {
       this.output.push(DATAOUTPUT)
     }
-    if (!this.belone.toLowerCase().match(/(intersection|federatedsample|evaluation|upload|download|rsa|datasplit)/i)) {
-      this.input.push(MODELINPUT)
-      this.output.push(MODELOUTPUT)
-      if (this.belone.toLowerCase().match(/(selection)/i)) {
-        this.input[1].mult = ports.get('mult_model_port')
-      }
+    if (this.belone.toLowerCase().match(/(kmeans)/i)) {
+      this.output.push(...[{
+        name: 'data0output', tooltip: 'Train Data Output', type: 'data'
+      }, {
+        name: 'data1output', tooltip: 'Validation Data Output', type: 'data'
+      }])
     }
     if (this.belone.toLowerCase().match(/(datasplit)/i)) {
       this.output.push(...[{
-        name: 'traindatainput', tooltip: 'Train Data Input', type: 'data'
+        name: 'data0output', tooltip: 'Train Data Output', type: 'data'
       }, {
-        name: 'validationdatainput', tooltip: 'Validation Data Input', type: 'data'
+        name: 'data1output', tooltip: 'Validation Data Output', type: 'data'
       }, {
-        name: 'testdatainput', tooltip: 'Test Data Input', type: 'data'
+        name: 'data2output', tooltip: 'Test Data Output', type: 'data'
       }])
+    }
+    if (!this.belone.toLowerCase().match(/(intersection|federatedsample|evaluation|upload|download|rsa|datasplit|reader|union|pearson)/i)) {
+      if (!this.belone.toLowerCase().match(/(statistics|psi)/i)) {
+        this.input.push(MODELINPUT)
+      }
+      this.output.push(MODELOUTPUT)
+      if (this.belone.toLowerCase().match(/(selection)/i)) {
+        this.input[1].mult = ports.get('MULT_MODEL_PORT')
+      }
     }
   }
   getComponentInstance(lay) {
@@ -371,7 +449,8 @@ class CompExpression {
         output: this.output,
         specialDataInput: this.specialDataInput,
         contentFontSize: lay.fontSizeForContent,
-        time: lay.$children.get(this.name) ? lay.$children.get(this.name).time : this.time
+        time: lay.$children.get(this.name) ? lay.$children.get(this.name).time : this.time,
+        img: this.img
       },
       zindex: 1,
       events: Progress.events

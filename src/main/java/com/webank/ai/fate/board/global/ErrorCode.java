@@ -18,7 +18,6 @@ package com.webank.ai.fate.board.global;
 
 public enum ErrorCode {
 
-    //COMMON CODE
     SUCCESS(0, "OK"),
     SERVLET_ERROR(10000, "Request parameters error!"),
     REQUESTBODY_ERROR(10001,"Request body error!"),
@@ -31,13 +30,16 @@ public enum ErrorCode {
     ERROR_PARAMETER(10008, "Parameters are illegal!"),
     DATABASE_ERROR_CONNECTION(10009, "Database connection error!"),
     SYSTEM_ERROR(10010, "System error!"),
+    DOWNLOAD_ERROR(10011, "File doesn't exist!"),
+    UPLOAD_ERROR(10012, "Upload error!"),
+    RERUN_ERROR(10013, "Rerun job error!"),
     ;
 
 
     private int code;
     private String msg;
 
-    private ErrorCode(int code, String msg) {
+    ErrorCode(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }
