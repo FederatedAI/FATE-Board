@@ -16,7 +16,7 @@
 package com.webank.ai.fate.board.ssh;
 
 import com.google.common.collect.Maps;
-import com.webank.ai.fate.board.utils.Dict;
+import com.webank.ai.fate.board.global.Dict;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -184,6 +184,16 @@ class SshConfigFileWatcher implements InitializingBean {
             } catch (IOException e) {
                 logger.error(" prepare watch file fail ! check Config Listening Path:{}", listeningPathString);
             }
+
+            //close the watcher
+            Thread hook = new Thread(() -> {
+                try {
+                    watcher.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            Runtime.getRuntime().addShutdownHook(hook);
         }
 
     }

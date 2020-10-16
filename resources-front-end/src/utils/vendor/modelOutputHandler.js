@@ -1,3 +1,22 @@
+
+/**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 import store from '@/store/modules/app'
 import { formatFloat } from '@/utils'
 // import doubleBarOptions from '@/utils/chart-options/doubleBar'
@@ -140,7 +159,7 @@ export default function({ outputType, responseData, role, partyId }) {
           iters
         }
       }
-      // console.log(output)
+      console.log(output)
     } else {
       output.isNoModelOutput = true
     }
@@ -294,6 +313,33 @@ export default function({ outputType, responseData, role, partyId }) {
     output.correlation = handleCorrelationData(responseData, role)
     output.role = role
     output.partyId = partyId
+  } else if (outputType === modelNameMap.psi) {
+    const { featurePsi, totalScore } = responseData
+    const psiSummaryTdata = []
+    const psiFeatureTdata = {}
+    const psiFeatureOption = []
+    Object.keys(featurePsi).forEach(feature => {
+      const featureName = featurePsi[feature].featureName
+      const featureInterval = featurePsi[feature].interval
+      psiFeatureTdata[featureName] = []
+      psiSummaryTdata.push({
+        variable: featureName,
+        psi: totalScore[featureName]
+      })
+      psiFeatureOption.push({
+        value: featureName,
+        label: featureName
+      })
+      featureInterval.forEach((interval, index) => {
+        psiFeatureTdata[featureName].push({
+          binning: interval,
+          expected: featurePsi[feature].expectPerc[index],
+          actual: featurePsi[feature].actualPerc[index],
+          psi: featurePsi[feature].psi[index]
+        })
+      })
+    })
+    output = { psiSummaryTdata, psiFeatureOption, psiFeatureTdata }
   }
   if (outputType === modelNameMap.heteroLR ||
     outputType === modelNameMap.heteroLinR ||
