@@ -1,8 +1,7 @@
 package com.webank.ai.fate.board.utils;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.webank.ai.fate.board.global.Dict;
 import org.springframework.boot.system.ApplicationHome;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
@@ -15,20 +14,39 @@ public class LogHandle {
         File jarF = h.getSource();
         String boardPath = jarF.getParentFile().toString();
         int fateboard = boardPath.lastIndexOf("fateboard");
-        String fatePath = boardPath.substring(0, fateboard);
-        String tmpPath = "/tmp/";
-        String ipRule="(127\\.0)|(10\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01])))|(192\\.168)";
+        String fateRule = boardPath.substring(0, fateboard);
+        String tmpRule= "/tmp/";
+        String ipRule = "(127\\.0)|(10\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01])))|(192\\.168)";
 
         for (Map stringObjectMap : result) {
             Object o = stringObjectMap.get(Dict.LOG_CONTENT);
             String log = (String) o;
-            String relativePathLog = log.replaceAll(fatePath, "./fate/");
-            String tmpPathLog = relativePathLog.replaceAll(tmpPath, "./");
+            String fatePath = log.replaceAll(fateRule, "./fate/");
+            String tmpPath = fatePath.replaceAll(tmpRule, "./");
 
-            String finalLog = tmpPathLog.replaceAll(ipRule, "xxx.xxx");
+            String finalLog = tmpPath.replaceAll(ipRule, "xxx.xxx");
             stringObjectMap.put(Dict.LOG_CONTENT, finalLog);
 
         }
         return result;
+    }
+
+    //replace ip and address in logs for security
+    public static String handleLog(String log) {
+        ApplicationHome h = new ApplicationHome(LogHandle.class);
+        File jarF = h.getSource();
+        String boardPath = jarF.getParentFile().toString();
+        int fateboard = boardPath.lastIndexOf("fateboard");
+        String fateRule = boardPath.substring(0, fateboard);
+        String tmpRule= "/tmp/";
+//        String ipRule = "(127\\.0)|(10\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01])))|(192\\.168)";
+        String ipRule = "(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01]))\\.\\d{1,3}\\.\\d{1,3})|(192\\.168\\.\\d{1,3}\\.\\d{1,3})";
+
+        String fatePath = log.replaceAll(fateRule, "./fate/");
+        String tempPath = fatePath.replaceAll(tmpRule, "./");
+
+        String finalLog = tempPath.replaceAll(ipRule, "xxx.xxx");
+
+        return finalLog;
     }
 }

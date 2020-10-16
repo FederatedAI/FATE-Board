@@ -1,0 +1,129 @@
+<template>
+  <div class="report-nav">
+    <crefresh @refresh="refreshAll" />
+    <span v-if="reportType.has" class="nav-item-wrap">
+      <span class="title">DownLoad:</span>
+      <span v-if="reportType.hasReport" class="nav-item" @click="download('report')">
+        <icon-hover-and-active
+          :default-url="require('@/icons/download_report_default.png')"
+          :hover-url="require('@/icons/download_report_hover.png')"
+          :active-url="require('@/icons/download_report_click.png')"
+          class="operation-btnicon"
+        />Report
+      </span>
+      <span v-if="reportType.hasModel" class="nav-item" @click="download('model')">
+        <icon-hover-and-active
+          :default-url="require('@/icons/download_model_default.png')"
+          :hover-url="require('@/icons/download_model_hover.png')"
+          :active-url="require('@/icons/download_model_click.png')"
+          class="operation-btnicon"
+        />Model
+      </span>
+      <span v-if="reportType.hasData" class="nav-item" @click="download('data')">
+        <icon-hover-and-active
+          :default-url="require('@/icons/download_data_default.png')"
+          :hover-url="require('@/icons/download_data_hover.png')"
+          :active-url="require('@/icons/download_data_click.png')"
+          class="operation-btnicon"
+        />Data
+      </span>
+    </span>
+  </div>
+</template>
+
+<script>
+/**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
+import { mapGetters } from 'vuex'
+import IconHoverAndActive from '@/components/IconHoverAndActive'
+import crefresh from './Refresh'
+
+export default {
+  name: 'ReportNav',
+  components: {
+    IconHoverAndActive,
+    crefresh
+  },
+  props: {
+    modelType: {
+      type: String,
+      default: ''
+    },
+    reportType: {
+      type: Object,
+      default: () => {}
+    }
+  },
+  computed: {
+    ...mapGetters(['modelNameMap'])
+  },
+  methods: {
+    download(command) {
+      this.$emit('download', command)
+    },
+    refreshAll() {
+      this.$emit('refresh')
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.report-nav {
+	display: inline;
+	line-height: 26px;
+	padding-left: 14px;
+	background-color: #fff;
+	span {
+		width: 80px;
+		font-size: 12px;
+		font-weight: bold;
+		cursor: pointer;
+		color: #4159d1;
+		text-align: center;
+		display: inline-block;
+	}
+	.nav-item-wrap {
+		background-color: #f8f9fa;
+		width: auto;
+		.nav-item {
+			position: relative;
+			&:hover::after {
+				content: ' ';
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				width: 80%;
+				margin: auto;
+				height: 1px;
+				background-color: #6d71d8;
+			}
+		}
+	}
+}
+
+.operation-btnicon {
+	display: inline-block;
+	vertical-align: middle;
+	width: 18px;
+	height: 18px;
+	line-height: 1;
+}
+</style>

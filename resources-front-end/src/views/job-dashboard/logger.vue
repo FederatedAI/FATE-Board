@@ -32,6 +32,24 @@
 </template>
 
 <script>
+/**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 import { initWebSocket } from '@/utils'
 import { queryLog, queryLogSize } from '@/api/job'
 export default {
@@ -61,10 +79,6 @@ export default {
     firstTip: {
       type: String,
       default: 'info'
-    },
-    componentId: {
-      type: String,
-      default: 'default'
     }
   },
 
@@ -84,7 +98,7 @@ export default {
 
   watch: {
     status(oldValue, newValue) {
-      if (this.status.toLowerCase().match(/(success|fail|cancel)/)) {
+      if (this.status.toLowerCase().match(/(success|complete|fail|cancel)/)) {
         this.queryAllLogSize().then(res => {
           for (const type of this.tips) {
             this.closeWebsocket(type)
@@ -114,7 +128,7 @@ export default {
         this.correctMax[key] = false
       }
       this.currentTip = this.firstTip
-      if (!this.status.toLowerCase().match(/(success|fail|cancel)/)) {
+      if (!this.status.toLowerCase().match(/(success|complete|fail|cancel)/)) {
         this.initAllSocket()
       } else {
         await this.queryAllLogSize()
@@ -142,8 +156,7 @@ export default {
     async queryLogSize(type) {
       await this._request(
         {
-          type,
-          componentId: this.componentId
+          type
         },
         queryLogSize,
         (data, meta) => {
@@ -163,7 +176,7 @@ export default {
     async queryLog(type, begin, end, exchange) {
       await this._request(
         {
-          componentId: this.componentId,
+          componentId: 'default',
           begin,
           end,
           type
@@ -278,7 +291,7 @@ export default {
 
     initWebsocket(type) {
       this.websockets[type] = initWebSocket(
-        `/log/${this.jobId}/${this.role}/${this.partyId}/${this.componentId}/${type}`,
+        `/log/${this.jobId}/${this.role}/${this.partyId}/default/${type}`,
         res => {
           // console.log(item, 'success')
         },
@@ -287,7 +300,9 @@ export default {
           // console.log(item, data)
           this.mixin(type, data)
           /* eslint-disable */
-					if (!this.status.toLowerCase().match(/(success|fail|cancel)/)) {
+					if (
+						!this.status.toLowerCase().match(/(success|complete|fail|cancel)/)
+					) {
 						const end =
 							this.logs[type].length > 0
 								? this.logs[type][this.logs[type].length - 1].lineNum
@@ -308,7 +323,7 @@ export default {
 		closeWebsocket(type) {
 			if (
 				this.correctMax[type] &&
-				this.status.toLowerCase().match(/(success|fail|cancel)/)
+				this.status.toLowerCase().match(/(success|complete|fail|cancel)/)
 			) {
 				if (
 					this.logs[type][this.logs[type].length - 1] ===

@@ -35,8 +35,8 @@
         />
         <el-table-column label align="center" width="150">
           <template slot-scope="scope">
-            <!--<el-button type="primary" size="small" @click="handleUpdate(scope.row)">修改</el-button>-->
-            <!--<el-button type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>-->
+            <!--<el-button type="primary" size="small" @click="handleUpdate(scope.row)">modify</el-button>-->
+            <!--<el-button type="danger" size="small" @click="handleDelete(scope.row)">delete</el-button>-->
             <i class="el-icon-edit-outline op-icon op-icon-edit" @click="handleUpdate(scope.row)" />
             <i class="el-icon-delete op-icon op-icon-delete" @click="handleDelete(scope.row)" />
           </template>
@@ -115,6 +115,24 @@
 </template>
 
 <script>
+/**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 import Pagination from '@/components/Pagination'
 import {
   getAllSSHConfig,
@@ -267,7 +285,7 @@ export default {
     },
     handleDelete(row) {
       this.$confirm(
-        "You can't undo this action",
+        "You can't undo this action，it may take few seconds to  update job status.",
         'Are you sure you want to delete this cluster?',
         {
           confirmButtonText: 'Save',

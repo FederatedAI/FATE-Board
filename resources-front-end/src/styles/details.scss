@@ -195,7 +195,7 @@ $link: #409eff;
     width: calc(100% - 18.8% - 15px);
   }
   .tab-bar {
-    margin: 0 18px 24px 24px;
+    margin: 0 10px 24px 24px;
     height: 24px;
     background: #F8F9FA;
     border: 1px solid #F8F9FA;
@@ -370,6 +370,7 @@ $link: #409eff;
     .el-dialog__body {
       padding: 0;
       height: calc(100% - 60px);
+      overflow: auto;
     }
   }
   .is-fullscreen{
@@ -381,4 +382,63 @@ $link: #409eff;
     background: #EBEDF0;
     top: 48px;
   } 
+}
+
+.dialog-tabs{
+  margin: 0 18px 24px 24px;
+  height: 24px;
+  background: #fff;
+  .el-tabs__active-bar{
+    display: none;
+  }
+  .el-tabs__header{
+    background: #F8F9FA;
+    padding: 1px 0;
+  }
+  .el-tabs__item{
+    $h: 22px;
+    width: 138px;
+    margin-right: 1px;
+    background: #fff;
+    height: $h;
+    line-height: $h;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
+    color: $dark-gray;
+    padding: 0px;
+    &:hover {
+      color: #fff;
+      background: $primary;
+    }
+  }
+  .el-tabs__item.is-active{
+    color: #fff;
+    background: #4159D1;
+  }
+  .el-tabs__nav-wrap::after{
+    content: none;
+    margin-bottom: 0px;
+    background-color: #fff;
+  }
+}
+.download {
+  display: flex;
+  height: 24px;
+  line-height: 24px;
+  padding: 0 20px;
+  margin-right: 18px;
+  background-color: #F8F9FA;
+  .link {
+    color: $primary;
+    cursor: pointer;
+  }
+  .head, .link {
+    font-size: 14px;
+    padding: 0 10px;
+    font-weight: 700;
+  }
 }
