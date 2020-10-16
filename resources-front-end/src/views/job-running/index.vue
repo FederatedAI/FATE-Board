@@ -7,7 +7,7 @@
           :role="item.role"
           :status="item.status"
           @enter="enter(item.jobId,item.role,item.partyId)"
-          @kill="handleKillJob(item.jobId, item.role,item.partyId, item.status==='waiting'?'cancel':'kill', index)"
+          @kill="handleKillJob(item.jobId, item.role,item.partyId, 'cancel', index)"
         />
       </li>
     </ul>
@@ -31,14 +31,32 @@
           @mouseout="checkSure=null;checkclick=null"
           @mousedown="checkclick=false"
           @click="closeDialog"
-        >cancel</button>
+        >Cancel</button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getAllJobsStatus, killJob, getJobDetails } from '@/api/job'
+/**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
+import { getAllJobsStatus, killJob } from '@/api/job'
 import jobRunning from './JobRunning'
 
 export default {
@@ -108,30 +126,13 @@ export default {
     },
     handleKillJob(job_id, role, party_id, method, index) {
       const para = { job_id, role, party_id }
-      getJobDetails(para).then(res => {
-        const { job } = res.data
-        const status = job.fStatus
-        if (status === 'waiting') {
-          if (method === 'kill') {
-            this.jobList[index].status = status
-            this.jobList.splice()
-          }
-          method = 'cancel'
-        } else {
-          if (method === 'cancel') {
-            method = 'kill'
-            this.jobList[index].status = status
-            this.jobList.splice()
-          }
-        }
-        this.checkSure = true
-        this.confirmKill(para, method)
-      })
+      this.checkSure = true
+      this.confirmKill(para, method)
       // this.confirmKill(para)
     },
     confirmKill(para, method) {
       this.mainContent = `Are you sure you want to ${method} this job?`
-      this.subContent = "You can't undo this action"
+      this.subContent = "You can't undo this action，it may take few seconds to  update job status."
       this.showDialog = true
       this.willKill = para
     },
@@ -144,7 +145,10 @@ export default {
     },
     submitKillJob(para) {
       const vm = this
-      killJob(para)
+      const mid = {
+        job_id: para.job_id
+      }
+      killJob(mid)
         .then(
           res => {
             this.getJobList()

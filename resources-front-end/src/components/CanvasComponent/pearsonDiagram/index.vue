@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col flex-center correlation-container" @click="dialogClose">
+  <div class="flex flex-col space-between correlation-container" @click="dialogClose">
     <div class="flex flex-row space-between flex-center correlation-title">
       <div class="flex flex-row flex-center">
         <span v-if="!single">role:</span>
@@ -40,7 +40,7 @@
           :default-url="require('@/components/CanvasComponent/pearsonDiagram/icons/sortby_default.png')"
           :hover-url="require('@/components/CanvasComponent/pearsonDiagram/icons/sortby_hover.png')"
           :active-url="require('@/components/CanvasComponent/pearsonDiagram/icons/sortby_click.png')"
-          class="operation-btn"
+          class="operation-btnicon"
           @clickFn="showingSortBy"
         />
         <sort-by
@@ -58,7 +58,7 @@
           :default-url="require('@/components/CanvasComponent/pearsonDiagram/icons/filter_default.png')"
           :hover-url="require('@/components/CanvasComponent/pearsonDiagram/icons/filter_hover.png')"
           :active-url="require('@/components/CanvasComponent/pearsonDiagram/icons/filter_click.png')"
-          class="operation-btn btn-no-margin"
+          class="operation-btnicon btn-no-margin"
           @clickFn="showingFilterRange"
         />
         <filter-range v-show="showRangefilter" ref="filterRange" @filter="filterCorrelation" />
@@ -89,6 +89,24 @@
 </template>
 
 <script>
+/**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 import IconHoverAndActive from '@/components/IconHoverAndActive'
 import correlation from './correlation'
 import transfer from './transfer'
@@ -255,6 +273,10 @@ export default {
       this.$refs.correlation.canvasResize()
     },
 
+    resize() {
+      this.canvasResize()
+    },
+
     filterCorrelation(max, min) {
       this.filterMax = max
       this.filterMin = min
@@ -294,13 +316,16 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .correlation-container {
 	width: 100%;
+	height: 100%;
 	position: relative;
+	flex: 1 1 100%;
 	.correlation-title {
 		width: 100%;
-		margin-bottom: 12px;
+		margin: 12px 0px;
+		flex: 0 0 auto;
 		.el-select {
 			max-width: 135px;
 			.el-input {
@@ -318,7 +343,7 @@ export default {
 				line-height: 24px;
 			}
 		}
-		.operation-btn {
+		.operation-btnicon {
 			margin-right: 12px;
 			max-width: 36px;
 			max-height: 24px;
@@ -374,10 +399,10 @@ export default {
 	}
 	.correlation-relationship {
 		width: 100%;
-		height: calc(100% - 36px);
+		flex: 1 1 100%;
 		position: relative;
 		.relationship-picture {
-			min-width: calc(100% - 70px);
+			width: 100%;
 			height: 100%;
 			margin-right: 15px;
 			border: 2px solid #ebedf0;

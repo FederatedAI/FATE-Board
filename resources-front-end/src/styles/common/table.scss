@@ -1,0 +1,97 @@
+.table-search {
+	margin-bottom: 12px;
+	.search-input {
+    max-width: 150px;
+    .el-input__inner {
+      background: #F8F8FA;
+      height: 24px;
+      border: 0px;
+      border-radius: 2px;
+      width: 130px;
+      padding-right: 20px;
+      line-height: 24px;
+    }
+    .el-input-group__append {
+      border: 0px;
+      border-radius: 2px;
+      background: #F8F8FA;
+      padding-right: 10px;
+      padding-left: 0px;
+    }
+    .el-input__icon {
+      line-height: 24px;
+      margin-right: 7px;
+    }
+  }
+  .el-select {
+      max-width: 135px;
+      .el-select__tags {
+        border-radius: 2px;
+        height: 16px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        .el-tag {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          border-radius: 2px;
+          height: 16px;
+          margin-right: 2px;
+          .el-select__tags-text {
+            line-height: 16px;
+          }
+          .el-tag__close {
+            line-height: 16px;
+            margin-top: 0px;
+          }
+        }
+      }
+      .el-input__inner {
+        height: 24px;
+        background-color: #fff;
+        border: 2px solid #EBEDF0;
+        border-radius: 2px;
+      }
+      .el-select__caret {
+        line-height: 24px;
+      }
+    }
+}
+.header-section-style {
+  background-color: #DEECFC !important;
+  border: 1px solid #ffffff;
+  color: #6A6C75;
+  padding: 3px 0px;
+  .caret-wrapper {
+    height: 22px;
+    .ascending {
+      top: 0px;
+    }
+    .descending {
+      bottom: 0px;
+    }
+  }
+}
+.default-cell-style {
+  border: 1px solid #fff;
+  border-bottom: 1px solid #fff !important;
+  background-color: #FAFBFC;
+  color: #999BA3;
+  font-size: 12px;
+  padding: 3px 0px;
+}
+.default-cell-first-col-style {
+  background-color: #EBEDF0 !important;
+  color: #6A6C75;
+}
+
+.default-cell-summary-font {
+  color: #6a6c75;
+  font-weight: bold;
+}
+
+.selction-row-choosed {
+  background-color: #ebedf0 !important;
+  color: #6A6C75;
+}

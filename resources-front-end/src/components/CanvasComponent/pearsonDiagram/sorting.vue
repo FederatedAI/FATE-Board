@@ -11,7 +11,7 @@
           @clear="clearSearch"
           @input="searching"
         >
-          <el-button slot="append" icon="el-icon-search" />
+          <el-button slot="append" icon="el-icon-search search-icon" />
         </el-input>
       </div>
       <div class="flex flex-col sort-list">
@@ -29,6 +29,7 @@
           :hover-url="require('@/components/CanvasComponent/pearsonDiagram/icons/sortby_up_hover.png')"
           :active-url="require('@/components/CanvasComponent/pearsonDiagram/icons/sortby_up_click.png')"
           :hold="true"
+          :btn-title="'ascending'"
           class="sort-btn-Order"
           @clickFn="changeOrder(true)"
         />
@@ -39,7 +40,7 @@
           :hover-url="require('@/components/CanvasComponent/pearsonDiagram/icons/sortby_down_hover.png')"
           :active-url="require('@/components/CanvasComponent/pearsonDiagram/icons/sortby_down_click.png')"
           :hold="true"
-          :origin="'active'"
+          :btn-title="'descending'"
           class="sort-btn-Desorder"
           @clickFn="changeOrder(false)"
         />
@@ -54,6 +55,24 @@
 </template>
 
 <script>
+/**
+ *
+ *  Copyright 2019 The FATE Authors. All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 import IconHoverAndActive from '@/components/IconHoverAndActive'
 export default {
   name: 'FeatureSort',
@@ -257,6 +276,7 @@ export default {
 	right: 70px;
 	max-width: 68%;
 	max-height: 70%;
+	min-width: 200px;
 	overflow: hidden;
 	background-color: #fff;
 	border-radius: 2px;
@@ -274,6 +294,21 @@ export default {
 		}
 		.sort-search {
 			margin-bottom: 10px;
+			.el-input {
+				max-width: 100%;
+				width: 100%;
+			}
+			.search-icon {
+				width: 15px;
+				height: 15px;
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				margin: auto;
+			}
+			.el-input__clear {
+				padding-right: 5px;
+			}
 		}
 		.sort-list {
 			height: 200px;
