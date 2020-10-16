@@ -4,42 +4,33 @@
 **Major Features**
 
 - Add model visualization of new algorithm components：Hetero/Homo Data Split, Table reader, Data Statistic, PSI，Hetero Fastsecureboost，Hetero Kmeans
-
-   - Hetero/Homo Data Split：Visualize dataset split results (training/validate/test)
-
-   - Table reader：read in the original modeling data and output data overview
-
-   - Data Statistic：display statistical indicators of each variable
-
-   - PSI：PSI detailed data display for each variable
-
-   - Hetero Fastsecureboost：fast secureboost model visualization in layered mode and mixed mode
-
-   - Hetero Kmeans：visualization of sample clustering results
-
+  - Hetero/Homo Data Split：Visualize dataset split results (training/validate/test)
+  - Table reader：read in the original modeling data and output data overview
+  - Data Statistic：display statistical indicators of each variable
+  - PSI：PSI detailed data display for each variable
+  - Hetero Fastsecureboost：fast secureboost model visualization in layered-mode and mixed-mode
+  - Hetero Kmeans：visualization of sample clustering results
+- Feature selection：supports connection with the output models of Data Statistic, PSI, SecureBoost, and other components for feature selection
+- Feature binning：Support binning visualization without calculating the iv value, and increase the display of the number of bins
+- Evaluation：Supports visualization of cluster model evaluation results
+- Hetero secureboost：Supports visualization of Completely SecureBoost models
+- Evaluation：Supports visualization of cluster model evaluation results
 - Support downloading model and data of algorithm components from FATEBoard（Feature Binning，Feature Selection，Secureboost，LR，Evaluation）
-
 - The page supports partial data refresh and global data refresh to update the data in the iteration
-
-- Support retry for failed or cancelled job
-
-- Data input port of component supports separate access according to train/validate
+- Support retry for failed or canceled job
+- Data input port of the component supports separate access according to train/validate
 
 **Features improvement**
 
-- Feature selection：supports connection with the output models of Data Statistic, PSI, SecureBoost and other components for feature selection
-- Feature binning：Support binning visualization without calculating the iv value, and increase the display of the number of bins
-- Ealuation：Supports visualization of cluster model evaluation results
-- Hetero secureboost：Supports visualization of Completely SecureBoost models
-- Evaluation：Supports visualization of cluster model evaluation results
 - Job list optimization：search, filter, and sort optimization
 - Significantly improve page fluency when the amount of data is large
-- Optimize log pull method and improve efficiency
+- Optimize the log pull method and improve efficiency
 - Enhance safety check
 - Interface optimization
-- Data decoupling：separate the relationship between presentation, interaction and data of the page
+- Data decoupling：separate the relationship between presentation, interaction, and data of the page
 - Interaction logic decoupling：Disassembly and refinement of complex functional logic
 - Improve the cohesion and reusability of components and tools
+
 # Release 1.4.2
 
 #### Major Features and Improvements
