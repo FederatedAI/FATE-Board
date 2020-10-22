@@ -192,7 +192,7 @@ export default function(data, header, type, partyId, role, Currentrole, skipStat
         monotonicity: skipStatic ? '-' : (Currentrole === 'host' ? '-' : (data[key].isWoeMonotonic ? data[key].isWoeMonotonic.toString() : 'false')),
         partyid: partyId,
         role,
-        binning_count: data[key].splitPoints.length
+        binning_count: data[key].splitPoints.length || data[key].ivArray.length
       })
       options.push({
         value: key,
