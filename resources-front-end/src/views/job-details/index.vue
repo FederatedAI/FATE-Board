@@ -597,6 +597,9 @@ export default {
         if (value === null) {
           value = 'null'
         }
+        if (value === '') {
+          value = `""`
+        }
         list.push({
           level,
           isObjKey: false,
@@ -686,6 +689,9 @@ export default {
       }
       if (job) {
         this.jobInfo = this.transformJobInfo(job)
+        this.$nextTick(() => {
+          this.notesHint()
+        })
       }
       if (dependency_data) {
         this.DAGData = this.transformDAGData(dependency_data)

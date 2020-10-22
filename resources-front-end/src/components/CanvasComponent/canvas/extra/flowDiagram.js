@@ -412,9 +412,9 @@ class CompExpression {
     }
     if (this.belone.toLowerCase().match(/(kmeans)/i)) {
       this.output.push(...[{
-        name: 'data0output', tooltip: 'Train Data Output', type: 'data'
+        name: 'data0output', tooltip: 'Data Output_0', type: 'data'
       }, {
-        name: 'data1output', tooltip: 'Validation Data Output', type: 'data'
+        name: 'data1output', tooltip: 'Data Output_1', type: 'data'
       }])
     }
     if (this.belone.toLowerCase().match(/(datasplit)/i)) {
