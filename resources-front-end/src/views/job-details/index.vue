@@ -248,6 +248,7 @@ export default {
       roleList: [],
       jobInfo: {},
       componentName: '',
+      lastStatus: '',
       logLoading: false,
       dagInstance: null,
       graphOptions,
@@ -461,10 +462,15 @@ export default {
       } else {
         this.dataOutputShow = true
       }
-      this.clickComponent(data.name, data.dataIndex, data.model, data.disable)
+      this.clickComponent(data.name, data.dataIndex, data.model, data.disable, data.status)
     },
 
-    clickComponent(component_name, dataIndex, componentType, disable) {
+    clickComponent(component_name, dataIndex, componentType, disable, status) {
+      let couldBeNeedRefresh = false
+      if (component_name === this.componentName) {
+        couldBeNeedRefresh = this.lastStatus !== status
+      }
+      this.lastStatus = status
       this.componentName = component_name
       this.lastComponentName = component_name
       this.modelOutputType = componentType || ''
@@ -480,6 +486,9 @@ export default {
         }]
         this.parameterCount = 0
         this.componentName = ''
+      }
+      if (couldBeNeedRefresh) {
+        this.$refs['outputDialog'].refresh()
       }
     },
     clickComponentChangeStyle(obj, dataIndex) {

@@ -108,6 +108,7 @@ export default {
 		.title {
 			color: #6a6c75;
 			font-weight: bold;
+			min-width: 25px;
 		}
 		.nav-item {
 			position: relative;

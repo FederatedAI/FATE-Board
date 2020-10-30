@@ -225,13 +225,15 @@ function PSIExchange(metricData) {
   pic.yAxis[0].name = 'Expected, Actual'
   const biggestY0 = getBiggest([...meta.expected_percentage, ...meta.actual_percentage])
   pic.yAxis[0].max = biggestY0
-  pic.yAxis[0].interval = biggestY0 / 5
-  pic.yAxis[0].axisLabel.formatter = (value) => { return `${accMul(value, 100, biggestY0)} %` }
+  const betY0 = accDivCoupon(biggestY0, 5)
+  pic.yAxis[0].interval = betY0
+  pic.yAxis[0].axisLabel.formatter = (value) => { return `${accMul(value, 100, betY0)} %` }
   pic.yAxis[1].name = 'PSI'
   const biggestY1 = getBiggest(meta.psi_scores)
   pic.yAxis[1].max = biggestY1
-  pic.yAxis[1].interval = biggestY1 / 5
-  pic.yAxis[1].axisLabel.formatter = (value) => { return `${accMul(value, 1, biggestY1)}` }
+  const betY1 = accDivCoupon(biggestY1, 5)
+  pic.yAxis[1].interval = betY1
+  pic.yAxis[1].axisLabel.formatter = (value) => { return `${accMul(value, 1, betY1)}` }
   pic.tooltip.formatter = (param) => {
     let str = param[0].name + '<br/>'
     param.forEach((item) => {
