@@ -33,7 +33,7 @@ const getHeaders = (stratified, hetero, role) => {
       { type: 'index', label: 'index' },
       createHeader('dataset'),
       createHeader('count'),
-      createHeader('radio')
+      createHeader('ratio')
     ]
   }
 }
@@ -70,7 +70,7 @@ const fn = (response, params) => {
             dataItem[h.prop] = label_info[h.prop][i]
             if (i === 0) {
               if (h.prop !== 'original') {
-                total[h.prop] = count_info[h.prop] + '(' + (ratio_info[h.prop] * 100).toFixed(6) + '%)'
+                total[h.prop] = count_info[h.prop] + '(' + (ratio_info[h.prop] * 100).toFixed(4) + '%)'
               } else {
                 total[h.prop] = count_info[h.prop]
               }
@@ -95,7 +95,7 @@ const fn = (response, params) => {
             dataItem[h.prop] = label_info[h.prop][index]
             if (index === 0) {
               if (h.prop !== 'original') {
-                total[h.prop] = count_info[h.prop] + '(' + (ratio_info[h.prop] * 100).toFixed(6) + '%)'
+                total[h.prop] = count_info[h.prop] + '(' + (ratio_info[h.prop] * 100).toFixed(4) + '%)'
               } else {
                 total[h.prop] = count_info[h.prop]
               }
@@ -111,12 +111,12 @@ const fn = (response, params) => {
       const dataItem = {}
       dataItem['dataset'] = key
       dataItem['count'] = count_info[key]
-      dataItem['radio'] = (ratio_info[key] * 100).toFixed(6) + '%'
+      dataItem['ratio'] = (ratio_info[key] * 100).toFixed(4) + '%'
       tableData.push(dataItem)
     })
     total['dataset'] = 'Total'
     total['count'] = count_info.original
-    total['radio'] = '100%'
+    total['ratio'] = '100%'
   }
   tableData.push(total)
   return [{

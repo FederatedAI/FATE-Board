@@ -621,7 +621,7 @@ export default {
     },
     onRetry(row) {
       const status = row.status
-      if (status === 'complete') {
+      if (status === 'complete' || status === 'success') {
         return
       }
       const isDone = status === 'failed' || status === 'canceled'
