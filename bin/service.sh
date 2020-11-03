@@ -28,11 +28,16 @@ fatepath=$(
   pwd
 )
 
-export JAVA_HOME=
-export PATH=$JAVA_HOME/bin:$PATH
+if test -f "${fatepath}/bin/init_env.sh";then
+  source ${fatepath}/bin/init_env.sh
+  echo "JAVA_HOME=$JAVA_HOME"
+else
+  echo "file not found:${fatepath}/bin/init_env.sh"
+  exit
+fi
+
 
 module=fateboard
-main_class=org.springframework.boot.loader.JarLauncher
 
 getpid() {
   pid=$(ps -ef | grep java | grep ${basepath}/fateboard.jar | grep -v grep | awk '{print $2}')
