@@ -3,7 +3,7 @@
     ref="cusInput"
     :class-name="className"
     :input-class-name="inputClassName"
-    placeholder="Search Variables"
+    :placeholder="placeholder || 'Search Variables'"
     @change="valueChange"
     @clear="searching"
     @keyup.enter.native="searching"
@@ -45,6 +45,10 @@ export default {
       default: ''
     },
     inputClassName: {
+      type: String,
+      default: ''
+    },
+    placeholder: {
       type: String,
       default: ''
     }
