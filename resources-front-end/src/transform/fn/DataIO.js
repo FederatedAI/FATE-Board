@@ -33,7 +33,7 @@ const getHeaderByType = type => [
 const getIndexedHeaderByType = type => {
   return [
     {
-      label: '',
+      label: 'index',
       width: 100,
       type: 'index'
     },
@@ -62,10 +62,35 @@ const iteratee = collection => {
   return (val, key) => {
     collection.push({
       variable: key,
-      ratio: formatFloat(val),
-      value: formatFloat(val)
+      ratio: formatFloat(val.ratio),
+      value: formatFloat(val.value)
     })
   }
+}
+
+const combineTo = (ratio, value) => {
+  const result = {}
+  for (const key in ratio) {
+    result[key] = {
+      ratio: ratio[key],
+      value: value[key]
+    }
+  }
+  return result
+}
+
+const sortBy = (list, name, sort) => {
+  list.sort((a, b) => {
+    const aIndex = sort.indexOf(a[name])
+    const bIndex = sort.indexOf(b[name])
+    if (aIndex > bIndex) {
+      return 1
+    } else if (aIndex < bIndex) {
+      return -1
+    } else {
+      return 0
+    }
+  })
 }
 
 const wrapComponent = options => ({
@@ -75,17 +100,19 @@ const wrapComponent = options => ({
 
 function dataIOHandler(modelData) {
   const { data, meta } = modelData.data
+  const originSort = data.header
   const imputerData = []
   const outlierData = []
   const { imputerParam, outlierParam } = data
-  const { imputerMeta, outlierMeta } = meta.meta_data
-  const isExistImputerParams = imputerMeta.isImputer
-  const isExistOutlierParams = outlierMeta.isOutlier
+  const { imputerMeta, outlierMeta } = meta ? meta.meta_data : {}
+  const isExistImputerParams = imputerMeta && imputerMeta.isImputer
+  const isExistOutlierParams = outlierMeta && outlierMeta.isOutlier
 
   const group = []
 
   if (isExistImputerParams) {
-    each(imputerParam.missingReplaceValue, iteratee(imputerData))
+    each(combineTo(imputerParam.missingValueRatio, imputerParam.missingReplaceValue), iteratee(imputerData))
+    sortBy(imputerData, 'variable', originSort)
     group.push(wrapComponent([
       getForm('Missing Fill Detail'),
       {
@@ -101,7 +128,8 @@ function dataIOHandler(modelData) {
     ]))
   }
   if (isExistOutlierParams) {
-    each(outlierParam.outlierReplaceValue, iteratee(outlierData))
+    each(combineTo(outlierParam.outlierValueRatio, outlierParam.outlierReplaceValue), iteratee(outlierData))
+    sortBy(outlierData, 'variable', originSort)
     group.push(wrapComponent([
       getForm('Outlier Replace Detail'),
       {

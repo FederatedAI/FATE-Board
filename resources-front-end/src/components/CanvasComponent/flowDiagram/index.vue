@@ -65,6 +65,7 @@ export default {
       thumb: 0.6,
       canvasId: 'flowDiagramCanvas',
       canvas: null,
+      choosed: null,
 
       needToSet: [],
       originalSetting: null,
@@ -145,6 +146,7 @@ export default {
           this.initing()
         }
         this.toSetting()
+        this.checkChoosed()
       },
       deep: true
     }
@@ -191,18 +193,22 @@ export default {
                   flowDiagram.events.lineBright.call(that.component, name)
                 }
                 let dataIndex = 0
+                let status = ''
                 that.dagInfo.component_list.map((item, index) => {
                   if (item.component_name === name) {
                     dataIndex = index
+                    status = item.status
                   }
                 })
                 const obj = {
                   name,
                   dataIndex,
                   model: that.dagInfo.component_module[name],
-                  disable: !that.dagInfo.component_need_run[name]
+                  disable: !that.dagInfo.component_need_run[name],
+                  status: status
                 }
                 if (here) {
+                  that.choosed = obj
                   that.$emit('choose', obj)
                 }
               }
@@ -295,6 +301,18 @@ export default {
           )
         }
         this.needToSet = []
+      }
+    },
+    checkChoosed() {
+      if (this.choosed) {
+        const val = this.dagInfo.component_list[this.choosed.dataIndex]
+        if (
+          val.component_name === this.choosed.name &&
+					val.status !== this.choosed.status
+        ) {
+          this.choosed.status = val.status
+          this.$emit('choose', this.choosed)
+        }
       }
     },
     checkThumbnail() {

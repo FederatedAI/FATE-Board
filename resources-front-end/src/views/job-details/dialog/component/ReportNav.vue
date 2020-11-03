@@ -2,7 +2,7 @@
   <div class="report-nav">
     <crefresh @refresh="refreshAll" />
     <span v-if="reportType.has" class="nav-item-wrap">
-      <span class="title">DownLoad:</span>
+      <span class="title">downLoad:</span>
       <span v-if="reportType.hasReport" class="nav-item" @click="download('report')">
         <icon-hover-and-active
           :default-url="require('@/icons/download_report_default.png')"
@@ -100,8 +100,16 @@ export default {
 		display: inline-block;
 	}
 	.nav-item-wrap {
-		background-color: #f8f9fa;
+		background-color: #ebedf0;
 		width: auto;
+		margin-right: 24px;
+		padding-left: 20px;
+		padding-right: 12px;
+		.title {
+			color: #6a6c75;
+			font-weight: bold;
+			min-width: 25px;
+		}
 		.nav-item {
 			position: relative;
 			&:hover::after {
