@@ -48,8 +48,11 @@ const createOption = (label, value) => {
 }
 
 function binningHandler(responseData, metricsData, partyId, crole) {
-  const { binningResult, hostResults: hostData, header } = responseData.data.data
-  const { skipStatic } = responseData.data.meta.meta_data
+  if (responseData.msg.toString().toLowerCase().match('no data')) {
+    return []
+  }
+  const { binningResult, hostResults: hostData, header } = responseData.data && responseData.data.data
+  const { skipStatic } = responseData.data && responseData.data.meta && responseData.data.meta.meta_data
   let data = binningResult
   let guestPartyId = 0
   let role = ''
@@ -94,7 +97,7 @@ function binningHandler(responseData, metricsData, partyId, crole) {
       hostPartyId.push(val.partyId || key)
     })
   } else {
-    return null
+    return []
   }
 
   let tableData1
@@ -142,7 +145,6 @@ function binningHandler(responseData, metricsData, partyId, crole) {
     const options4form2 = {
       guest: table.options
     }
-
     each(hostPartyId, (id, i) => {
       const hm = hostMiddle[i]
       tableData1[id] = hm.sourceData
@@ -212,6 +214,7 @@ function binningHandler(responseData, metricsData, partyId, crole) {
 
   if (crole === 'host') {
     header1.splice(2, 0, createHeader('anonymInGuest', 'anonym in guest'))
+    header2.splice(2, 0, createHeader('anonym in guest', 'anonym in guest'))
   }
 
   const group2 = [

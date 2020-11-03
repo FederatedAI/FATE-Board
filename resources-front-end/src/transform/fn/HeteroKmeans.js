@@ -74,7 +74,7 @@ const clusterData = (clusters) => {
     result.push({
       custerLabel: 'Cluster' + c.cluster[0],
       count: c.cluster[1],
-      ratio: (c.cluster[2] * 100).toFixed(6) + '%'
+      ratio: (c.cluster[2] * 100).toFixed(4) + '%'
     })
   })
   total['custerLabel'] = 'Total'

@@ -19,6 +19,7 @@
 - The page supports partial data refresh and global data refresh to update the data in the iteration
 - Support retry for failed or canceled job
 - Data input port of the component supports separate access according to train/validate
+- Make the status of job compatible for success and complete
 
 **Features improvement**
 
