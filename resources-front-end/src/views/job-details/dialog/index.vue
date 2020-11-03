@@ -260,24 +260,35 @@ export default {
 						modelData.data
 						  .toString()
 						  .toLowerCase()
-						  .match('no data')) &&
+						  .match('no data') ||
+						(modelData.msg &&
+							modelData.msg
+							  .toString()
+							  .toLowerCase()
+							  .match('no data'))) &&
 					(metricsData.data === null ||
 						metricsData.data
 						  .toString()
 						  .toLowerCase()
-						  .match('no data'))
+						  .match('no data') ||
+						(metricsData.msg &&
+							metricsData.msg
+							  .toString()
+							  .toLowerCase()
+							  .match('no data')))
         ) {
           transformResult = []
+        } else {
+          transformResult = this.transformFn(
+            modelData,
+            metricsData,
+            this.partyId,
+            this.role,
+            this.componentName,
+            this.jobId,
+            this.modelType
+          )
         }
-        transformResult = this.transformFn(
-          modelData,
-          metricsData,
-          this.partyId,
-          this.role,
-          this.componentName,
-          this.jobId,
-          this.modelType
-        )
         if (Array.isArray(transformResult)) {
           this.cList = transformResult
         } else {

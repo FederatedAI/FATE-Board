@@ -54,7 +54,7 @@
         ref="treeIdText"
         :content="'Tree ID: {id}'"
         :data="{
-          '{id}': (param) => {return param.id}
+          '{id}': treeIdFormat
         }"
         class="cus-tree__text"
       />
@@ -386,6 +386,10 @@ export default {
     },
     resize() {
       this.refOpera('treeSelectChart', 'resize')
+    },
+    treeIdFormat(param) {
+      const paramId = param.id.split('_')
+      return paramId[1] || paramId[0]
     }
   }
 }

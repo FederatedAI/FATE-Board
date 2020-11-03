@@ -29,9 +29,12 @@ const getHeaders = (statistics) => {
 }
 
 const fn = function(modelData) {
+  if (modelData.msg.toString().toLowerCase().match('no data')) {
+    return []
+  }
   const { data, meta } = modelData.data
   const tableData = []
-  meta.meta_data.staticColumns.forEach((column, index) => {
+  meta && meta.meta_data && meta.meta_data.staticColumns.forEach((column, index) => {
     const tableItem = {}
     tableItem['variable'] = column
     data.selfValues.results.forEach(item => {

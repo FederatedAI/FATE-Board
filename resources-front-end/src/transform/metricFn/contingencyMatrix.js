@@ -46,18 +46,36 @@ function createHeaderList(list) {
   return headerList
 }
 
-function createRow(list, rowData) {
+function precentage(origin, total) {
+  return ((origin / total) * 100).toFixed(4) + '%'
+}
+
+function createRow(list, rowData, total) {
   const row = {}
   for (let i = 0; i < list.length; i++) {
-    row[list[i].prop] = rowData[i]
+    const showAddPrecentage = (rowData[i]).toString().match(/[a-zA-Z]+/)
+    row[list[i].prop] = rowData[i] + (!showAddPrecentage ? ` (${precentage(rowData[i], total)})` : '')
   }
   return row
 }
 
+function getTotal(rowData) {
+  return rowData.reduce((total, row) => {
+    return row.reduce((total, num) => {
+      if (!num.toString().match(/[a-zA-Z]+/)) {
+        return total + num
+      } else {
+        return total
+      }
+    }, total)
+  }, 0)
+}
+
 function createRows(header, rowData) {
   const tableData = []
+  const total = getTotal(rowData)
   each(rowData, (row) => {
-    tableData.push(createRow(header, row))
+    tableData.push(createRow(header, row, total))
   })
   return tableData
 }
