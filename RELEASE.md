@@ -3,7 +3,7 @@
 #### Major Features and Improvements
 **Major Features**
 
-- Modificated display of DAG diagram 
+- Modify the display of DAG diagram 
 
 
 # Release 1.5.0
