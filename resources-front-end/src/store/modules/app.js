@@ -53,7 +53,8 @@ const app = {
       heteroGMF: 'HeteroGMF',
       psi: 'PSI',
       statistic: 'DataStatistics',
-      reader: 'Reader'
+      reader: 'Reader',
+      scorecard: 'Scorecard'
     },
     metricTypeMap: {
       dataIOTable: 'DATAIO_TABLE',
