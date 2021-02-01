@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.*;
@@ -76,21 +77,29 @@ public class JobManagerService {
     }
 
 
-
     public PageBean<Map<String, Object>> queryPagedJobs(PagedJobQO pagedJobQO) {
-        if (pagedJobQO.getJobId() != null && 0 != pagedJobQO.getJobId().trim().length()) {
-            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getJobId()));
-            pagedJobQO.setJobId("%" + pagedJobQO.getJobId() + "%");
+        String jobId = pagedJobQO.getJobId();
+        if (jobId != null && 0 != jobId.trim().length()) {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId));
+            pagedJobQO.setJobId("%" + jobId + "%");
         }
-        if (pagedJobQO.getPartyId() != null && 0 != pagedJobQO.getPartyId().trim().length()) {
-            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getPartyId()));
-            pagedJobQO.setPartyId("%" + pagedJobQO.getPartyId() + "%");
+        String partyId = pagedJobQO.getPartyId();
+        if (partyId != null && 0 != partyId.trim().length()) {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(partyId));
+            pagedJobQO.setPartyId("%" + partyId + "%");
         }
-        if (pagedJobQO.getfDescription() != null && 0 != pagedJobQO.getfDescription().trim().length()) {
-            Preconditions.checkArgument(LogFileService.checkParameters( "^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5\\s]+$",pagedJobQO.getfDescription()));
+        String partner = pagedJobQO.getPartner();
+        if (partner != null && partner.trim().length() != 0) {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(partner));
+            pagedJobQO.setPartner("%" + partyId + "%");
+        }
+        String fDescription = pagedJobQO.getFDescription();
+        if (fDescription != null && 0 != fDescription.trim().length()) {
+            Preconditions.checkArgument(LogFileService.checkParameters("^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5\\s]+$", fDescription));
 //            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getfDescription()));
-            pagedJobQO.setfDescription("%" + pagedJobQO.getfDescription() + "%");
+            pagedJobQO.setFDescription("%" + fDescription + "%");
         }
+
         long jobSum = this.countJob(pagedJobQO);
         PageBean<Map<String, Object>> listPageBean = new PageBean<>(pagedJobQO.getPageNum(), pagedJobQO.getPageSize(), jobSum);
         long startIndex = listPageBean.getStartIndex();
