@@ -36,6 +36,9 @@
             <if test="partyId != null and partyId != ''">
                 and f_party_id like #{partyId}
             </if>
+            <if test="partner != null and partner != ''">
+                and f_roles like #{partner}
+           </if>
             <if test="fDescription != null and fDescription != ''">
                 and f_description like #{fDescription}
             </if>
@@ -60,6 +63,9 @@
             </if>
             <if test="pagedJobQO.partyId != null and pagedJobQO.partyId != ''">
                 and f_party_id like #{pagedJobQO.partyId}
+            </if>
+            <if test="pagedJobQO.partner != null and pagedJobQO.partner != ''">
+                and f_roles like #{pagedJobQO.partner}
             </if>
             <if test="pagedJobQO.fDescription != null and pagedJobQO.fDescription != ''">
                 and f_description like #{pagedJobQO.fDescription}
