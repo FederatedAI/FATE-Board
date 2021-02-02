@@ -35,6 +35,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -174,5 +178,55 @@ public class JobManagerService {
         return command.toString();
     }
 
+
+    public void download(DownloadQO downloadQO, HttpServletRequest request, HttpServletResponse response) {
+        String jobId = downloadQO.getJobId();
+        String role = downloadQO.getRole();
+        String type = downloadQO.getType();
+
+        String fileName = "b60bcf72-219d-4e92-88de-ed6b0ad9b0e7-2018-04-23-14-09-14.xls";// 设置文件名，根据业务需要替换成要下载的文件名
+        if (fileName != null) {
+            //设置文件路径
+            String realPath = "D:\\eclipsworksapce1\\upgrade\\src\\main\\webapp\\upload\\tbox\\456789\\";
+            File file = new File(realPath, fileName);
+            if (file.exists()) {
+                response.setContentType("application/octet-stream");//
+                response.setHeader("content-type", "application/octet-stream");
+                response.setHeader("Content-Disposition", "attachment;fileName=" + fileName);// 设置文件名
+                byte[] buffer = new byte[1024];
+                FileInputStream fis = null;
+                BufferedInputStream bis = null;
+                try {
+                    fis = new FileInputStream(file);
+                    bis = new BufferedInputStream(fis);
+                    OutputStream os = response.getOutputStream();
+                    int i = bis.read(buffer);
+                    while (i != -1) {
+                        os.write(buffer, 0, i);
+                        i = bis.read(buffer);
+                    }
+                    System.out.println("success");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (bis != null) {
+                        try {
+                            bis.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (fis != null) {
+                        try {
+                            fis.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 
 }
