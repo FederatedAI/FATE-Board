@@ -34,11 +34,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.FileSystem;
 import java.util.*;
 
 
@@ -254,4 +265,25 @@ public class JobManagerController {
         String componentCommand = jobManagerService.getComponentCommand(componentQueryDTO);
         return new ResponseResult<>(ErrorCode.SUCCESS, componentCommand);
     }
+
+
+    @RequestMapping(value = "/download", method = RequestMethod.POST)
+    public ResponseResult download(@Valid @RequestBody DownloadQO downloadQO, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) {
+
+        if (bindingResult.hasErrors()) {
+            FieldError errors = bindingResult.getFieldError();
+            return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
+        }
+//        FileSystemResource fileSystemResource = new FileSystemResource("a.json");
+//        InputStream inputStream = fileSystemResource.getInputStream();
+//
+//        HttpHeaders httpHeaders = new HttpHeaders();
+//        httpHeaders.add("Content-Disposition","attachment;filename=a.json");
+//        ResponseEntity<InputStreamResource> body = ResponseEntity.ok().headers(httpHeaders).contentLength(fileSystemResource.contentLength()).contentType(MediaType.parseMediaType("application/octet-stream")).body(new InputStreamResource(inputStream));
+//        return body;
+        jobManagerService.download(downloadQO,request,response);
+        return new ResponseResult<>(ErrorCode.SUCCESS);
+
+    }
+
 }
