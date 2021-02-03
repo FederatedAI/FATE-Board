@@ -16,6 +16,7 @@
 package com.webank.ai.fate.board.services;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -26,6 +27,7 @@ import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.utils.HttpClientPool;
 import com.webank.ai.fate.board.utils.PageBean;
 import com.webank.ai.fate.board.utils.ThreadPoolTaskExecutorUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +48,7 @@ import java.util.concurrent.Future;
 
 
 @Service
-
+@Slf4j
 public class JobManagerService {
     public static Set<String> jobFinishStatus = new HashSet<String>() {
         {
@@ -124,12 +126,54 @@ public class JobManagerService {
                 jobParams.put(Dict.PARTY_ID, partyId1);
                 String result = httpClientPool.post(fateUrl + Dict.URL_JOB_DATAVIEW, JSON.toJSONString(jobParams));
                 JSONObject data = JSON.parseObject(result).getJSONObject(Dict.DATA);
-
+//                JSONObject data=null;
                 return data;
             }, new int[]{500, 1000}, new int[]{3, 3});
 //            jobWithBLOB.setfRunIp(null);
             jobWithBLOB.setfDsl(null);
             jobWithBLOB.setfRuntimeConf(null);
+
+            //set partners
+            String role = jobWithBLOB.getfRole();
+            if ("local".equals(role) || "arbiter".equals(role)) {
+                jobWithBLOB.setPartners(null);
+            }
+            HashSet<String> partners = new HashSet<>();
+            String roles = jobWithBLOB.getfRoles();
+            JSONObject jsonObject = JSON.parseObject(roles);
+            if ("guest".equals(role)) {
+
+                JSONArray hosts = jsonObject.getJSONArray("host");
+                if (hosts != null) {
+                    for (int i = 0; i < hosts.size(); i++) {
+                        Object o = hosts.get(i);
+                        partners.add(String.valueOf(o) );
+
+                    }
+                }
+
+                JSONArray arbiters = jsonObject.getJSONArray("arbiter");
+                if (arbiters != null) {
+                    for (int i = 0; i < arbiters.size(); i++) {
+                        Object o = arbiters.get(i);
+                        partners.add(String.valueOf(o) );
+                    }
+                }
+
+            }
+
+            if ("host".equals(role)) {
+                JSONArray guests = jsonObject.getJSONArray("guest");
+                if (guests != null) {
+                    for (int i = 0; i < guests.size(); i++) {
+                        Object o = guests.get(i);
+                        partners.add(String.valueOf(o) );
+                    }
+                }
+
+            }
+            jobWithBLOB.setPartners(partners);
+
             jobDataMap.put(jobWithBLOB, future);
         }
         jobDataMap.forEach((k, v) -> {
@@ -184,48 +228,74 @@ public class JobManagerService {
         String role = downloadQO.getRole();
         String type = downloadQO.getType();
 
-        String fileName = "b60bcf72-219d-4e92-88de-ed6b0ad9b0e7-2018-04-23-14-09-14.xls";// 设置文件名，根据业务需要替换成要下载的文件名
-        if (fileName != null) {
-            //设置文件路径
-            String realPath = "D:\\eclipsworksapce1\\upgrade\\src\\main\\webapp\\upload\\tbox\\456789\\";
-            File file = new File(realPath, fileName);
-            if (file.exists()) {
-                response.setContentType("application/octet-stream");//
-                response.setHeader("content-type", "application/octet-stream");
-                response.setHeader("Content-Disposition", "attachment;fileName=" + fileName);// 设置文件名
-                byte[] buffer = new byte[1024];
-                FileInputStream fis = null;
-                BufferedInputStream bis = null;
-                try {
-                    fis = new FileInputStream(file);
-                    bis = new BufferedInputStream(fis);
-                    OutputStream os = response.getOutputStream();
-                    int i = bis.read(buffer);
-                    while (i != -1) {
-                        os.write(buffer, 0, i);
-                        i = bis.read(buffer);
+        String webPath = System.getProperty("user.dir");
+        int i1 = webPath.lastIndexOf("/");
+        String substring = webPath.substring(0, i1);
+
+        String fileName = "";
+        String realPath = "";
+        String fileOutputName = "";
+
+        if ("dsl".equals(type)) {
+            fileName = "job_dsl.json";
+            realPath = substring + "/jobs/" + jobId + "/";
+            fileOutputName = "runtime_config_" + jobId + ".json";
+        } else {
+
+            if ("guest".equals(role) || "local".equals(role)) {
+                fileName = "job_runtime_conf.json";
+                realPath = substring + "/jobs/" + jobId + "/";
+                fileOutputName = "job_dsl_" + jobId + ".json";
+
+            } else if ("host".equals(role)) {
+                fileName = "job_runtime_on_party_conf.json";
+                realPath = substring + "/jobs/" + jobId + "/" + role + "/";
+                fileOutputName = "job_dsl_" + jobId + ".json";
+            } else {
+                return;
+            }
+
+        }
+
+
+        File file = new File(realPath, fileName);
+        if (file.exists()) {
+            response.setContentType("application/octet-stream");
+            response.setHeader("content-type", "application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
+            byte[] buffer = new byte[1024];
+            FileInputStream fis = null;
+            BufferedInputStream bis = null;
+            try {
+                fis = new FileInputStream(file);
+                bis = new BufferedInputStream(fis);
+                OutputStream os = response.getOutputStream();
+                int i = bis.read(buffer);
+                while (i != -1) {
+                    os.write(buffer, 0, i);
+                    i = bis.read(buffer);
+                }
+                log.info("download success");
+            } catch (Exception e) {
+                log.error("download failed", e);
+            } finally {
+                if (bis != null) {
+                    try {
+                        bis.close();
+                    } catch (IOException e) {
+                        log.error("download io close failed", e);
                     }
-                    System.out.println("success");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    if (bis != null) {
-                        try {
-                            bis.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (fis != null) {
-                        try {
-                            fis.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                }
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException e) {
+                        log.error("download io close failed", e);
                     }
                 }
             }
         }
+
 
     }
 
