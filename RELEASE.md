@@ -1,3 +1,11 @@
+# Release 1.5.1
+
+#### Major Features and Improvements
+**Major Features**
+
+- Modify the display of DAG diagram 
+
+
 # Release 1.5.0
 
 #### Major Features and Improvements

@@ -158,7 +158,8 @@ export default {
         'heteroSVDPP',
         'heteroGMF'
       ]
-      if (this.modelType === this.modelNameMap.evaluation) {
+      const metricsOutputCheck = ['evaluation', 'scorecard']
+      if (this.joinComponents(metricsOutputCheck).match(this.modelType)) {
         name = 'metrics'
       } else if (this.joinComponents(modelOutputCheck).match(this.modelType)) {
         name = 'model output'
