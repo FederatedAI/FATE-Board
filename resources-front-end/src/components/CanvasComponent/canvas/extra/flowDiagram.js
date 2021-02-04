@@ -426,7 +426,7 @@ class CompExpression {
         name: 'data2output', tooltip: 'Test Data Output', type: 'data'
       }])
     }
-    if (!this.belone.toLowerCase().match(/(intersection|federatedsample|evaluation|upload|download|rsa|datasplit|reader|union|pearson)/i)) {
+    if (!this.belone.toLowerCase().match(/(intersection|federatedsample|evaluation|upload|download|rsa|datasplit|reader|union|pearson|scorecard)/i)) {
       if (!this.belone.toLowerCase().match(/(statistics|psi)/i)) {
         this.input.push(MODELINPUT)
       }

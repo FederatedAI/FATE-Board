@@ -27,8 +27,8 @@ export default {
   name: 'App',
   data: () => {
     return {
-      version: 'v1.5.0',
-      packageTime: '2020/10/22 20:18'
+      version: 'v1.5.1',
+      packageTime: '2020/12/7 11:18'
     }
   }
 }
