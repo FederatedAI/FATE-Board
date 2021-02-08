@@ -99,7 +99,7 @@ public class JobManagerService {
         String partner = pagedJobQO.getPartner();
         if (partner != null && partner.trim().length() != 0) {
             Preconditions.checkArgument(LogFileService.checkPathParameters(partner));
-            pagedJobQO.setPartner("%" + partyId + "%");
+            pagedJobQO.setPartner("%" + partner + "%");
         }
         String fDescription = pagedJobQO.getFDescription();
         if (fDescription != null && 0 != fDescription.trim().length()) {
