@@ -21,6 +21,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.webank.ai.fate.board.dao.JobMapper;
+import com.webank.ai.fate.board.global.ErrorCode;
+import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.log.LogFileService;
 import com.webank.ai.fate.board.pojo.*;
 import com.webank.ai.fate.board.global.Dict;
@@ -147,7 +149,7 @@ public class JobManagerService {
                 if (hosts != null) {
                     for (int i = 0; i < hosts.size(); i++) {
                         Object o = hosts.get(i);
-                        partners.add(String.valueOf(o) );
+                        partners.add(String.valueOf(o));
 
                     }
                 }
@@ -156,7 +158,7 @@ public class JobManagerService {
                 if (arbiters != null) {
                     for (int i = 0; i < arbiters.size(); i++) {
                         Object o = arbiters.get(i);
-                        partners.add(String.valueOf(o) );
+                        partners.add(String.valueOf(o));
                     }
                 }
 
@@ -167,7 +169,7 @@ public class JobManagerService {
                 if (guests != null) {
                     for (int i = 0; i < guests.size(); i++) {
                         Object o = guests.get(i);
-                        partners.add(String.valueOf(o) );
+                        partners.add(String.valueOf(o));
                     }
                 }
 
@@ -223,46 +225,67 @@ public class JobManagerService {
     }
 
 
-    public void download(DownloadQO downloadQO, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseResult download(DownloadQO downloadQO, HttpServletResponse response) {
+
+        //check input parameters
         String jobId = downloadQO.getJobId();
         String role = downloadQO.getRole();
         String type = downloadQO.getType();
 
+        if (StringUtils.isEmpty(jobId)) {
+            log.error("parameter null:jobId");
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
+        }
+        if (StringUtils.isEmpty(role)) {
+            log.error("parameter null:role");
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
+        }
+        if (StringUtils.isEmpty(type)) {
+            log.error("parameter null:type");
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
+        }
+
+        if (!LogFileService.checkParameters("^[0-9a-zA-Z\\-_]+$", jobId, role, type)) {
+            log.error("parameter error: illegal characters in role or jobId or type");
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
+        }
+
+        //get fate path
         String webPath = System.getProperty("user.dir");
         int i1 = webPath.lastIndexOf("/");
-        String substring = webPath.substring(0, i1);
+        String fatePath = webPath.substring(0, i1);
 
+        //build file path
         String fileName = "";
         String realPath = "";
         String fileOutputName = "";
 
         if ("dsl".equals(type)) {
             fileName = "job_dsl.json";
-            realPath = substring + "/jobs/" + jobId + "/";
+            realPath = fatePath + "/jobs/" + jobId + "/";
             fileOutputName = "runtime_config_" + jobId + ".json";
         } else {
-
             if ("guest".equals(role) || "local".equals(role)) {
                 fileName = "job_runtime_conf.json";
-                realPath = substring + "/jobs/" + jobId + "/";
+                realPath = fatePath + "/jobs/" + jobId + "/";
                 fileOutputName = "job_dsl_" + jobId + ".json";
 
             } else if ("host".equals(role)) {
                 fileName = "job_runtime_on_party_conf.json";
-                realPath = substring + "/jobs/" + jobId + "/" + role + "/";
+                realPath = fatePath + "/jobs/" + jobId + "/" + role + "/";
                 fileOutputName = "job_dsl_" + jobId + ".json";
             } else {
-                return;
+                log.error("download error: role:{} doesn't support", role);
+                return new ResponseResult(ErrorCode.ERROR_PARAMETER);
             }
 
         }
 
 
+        // download
         File file = new File(realPath, fileName);
         if (file.exists()) {
-            response.setContentType("application/octet-stream");
-            response.setHeader("content-type", "application/octet-stream");
-            response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
+
             byte[] buffer = new byte[1024];
             FileInputStream fis = null;
             BufferedInputStream bis = null;
@@ -275,9 +298,10 @@ public class JobManagerService {
                     os.write(buffer, 0, i);
                     i = bis.read(buffer);
                 }
-                log.info("download success");
+                log.info("download success,file :{}", realPath + fileName);
             } catch (Exception e) {
                 log.error("download failed", e);
+                return new ResponseResult(ErrorCode.DOWNLOAD_ERROR);
             } finally {
                 if (bis != null) {
                     try {
@@ -294,8 +318,13 @@ public class JobManagerService {
                     }
                 }
             }
+            response.setContentType("application/octet-stream");
+            response.setHeader("content-type", "application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
+            return null;
+        } else {
+            return new ResponseResult(ErrorCode.FILE_ERROR);
         }
-
 
     }
 

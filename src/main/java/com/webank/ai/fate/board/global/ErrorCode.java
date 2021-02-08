@@ -30,9 +30,10 @@ public enum ErrorCode {
     ERROR_PARAMETER(10008, "Parameters are illegal!"),
     DATABASE_ERROR_CONNECTION(10009, "Database connection error!"),
     SYSTEM_ERROR(10010, "System error!"),
-    DOWNLOAD_ERROR(10011, "File doesn't exist!"),
+    DOWNLOAD_ERROR(10011, "Download error!"),
     UPLOAD_ERROR(10012, "Upload error!"),
     RERUN_ERROR(10013, "Rerun job error!"),
+    FILE_ERROR(10014, "File doesn't exist!"),
     ;
 
 
