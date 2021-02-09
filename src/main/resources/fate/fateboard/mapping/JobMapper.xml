@@ -28,66 +28,159 @@
     </resultMap>
 
     <select id="countJob" parameterType="com.webank.ai.fate.board.pojo.PagedJobQO" resultType="java.lang.Long">
-        select count(1) from t_job
-        <where>
-            <if test="jobId != null and jobId != ''">
-                and f_job_id like #{jobId}
-            </if>
-            <if test="partyId != null and partyId != ''">
-                and f_party_id like #{partyId}
-            </if>
-            <if test="partner != null and partner != ''">
-                and f_roles like #{partner}
-           </if>
-            <if test="fDescription != null and fDescription != ''">
-                and f_description like #{fDescription}
-            </if>
-            <if test="role != null and role.size() > 0">
-                <foreach collection="role" open=" and f_role  in (" close=")" item="roleType" separator=",">
-                    #{roleType}
-                </foreach>
-            </if>
-            <if test="status != null and status.size() > 0">
-                <foreach collection="status" open=" and f_status  in (" close=")" item="statusType" separator=",">
-                    #{statusType}
-                </foreach>
-            </if>
-        </where>
+        <if test="partner == null or partner == ''">
+            select count(1) from t_job
+            <where>
+                <if test="jobId != null and jobId != ''">
+                    and f_job_id like #{jobId}
+                </if>
+                <if test="partyId != null and partyId != ''">
+                    and f_party_id like #{partyId}
+                </if>
+                <if test="fDescription != null and fDescription != ''">
+                    and f_description like #{fDescription}
+                </if>
+                <if test="role != null and role.size() > 0">
+                    <foreach collection="role" open=" and f_role  in (" close=")" item="roleType" separator=",">
+                        #{roleType}
+                    </foreach>
+                </if>
+                <if test="status != null and status.size() > 0">
+                    <foreach collection="status" open=" and f_status  in (" close=")" item="statusType" separator=",">
+                        #{statusType}
+                    </foreach>
+                </if>
+            </where>
+        </if>
+
+        <if test="partner != null and partner != ''">
+            select count(1) from t_job a,
+            (SELECT f_job_id, f_party_id, f_role,CASE f_role
+            WHEN 'guest' THEN
+            json_remove(f_roles, CONCAT('$.', 'guest') )
+            WHEN 'host' THEN
+            json_remove(f_roles, CONCAT('$.', 'host'), CONCAT('$.', 'arbiter') )
+            ELSE
+            f_roles
+            END  AS f_roles
+            from t_job ) b
+            <where>
+                <if test="jobId != null and jobId != ''">
+                    and a.f_job_id like #{jobId}
+                </if>
+                <if test="partyId != null and partyId != ''">
+                    and a.f_party_id like #{partyId}
+                </if>
+                <if test="fDescription != null and fDescription != ''">
+                    and a.f_description like #{fDescription}
+                </if>
+                <if test="role != null and role.size() > 0">
+                    <foreach collection="role" open=" and a.f_role  in (" close=")" item="roleType" separator=",">
+                        #{roleType}
+                    </foreach>
+                </if>
+                <if test="status != null and status.size() > 0">
+                    <foreach collection="status" open=" and a.f_status  in (" close=")" item="statusType" separator=",">
+                        #{statusType}
+                    </foreach>
+                </if>
+                and a.f_job_id=b.f_job_id
+                and a.f_party_id=b.f_party_id
+                and a.f_role=b.f_role
+                and a.f_role in ('guest','host')
+                and b.f_roles like #{partner}
+            </where>
+
+        </if>
+
     </select>
 
     <select id="queryPagedJobs" resultMap="BaseResultMap">
-        select * from t_job
-        <where>
-            <if test="pagedJobQO.jobId != null and pagedJobQO.jobId != ''">
-                and f_job_id like #{pagedJobQO.jobId}
+
+        <if test="pagedJobQO.partner == null or pagedJobQO.partner == ''">
+            select * from t_job
+            <where>
+                <if test="pagedJobQO.jobId != null and pagedJobQO.jobId != ''">
+                    and f_job_id like #{pagedJobQO.jobId}
+                </if>
+                <if test="pagedJobQO.partyId != null and pagedJobQO.partyId != ''">
+                    and f_party_id like #{pagedJobQO.partyId}
+                </if>
+                <if test="pagedJobQO.fDescription != null and pagedJobQO.fDescription != ''">
+                    and f_description like #{pagedJobQO.fDescription}
+                </if>
+                <if test="pagedJobQO.role != null and pagedJobQO.role.size() > 0">
+                    <foreach collection="pagedJobQO.role" open=" and f_role  in (" close=")" item="roleType" separator=",">
+                        #{roleType}
+                    </foreach>
+                </if>
+                <if test="pagedJobQO.status != null and pagedJobQO.status.size() > 0">
+                    <foreach collection="pagedJobQO.status" open=" and f_status  in (" close=")" item="statusType"
+                             separator=",">
+                        #{statusType}
+                    </foreach>
+                </if>
+            </where>
+            <if test="pagedJobQO.orderField != null and pagedJobQO.orderField != '' and pagedJobQO.orderRule != null and pagedJobQO.orderRule != ''">
+                order by ${pagedJobQO.orderField} ${pagedJobQO.orderRule}
             </if>
-            <if test="pagedJobQO.partyId != null and pagedJobQO.partyId != ''">
-                and f_party_id like #{pagedJobQO.partyId}
+            <if test="startIndex != null and pagedJobQO.pageSize != null ">
+                limit #{startIndex}, #{pagedJobQO.pageSize}
             </if>
-            <if test="pagedJobQO.partner != null and pagedJobQO.partner != ''">
-                and f_roles like #{pagedJobQO.partner}
-            </if>
-            <if test="pagedJobQO.fDescription != null and pagedJobQO.fDescription != ''">
-                and f_description like #{pagedJobQO.fDescription}
-            </if>
-            <if test="pagedJobQO.role != null and pagedJobQO.role.size() > 0">
-                <foreach collection="pagedJobQO.role" open=" and f_role  in (" close=")" item="roleType" separator=",">
-                    #{roleType}
-                </foreach>
-            </if>
-            <if test="pagedJobQO.status != null and pagedJobQO.status.size() > 0">
-                <foreach collection="pagedJobQO.status" open=" and f_status  in (" close=")" item="statusType"
-                         separator=",">
-                    #{statusType}
-                </foreach>
-            </if>
-        </where>
-        <if test="pagedJobQO.orderField != null and pagedJobQO.orderField != '' and pagedJobQO.orderRule != null and pagedJobQO.orderRule != ''">
-            order by ${pagedJobQO.orderField} ${pagedJobQO.orderRule}
         </if>
-        <if test="startIndex != null and pagedJobQO.pageSize != null ">
-            limit #{startIndex}, #{pagedJobQO.pageSize}
+
+        <if test="pagedJobQO.partner != null and pagedJobQO.partner != ''">
+            select
+            a.f_job_id,a.f_role,a.f_party_id,a.f_name,a.f_description,a.f_tag,a.f_dsl,a.f_runtime_conf,a.f_train_runtime_conf,a.f_work_mode,a.f_initiator_role,
+            a.f_initiator_party_id,a.f_status,a.f_is_initiator,a.f_progress,a.f_create_time,a.f_update_time,a.f_start_time,a.f_end_time,a.f_elapsed,
+            b.f_roles
+            from t_job a,
+            (SELECT f_job_id, f_party_id, f_role,CASE f_role
+            WHEN 'guest' THEN
+            json_remove(f_roles, CONCAT('$.', 'guest') )
+            WHEN 'host' THEN
+            json_remove(f_roles, CONCAT('$.', 'host'), CONCAT('$.', 'arbiter') )
+            ELSE
+            f_roles
+            END  AS f_roles
+            from t_job ) b
+            <where>
+                <if test="pagedJobQO.jobId != null and pagedJobQO.jobId != ''">
+                    and f_job_id like #{pagedJobQO.jobId}
+                </if>
+                <if test="pagedJobQO.partyId != null and pagedJobQO.partyId != ''">
+                    and f_party_id like #{pagedJobQO.partyId}
+                </if>
+                <if test="pagedJobQO.fDescription != null and pagedJobQO.fDescription != ''">
+                    and f_description like #{pagedJobQO.fDescription}
+                </if>
+                <if test="pagedJobQO.role != null and pagedJobQO.role.size() > 0">
+                    <foreach collection="pagedJobQO.role" open=" and f_role  in (" close=")" item="roleType" separator=",">
+                        #{roleType}
+                    </foreach>
+                </if>
+                <if test="pagedJobQO.status != null and pagedJobQO.status.size() > 0">
+                    <foreach collection="pagedJobQO.status" open=" and f_status  in (" close=")" item="statusType"
+                             separator=",">
+                        #{statusType}
+                    </foreach>
+                </if>
+
+                and a.f_job_id=b.f_job_id
+                and a.f_party_id=b.f_party_id
+                and a.f_role=b.f_role
+                and a.f_role in ('guest','host')
+                and b.f_roles like #{pagedJobQO.partner}
+
+            </where>
+            <if test="pagedJobQO.orderField != null and pagedJobQO.orderField != '' and pagedJobQO.orderRule != null and pagedJobQO.orderRule != ''">
+                order by ${pagedJobQO.orderField} ${pagedJobQO.orderRule}
+            </if>
+            <if test="startIndex != null and pagedJobQO.pageSize != null ">
+                limit #{startIndex}, #{pagedJobQO.pageSize}
+            </if>
         </if>
+
     </select>
 
 
