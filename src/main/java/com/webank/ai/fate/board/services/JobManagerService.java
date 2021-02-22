@@ -263,17 +263,17 @@ public class JobManagerService {
         if ("dsl".equals(type)) {
             fileName = "job_dsl.json";
             realPath = fatePath + "/jobs/" + jobId + "/";
-            fileOutputName = "runtime_config_" + jobId + ".json";
+            fileOutputName = "job_dsl_" + jobId + ".json";
         } else {
             if ("guest".equals(role) || "local".equals(role)) {
                 fileName = "job_runtime_conf.json";
                 realPath = fatePath + "/jobs/" + jobId + "/";
-                fileOutputName = "job_dsl_" + jobId + ".json";
+                fileOutputName = "runtime_config_" + jobId + ".json";
 
             } else if ("host".equals(role)) {
                 fileName = "job_runtime_on_party_conf.json";
                 realPath = fatePath + "/jobs/" + jobId + "/" + role + "/";
-                fileOutputName = "job_dsl_" + jobId + ".json";
+                fileOutputName = "runtime_config_" + jobId + ".json";
             } else {
                 log.error("download error: role:{} doesn't support", role);
                 return new ResponseResult(ErrorCode.ERROR_PARAMETER);

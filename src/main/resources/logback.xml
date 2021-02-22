@@ -120,14 +120,14 @@
         <appender-ref ref="httpclient"/>
     </logger>
 
-<!--    <logger name="org.mybatis.spring" level="INFO" additivity="false"/>-->
+    <logger name="org.mybatis.spring" level="INFO" additivity="false"/>
 
 
-    <root level="INFO">
-<!--        <appender-ref ref="STDOUT"/>-->
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT"/>
         <appender-ref ref="ERROR"/>
         <appender-ref ref="WARN"/>
         <appender-ref ref="INFO"/>
-<!--        <appender-ref ref="DEBUG"/>-->
+        <appender-ref ref="DEBUG"/>
     </root>
 </configuration>
