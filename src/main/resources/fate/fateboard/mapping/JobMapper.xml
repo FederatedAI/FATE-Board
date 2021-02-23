@@ -146,21 +146,21 @@
             from t_job ) b
             <where>
                 <if test="pagedJobQO.jobId != null and pagedJobQO.jobId != ''">
-                    and f_job_id like #{pagedJobQO.jobId}
+                    and a.f_job_id like #{pagedJobQO.jobId}
                 </if>
                 <if test="pagedJobQO.partyId != null and pagedJobQO.partyId != ''">
-                    and f_party_id like #{pagedJobQO.partyId}
+                    and a.f_party_id like #{pagedJobQO.partyId}
                 </if>
                 <if test="pagedJobQO.fDescription != null and pagedJobQO.fDescription != ''">
-                    and f_description like #{pagedJobQO.fDescription}
+                    and a.f_description like #{pagedJobQO.fDescription}
                 </if>
                 <if test="pagedJobQO.role != null and pagedJobQO.role.size() > 0">
-                    <foreach collection="pagedJobQO.role" open=" and f_role  in (" close=")" item="roleType" separator=",">
+                    <foreach collection="pagedJobQO.role" open=" and a.f_role  in (" close=")" item="roleType" separator=",">
                         #{roleType}
                     </foreach>
                 </if>
                 <if test="pagedJobQO.status != null and pagedJobQO.status.size() > 0">
-                    <foreach collection="pagedJobQO.status" open=" and f_status  in (" close=")" item="statusType"
+                    <foreach collection="pagedJobQO.status" open=" and a.f_status  in (" close=")" item="statusType"
                              separator=",">
                         #{statusType}
                     </foreach>
