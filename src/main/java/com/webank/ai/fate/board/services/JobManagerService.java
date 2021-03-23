@@ -285,7 +285,7 @@ public class JobManagerService {
         // download
         File file = new File(realPath, fileName);
         if (file.exists()) {
-            response.setBufferSize(402800);
+            response.setBufferSize(1024*1000);
             byte[] buffer = new byte[1024];
             FileInputStream fis = null;
             BufferedInputStream bis = null;
