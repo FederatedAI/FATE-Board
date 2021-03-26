@@ -318,8 +318,7 @@ public class JobManagerService {
                     }
                 }
             }
-            response.setContentType("application/octet-stream");
-            response.setHeader("content-type", "application/octet-stream");
+            response.setContentType("application/force-download");
             response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
             return null;
         } else {
