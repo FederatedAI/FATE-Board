@@ -39,7 +39,7 @@ const shortCurveName = name => {
   return name && name.replace(/(train_|validate_)/g, '').replace(/(train\.|validate\.)/g, 'fold_')
 }
 
-export default function(chartName, settingOpts = {}, seriesOpts = {}, formatter) {
+export default function(chartName, settingOpts = {}, seriesOpts = {}, formatter, legend = 'custom') {
   return function(metricData) {
     const group = []
     each(metricData, (curves, metric_namespace) => {
@@ -82,7 +82,7 @@ export default function(chartName, settingOpts = {}, seriesOpts = {}, formatter)
         props: {
           options,
           setting,
-          legend: 'custom'
+          legend: legend
         }
       })
     })

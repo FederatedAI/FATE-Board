@@ -11,7 +11,7 @@
         title="Modify the variable names as needed:"
         tip="(The changes will only be applied to the downloaded files)"
       />
-      <table-form :data.sync="variableNames" />
+      <table-form ref="tableImplying" :data.sync="variableNames" />
       <div class="divider" />
       <template v-if="useLogic">
         <heading
@@ -361,6 +361,10 @@ export default {
       })
     },
     downloadFiles(res, name) {
+      const imply = this.getImplying()
+      if (imply) {
+        res.push(imply)
+      }
       mkzip(
         res,
         name,
@@ -376,6 +380,11 @@ export default {
     },
     loaded() {
       this.loading = false
+    },
+    getImplying() {
+      if (this.$refs.tableImplying) {
+        return this.$refs.tableImplying.tableDownload()
+      }
     }
   }
 }

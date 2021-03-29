@@ -3,29 +3,50 @@
     <crefresh @refresh="refreshAll" />
     <span v-if="reportType.has" class="nav-item-wrap">
       <span class="title">downLoad:</span>
-      <span v-if="reportType.hasReport" class="nav-item" @click="download('report')">
+      <span
+        v-if="reportType.hasReport"
+        :class="noReportData ? 'disable-color' : 'nav-item'"
+        @click="download('report', noReportData)"
+      >
         <icon-hover-and-active
           :default-url="require('@/icons/download_report_default.png')"
           :hover-url="require('@/icons/download_report_hover.png')"
           :active-url="require('@/icons/download_report_click.png')"
+          :disable-url="require('@/icons/download_report_disable.png')"
+          :disabled="noReportData"
           class="operation-btnicon"
         />Report
+        <div v-show="noReportData" class="disable-div" />
       </span>
-      <span v-if="reportType.hasModel" class="nav-item" @click="download('model')">
+      <span
+        v-if="reportType.hasModel"
+        :class="noModelData ? 'disable-color' : 'nav-item'"
+        @click="download('model', noModelData)"
+      >
         <icon-hover-and-active
           :default-url="require('@/icons/download_model_default.png')"
           :hover-url="require('@/icons/download_model_hover.png')"
           :active-url="require('@/icons/download_model_click.png')"
+          :disable-url="require('@/icons/download_model_disable.png')"
+          :disabled="noModelData"
           class="operation-btnicon"
         />Model
+        <div v-show="noModelData" class="disable-div" />
       </span>
-      <span v-if="reportType.hasData" class="nav-item" @click="download('data')">
+      <span
+        v-if="reportType.hasData"
+        :class="noDataOutput ? 'disable-color' : 'nav-item'"
+        @click="download('data', noDataOutput)"
+      >
         <icon-hover-and-active
           :default-url="require('@/icons/download_data_default.png')"
           :hover-url="require('@/icons/download_data_hover.png')"
           :active-url="require('@/icons/download_data_click.png')"
+          :disable-url="require('@/icons/download_data_disable.png')"
+          :disabled="noDataOutput"
           class="operation-btnicon"
         />Data
+        <div v-show="noDataOutput" class="disable-div" />
       </span>
     </span>
   </div>
@@ -68,14 +89,28 @@ export default {
     reportType: {
       type: Object,
       default: () => {}
+    },
+    noReportData: {
+      type: Boolean,
+      default: false
+    },
+    noModelData: {
+      type: Boolean,
+      default: false
+    },
+    noDataOutput: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
     ...mapGetters(['modelNameMap'])
   },
   methods: {
-    download(command) {
-      this.$emit('download', command)
+    download(command, disabled) {
+      if (!disabled) {
+        this.$emit('download', command)
+      }
     },
     refreshAll() {
       this.$emit('refresh')
@@ -94,7 +129,6 @@ export default {
 		width: 80px;
 		font-size: 12px;
 		font-weight: bold;
-		cursor: pointer;
 		color: #4159d1;
 		text-align: center;
 		display: inline-block;
@@ -112,6 +146,7 @@ export default {
 		}
 		.nav-item {
 			position: relative;
+			cursor: pointer;
 			&:hover::after {
 				content: ' ';
 				position: absolute;
@@ -133,5 +168,18 @@ export default {
 	width: 18px;
 	height: 18px;
 	line-height: 1;
+}
+
+.disable-div {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+}
+.disable-color {
+	position: relative;
+	color: #c6c8cc !important;
+	cursor: auto;
 }
 </style>

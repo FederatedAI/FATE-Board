@@ -18,6 +18,8 @@
  */
 
 import { getPSIbarOptions } from '@/utils/chart-options/PSIbar'
+import { formatFloat } from '../../utils'
+import { divide, multiply } from 'lodash'
 
 function accDivCoupon(arg1, arg2) {
   try {
@@ -27,7 +29,11 @@ function accDivCoupon(arg1, arg2) {
     t2 = t2.length > 1 ? t2[1].length : 0
     const r1 = Number(arg1.toString().replace('.', ''))
     const r2 = Number(arg2.toString().replace('.', ''))
-    return (r1 / r2) * Math.pow(10, t2 - t1)
+    let result = multiply(divide(r1, r2), Math.pow(10, t2 - t1))
+    if (result.toString().length > 8) {
+      result = parseFloat(result.toFixed(arg1.toString().length + 2))
+    }
+    return result
   } catch (e) {
     // console.log()
   }
@@ -127,7 +133,7 @@ const quantileHeader = [{
     label: 'instance_count(%total)',
     prop: 'expected_interval',
     formatter(row) {
-      return row.expected_interval + ' (' + row.expected + ')'
+      return row.expected_interval + ' (' + formatFloat(row.expected) + ')'
     }
   }, {
     label: 'event_ratio',
@@ -142,7 +148,7 @@ const quantileHeader = [{
     label: 'instance_count(%total)',
     prop: 'actual_interval',
     formatter(row) {
-      return row.actual_interval + ' (' + row.actual + ')'
+      return row.actual_interval + ' (' + formatFloat(row.actual) + ')'
     }
   }, {
     label: 'event_ratio',

@@ -20,6 +20,7 @@
 import { formatFloat } from '@/utils/index'
 import { getStackBarOptions } from '@/utils/chart-options/stackBar'
 import { isEmpty } from './uitls'
+import multiply from 'lodash/multiply'
 
 function formatFloatWithDefault(value, role, flag) {
   if (flag) {
@@ -71,13 +72,15 @@ export default function(data, header, type, partyId, role, Currentrole, skipStat
           }
           min = point
         }
+        const event_ratio = multiply(formatFloatWithDefault(data[key].eventRateArray[index], Currentrole, skipStatic), 100)
+        const non_event_ratio = multiply(formatFloatWithDefault(data[key].nonEventRateArray[index], Currentrole, skipStatic), 100)
         tableData.push({
           binning,
           'anonym in guest': 'bin_' + index,
           event_count: formatFloatWithDefault(data[key].eventCountArray[index], Currentrole, skipStatic),
-          event_ratio: formatFloatWithDefault(data[key].eventRateArray[index], Currentrole, skipStatic),
+          event_ratio: event_ratio ? event_ratio.toFixed(4) + '%' : '',
           non_event_count: formatFloatWithDefault(data[key].nonEventCountArray[index], Currentrole, skipStatic),
-          non_event_ratio: formatFloatWithDefault(data[key].nonEventRateArray[index], Currentrole, skipStatic),
+          non_event_ratio: non_event_ratio ? non_event_ratio.toFixed(4) + '%' : '',
           woe: formatFloatWithDefault(data[key].woeArray[index], Currentrole, skipStatic),
           iv: formatFloatWithDefault(data[key].ivArray[index], Currentrole, skipStatic)
         })
@@ -123,17 +126,26 @@ export default function(data, header, type, partyId, role, Currentrole, skipStat
 
       _eventOptions.tooltip.formatter = (params) => {
         const obj = formatterArr[params[0].dataIndex]
-        let str = `${obj.formatterBinning}<br>`
+        const str = [`${obj.formatterBinning}<br>`]
         for (const val of params) {
           if (val.seriesName === 'event_count') {
-            str += `Event_Count: ${obj.event_count}<br>
-            Event_Ratio: ${obj.event_ratio}<br>`
+            str.push(`Event_Count: ${obj.event_count}<br>
+            Event_Ratio: ${(parseFloat(obj.event_ratio) * 100).toFixed(4) + '%'}<br>`)
           } else if (val.seriesName === 'non_event_count') {
-            str += `Non_Event_Count: ${obj.non_event_count}<br>
-            Non_Event_Ratio: ${obj.non_event_ratio}<br>`
+            str.push(`Non_Event_Count: ${obj.non_event_count}<br>
+            Non_Event_Ratio: ${(parseFloat(obj.non_event_ratio) * 100).toFixed(4) + '%'}<br>`)
           }
         }
-        return str
+        str.sort((a, b) => {
+          if (a.match('Event_Count') && b.match('Non_Event_Count')) {
+            return 1
+          } else if (a.match('Non_Event_Count') && b.match('Event_Count')) {
+            return -1
+          } else {
+            return 0
+          }
+        })
+        return str.join('')
       }
       // _woeOptions.tooltip.trigger = 'item'
       _woeOptions.tooltip.formatter = (params) => {
