@@ -217,12 +217,43 @@ function binningHandler(responseData, metricsData, partyId, crole) {
     header2.splice(2, 0, createHeader('anonym in guest', 'anonym in guest'))
   }
 
+  if (crole === 'guest') {
+    form2.push(createFormComponent('tslider', 'tslider', {
+      label: 'woe range',
+      range: true,
+      step: 0.001,
+      outSide: function(value) {
+        const items = value.data
+        let max, min
+        each(items, item => {
+          const data = parseFloat(item['woe'])
+          if (!min) min = data
+          if (!max) max = data
+          if (data < min) {
+            min = data
+          }
+          if (data > max) {
+            max = data
+          }
+        })
+        this.dataMax = parseFloat(max)
+        this.dataMin = parseFloat(min)
+      },
+      formatRange: function(value) {
+        const res = { columnName: 'woe' }
+        res.min = value[0]
+        res.max = value[1]
+        return res
+      }
+    }))
+  }
   const group2 = [
     {
       type: 'form',
       props: {
         form: form2,
-        toProperty: 'select'
+        toProperty: 'select',
+        inrow: true
       }
     },
     {
@@ -231,50 +262,53 @@ function binningHandler(responseData, metricsData, partyId, crole) {
         header: header2,
         data: tableData2,
         zeroFormat: '0',
-        export: 'feature_binning_detail'
+        export: 'feature_binning_detail',
+        toExp: false
       }
     }
   ]
 
   if (role === 'guest') {
-    let needShowPic = true
-    for (const key in stackBarData) {
-      const val = stackBarData[key]
-      if (Object.keys(val) <= 0) {
-        needShowPic = false
+    // let needShowPic = true
+    // for (const key in stackBarData) {
+    //   const val = stackBarData[key]
+    //   if (Object.keys(val) <= 0) {
+    //     needShowPic = false
+    //   }
+    // }
+    // if (needShowPic) {
+    group2.push({
+      type: 'chart',
+      name: 'stackBar',
+      props: {
+        setting: stackBarSetting,
+        options: stackBarData,
+        export: 'instance_distribution',
+        detail: false,
+        noDataMissing: true
       }
-    }
-    if (needShowPic) {
-      group2.push({
-        type: 'chart',
-        name: 'stackBar',
-        props: {
-          setting: stackBarSetting,
-          options: stackBarData,
-          export: 'instance_distribution',
-          detail: false
-        }
-      })
-    }
-    let needShowWoePic = true
-    for (const key in woeData) {
-      const val = woeData[key]
-      if (Object.keys(val) <= 0) {
-        needShowWoePic = false
+    })
+    // }
+    // let needShowWoePic = true
+    // for (const key in woeData) {
+    //   const val = woeData[key]
+    //   if (Object.keys(val) <= 0) {
+    //     needShowWoePic = false
+    //   }
+    // }
+    // if (needShowWoePic) {
+    group2.push({
+      type: 'chart',
+      name: 'woe',
+      props: {
+        setting: woeDataSetting,
+        options: woeData,
+        export: 'woe',
+        detail: false,
+        noDataMissing: true
       }
-    }
-    if (needShowWoePic) {
-      group2.push({
-        type: 'chart',
-        name: 'woe',
-        props: {
-          setting: woeDataSetting,
-          options: woeData,
-          export: 'woe',
-          detail: false
-        }
-      })
-    }
+    })
+    // }
   }
 
   const group = [
@@ -292,7 +326,8 @@ function binningHandler(responseData, metricsData, partyId, crole) {
           header: header1,
           data: tableData1,
           zeroFormat: '0',
-          export: 'feature_summary'
+          export: 'feature_summary',
+          toExp: false
         }
       }
     ],

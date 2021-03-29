@@ -268,6 +268,10 @@ function arrangeMetric(metrics) {
       return -1
     } else if (b.name === 'loss') {
       return 1
+    } else if (a.name === 'others') {
+      return -1
+    } else if (b.name === 'others') {
+      return 1
     } else if (a.name === 'curves') {
       return 1
     } else if (b.name === 'curves') {

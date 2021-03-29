@@ -426,11 +426,13 @@ class CompExpression {
         name: 'data2output', tooltip: 'Test Data Output', type: 'data'
       }])
     }
-    if (!this.belone.toLowerCase().match(/(intersection|federatedsample|evaluation|upload|download|rsa|datasplit|reader|union|pearson|scorecard)/i)) {
-      if (!this.belone.toLowerCase().match(/(statistics|psi)/i)) {
+    if (!this.belone.toLowerCase().match(/(intersection|federatedsample|evaluation|upload|download|rsa|datasplit|reader|union|scorecard|sampleweight)/i)) {
+      if (!this.belone.toLowerCase().match(/(statistics|pearson|psi)/i)) {
         this.input.push(MODELINPUT)
       }
+      // if (!this.belone.toLowerCase().match(/(transformer)/)) {
       this.output.push(MODELOUTPUT)
+      // }
       if (this.belone.toLowerCase().match(/(selection)/i)) {
         this.input[1].mult = ports.get('MULT_MODEL_PORT')
       }

@@ -36,6 +36,7 @@ const app = {
       evaluation: 'Evaluation',
       boost: 'HeteroSecureBoost',
       binning: 'HeteroFeatureBinning',
+      homoBinning: 'HomoFeatureBinning',
       selection: 'HeteroFeatureSelection',
       scale: 'FeatureScale',
       sample: 'FederatedSample',
@@ -54,7 +55,8 @@ const app = {
       psi: 'PSI',
       statistic: 'DataStatistics',
       reader: 'Reader',
-      scorecard: 'Scorecard'
+      scorecard: 'Scorecard',
+      transformer: 'Transformer'
     },
     metricTypeMap: {
       dataIOTable: 'DATAIO_TABLE',

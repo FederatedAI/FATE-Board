@@ -76,6 +76,10 @@ async function handler(metricsData, params) {
       }
       const component = fn(mid)
       others.push({ title: METRIC_TYPES.PSI, content: wrapGroupComponent(component) })
+    } else if (metric_type === METRIC_TYPES.OVR) {
+      const fn = getTransformMetricFn(metric_type)
+      const component = fn(res, metric_type)
+      others.push({ title: 'One_vs_Rest Evaluation', content: wrapGroupComponent(component) })
     } else {
       each(res, (data, name_space) => {
         if (typeof data !== 'string') {
