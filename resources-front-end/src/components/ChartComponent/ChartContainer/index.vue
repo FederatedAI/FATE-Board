@@ -15,6 +15,7 @@
       :height="currentHeight"
       :container-height="currentContainerHeight"
       :no-data="noData"
+      :no-data-missing="noDataMissing"
       :zoom="zoom"
       :legend="legend === 'custom'"
       :class-name="className"
@@ -138,6 +139,10 @@ export default {
     detail: {
       type: Boolean,
       default: false
+    },
+    noDataMissing: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -168,7 +173,10 @@ export default {
       setting = Object.assign({}, setting, series.length > 0 ? { series } : {})
       if (!this.legend || this.legend === 'custom') {
         delete setting.legend
-      } else if (this.legend === true && !setting.legend) {
+      } else if (
+        this.legend === true &&
+				(!setting.legend || !setting.legend.data)
+      ) {
         setting = this.setLegend(setting)
       }
       if (this.needToImply) {
@@ -284,7 +292,9 @@ export default {
           res.push(val.name)
         }
         if (res.length > 0) {
-          tableSetting.legend = { data: res }
+          tableSetting.legend = Object.assign({}, tableSetting.legend, {
+            data: res
+          })
         }
       }
       return tableSetting

@@ -67,7 +67,7 @@ const dataReporter = {
                 [xAxis[0] || 'xAxis']: isArr ? vl[0] : xVariable[index],
                 [yAxis[yindex] || 'yAxis']: isArr ? vl[1] : vl
               })
-              order.push(...[' ', xAxis[0] || 'xAxis', yAxis[yindex] || 'yAxis'])
+              order.push(...[' ', xAxis[0] || 'xAxis', yAxis[yindex].replace(', ', '') || 'yAxis'])
               index++
             }
           }

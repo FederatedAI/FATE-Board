@@ -25,6 +25,7 @@ const DEFAULTS = {
   quote: '"',
   escapedQuote: '""',
   delimiter: ',',
+  escapedDelimiter: '_',
   eol: isWin ? '\r\n' : '\n',
   header: true,
   includeEmptyRows: false
@@ -129,6 +130,9 @@ export default class Json2Csv {
     }
     if (typeof value === 'string') {
       value = value.replace(new RegExp(this.options.quote, 'g'), this.options.escapedQuote)
+      if (value.match(new RegExp(this.options.delimiter, 'g'))) {
+        value = `${this.options.quote}${value}${this.options.quote}`
+      }
       // value = `${this.options.quote}${value}${this.options.quote}`
       value = `${value + '\t'}`
     }

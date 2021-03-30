@@ -16,24 +16,33 @@
 package com.webank.ai.fate.board.services;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.webank.ai.fate.board.dao.JobMapper;
+import com.webank.ai.fate.board.global.ErrorCode;
+import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.log.LogFileService;
 import com.webank.ai.fate.board.pojo.*;
 import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.utils.HttpClientPool;
 import com.webank.ai.fate.board.utils.PageBean;
 import com.webank.ai.fate.board.utils.ThreadPoolTaskExecutorUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -41,7 +50,7 @@ import java.util.concurrent.Future;
 
 
 @Service
-
+@Slf4j
 public class JobManagerService {
     public static Set<String> jobFinishStatus = new HashSet<String>() {
         {
@@ -76,21 +85,29 @@ public class JobManagerService {
     }
 
 
-
     public PageBean<Map<String, Object>> queryPagedJobs(PagedJobQO pagedJobQO) {
-        if (pagedJobQO.getJobId() != null && 0 != pagedJobQO.getJobId().trim().length()) {
-            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getJobId()));
-            pagedJobQO.setJobId("%" + pagedJobQO.getJobId() + "%");
+        String jobId = pagedJobQO.getJobId();
+        if (jobId != null && 0 != jobId.trim().length()) {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(jobId));
+            pagedJobQO.setJobId("%" + jobId + "%");
         }
-        if (pagedJobQO.getPartyId() != null && 0 != pagedJobQO.getPartyId().trim().length()) {
-            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getPartyId()));
-            pagedJobQO.setPartyId("%" + pagedJobQO.getPartyId() + "%");
+        String partyId = pagedJobQO.getPartyId();
+        if (partyId != null && 0 != partyId.trim().length()) {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(partyId));
+            pagedJobQO.setPartyId("%" + partyId + "%");
         }
-        if (pagedJobQO.getfDescription() != null && 0 != pagedJobQO.getfDescription().trim().length()) {
-            Preconditions.checkArgument(LogFileService.checkParameters( "^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5\\s]+$",pagedJobQO.getfDescription()));
+        String partner = pagedJobQO.getPartner();
+        if (partner != null && partner.trim().length() != 0) {
+            Preconditions.checkArgument(LogFileService.checkPathParameters(partner));
+            pagedJobQO.setPartner("%" + partner + "%");
+        }
+        String fDescription = pagedJobQO.getFDescription();
+        if (fDescription != null && 0 != fDescription.trim().length()) {
+            Preconditions.checkArgument(LogFileService.checkParameters("^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5\\s]+$", fDescription));
 //            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getfDescription()));
-            pagedJobQO.setfDescription("%" + pagedJobQO.getfDescription() + "%");
+            pagedJobQO.setFDescription("%" + fDescription + "%");
         }
+
         long jobSum = this.countJob(pagedJobQO);
         PageBean<Map<String, Object>> listPageBean = new PageBean<>(pagedJobQO.getPageNum(), pagedJobQO.getPageSize(), jobSum);
         long startIndex = listPageBean.getStartIndex();
@@ -111,12 +128,54 @@ public class JobManagerService {
                 jobParams.put(Dict.PARTY_ID, partyId1);
                 String result = httpClientPool.post(fateUrl + Dict.URL_JOB_DATAVIEW, JSON.toJSONString(jobParams));
                 JSONObject data = JSON.parseObject(result).getJSONObject(Dict.DATA);
-
+//                JSONObject data=null;
                 return data;
             }, new int[]{500, 1000}, new int[]{3, 3});
 //            jobWithBLOB.setfRunIp(null);
             jobWithBLOB.setfDsl(null);
             jobWithBLOB.setfRuntimeConf(null);
+
+            //set partners
+            String role = jobWithBLOB.getfRole();
+            if ("local".equals(role) || "arbiter".equals(role)) {
+                jobWithBLOB.setPartners(null);
+            }
+            HashSet<String> partners = new HashSet<>();
+            String roles = jobWithBLOB.getfRoles();
+            JSONObject jsonObject = JSON.parseObject(roles);
+            if ("guest".equals(role)) {
+
+                JSONArray hosts = jsonObject.getJSONArray("host");
+                if (hosts != null) {
+                    for (int i = 0; i < hosts.size(); i++) {
+                        Object o = hosts.get(i);
+                        partners.add(String.valueOf(o));
+
+                    }
+                }
+
+                JSONArray arbiters = jsonObject.getJSONArray("arbiter");
+                if (arbiters != null) {
+                    for (int i = 0; i < arbiters.size(); i++) {
+                        Object o = arbiters.get(i);
+                        partners.add(String.valueOf(o));
+                    }
+                }
+
+            }
+
+            if ("host".equals(role)) {
+                JSONArray guests = jsonObject.getJSONArray("guest");
+                if (guests != null) {
+                    for (int i = 0; i < guests.size(); i++) {
+                        Object o = guests.get(i);
+                        partners.add(String.valueOf(o));
+                    }
+                }
+
+            }
+            jobWithBLOB.setPartners(partners);
+
             jobDataMap.put(jobWithBLOB, future);
         }
         jobDataMap.forEach((k, v) -> {
@@ -165,5 +224,107 @@ public class JobManagerService {
         return command.toString();
     }
 
+
+    public ResponseResult download(DownloadQO downloadQO, HttpServletResponse response) {
+
+        //check input parameters
+        String jobId = downloadQO.getJobId();
+        String role = downloadQO.getRole();
+        String type = downloadQO.getType();
+
+        if (StringUtils.isEmpty(jobId)) {
+            log.error("parameter null:jobId");
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
+        }
+        if (StringUtils.isEmpty(role)) {
+            log.error("parameter null:role");
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
+        }
+        if (StringUtils.isEmpty(type)) {
+            log.error("parameter null:type");
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
+        }
+
+        if (!LogFileService.checkParameters("^[0-9a-zA-Z\\-_]+$", jobId, role, type)) {
+            log.error("parameter error: illegal characters in role or jobId or type");
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
+        }
+
+        //get fate path
+        String webPath = System.getProperty("user.dir");
+        int i1 = webPath.lastIndexOf("/");
+        String fatePath = webPath.substring(0, i1);
+
+        //build file path
+        String fileName = "";
+        String realPath = "";
+        String fileOutputName = "";
+
+        if ("dsl".equals(type)) {
+            fileName = "job_dsl.json";
+            realPath = fatePath + "/jobs/" + jobId + "/";
+            fileOutputName = "job_dsl_" + jobId + ".json";
+        } else {
+            if ("guest".equals(role) || "local".equals(role)) {
+                fileName = "job_runtime_conf.json";
+                realPath = fatePath + "/jobs/" + jobId + "/";
+                fileOutputName = "runtime_config_" + jobId + ".json";
+
+            } else if ("host".equals(role)) {
+                fileName = "job_runtime_on_party_conf.json";
+                realPath = fatePath + "/jobs/" + jobId + "/" + role + "/";
+                fileOutputName = "runtime_config_" + jobId + ".json";
+            } else {
+                log.error("download error: role:{} doesn't support", role);
+                return new ResponseResult(ErrorCode.ERROR_PARAMETER);
+            }
+
+        }
+
+
+        // download
+        File file = new File(realPath, fileName);
+        if (file.exists()) {
+            response.setBufferSize(1024*1000);
+            byte[] buffer = new byte[1024];
+            FileInputStream fis = null;
+            BufferedInputStream bis = null;
+            try {
+                fis = new FileInputStream(file);
+                bis = new BufferedInputStream(fis);
+                OutputStream os = response.getOutputStream();
+                int i = bis.read(buffer);
+                while (i != -1) {
+                    os.write(buffer, 0, i);
+                    i = bis.read(buffer);
+                }
+                log.info("download success,file :{}", realPath + fileName);
+            } catch (Exception e) {
+                log.error("download failed", e);
+                return new ResponseResult(ErrorCode.DOWNLOAD_ERROR);
+            } finally {
+                if (bis != null) {
+                    try {
+                        bis.close();
+                    } catch (IOException e) {
+                        log.error("download io close failed", e);
+                    }
+                }
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException e) {
+                        log.error("download io close failed", e);
+                    }
+                }
+            }
+            response.setContentType("application/force-download");
+            response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
+            return null;
+        } else {
+            return new ResponseResult(ErrorCode.FILE_ERROR);
+        }
+
+    }
 
 }
