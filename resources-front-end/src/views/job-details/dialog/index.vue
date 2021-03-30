@@ -18,6 +18,9 @@
       <report-nav
         :model-type="modelType"
         :report-type="reportType"
+        :no-report-data="noReportData"
+        :no-model-data="noModelData"
+        :no-data-output="noDataOutput"
         class="report"
         @download="command => $emit('download', command)"
         @refresh="refreshAll"
@@ -134,7 +137,11 @@ export default {
       cList: [],
       tabIndex: 0,
       logInited: false,
-      dataOutput: []
+      dataOutput: [],
+      noReportData: false,
+      noModelData: false,
+      noDataOutput: false,
+      dataOutputResponse: null
     }
   },
   computed: {
@@ -204,6 +211,7 @@ export default {
     componentName() {
       if (this.componentName) {
         this.refresh()
+        this.dataOutputResponse = null
       }
     },
     fullscreen() {
@@ -221,6 +229,7 @@ export default {
         party_id: this.partyId,
         component_name: this.componentName
       }
+      this.dataDataOutputCheck()
       this.getResults(param)
       this.transformFn = getTransformFn(this.modelType)
       this.dataOutput = []
@@ -292,9 +301,23 @@ export default {
         }
         if (Array.isArray(transformResult)) {
           this.cList = transformResult
+          if (transformResult.length === 0) {
+            this.noModelData = true
+            this.noReportData = true
+          } else {
+            this.noModelData = false
+            this.noReportData = false
+          }
         } else {
           transformResult.then(list => {
             this.cList = list
+            if (list.length === 0) {
+              this.noModelData = true
+              this.noReportData = true
+            } else {
+              this.noModelData = false
+              this.noReportData = false
+            }
           })
         }
       })
@@ -323,9 +346,27 @@ export default {
         party_id: this.partyId,
         component_name: this.componentName
       }
-      getDataOutput(para).then(res => {
-        this.dataOutput = res.data
-      })
+      const responseHandler = res => {
+        this.dataOutputResponse = res
+        this.dataOutput = (res && res.data) || []
+        if (
+          !this.dataOutput ||
+					!this.dataOutput.retmsg ||
+					this.dataOutput.retmsg
+					  .toString()
+					  .toLowerCase()
+					  .match('no data')
+        ) {
+          this.noDataOutput = true
+        } else {
+          this.noDataOutput = false
+        }
+      }
+      if (!this.dataOutputResponse) {
+        getDataOutput(para).then(responseHandler)
+      } else {
+        responseHandler(this.dataOutputResponse)
+      }
     },
     getNames() {
       return this.$refs['model_output'].getNames()
@@ -347,6 +388,9 @@ export default {
     },
     handleFilterLogic(filters) {
       return this.$refs['model_output'].handleFilterLogic(filters)
+    },
+    dataDataOutputCheck() {
+      this.getDataOutputData()
     }
   }
 }

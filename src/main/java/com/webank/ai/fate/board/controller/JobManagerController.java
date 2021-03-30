@@ -34,11 +34,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.FileSystem;
 import java.util.*;
 
 
@@ -161,7 +172,6 @@ public class JobManagerController {
     }
 
 
-
     @RequestMapping(value = "/query/page/new", method = RequestMethod.POST)
     public ResponseResult<PageBean<Map<String, Object>>> queryPagedJob(@RequestBody PagedJobQO pagedJobQO) {
         List<String> roles = pagedJobQO.getRole();
@@ -197,14 +207,13 @@ public class JobManagerController {
     public ResponseResult updateJobById(@Valid @RequestBody UpdateNotesDTO updateNotesDTO, BindingResult bindingResult) {
 
 
-
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
             return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
 
         Preconditions.checkArgument(LogFileService.checkPathParameters(updateNotesDTO.getJob_id(), updateNotesDTO.getRole(), updateNotesDTO.getParty_id()));
-        Preconditions.checkArgument(LogFileService.checkParameters( "^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5\\s]+$",updateNotesDTO.getNotes()));
+        Preconditions.checkArgument(LogFileService.checkParameters("^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5\\s]+$", updateNotesDTO.getNotes()));
 
         String result;
         try {
@@ -233,7 +242,7 @@ public class JobManagerController {
             FieldError errors = bindingResult.getFieldError();
             return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
-        Preconditions.checkArgument(LogFileService.checkPathParameters(reRunDTO.getJob_id(),  reRunDTO.getComponent_name()));
+        Preconditions.checkArgument(LogFileService.checkPathParameters(reRunDTO.getJob_id(), reRunDTO.getComponent_name()));
 
         int i = jobManagerService.reRun(reRunDTO);
         if (i == 0) {
@@ -254,4 +263,16 @@ public class JobManagerController {
         String componentCommand = jobManagerService.getComponentCommand(componentQueryDTO);
         return new ResponseResult<>(ErrorCode.SUCCESS, componentCommand);
     }
+
+
+    /*
+     * download dsl and runtime conf
+     *
+     */
+    @RequestMapping(value = "/download", method = RequestMethod.POST)
+    public ResponseResult download(@RequestBody DownloadQO downloadQO, HttpServletResponse response) {
+        return jobManagerService.download(downloadQO, response);
+
+    }
+
 }

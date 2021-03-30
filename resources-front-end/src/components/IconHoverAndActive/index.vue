@@ -54,6 +54,10 @@ export default {
       type: String,
       default: ''
     },
+    disableUrl: {
+      type: String,
+      default: ''
+    },
     origin: {
       type: String,
       default: 'default'
@@ -65,6 +69,10 @@ export default {
     btnTitle: {
       type: String,
       default: ''
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -76,7 +84,9 @@ export default {
   computed: {
     imgUrl() {
       let url = ''
-      if (this.status === 'default') {
+      if (this.disabled) {
+        url = this.disableUrl
+      } else if (this.status === 'default') {
         url = this.defaultUrl
       } else if (this.status === 'hover') {
         url = this.hoverUrl
@@ -96,35 +106,45 @@ export default {
       this.status = this.origin
     },
     mouseenter() {
-      if (this.hold) {
-        this.holded = this.status
-      }
-      if (this.hoverUrl) {
-        this.status = 'hover'
+      if (!this.disabled) {
+        if (this.hold) {
+          this.holded = this.status
+        }
+        if (this.hoverUrl) {
+          this.status = 'hover'
+        }
       }
     },
     mouseout() {
-      if (this.hold) {
-        this.status = this.holded
-      } else {
-        this.status = 'default'
+      if (!this.disabled) {
+        if (this.hold) {
+          this.status = this.holded
+        } else {
+          this.status = 'default'
+        }
       }
     },
     mousedown() {
-      if (this.activeUrl) {
-        if (this.holded) {
-          this.holded = 'active'
+      if (!this.disabled) {
+        if (this.activeUrl) {
+          if (this.holded) {
+            this.holded = 'active'
+          }
+          this.status = 'active'
         }
-        this.status = 'active'
       }
     },
     mouseup() {
-      if (this.status === 'active' && !this.hold) {
-        this.status = 'default'
+      if (!this.disabled) {
+        if (this.status === 'active' && !this.hold) {
+          this.status = 'default'
+        }
       }
     },
     click() {
-      this.$emit('clickFn')
+      if (!this.disabled) {
+        this.$emit('clickFn')
+      }
     },
     restart() {
       this.holded = 'default'

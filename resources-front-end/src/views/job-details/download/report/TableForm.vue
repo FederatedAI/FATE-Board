@@ -111,6 +111,19 @@ export default {
     },
     handleInputEnter(event) {
       event.target.blur()
+    },
+    tableDownload() {
+      // 映射表下载
+      const data = this.data
+      const header = ['origin', 'modified']
+      return {
+        default: {
+          'variable_modify.csv': {
+            header,
+            data
+          }
+        }
+      }
     }
   }
 }

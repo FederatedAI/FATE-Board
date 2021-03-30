@@ -101,6 +101,14 @@
                 </el-popover>
               </div>
             </li>
+            <li class="inline-row download-link" @click="downloadJobConfig('dsl')">
+              Job DSL&nbsp;
+              <i class="el-icon-download"/>
+            </li>
+            <li :class="{'disable-color': role.toLowerCase() === 'arbiter'}" class="inline-row download-link" @click="downloadJobConfig('runtime')">
+              Runtime config&nbsp;
+              <i class="el-icon-download"/>
+            </li>
             <li>
               <hr class="hr-style">
             </li>
@@ -208,7 +216,7 @@
  */
 
 import { parseTime, formatSeconds } from '@/utils'
-import { getComponentPara, getComponentCommand, retryJob } from '@/api/job'
+import { getComponentPara, getComponentCommand, retryJob, jobDownload } from '@/api/job'
 import IconHoverAndActive from '@/components/IconHoverAndActive'
 import graphChartHandler from '@/utils/vendor/graphChartHandler'
 import graphOptions from '@/utils/chart-options/graph'
@@ -844,6 +852,15 @@ export default {
     },
     downloadFile(res) {
       this.$refs.downloadReport.downloadFiles(res, this.jobId + '_' + this.componentName)
+    },
+    downloadJobConfig(type) {
+      if (!(this.role.toLowerCase() === 'arbiter' && type === 'runtime')) {
+        jobDownload({
+          jobId: this.jobId,
+          role: this.role,
+          type
+        })
+      }
     }
   }
 }
@@ -859,5 +876,16 @@ export default {
         padding: 30px 20px;
       }
     }
+  }
+  .download-link {
+    font-size: 12px;
+    color: #4159D1;
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: bold;
+  }
+  .disable-color {
+    color: #c6c8cc;
+    cursor: default;
   }
 </style>

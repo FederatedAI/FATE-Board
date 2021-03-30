@@ -49,12 +49,12 @@ export default function(summary, quantilePR, isEvaluation) {
         {
           type: 'title',
           props: {
-            title: isEvaluation ? 'Evaluation scores' : 'Performance scores'
+            title: isEvaluation ? 'Evaluation Scores' : 'Performance Scores'
           }
-        },
-        {
-          type: 'search'
         }
+        // {
+        //   type: 'search'
+        // }
       ]
     }
   }
@@ -66,7 +66,7 @@ export default function(summary, quantilePR, isEvaluation) {
     props: {
       header,
       data: tableData,
-      pageSize: 'all',
+      pageSize: 20,
       zeroFormat: '0',
       export: isEvaluation ? 'evaluation_scores' : 'performance_scores'
     }

@@ -21,7 +21,18 @@
 export function getEvaluationCurveOptions() {
   return {
     // color: ['#ff8800', '#f23ba9', '#494ece', '#24b68b', '#A21155'],
-    color: ['#f00', '#0f0', '#00f', '#24b68b', '#A21155'],
+    color: ['#494ece',
+      '#00d269',
+      '#ff8103',
+      '#00dfcf',
+      '#f23ba9',
+      '#0080ff',
+      '#c13ce1',
+      '#ffcd03',
+      '#7c56ff',
+      '#a7cf02',
+      '#00d3ff',
+      '#ff1414'],
     backgroundColor: '#fbfbfc',
     tooltip: {
       // enterable: true,
@@ -105,7 +116,8 @@ export function getEvaluationCurveOptions() {
       //   // },
       //   data: []
       // }
-    ]
+    ],
+    legend: {}
   }
 }
 
