@@ -15,6 +15,9 @@
  */
 package com.webank.ai.fate.board.pojo;
 
+import java.util.List;
+import java.util.Set;
+
 public class JobDO {
 
     private String fJobId;
@@ -60,6 +63,8 @@ public class JobDO {
     private Long fEndTime;
 
     private Long fElapsed;
+
+    private Set<String> partners;
 
     public JobDO() {
     }
@@ -230,5 +235,13 @@ public class JobDO {
 
     public void setfElapsed(Long fElapsed) {
         this.fElapsed = fElapsed;
+    }
+
+    public Set<String> getPartners() {
+        return partners;
+    }
+
+    public void setPartners(Set<String> partners) {
+        this.partners = partners;
     }
 }

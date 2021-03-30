@@ -22,6 +22,7 @@ import { getMetricData, getMetrics } from '@/api/chart'
 import { formatFloat } from '@/utils'
 import metricsArrange from './metricsArrange'
 import { deepClone } from '@/utils'
+import isFunction from 'lodash/isFunction'
 
 const makeMetricsDataRequest = (name, namespace, partyId, role, componentName, jobId) => {
   const param = {
@@ -318,25 +319,33 @@ export function weightHandler(responseData) {
   return group
 }
 
-export const createAsyncComponent = options => ({
+const defaultRefreshing = async({ name, originParam }) => {
+  const response = await getMetrics(originParam.props)
+  const arrange = metricsArrange(response.data)
+  let option
+  if (name.startsWith('loss')) {
+    option = arrange.find(arra => arra.name === 'loss')
+  } else if (name.startsWith('dbi')) {
+    option = arrange.find(arr => arr.name === 'dbi')
+  } else {
+    option = arrange.find(arra => arra.name === 'curves')
+  }
+  option = option.options[name]
+  const final = deepClone(originParam)
+  final.props.metrics = option
+  return final
+}
+
+export const createAsyncComponent = (options, refreshing = true) => ({
   type: 'async',
   props: {
     options,
-    refresh: async({ name, originParam }) => {
-      const response = await getMetrics(originParam.props)
-      const arrange = metricsArrange(response.data)
-      let option
-      if (name.startsWith('loss')) {
-        option = arrange.find(arra => arra.name === 'loss')
-      } else if (name.startsWith('dbi')) {
-        option = arrange.find(arr => arr.name === 'dbi')
+    refresh: refreshing ? async(params) => {
+      if (isFunction(refreshing)) {
+        refreshing(params)
       } else {
-        option = arrange.find(arra => arra.name === 'curves')
+        await defaultRefreshing(params)
       }
-      option = option.options[name]
-      const final = deepClone(originParam)
-      final.props.metrics = option
-      return final
-    }
+    } : ''
   }
 })
