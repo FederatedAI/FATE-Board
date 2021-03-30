@@ -39,54 +39,83 @@ const fn = (response) => {
   })
 
   sortByName(tableData, 'variable')
-
-  return [{
-    type: 'text',
-    props: {
-      content: 'namespace: ' + response.reader_name.meta.namespace,
-      className: 'small-form-text'
+  const group = []
+  const meta = response.reader_name && response.reader_name.meta
+  if (meta) {
+    if (meta.file_path) {
+      group.push({
+        type: 'text',
+        props: {
+          content: 'file path: ' + meta.file_path,
+          className: 'small-form-text'
+        }
+      })
     }
-  }, {
-    type: 'text',
-    props: {
-      content: 'table name: ' + response.reader_name.meta.table_name,
-      className: 'small-form-text'
+    if (meta.file_count) {
+      group.push({
+        type: 'text',
+        props: {
+          content: 'file count: ' + meta.file_count,
+          className: 'small-form-text'
+        }
+      })
     }
-  }, {
-    type: 'text',
-    props: {
-      content: 'count: ' + response.reader_name.meta.count,
-      className: 'small-form-text'
+    group.push(...[{
+      type: 'text',
+      props: {
+        content: 'namespace: ' + response.reader_name.meta.namespace,
+        className: 'small-form-text'
+      }
+    }, {
+      type: 'text',
+      props: {
+        content: 'name: ' + response.reader_name.meta.table_name,
+        className: 'small-form-text'
+      }
+    }])
+    if (meta.count) {
+      group.push({
+        type: 'text',
+        props: {
+          content: 'count: ' + meta.count,
+          className: 'small-form-text'
+        }
+      })
     }
-  }, {
-    type: 'text',
-    props: {
-      content: 'partitions: ' + response.reader_name.meta.partitions,
-      className: 'small-form-text'
+    group.push(...[{
+      type: 'text',
+      props: {
+        content: 'partitions: ' + response.reader_name.meta.partitions,
+        className: 'small-form-text'
+      }
+    }, {
+      type: 'text',
+      props: {
+        content: 'storage engine: ' + response.reader_name.meta.storage_engine,
+        className: 'small-form-text'
+      }
+    }])
+    if (tableData.length > 0) {
+      group.push(...[{
+        type: 'form',
+        props: {
+          form: [
+            { type: 'search' }
+          ]
+        }
+      }, {
+        type: 'table',
+        props: {
+          data: tableData,
+          header: getHeader(),
+          zeroFormat: '0',
+          export: response.reader_name.meta.table_name,
+          pageSize: -1
+        }
+      }])
     }
-  }, {
-    type: 'text',
-    props: {
-      content: 'storage engine: ' + response.reader_name.meta.storage_engine,
-      className: 'small-form-text'
-    }
-  }, {
-    type: 'form',
-    props: {
-      form: [
-        { type: 'search' }
-      ]
-    }
-  }, {
-    type: 'table',
-    props: {
-      data: tableData,
-      header: getHeader(),
-      zeroFormat: '0',
-      export: response.reader_name.meta.table_name,
-      pageSize: -1
-    }
-  }]
+  }
+  return group
 }
 
 export default fn

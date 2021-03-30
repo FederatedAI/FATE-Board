@@ -2,18 +2,21 @@
   <div
     v-loading="loading"
     :class="{
-      'async__def-size':loading || displayParam
+      'async__def-size':loading || displayParam,
+      'async-showing': !hiddenCheck
     }"
     class="async__container"
   >
-    <cgroup
-      ref="asyncGroup"
-      :options="displayParam"
-      :style="loading ? 'min-height:200px;' : ''"
-      class="async__group"
-      @refreshed="finishLoading"
-      @reporter="asyncReport"
-    />
+    <keep-alive>
+      <cgroup
+        ref="asyncGroup"
+        :options="displayParam"
+        :style="loading ? 'min-height:200px;' : ''"
+        class="async__group"
+        @refreshed="finishLoading"
+        @reporter="asyncReport"
+      />
+    </keep-alive>
   </div>
 </template>
 
@@ -66,17 +69,26 @@ export default {
     variableMap: {
       type: Array,
       default: () => []
+    },
+    needLoad: {
+      type: Boolean,
+      default: true
+    },
+    hidden: {
+      type: Function,
+      default: () => {}
     }
   },
   data() {
     return {
       cacheData: new Map(),
       displayParam: [],
-      loading: true,
+      loading: this.needLoad,
       requestParam: Array.isArray(this.options)
         ? [...this.options]
         : Object.assign({}, this.options),
-      noNeedToRefresh: false
+      noNeedToRefresh: false,
+      hiddenCheck: true
     }
   },
   computed: {
@@ -134,7 +146,7 @@ export default {
   },
   methods: {
     init() {
-      this.loading = true
+      this.loading = this.needLoad
       this.combine().then(params => {
         this.displayParam = params
       })
@@ -156,8 +168,10 @@ export default {
       }
       const mid = Array.isArray(afterTrans) ? afterTrans : [afterTrans]
       for (const val of mid) {
-        val.props.export = opt.export || ''
-        val.props.detail = !!opt.detail
+        if (val.props) {
+          val.props.export = opt.export || ''
+          val.props.detail = !!opt.detail
+        }
       }
       this.cacheData.set(name, afterTrans)
       this.$emit('afterRequest', {
@@ -177,13 +191,14 @@ export default {
           await this.requesting(val.opts, val.name)
         }
         const res = this.cacheData.get(val.name)
+        this.hiddenCheck = !!this.hidden()
         if (Array.isArray(res)) {
           for (const item of res) {
-            item.props.name = val.name
+            if (item.props) item.props.name = val.name
           }
           newParam.splice(i, 1, ...res)
         } else {
-          res.props.name = val.name
+          if (res.props) res.props.name = val.name
           newParam.splice(i, 1, res)
         }
       }
@@ -200,7 +215,7 @@ export default {
     },
 
     async linkageRefresh() {
-      this.loading = true
+      this.loading = this.needLoad
       const list = Array.isArray(this.property)
         ? this.property
         : this.property

@@ -1,3 +1,23 @@
+# Release 1.6.0
+
+#### Major Features and Improvements
+
+* SBT Transformer: new module, encode features using Hetero SBT model
+* Sample Weight: new module, set sample weights based on label or from feature column 
+* Homo Feature Binning: new module, performs homogeneous federated binning, bin number and bin interval available on Board 
+* Data Transformer: new module, same functionality as DataIO with added features such as case-insensitive 
+* Reader: supports image format input 
+* Hetero Feature Binning: filter results display by WOE
+* Hetero Pearson: support VIF computation 
+* Feature Selection: support selection based on VIF 
+* SecureBoost: display gain & split simultaneously; Performance Score diagram for binary classification 
+* Cross Validation: display & download fold split history and fold prediction results
+* Evaluation: metrics & visualization for each one_vs_rest child model 
+* Export job DSL & Conf files on Board 
+* Search for jobs using party_id 
+* Improved component model/data download 
+* Improved performance score display over large number of iterations or cv folds
+
 # Release 1.5.1
 
 #### Major Features and Improvements

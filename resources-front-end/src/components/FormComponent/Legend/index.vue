@@ -11,6 +11,7 @@
           v-for="(val, key) in item"
           :key="key"
           :style="labelDisplay(val.color)"
+          :title="val.label"
           class="legend__label"
         >{{ val.label }}</span>
       </div>
@@ -61,7 +62,7 @@
             v-for="(val, key) in item"
             :key="key"
             :style="labelDisplay(val.color)"
-            class="legend__label"
+            class="legend__label showAll"
           >{{ val.label }}</span>
         </div>
       </main>
@@ -90,6 +91,7 @@
 
 import IconHoverAndActive from '@/components/IconHoverAndActive'
 import { mapGetters } from 'vuex'
+
 export default {
   name: 'CustomeLegend',
   components: {
@@ -410,6 +412,15 @@ export default {
         })
       })
       return res
+    },
+
+    contentTo(items) {
+      let res = ''
+      for (const val of items) {
+        if (val.length > 0) res += '<br>'
+        res += val.label
+      }
+      return res
     }
   }
 }
@@ -442,6 +453,10 @@ export default {
 			margin-bottom: 2px;
 			width: 100%;
 			text-align: center;
+      max-width: 150px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
 			&:last-child {
 				margin-bottom: 0px;
 			}

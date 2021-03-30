@@ -34,6 +34,16 @@
         />
       </div>
       <div class="tool-item">
+        <span class="title">Partner:</span>
+        <el-input
+          v-model="condition.partner"
+          :size="'mini'"
+          clearable
+          @keyup.native.enter="search"
+          @clear="search"
+        />
+      </div>
+      <div class="tool-item">
         <span class="title">Status:</span>
         <el-select v-model="condition.status" :size="'mini'" collapse-tags multiple placeholder>
           <el-option
@@ -205,7 +215,8 @@ export default {
         note: '',
         orderRule: 'desc',
         // orderField: 'f_start_time'
-        orderField: 'f_job_id'
+        orderField: 'f_job_id',
+        partner: ''
       },
       currentRow: 1,
       saveCondition: {},
@@ -223,6 +234,11 @@ export default {
         {
           key: 'partyId',
           label: 'Party ID',
+          width: 100
+        },
+        {
+          key: 'partner',
+          label: 'Partner',
           width: 100
         },
         {
@@ -318,7 +334,8 @@ export default {
       search_party_id,
       search_role,
       search_status,
-      search_note
+      search_note,
+      search_partner
     } = this.$route.params
 
     if (search_job_id) {
@@ -335,6 +352,9 @@ export default {
     }
     if (search_note) {
       this.condition.note = search_note
+    }
+    if (search_partner) {
+      this.condition.partner = search_partner
     }
     this.saveCondition = deepClone(this.condition)
     // console.log(query)
@@ -428,6 +448,7 @@ export default {
               let status = ''
               let progress = ''
               let notes = ''
+              let partner = ''
 
               const { job } = item
 
@@ -447,6 +468,14 @@ export default {
                 status = job.fStatus || ''
                 progress = job.fStatus === 'running' ? job.fProgress || 0 : null
                 notes = job.fDescription || ''
+                // const partC = []
+                // for (const key in dataset.partner) {
+                //   partC.push(dataset.partner[key])
+                // }
+                // partC.sort((a, b) => {
+                //   return parseFloat(a) > parseFloat(b) ? 1 : -1
+                // })
+                partner = Array.isArray(job.partners) ? job.partners.join(',') : '-'
               }
               // if (dataset) {
               //   _dataset = dataset.dataset || ''
@@ -466,7 +495,8 @@ export default {
                 status,
                 progress,
                 notes,
-                notesEdit: false
+                notesEdit: false,
+                partner
               })
             })
             if (willUpdated) {
@@ -501,7 +531,8 @@ export default {
         job_id: search_job_id,
         party_id: search_party_id,
         role: search_role,
-        status: search_status
+        status: search_status,
+        partner: search_partner
       } = this.saveCondition
       if (search_job_id) {
         query.search_job_id = search_job_id
@@ -514,6 +545,9 @@ export default {
       }
       if (search_status && search_status.length > 0) {
         query.search_status = search_status.toString()
+      }
+      if (search_partner && search_partner.length > 0) {
+        query.search_partner = search_partner.toString()
       }
       // console.log(query)
       const href = this.$router.resolve({

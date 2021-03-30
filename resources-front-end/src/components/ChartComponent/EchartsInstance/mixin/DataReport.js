@@ -20,7 +20,7 @@
 const pictureReport = {
   methods: {
     getPicture(settings) {
-      if (!settings && this.instance && Object.keys(this.currentOptions).length > 0) {
+      if (!settings && this.instance && Object.keys(this.currentOptions).length > 0 && !this.showNoData) {
         return this.instance.getDataURL()
       } else if (settings) {
         return this.drawAndGet(settings)
