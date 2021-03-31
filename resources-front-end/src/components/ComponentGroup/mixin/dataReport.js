@@ -110,7 +110,7 @@ const dataReport = {
               finalRes.push(mid)
             }
           }
-        } else if (['chart', 'async'].indexOf(val.type) >= 0) {
+        } else if (['chart', 'async', 'group', 'tabs'].indexOf(val.type) >= 0) {
           const names = this.refOpera('comp' + i, 'getNames')
           const fd = names.find(res => needRep.match(res))
           if (fd) {
@@ -201,6 +201,7 @@ const dataReport = {
           this.dataCollection.push(res[key])
         }
       } else if ((!data || data === 'default') && type === 'group') {
+        if (this.dataCollection === '') this.dataCollection = []
         this.dataCollection.push(...res['group'])
       } else if (data && type === 'chart') {
         combine(data, res)
@@ -239,7 +240,7 @@ const dataReport = {
     getNames() {
       const nameList = []
       this.currentList.forEach((item, index) => {
-        if (['form', 'table', 'async', 'group', 'chart'].indexOf(item.type) >= 0) {
+        if (['form', 'table', 'async', 'group', 'chart', 'tabs'].indexOf(item.type) >= 0) {
           const mid = this.refOpera('comp' + index, 'getNames')
           if (Array.isArray(mid) && mid.length > 0) {
             nameList.push(...mid)
