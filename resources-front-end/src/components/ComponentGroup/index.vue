@@ -269,7 +269,9 @@ export default {
         if (val.type === 'form') {
           this.addEventForForm(variable, i)
         }
-        if (['group', 'chart', 'echart', 'async'].indexOf(val.type) >= 0) {
+        if (
+          ['group', 'chart', 'echart', 'async', 'tabs'].indexOf(val.type) >= 0
+        ) {
           this.addEventForChart(variable, i)
         }
         if (['table', 'chart'].indexOf(val.type) >= 0) {
