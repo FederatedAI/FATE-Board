@@ -1,3 +1,10 @@
+# Release 1.5.2
+
+#### Major Features and Improvements
+**Major Features**
+
+- Update for security 
+
 # Release 1.5.1
 
 #### Major Features and Improvements
