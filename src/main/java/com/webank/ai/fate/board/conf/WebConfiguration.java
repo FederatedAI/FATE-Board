@@ -16,6 +16,7 @@
 package com.webank.ai.fate.board.conf;
 
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import com.webank.ai.fate.board.intercept.UserInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
@@ -83,5 +84,17 @@ public class WebConfiguration implements WebMvcConfigurer {
         return executor;
     }
 
+    @Bean
+    public UserInterceptor getUserInterceptor() {
+        return new UserInterceptor();
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(getUserInterceptor())
+                .addPathPatterns("/job/**")
+                .addPathPatterns("/v1/**");
+//                .addPathPatterns("/**").excludePathPatterns("/static/*").excludePathPatterns("user/login","/user/logout");
+    }
 
 }
