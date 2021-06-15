@@ -49,9 +49,9 @@ public class UserController {
         boolean result = userService.login(userDTO, httpServletRequest);
 
         if (result) {
-            return new ResponseResult(ErrorCode.SUCCESS);
+            return new ResponseResult(ErrorCode.SUCCESS,true);
         } else {
-            return new ResponseResult(ErrorCode.USER_ERROR);
+            return new ResponseResult(ErrorCode.SUCCESS,false);
 
         }
 
