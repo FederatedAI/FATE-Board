@@ -3,7 +3,7 @@
     v-drag="!zoom ? false : chartSuitables"
     v-scale="!zoom ? false : chartScale"
     :style="containerStyle"
-    :class="className"
+    :class="containerClass"
     class="charts__container"
   >
     <div ref="myChart" :style="chartStyle" class="charts__instance" />
@@ -82,6 +82,10 @@ export default {
     zoom: {
       type: Boolean,
       default: false
+    },
+    noDataMissing: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -118,6 +122,16 @@ export default {
       } else {
         return 'height: 500px;'
       }
+    },
+    containerClass() {
+      let res = ''
+      if (this.noDataMissing && this.showNoData) {
+        res = 'missing'
+      }
+      if (this.className) {
+        res += (res ? ' ' : '') + this.className
+      }
+      return res
     }
   },
   watch: {
@@ -169,6 +183,13 @@ export default {
     refresh(seriess) {
       seriess = seriess || this.currentOptions
       if (Object.keys(seriess).length > 0 || !this.noData) {
+        if (
+          seriess.series.length <= 1 &&
+					Object.keys(seriess.series[0] || {}).length === 0
+        ) {
+          this.showNoData = true
+          return false
+        }
         this.instance.setOption(seriess, true)
         this.showNoData = false
         return true
@@ -276,7 +297,7 @@ export default {
 		right: 0px;
 		margin: auto;
 		min-height: 500px;
-		background-color: #fff;
+		background-color: #ebedf0;
 		z-index: 10;
 		@include flex(column, center, center);
 	}
@@ -300,5 +321,8 @@ export default {
 			color: #fff;
 		}
 	}
+}
+.missing {
+	display: none;
 }
 </style>
