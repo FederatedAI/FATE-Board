@@ -18,14 +18,16 @@
  */
 
 import { login, logout, getInfo } from '@/api/login'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+// import { getToken } from '@/utils/auth'
+import { getLocal, setLocal, removeLocal } from '../../utils/localStorage'
 
 const user = {
   state: {
-    token: getToken(),
+    token: '',
     name: '',
+    username: getLocal('CurrentUser') || '',
     avatar: '',
-    roles: []
+    roles: ''
   },
 
   mutations: {
@@ -40,6 +42,9 @@ const user = {
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+    },
+    SET_USERNAME: (state, username) => {
+      state.username = username
     }
   },
 
@@ -49,9 +54,12 @@ const user = {
       return new Promise((resolve, reject) => {
         login(username, userInfo.password).then(response => {
           const data = response.data
-          const token = data.tokenHead + data.token
-          setToken(token)
+          if (!data) throw new Error('Account is not matched')
+          const token = !data ? username : (data.tokenHead || username) + (data.token || '')
+          // setToken(token, new Date(new Date().getTime() + 30 * 60 * 1000))
           commit('SET_TOKEN', token)
+          commit('SET_USERNAME', username)
+          setLocal('CurrentUser', username, 29 * 60 * 1000)
           resolve()
         }).catch(error => {
           reject(error)
@@ -81,17 +89,34 @@ const user = {
       return new Promise((resolve, reject) => {
         logout().then(res => {
           commit('SET_TOKEN', '')
+          removeLocal('CurrentUser')
           commit('SET_ROLES', [])
-          removeToken()
+          commit('SET_USERNAME', '')
+          // removeToken()
           resolve()
         }).catch(() => {
           commit('SET_TOKEN', '')
+          removeLocal('CurrentUser')
           commit('SET_ROLES', [])
-          removeToken()
+          commit('SET_USERNAME', '')
+          // removeToken()
           resolve()
           // reject(error)
         })
       })
+    },
+
+    setInfo({ commit }, username) {
+      // 临时用于信息设置
+      commit('SET_USERNAME', username)
+      commit('SET_TOKEN', username)
+    },
+
+    removeInfo({ commit }) {
+      // 删除当前的存储的信息
+      commit('SET_USERNAME', '')
+      commit('SET_TOKEN', '')
+      commit('SET_ROLES', [])
     }
   }
 }

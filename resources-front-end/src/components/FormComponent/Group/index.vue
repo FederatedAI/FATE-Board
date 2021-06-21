@@ -40,7 +40,10 @@ export default {
     ctabs: () => import('../Tabs'),
     ctreeSelect: () => import('../TreeSelect'),
     ctableFilter: () => import('../TableSelection'),
-    cheaderPagination: () => import('../HeaderPagination')
+    cheaderPagination: () => import('../HeaderPagination'),
+    clabelTab: () => import('../labelTab'),
+    cslider: () => import('../Slider'),
+    ctslider: () => import('../tableSlider')
   },
   mixins: [basicOperation],
   props: {
@@ -87,7 +90,7 @@ export default {
       filterProperty: {},
       formType: ['input', 'select'],
       formParam: {},
-      needConnect: ['text', 'title', 'headerPagination'],
+      needConnect: ['text', 'title', 'headerPagination', 'tslider'],
 
       canSend: false,
       finalList: []
@@ -318,7 +321,7 @@ export default {
           this.refreshing()
         }
       }
-      if (type.toLowerCase().match('range')) {
+      if (type.toLowerCase().match(/(range|tslider)/)) {
         res.range = param => {
           this.range(param)
         }
@@ -475,7 +478,7 @@ export default {
       return h(
         'section',
         {
-          class: 'group__container ' + (this.inrow ? 'group__inrow-container' : '') + this.className + (this.checkOnlySearching(compList) ? 'group__inrow-right' : '')
+          class: 'group__container ' + (this.inrow ? this.inrow === 'left' ? 'group__inrow-container-left' : 'group__inrow-container' : '') + this.className + (this.checkOnlySearching(compList) ? 'group__inrow-right' : '')
         },
         this.comps(h, compList)
       )
@@ -490,19 +493,29 @@ export default {
 <style lang="scss" scoped>
 @import '../../../styles/position';
 .group__container {
-  @include flex(column, flex-start, flex-start);
+	@include flex(column, flex-start, flex-start);
 }
 .group__inrow-container {
-  width: 100%;
-  @include flex(row, space-between, center);
-  .form__each {
-    margin-right: 12px;
-    &:last-child {
-      margin-right: 0px;
-    }
-  }
+	width: 100%;
+	@include flex(row, space-between, center);
+	.form__each {
+		margin-right: 12px;
+		&:last-child {
+			margin-right: 0px;
+		}
+	}
+}
+.group__inrow-container-left {
+	width: 100%;
+	@include flex(row, flex-start, center);
+	.form__each {
+		margin-right: 12px;
+		&:last-child {
+			margin-right: 0px;
+		}
+	}
 }
 .group__inrow-right {
-  @include flex(row, flex-end, center);
+	@include flex(row, flex-end, center);
 }
 </style>

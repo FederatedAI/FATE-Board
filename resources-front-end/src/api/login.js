@@ -21,10 +21,10 @@ import request from '@/utils/request'
 
 export function login(username, password) {
   return request({
-    url: '/admin/login',
+    url: '/user/login',
     method: 'post',
     data: {
-      username,
+      name: username,
       password
     }
   })
@@ -39,7 +39,7 @@ export function getInfo() {
 
 export function logout() {
   return request({
-    url: '/admin/logout',
+    url: '/user/logout',
     method: 'post'
   })
 }

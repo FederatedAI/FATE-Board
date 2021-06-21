@@ -40,8 +40,10 @@ const DataSort = {
         }
         if (this.currentOrder !== null) {
           list.sort((a, b) => {
-            const aVal = a[this.currentSortColumn.property]
-            const bVal = b[this.currentSortColumn.property]
+            let aVal = parseFloat(a[this.currentSortColumn.property])
+            let bVal = parseFloat(b[this.currentSortColumn.property])
+            aVal = isNaN(aVal) ? a[this.currentSortColumn.property] : aVal
+            bVal = isNaN(bVal) ? b[this.currentSortColumn.property] : bVal
             if (aVal === '-' && bVal === '-') {
               return 0
             } else if (b._total && aVal === '-') {

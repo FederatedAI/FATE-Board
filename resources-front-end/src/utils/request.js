@@ -22,6 +22,10 @@ import axios from 'axios'
 import { Message } from 'element-ui'
 // import store from '@/store'
 // import { getToken } from '@/utils/auth'
+import { saveAs } from 'file-saver'
+import router from '../router'
+import { removeLocal } from './localStorage'
+import store from '../store'
 
 // axios.defaults.headers.common['Authorization'] = getToken()
 // create an axios instance
@@ -54,44 +58,73 @@ service.interceptors.response.use(
    * Please return  response => response
    */
   response => {
-    const res = response.data
-    if (res.code === 0) {
-      return new Promise(resolve => {
-        // if (store.getters.isOpenReqSimulate) {
-        //   setTimeout(function() {
-        //     resolve(res)
-        //     // console.log('util.request: response:', res)
-        //   }, 1000)
-        // } else {
-        resolve(res)
-        // console.log('util.request: response:', res)
-        // }
+    const data = response.data
+    const header = response.headers
+    const codeCheck = function(res) {
+      if (res.code === 0) {
+        return new Promise(resolve => {
+          // if (store.getters.isOpenReqSimulate) {
+          //   setTimeout(function() {
+          //     resolve(res)
+          //     // console.log('util.request: response:', res)
+          //   }, 1000)
+          // } else {
+          resolve(res)
+          // console.log('util.request: response:', res)
+          // }
+        })
+      } else if (res.code === 100) {
+        Message({
+          message: res.message || res.msg || res.retmsg || (res.data && res.data.retmsg),
+          type: 'warning',
+          duration: 3 * 1000
+        })
+        // return new Promise(resolve => {
+        //   // if (store.getters.isOpenReqSimulate) {
+        //   //   setTimeout(function() {
+        //   //     resolve(res)
+        //   //     // console.log('util.request: response:', res)
+        //   //   }, 1000)
+        //   // } else {
+        //   resolve(res)
+        //   // console.log('util.request: response:', res)
+        //   // }
+        // })
+        return Promise.reject('warning')
+      } else if (res.code === 10015) {
+        // 表示当前的内容为没有登录，所以直接跳转到登录界面。
+        // debugger
+        removeLocal('CurrentUser')
+        store.dispatch('removeInfo')
+        router.push({
+          name: 'login'
+        })
+        return Promise.reject('error')
+      } else {
+        Message({
+          message: res.message || res.msg || res.retmsg,
+          type: 'error',
+          duration: 3 * 1000
+        })
+        return Promise.reject('error')
+      }
+    }
+    // 如果数据是blob则转换完成之后进行下一步骤。
+    if (header['content-disposition'] || data.toString().match(/blob/i)) {
+      const filename = header['content-disposition'] ? header['content-disposition'].split('=')[1] : ''
+
+      const reader = new FileReader()
+      reader.addEventListener('loadend', function() {
+        const result = JSON.parse(reader.result)
+        if (result.code !== undefined) {
+          return codeCheck(result)
+        } else {
+          saveBlob(data, filename)
+        }
       })
-    } else if (res.code === 100) {
-      Message({
-        message: res.message || res.msg || res.retmsg || (res.data && res.data.retmsg),
-        type: 'warning',
-        duration: 3 * 1000
-      })
-      // return new Promise(resolve => {
-      //   // if (store.getters.isOpenReqSimulate) {
-      //   //   setTimeout(function() {
-      //   //     resolve(res)
-      //   //     // console.log('util.request: response:', res)
-      //   //   }, 1000)
-      //   // } else {
-      //   resolve(res)
-      //   // console.log('util.request: response:', res)
-      //   // }
-      // })
-      return Promise.reject('warning')
+      reader.readAsText(data)
     } else {
-      Message({
-        message: res.message || res.msg || res.retmsg,
-        type: 'error',
-        duration: 3 * 1000
-      })
-      return Promise.reject('error')
+      return codeCheck(data)
     }
   },
   error => {
@@ -104,5 +137,9 @@ service.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+function saveBlob(blob, name) {
+  saveAs(blob, name)
+}
 
 export default service

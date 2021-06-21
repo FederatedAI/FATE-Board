@@ -1,5 +1,5 @@
 <template>
-  <h3 class="cus-title" @click.stop="clicked">{{ title || content }}</h3>
+  <span :style="styles" class="cus-title" @click.stop="clicked">{{ title || content }}</span>
 </template>
 
 <script>
@@ -31,6 +31,10 @@ export default {
     content: {
       type: String,
       default: ''
+    },
+    styles: {
+      type: String | Object,
+      default: ''
     }
   },
   methods: {
@@ -45,5 +49,6 @@ export default {
 .cus-title {
 	font-size: 24px !important;
 	color: #3e4052 !important;
+	font-weight: bold;
 }
 </style>

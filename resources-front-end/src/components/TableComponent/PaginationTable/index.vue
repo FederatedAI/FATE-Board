@@ -24,8 +24,8 @@
         v-show="isNotNoData"
         ref="pagination"
         :layout="'prev, pager, next'"
-        :page-size="(pageSize < 0 || typeof pageSize === 'string') ? currentTotal : pageSize"
-        :total="currentTotal"
+        :page-size="(pageSize < 0 || typeof pageSize === 'string') ? actualCurrentTotal : pageSize"
+        :total="actualCurrentTotal"
         :current-page.sync="currentPage"
         :background="true"
         :hide-on-single-page="true"
@@ -57,6 +57,7 @@ import dataSort from '../OriginTable/mixins/DataSort'
 import tableSearch from './mixins/PageationTableSearch'
 import originTable from '../OriginTable'
 import dataReporter from './mixins/DataReport'
+import { isArray } from 'lodash'
 export default {
   name: 'PaginationTable',
   components: {
@@ -156,21 +157,26 @@ export default {
 
       formFilters: {},
 
-      isNotNoData: true
+      isNotNoData: true,
+      filterForCurrent: null
     }
   },
   computed: {
     currentTableData() {
+      let origin = this.currentDatas
+      if (this.filterForCurrent) {
+        origin = this.filterForCurrent(origin)
+      }
       if (
         this.headerPagination ||
 				this.pageSize < 0 ||
 				this.pageSize === 'all' ||
 				this.async
       ) {
-        return this.currentDatas
+        return origin
       } else {
         const start = (this.currentPage - 1) * this.pageSize
-        return this.currentDatas.slice(start, start + this.pageSize)
+        return origin.slice(start, start + this.pageSize)
       }
     },
     currentTableHeader() {
@@ -188,6 +194,12 @@ export default {
           this.pageSize
         )
       }
+    },
+    actualCurrentTotal() {
+      if (!this.headerPagination && this.filterForCurrent) {
+        return this.filterForCurrent(this.currentDatas).length
+      }
+      return this.currentTotal
     }
   },
   watch: {
@@ -339,6 +351,7 @@ export default {
     },
     setProperty(value) {
       this.property = value
+      this.filterForCurrent = null
       this.currentDatas = this.getList(this.filterData(Array.isArray(this.data)
         ? [...this.data]
         : this.originGetList(this.data, this.property)), this.dataFilter)
@@ -425,22 +438,22 @@ export default {
     },
 
     change() {
-      if (this.currentTableData.length > 0) {
-        const res = Object.assign(
-          {},
-          {
-            data: this.currentTableData,
-            header: this.currentTableHeader,
-            sortColumn: this.currentSortColumn,
-            sortOrder: this.currentOrder,
-            currentPage: this.currentPage,
-            pageSize: this.pageSize,
-            total: this.currentTotal
-          },
-          this.formFilters
-        )
-        this.$emit('change', res)
-      }
+      // if (this.currentTableData.length > 0) {
+      const res = Object.assign(
+        {},
+        {
+          data: this.currentTableData,
+          header: this.currentTableHeader,
+          sortColumn: this.currentSortColumn,
+          sortOrder: this.currentOrder,
+          currentPage: this.currentPage,
+          pageSize: this.pageSize,
+          total: this.currentTotal
+        },
+        this.formFilters
+      )
+      this.$emit('change', res)
+      // }
     },
 
     toFirstPage() {
@@ -464,8 +477,34 @@ export default {
       }
     },
 
+    // param 需要的内容包括列名，范围，当前只针对数字类型或者可以转换成数字类型的数值有用。
     linkageRange(param) {
-      this.$refs['originTable'].linkageRange(param)
+      if (!param.columnName) {
+        this.$refs['originTable'].linkageRange(param)
+      } else {
+        const filterOrigin = (param, list) => {
+          if (isArray(list)) {
+            return list.filter(item => {
+              const origin = parseFloat(item[param.columnName])
+              return origin >= param.min && origin <= param.max
+            })
+          } else {
+            return list
+          }
+        }
+        this.filterForCurrent = filterOrigin.bind(this, param)
+        this.currentPage = 1
+        // const filtersFunc = item => {
+        //   const content = parseFloat(item[param.columnNmae])
+        //   if (!content) {
+        //     return false
+        //   } else {
+        //     return content >= param.min && content <= param.max
+        //   }
+        // }
+        // this.currentDatas = this.currentDatas.filter(filtersFunc)
+        // this.oldCurrentDatas = this.oldCurrentDatas.filter(filtersFunc)
+      }
     },
 
     linkageHeaderPage(param) {
