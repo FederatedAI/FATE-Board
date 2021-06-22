@@ -15,7 +15,6 @@
  */
 package com.webank.ai.fate.board.pojo;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;

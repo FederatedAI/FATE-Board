@@ -18,8 +18,6 @@ package com.webank.ai.fate.board.intercept;
 import com.alibaba.fastjson.JSON;
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
-import com.webank.ai.fate.board.pojo.UserDO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
