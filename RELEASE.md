@@ -4,6 +4,7 @@
 **Major Features**
 
 - Update for security 
+- Add default login account (Account:admin  Password:admin)
 
 # Release 1.5.1
 
