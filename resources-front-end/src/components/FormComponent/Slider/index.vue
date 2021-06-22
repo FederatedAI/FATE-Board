@@ -11,6 +11,7 @@
       :step="step"
       :range="range"
       :marks="marks"
+      :style="styles"
       v-bind="$attrs"
       class="cus-slider__slider"
       @change="formatSlider"
@@ -76,12 +77,27 @@ export default {
     range: {
       type: Boolean,
       default: false
+    },
+    styles: {
+      type: String,
+      default: ''
     }
   },
   data() {
     return {
-      sliderValue: this.value || 0
+      sliderValue: this.value
     }
+  },
+  watch: {
+    min() {
+      this.sliderCheck()
+    },
+    max() {
+      this.sliderCheck()
+    }
+  },
+  created() {
+    this.sliderCheck()
   },
   methods: {
     formatSlider(value) {
@@ -98,6 +114,10 @@ export default {
     setDefault() {
       this.change()
       return true
+    },
+
+    sliderCheck() {
+      this.sliderValue = !this.range ? this.value : [this.min, this.max]
     }
   }
 }

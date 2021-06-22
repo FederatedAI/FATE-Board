@@ -101,9 +101,10 @@ export default {
           order: this.currentOrder
         })
         if (this.hasWeight >= 0) {
-          this.biggestWeight = this.currentTableData[0][
-            this.header[this.hasWeight].prop
-          ]
+          this.biggestWeight =
+						this.currentTableData.length > 0
+						  ? this.currentTableData[0][this.header[this.hasWeight].prop]
+						  : 0
         }
         this.notSearched()
       },

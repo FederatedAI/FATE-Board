@@ -133,3 +133,12 @@ export function queryFileds() {
     method: 'post'
   })
 }
+
+export function jobDownload(data) {
+  return request({
+    url: '/job/download',
+    method: 'post',
+    responseType: 'blob',
+    data
+  })
+}

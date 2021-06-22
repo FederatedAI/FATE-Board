@@ -66,7 +66,7 @@ export default class ReconnectingWebSocket {
   static OPEN = WebSocket.OPEN
   static CLOSING = WebSocket.CLOSING
   static CLOSE = WebSocket.CLOSE
-  static baseUrl = `ws://${location.host}`
+  static baseUrl = process.env.NODE_ENV === 'development' ? 'ws://127.0.0.1:8080' : `ws://${location.host}`
   constructor(url, protocols, options = {}) {
     this.url = url
     this.protocols = protocols

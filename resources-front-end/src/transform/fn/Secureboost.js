@@ -26,10 +26,11 @@ import { deepClone } from '../../utils'
 import { wrapGroupComponent, createAsyncComponent } from './common'
 import { getTransformMetricFn } from '../index'
 import { each } from './uitls'
-
+import isNil from 'lodash/isNil'
 import { METRIC_TYPES } from './const'
 import { getMetricsData } from '@/api/chart'
 import { explainCurves } from './metricsArrange'
+import { combineForPerformanceSum } from './metricsCombine'
 
 const createComponent = (type, name, props, other) => {
   return {
@@ -69,6 +70,23 @@ const importanceHeader = [
     type: 'weight',
     label: '',
     prop: 'importance',
+    much_deep: true
+  }
+]
+
+const gainHeader = [
+  {
+    label: 'FEATURE',
+    prop: 'fullname',
+    width: '110px',
+    align: 'left',
+    showOverflowTooltip: true,
+    normal_deep: true
+  },
+  {
+    type: 'weight',
+    label: '',
+    prop: 'gain',
     much_deep: true
   }
 ]
@@ -163,7 +181,7 @@ function modelTreeData(modelData, partyId, role) {
         value: key + '_' + (impleToSelection[key].length)
       })
       impleToLines[key].push([impleToLines[key].length, item.tree.length])
-      impleColor[key] = `rgba(${basicColor[key]},1)`
+      impleColor[key] = `rgba(${basicColor[parseFloat(key) % basicColor.length]},1)`
       const name = key + '_' + (impleToSelection[key].length - 1)
       const objList = Object.keys(impleToTrees).filter(item => item.match(key + '_'))
       const planId = (objList.length) % treePlan.length
@@ -326,19 +344,26 @@ function TreeSetting(modelData, partyId, role) {
   ]
 }
 
-function transformImportance(responseData, role, workmode) {
+function transformImportance(responseData) {
   if (responseData.featureImportances && responseData.featureImportances.length > 0) {
-    const tBody = deepClone(responseData.featureImportances)
+    const tBody = []
+    each(deepClone(responseData.featureImportances), item => {
+      tBody.push(Object.assign({}, item, {
+        gain: (item.main && item.main === 'split' || !item.main) ? item.importance2 : item.importance,
+        importance: item.main && item.main === 'gain' ? item.importance2 : item.importance
+      }))
+      isSplit = item.main === 'split'
+    })
     return tBody
   }
   return false
 }
 
-function importanceSetting(responseData, role) {
-  const dataList = transformImportance(responseData, role)
-  if (!dataList) {
-    return false
-  }
+function hasGain(dataList) {
+  return dataList.find(val => !isNil(val.gain) && val.gain !== 0)
+}
+
+function importanceTableContent(dataList, role) {
   const data = {
     [role]: []
   }
@@ -362,36 +387,156 @@ function importanceSetting(responseData, role) {
     addOption(role, role),
     addOption(role === 'guest' ? 'host' : 'guest', hostChildSelection)
   ] : []
-  const fromComponent = [
-    createComponent('title', '', {
-      content: 'Feature Importance'
-    }),
-    createComponent('text', '', {
-      content: '{t} features involved in model splitting',
-      data: {
-        '{t}': (tableParam) => { return tableParam.data.length }
-      }
-    })
-  ]
-  if (selection.length > 0) {
-    fromComponent.push(createComponent('f-select', '', {
+  return {
+    selection: selection.length > 0 ? createComponent('f-select', '', {
       options: selection,
       legend: true,
       multiple: true
-    }))
+    }) : null,
+    data: selection.length > 0 ? data : data[role]
   }
-  return [
+}
+
+function impotanceAsync(responseData, role) {
+  const dataList = transformImportance(responseData, role)
+  if (!dataList) {
+    return false
+  }
+  const { selection, data } = importanceTableContent(dataList, role)
+  const formList = [createComponent('text', '', {
+    content: `{t} features involved in model splitting`,
+    data: {
+      '{t}': (tableParam) => {
+        return tableParam.data.length || 0
+      }
+    }
+  })]
+  if (selection) formList.push(selection)
+  const importanceSplit = [
     createComponent('form', '', {
-      form: fromComponent
+      form: formList
     }),
     createComponent('table', '', {
       header: importanceHeader,
-      data: selection.length > 0 ? data : data[role],
+      data: data,
       pageSize: 'all',
       combine: false,
-      export: 'feature_importance',
+      export: 'feature_importance_split',
       mapVariable: 'fullname'
     })
+  ]
+  const gainTable = hasGain(dataList)
+
+  if (gainTable) {
+    const formList2 = [
+      createComponent('text', '', {
+        content: `{t} features involved in model splitting`,
+        data: {
+          '{t}': (tableParam) => {
+            return tableParam.data.length || 0
+          }
+        }
+      })]
+    if (selection) formList2.push(selection)
+    const importanceGain = [
+      createComponent('form', '', {
+        form: formList2
+      }),
+      createComponent('table', '', {
+        header: gainHeader,
+        data: data,
+        pageSize: 'all',
+        combine: false,
+        export: 'feature_importance_gain',
+        mapVariable: 'fullname'
+      })
+    ]
+    // const asyncComponent = [
+    //   {
+    //     name: 'importance',
+    //     export: 'feature_importance_split',
+    //     props: importanceSplit,
+    //     transform: (props) => {
+    //       return {
+    //         type: 'group',
+    //         props: {
+    //           options: props
+    //         }
+    //       }
+    //     }
+    //   }]
+    // asyncComponent.push({
+    //   name: 'gain',
+    //   export: 'feature_importance_gain',
+    //   props: importanceGain,
+    //   transform: (props) => {
+    //     return {
+    //       type: 'group',
+    //       props: {
+    //         options: props
+    //       }
+    //     }
+    //   }
+    // })
+    // const async = createAsyncComponent(asyncComponent)
+    // async.props.needLoad = false
+    // return async
+    return {
+      importanceSplit,
+      importanceGain
+    }
+  } else {
+    return {
+      type: 'group',
+      props: {
+        options: importanceSplit
+      }
+    }
+  }
+}
+
+let isSplit = true
+
+function importanceSetting(responseData, role) {
+  isSplit = true
+  const asyncSetting = impotanceAsync(responseData, role)
+  if (!asyncSetting) {
+    return false
+  }
+
+  const fromComponent = [
+    createComponent('title', '', {
+      content: 'Feature Importance'
+    })
+  ]
+  // if (asyncSetting.type.search('async') >= 0) {
+  //   fromComponent.push(createComponent('f-labelTab', '', {
+  //     options: [{
+  //       label: 'split (applied)',
+  //       value: 'importance'
+  //     }, {
+  //       label: 'gain',
+  //       value: 'gain'
+  //     }]
+  //   }))
+  // }
+
+  const Options = [{
+    label: 'split' + (isSplit ? ' (applied)' : ''),
+    value: 'importanceSplit'
+  }, {
+    label: 'gain' + (!isSplit ? ' (applied)' : ''),
+    value: 'importanceGain'
+  }]
+  return !asyncSetting.type ? [
+    createComponent('tabs', '', {
+      title: 'Feature Importance',
+      options: isSplit ? Options : Options.reverse(),
+      content: asyncSetting
+    })
+  ] : [
+    ...fromComponent,
+    asyncSetting
   ]
 }
 
@@ -481,10 +626,18 @@ async function metricsTransform(group, metricsData, partyId, role, componentName
     if (othersResult) {
       const transformFn = getTransformMetricFn(METRIC_TYPES.EVALUATION_SUMMARY)
       const table = transformFn(othersResult.data)
+      // TODO: Combining others result for performance sum
+      const asyncSum = combineForPerformanceSum(table)
       if (group.length > 1) {
         group.splice(1, 0, table)
+        if (asyncSum.length > 0) {
+          group.splice(2, 0, asyncSum)
+        }
       } else {
         group.push(table)
+        if (asyncSum.length > 0) {
+          group.push(asyncSum)
+        }
       }
     }
   }
@@ -497,7 +650,7 @@ const fn = async(modelData, metricData, partyId, role, componentName, jobId) => 
     const workMode = modelData.data.meta.meta_data.workMode
     finalSetting.push(TreeSetting(modelData, partyId, role))
     if (role === 'guest' || workMode.toLowerCase().match('mix')) {
-      const featureImportances = importanceSetting(modelData.data.data, role, modelData.data.meta.meta_data.workMode)
+      const featureImportances = importanceSetting(modelData.data.data, role)
       if (featureImportances) {
         finalSetting.push(featureImportances)
       }
