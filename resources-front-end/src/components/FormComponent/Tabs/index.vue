@@ -22,7 +22,7 @@
           @click="handleSwitchTab(subTab)"
         >{{ subTab.label }}</div>
       </div>
-      <refresh @refresh="$emit('refresh')" />
+      <refresh v-if="needRefresh" @refresh="$emit('refresh')" />
     </div>
   </div>
 </template>
@@ -63,6 +63,10 @@ export default {
     value: {
       type: String,
       default: ''
+    },
+    needRefresh: {
+      type: Boolean,
+      default: true
     }
   },
   data() {

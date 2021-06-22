@@ -30,7 +30,8 @@ export default {
     Casync: () => import('../AsyncComponent'),
     Ctitle: () => import('../FormComponent/Text/Title'),
     Ctext: () => import('../FormComponent/Text'),
-    Cpearson: () => import('../CanvasComponent/pearsonDiagram')
+    Cpearson: () => import('../CanvasComponent/pearsonDiagram'),
+    Ctabs: () => import('../TabsComponent')
   },
   mixins: [basicOperation, statusManager, dataReporter],
   props: {
@@ -246,6 +247,14 @@ export default {
       this.addEvents(obj, eves)
     },
 
+    addEventForTable(obj, pos) {
+      this.addEvents(obj, {
+        refreshed: () => {
+          this.$emit('refreshed')
+        }
+      })
+    },
+
     children(h) {
       const child = []
       for (let i = 0; i < this.currentList.length; i++) {
@@ -260,7 +269,9 @@ export default {
         if (val.type === 'form') {
           this.addEventForForm(variable, i)
         }
-        if (['group', 'chart', 'echart', 'async'].indexOf(val.type) >= 0) {
+        if (
+          ['group', 'chart', 'echart', 'async', 'tabs'].indexOf(val.type) >= 0
+        ) {
           this.addEventForChart(variable, i)
         }
         if (['table', 'chart'].indexOf(val.type) >= 0) {
@@ -268,6 +279,9 @@ export default {
         }
         if (val.type === 'async') {
           this.addEventForOthers(variable, i, true)
+        }
+        if (['table'].indexOf(val.type) >= 0) {
+          this.addEventForTable(variable, i)
         }
         const classDiv = 'comp-group__each' + (' ' + val.type + '_inrow')
         child.push(
@@ -334,12 +348,12 @@ export default {
 	position: relative;
 }
 .table_inrow {
-	flex: 1 1 25%;
-	min-width: 25%;
+	flex: 1 1 30%;
+	min-width: 30%;
 }
 .group_inrow {
-	flex: 1 1 25%;
-	min-width: 25%;
+	flex: 1 1 30%;
+	min-width: 30%;
 }
 .pearson_inrow {
 	padding-left: 12px;

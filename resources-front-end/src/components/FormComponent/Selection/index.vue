@@ -4,6 +4,7 @@
       'filter__container': true,
       'filter__left-container': !(Object.keys(others).length > 0)
     }"
+    :style="styles"
   >
     <c-select
       v-if="Object.keys(others).length > 0"
@@ -76,6 +77,10 @@ export default {
     supportFilter: {
       type: Boolean,
       default: false
+    },
+    styles: {
+      type: Object | String,
+      default: ''
     }
   },
   data() {
@@ -248,7 +253,7 @@ export default {
               const data = item.label
               if (args.imply) {
                 for (const val of args.imply) {
-                  if (data && data.match(val[ORIGIN])) {
+                  if (data && data === val[ORIGIN]) {
                     return val[TO] || data
                   }
                 }

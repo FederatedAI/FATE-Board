@@ -52,6 +52,13 @@ export default {
       }
     }
   },
+  mounted() {
+    if (Object.keys(this.data).length > 0) {
+      this.showNoData = false
+      this.handleOptions()
+      this.$forceUpdate()
+    }
+  },
   methods: {
     handleOptions() {
       const tableHeader = {}

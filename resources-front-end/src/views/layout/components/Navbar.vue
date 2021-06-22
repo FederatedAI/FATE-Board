@@ -6,9 +6,11 @@
           <b>FATE</b>Board
         </div>
       </div>
-      <div class="router-btns flex">
-        <span :class="{'active':path === '/running'}" @click="go('/running')">RUNNING</span>
-        <span :class="{'active':path === '/history'}" @click="go('/history')">JOBS</span>
+      <div class="router-btns flex flex-center">
+        <span v-if="!!username" :class="{'active':path === '/running'}" @click="go('/running')">RUNNING</span>
+        <span v-if="!!username" :class="{'active':path === '/history'}" @click="go('/history')">JOBS</span>
+        <userinfo v-if="!!username" />
+        <span v-if="!username" :class="{'active':path === '/login'}" @click="go('/login')">SIGNIN</span>
       </div>
     </div>
 
@@ -56,14 +58,18 @@
  *
  */
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 // import SSHConfig from './SSHConfig'
 // import { getAllSSHConfig, getSSHConfig, removeSSHConfig, addSSHConfig } from '@/api/ssh'
+import Userinfo from './UserInfo'
 
 export default {
   // components: {
   //   SSHConfig
   // },
+  components: {
+    Userinfo
+  },
   data() {
     return {
       projectsData: null,
@@ -73,6 +79,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      username: state => state.user.username
+    }),
     routes() {
       // console.log(this.$route.fullPath === '/old-job-dashboard')
       return this.$router.options.routes[0].children.filter(item => {

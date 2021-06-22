@@ -53,11 +53,24 @@ function pearsonHandler(modelData, metricData, partyId, role, componentName, job
     anonyHeader.push({
       label: `anonym in ${(role === 'guest' ? 'host' : 'guest')}`,
       prop: 'anonymous',
-      width: 150,
+      width: 115,
       showOverflowTooltip: true
     })
   }
+
   anony = data.anonymousMap
+  // adding vif data
+  if (data.localVif && Array.isArray(data.localVif) && data.localVif.length > 0) {
+    anonyHeader.push({
+      label: 'vif',
+      prop: 'vif',
+      showOverflowTooltip: true,
+      sortable: true
+    })
+    each(anony, (item, index) => {
+      item['vif'] = data.localVif[index]
+    })
+  }
   // get local correlation
   const fillCorrData = (corr, header1, header2, data) => {
     const header2Legnth = header2.length
