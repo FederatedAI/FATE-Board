@@ -1,3 +1,11 @@
+# Release 1.5.3
+
+#### Major Features and Improvements
+**Major Features**
+
+- Fix feature anonym inconsistency of HeteroBinning
+- Login page memorizes default account(admin) and password(admin)
+
 # Release 1.5.2
 
 #### Major Features and Improvements
@@ -5,6 +13,7 @@
 
 - Update for security 
 - Add default login account (Account:admin  Password:admin)
+
 
 # Release 1.5.1
 
