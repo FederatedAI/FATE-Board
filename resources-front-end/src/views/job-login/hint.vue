@@ -1,7 +1,9 @@
 <template>
-  <div id="app">
-    <router-view />
-  </div>
+  <section>
+    <slot v-if="!!text" name="prefix" />
+    <span v-if="!!text" :class="'text-' + type">{{ text }}</span>
+    <slot v-if="!!text" name="suffix" />
+  </section>
 </template>
 
 <script>
@@ -24,12 +26,32 @@
  */
 
 export default {
-  name: 'App',
-  data: () => {
-    return {
-      version: 'v1.5.2',
-      packageTime: '2021/6/21 18:11'
+  name: 'LoginHint',
+
+  props: {
+    type: {
+      type: String,
+      default: 'error'
+    },
+    text: {
+      type: String,
+      default: ''
     }
-  }
+  },
+
+  data() {
+    return {}
+  },
+
+  methods: {}
 }
 </script>
+
+<style scoped lang="scss">
+.text-error {
+	color: red;
+}
+.text-warning {
+	color: red;
+}
+</style>

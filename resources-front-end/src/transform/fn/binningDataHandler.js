@@ -36,7 +36,7 @@ function formatFloatWithDefault(value, role, flag) {
   }
 }
 
-export default function(data, header, type, partyId, role, Currentrole, skipStatic = false) {
+export default function(data, header, type, partyId, role, Currentrole, skipStatic = false, headerAnonymous) {
   if (!isEmpty(data)) {
     const sourceData = []
     let options = []
@@ -184,6 +184,12 @@ export default function(data, header, type, partyId, role, Currentrole, skipStat
           return key
         })(),
         anonymInGuest: (() => {
+          if (headerAnonymous && headerAnonymous.length > 0) {
+            const index = header.findIndex((val) => val === key)
+            if (index >= 0) {
+              return headerAnonymous[index]
+            }
+          }
           if (Currentrole === role) {
             const inName = key.match(/[0-9]+/) ? key.match(/[0-9]+/)[0] : indexData
             return role + '_' + partyId + '_' + inName
