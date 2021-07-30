@@ -152,7 +152,7 @@
             <div v-loading="paraLoading" class="para-wrapper flex flex-col space-between">
               <div class="flex flex-col flex-start para-warpper-content" style="width:100%;">
                 <h4 class="para-title">Parameter({{ parameterCount }})</h4>
-                <div v-loading="msgLoading" class="msg bg-dark">
+                <div v-loading="msgLoading" class="msg bg-dark" style="display:flex;">
                   <el-tree v-if="treeRefresh" ref="foldParameterTree" :data="paramList" :empty-text="''" :default-expand-all="treeUnfoldAll" :props="defaultPropsForTree" class="bg-dark"/>
                   <div v-if="paramList && paramList.length > 0" class="unfold-tree" @click.stop="unfoldAll">{{ treeUnfoldAll ? 'fold all' : 'unfold all' }}</div>
                 </div>
