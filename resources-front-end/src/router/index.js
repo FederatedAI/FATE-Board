@@ -27,6 +27,7 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '../views/layout/Layout'
+import { getLocal } from '../utils/localStorage'
 
 /**
  * hidden: true                   if `hidden:true` will not show in the sidebar(default is false)
@@ -96,15 +97,20 @@ export const constantRouterMap = [
         path: '/details',
         name: 'JobDetails',
         component: () => import('@/views/job-details')
-      }
+      },
       // {
       //   path: '/oldDashboard',
       //   name: 'Dashboard',
       //   component: () => import('@/views/old-job-dashboard')
       // }
+      {
+        path: '/login',
+        name: 'login',
+        component: () => import('@/views/job-login/index')
+      }
     ]
   },
-  // { path: '/login', component: () => import('@/views/login/index'), hidden: true },
+  // { path: '/login', component: () => import('@/views/job-login/index'), hidden: true },
   { path: '/404', component: () => import('@/views/404'), hidden: true },
   { path: '*', redirect: '/404', hidden: true }
 ]
@@ -114,18 +120,39 @@ const router = new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 })
+let preUrl = null
 router.beforeEach((to, from, next) => {
-  if (to.path === '/history') {
-    if (from.query.page || from.params.page) {
-      to.params.page = from.query.page
-      to.params.search_job_id = from.query.search_job_id
-      to.params.search_party_id = from.query.search_party_id
-      to.params.search_role = from.query.search_role
-      to.params.search_status = from.query.search_status
+  if (getLocal('CurrentUser')) {
+    if (preUrl) {
+      const mid = preUrl
+      preUrl = null
+      next(mid)
+    } else if (to.path === '/history') {
+      if (from.query.page || from.params.page) {
+        to.params.page = from.query.page
+        to.params.search_job_id = from.query.search_job_id
+        to.params.search_party_id = from.query.search_party_id
+        to.params.search_role = from.query.search_role
+        to.params.search_status = from.query.search_status
+      }
+      // console.log(to, from)
+      next()
+    } else if (to.name === 'login') {
+      next({
+        name: 'RUNNINNG'
+      })
+    } else {
+      next()
     }
-    // console.log(to, from)
-    next()
+  } else if (to.name !== 'login') {
+    preUrl = Object.assign({}, to)
+    next({
+      name: 'login'
+    })
   } else {
+    if (from.name !== 'login') {
+      preUrl = Object.assign({}, from)
+    }
     next()
   }
 })
