@@ -18,6 +18,23 @@
 * Improved component model/data download 
 * Improved performance score display over large number of iterations or cv folds
 
+# Release 1.5.3
+
+#### Major Features and Improvements
+**Major Features**
+
+- Fix feature anonym inconsistency of HeteroBinning
+- Login page memorizes default account(admin) and password(admin)
+
+# Release 1.5.2
+
+#### Major Features and Improvements
+**Major Features**
+
+- Update for security 
+- Add default login account (Account:admin  Password:admin)
+
+
 # Release 1.5.1
 
 #### Major Features and Improvements

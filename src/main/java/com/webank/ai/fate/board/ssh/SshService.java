@@ -217,9 +217,7 @@ public class SshService implements InitializingBean {
             try {
                 session.connect(timeout);
             } catch (Exception e) {
-                e.printStackTrace();
 
-                logger.error("ssh connect error {} password {}", sessionKey, passwd);
                 throw new Exception("ssh connect error");
             }
             sessionMap.put(sessionKey, session);
