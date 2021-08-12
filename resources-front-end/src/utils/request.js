@@ -62,6 +62,7 @@ service.interceptors.response.use(
     const header = response.headers
     const codeCheck = function(res) {
       if (res.code === 0) {
+        // debugger
         return new Promise(resolve => {
           // if (store.getters.isOpenReqSimulate) {
           //   setTimeout(function() {
