@@ -17,25 +17,23 @@ package com.webank.ai.fate.board.pojo;
 
 import lombok.*;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.List;
-import java.util.Objects;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class PagedJobQO implements Serializable {
+public class DownloadQO implements Serializable {
+
+    @NotNull(message = "Job id can't be null!")
     private String jobId;
-    private String partyId;
-    private Long pageNum = 1L;
-    private Long pageSize = 10L;
-    private List<String> role;
-    private List<String> status;
-    private String orderField;
-    private String orderRule;
-    private String fDescription;
-    private String partner;
+
+    @NotNull(message = "Role can't be null!")
+    private String role;
+
+    @NotNull(message = "Type can't be null!")
+    private String type;
 
 }

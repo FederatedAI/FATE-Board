@@ -11,17 +11,6 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/': {
-        // target: 'http://172.16.153.108:8081',
-        // target: 'http://172.16.153.34:8080',
-        // target: 'http://172.16.153.121:8999',
-        // target: 'http://172.16.153.47:8008',
-        // target: 'http://172.16.153.198:8080',
-        // target: 'http://172.16.153.239:8080',
-        // target: 'http://172.16.153.164:8008',
-        target: 'http://172.16.153.195:8080',
-        // target: 'http://172.16.153.248:8080',
-        // target: 'http://172.16.153.111:8008',
-        // target: 'http://172.16.153.135:8008',
         changeOrigin: true
       }
     },

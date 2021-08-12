@@ -26,8 +26,13 @@
       @input="errorHintHide"
     >
       <template slot-scope="{ item }">
-        <div class="name">{{ item.username }}</div>
-        <span class="addr">{{ item.passwordSec }}</span>
+        <div class="auto-container">
+          <div class="auto-info">
+            <div class="name">{{ item.username }}</div>
+            <span class="addr">{{ item.passwordSec }}</span>
+          </div>
+          <span v-if="item.default" class="hint-def">(Default)</span>
+        </div>
       </template>
     </el-autocomplete>
     <!-- password -->
@@ -145,16 +150,26 @@ export default {
 
     getAccount() {
       if (!this.selectable) {
-        this.selectable = JSON.parse(localStorage.getItem('AccountCache')) || []
+        let mid = JSON.parse(localStorage.getItem('AccountCache'))
+        if (!mid) {
+          this.setAccount('admin', 'admin', true)
+          mid = JSON.parse(localStorage.getItem('AccountCache'))
+        }
+        this.selectable = mid
       }
       return this.selectable
     },
 
-    setAccount() {
+    setAccount(username, password, def) {
       const cacheData = {
-        username: this.username,
-        password: this.password,
-        passwordSec: new Array(this.password.length).fill('*').join('')
+        username: username || this.username,
+        password: password || this.password,
+        passwordSec: new Array(
+          password ? password.length : this.password.length
+        )
+          .fill('*')
+          .join(''),
+        default: def
       }
       if (!this.selectable) this.selectable = []
       const index = this.selectable.findIndex(val => {
@@ -281,6 +296,20 @@ export default {
 	.eye_hint {
 		width: 20px;
 		height: 100%;
+	}
+}
+.auto-container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	.auto-info {
+		display: flex;
+		justify-content: space-between;
+		flex-direction: column;
+		align-items: flex-start;
+	}
+	.hint-def {
+		color: #bbb;
 	}
 }
 </style>

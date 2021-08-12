@@ -51,7 +51,7 @@ function binningHandler(responseData, metricsData, partyId, crole) {
   if (responseData.msg.toString().toLowerCase().match('no data')) {
     return []
   }
-  const { binningResult, hostResults: hostData, header } = responseData.data && responseData.data.data
+  const { binningResult, hostResults: hostData, header, headerAnonymous } = responseData.data && responseData.data.data
   const { skipStatic } = responseData.data && responseData.data.meta && responseData.data.meta.meta_data
   let data = binningResult
   let guestPartyId = 0
@@ -71,7 +71,7 @@ function binningHandler(responseData, metricsData, partyId, crole) {
   }
 
   if (!isEmpty(data) || !isEmpty(hostData)) {
-    const middleData = handleBinningData(data, header, 'guest', guestPartyId, role, role, skipStatic)
+    const middleData = handleBinningData(data, header, 'guest', guestPartyId, role, role, skipStatic, headerAnonymous)
     const sd = []
     const op = []
     each(header, val => {
