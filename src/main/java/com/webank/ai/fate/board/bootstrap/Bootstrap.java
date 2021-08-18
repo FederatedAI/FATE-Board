@@ -53,33 +53,33 @@ public class Bootstrap {
 
     }
 
-    @Bean
-    public TomcatServletWebServerFactory tomcatServletWebServerFactory() {
-        TomcatServletWebServerFactory tomcatServletWebServerFactory = new TomcatServletWebServerFactory() {
-            @Override
-            protected void postProcessContext(Context context) {
-                SecurityConstraint securityConstraint = new SecurityConstraint();
-                securityConstraint.setUserConstraint("CONFIDENTIAL");
-                SecurityCollection securityCollection = new SecurityCollection();
-                securityCollection.addPattern("/*");
-                securityConstraint.addCollection(securityCollection);
-                context.addConstraint(securityConstraint);
-            }
-        };
-        tomcatServletWebServerFactory.addAdditionalTomcatConnectors(httpConnector());
-        return tomcatServletWebServerFactory;
-    }
-
-
-    @Bean
-    public Connector httpConnector() {
-        Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
-        connector.setScheme("http");
-        connector.setPort(8080);
-        connector.setSecure(false);
-        connector.setRedirectPort(8443);
-        return connector;
-    }
+//    @Bean
+//    public TomcatServletWebServerFactory tomcatServletWebServerFactory() {
+//        TomcatServletWebServerFactory tomcatServletWebServerFactory = new TomcatServletWebServerFactory() {
+//            @Override
+//            protected void postProcessContext(Context context) {
+//                SecurityConstraint securityConstraint = new SecurityConstraint();
+//                securityConstraint.setUserConstraint("CONFIDENTIAL");
+//                SecurityCollection securityCollection = new SecurityCollection();
+//                securityCollection.addPattern("/*");
+//                securityConstraint.addCollection(securityCollection);
+//                context.addConstraint(securityConstraint);
+//            }
+//        };
+//        tomcatServletWebServerFactory.addAdditionalTomcatConnectors(httpConnector());
+//        return tomcatServletWebServerFactory;
+//    }
+//
+//
+//    @Bean
+//    public Connector httpConnector() {
+//        Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
+//        connector.setScheme("http");
+//        connector.setPort(8080);
+//        connector.setSecure(false);
+//        connector.setRedirectPort(8443);
+//        return connector;
+//    }
 
 
     @Bean
