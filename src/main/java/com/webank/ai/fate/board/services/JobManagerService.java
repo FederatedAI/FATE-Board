@@ -27,6 +27,7 @@ import com.webank.ai.fate.board.log.LogFileService;
 import com.webank.ai.fate.board.pojo.*;
 import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.utils.HttpClientPool;
+import com.webank.ai.fate.board.utils.JsonFormatUtil;
 import com.webank.ai.fate.board.utils.PageBean;
 import com.webank.ai.fate.board.utils.ThreadPoolTaskExecutorUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -274,6 +275,7 @@ public class JobManagerService {
                 fileName = "job_runtime_on_party_conf.json";
                 realPath = fatePath + "/jobs/" + jobId + "/" + role + "/";
                 fileOutputName = "runtime_config_" + jobId + ".json";
+                return getHostConfig(response, fileName, realPath, fileOutputName);
             } else {
                 log.error("download error: role:{} doesn't support", role);
                 return new ResponseResult(ErrorCode.ERROR_PARAMETER);
@@ -325,6 +327,60 @@ public class JobManagerService {
             return new ResponseResult(ErrorCode.FILE_ERROR);
         }
 
+    }
+
+    private ResponseResult getHostConfig(HttpServletResponse response, String fileName, String realPath, String fileOutputName) {
+        File file = new File(realPath, fileName);
+        if (file.exists()) {
+            BufferedReader br = null;
+            BufferedWriter bw = null;
+            try {
+                br = new BufferedReader(new FileReader(file));
+                bw = new BufferedWriter(response.getWriter());
+                String s = null;
+                String ws = null;
+                StringBuilder ss = new StringBuilder();
+                while ((s = br.readLine()) != null) {
+                    ss.append(s);
+                }
+                org.springframework.boot.configurationprocessor.json.JSONObject dataJson = new org.springframework.boot.configurationprocessor.json.JSONObject(ss.toString());
+                dataJson.remove("initiator");
+                org.springframework.boot.configurationprocessor.json.JSONObject role = dataJson.getJSONObject("role");
+                role.remove("guest");
+                role.remove("arbiter");
+                org.springframework.boot.configurationprocessor.json.JSONObject component_parameters = dataJson.getJSONObject("component_parameters");
+                org.springframework.boot.configurationprocessor.json.JSONObject role1 = component_parameters.getJSONObject("role");
+                role1.remove("guest");
+                ws = dataJson.toString();
+                ws= JsonFormatUtil.format(ws);
+                bw.write(ws);
+                bw.flush();
+                log.info("download success,file :{}", realPath + fileName);
+            } catch (Exception e) {
+                log.error("download failed", e);
+                return new ResponseResult(ErrorCode.DOWNLOAD_ERROR);
+            } finally {
+                if (br != null) {
+                    try {
+                        br.close();
+                    } catch (IOException e) {
+                        log.error("download io close failed", e);
+                    }
+                }
+                if (bw != null) {
+                    try {
+                        bw.close();
+                    } catch (IOException e) {
+                        log.error("download io close failed", e);
+                    }
+                }
+            }
+            response.setContentType("application/force-download");
+            response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
+            return null;
+        } else {
+            return new ResponseResult(ErrorCode.FILE_ERROR);
+        }
     }
 
 }
