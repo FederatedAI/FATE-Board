@@ -145,13 +145,17 @@ router.beforeEach((to, from, next) => {
       next()
     }
   } else if (to.name !== 'login') {
-    preUrl = Object.assign({}, to)
+    if (!preUrl) {
+      preUrl = Object.assign({}, to)
+    }
     next({
       name: 'login'
     })
   } else {
     if (from.name !== 'login') {
-      preUrl = Object.assign({}, from)
+      if (!preUrl) {
+        preUrl = Object.assign({}, from)
+      }
     }
     next()
   }
