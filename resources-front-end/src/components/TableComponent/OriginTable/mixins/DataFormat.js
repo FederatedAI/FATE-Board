@@ -84,7 +84,7 @@ const dataFormat = {
               val[key] = nearBy(val[key], this.range)
             }
             const toNum = parseFloat(val[key])
-            if (typeof val[key] === 'number' && val[key].toString().match(/[0-9]+e/)) {
+            if (typeof val[key] === 'number' || val[key].toString().match(/[0-9]+e/)) {
               continue
             }
             if (toNum && toNum.toString() === val[key].toString()) {
