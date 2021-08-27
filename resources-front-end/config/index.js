@@ -7,13 +7,10 @@ const path = require('path')
 module.exports = {
   dev: {
     // Paths
+    httpsProxy: false,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {
-      '/': {
-        changeOrigin: true
-      }
-    },
+    proxyTable: {},
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
