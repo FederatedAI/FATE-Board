@@ -343,13 +343,13 @@ public class JobManagerService {
                 while ((s = br.readLine()) != null) {
                     ss.append(s);
                 }
-                org.springframework.boot.configurationprocessor.json.JSONObject dataJson = new org.springframework.boot.configurationprocessor.json.JSONObject(ss.toString());
+                JSONObject dataJson =JSON.parseObject(ss.toString());
                 dataJson.remove("initiator");
-                org.springframework.boot.configurationprocessor.json.JSONObject role = dataJson.getJSONObject("role");
+                JSONObject role = dataJson.getJSONObject("role");
                 role.remove("guest");
                 role.remove("arbiter");
-                org.springframework.boot.configurationprocessor.json.JSONObject component_parameters = dataJson.getJSONObject("component_parameters");
-                org.springframework.boot.configurationprocessor.json.JSONObject role1 = component_parameters.getJSONObject("role");
+                JSONObject component_parameters = dataJson.getJSONObject("component_parameters");
+                JSONObject role1 = component_parameters.getJSONObject("role");
                 role1.remove("guest");
                 ws = dataJson.toString();
                 ws= JsonFormatUtil.format(ws);
