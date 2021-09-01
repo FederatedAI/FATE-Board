@@ -341,6 +341,8 @@ public class JobManagerService {
             BufferedWriter bw = null;
             try {
                 br = new BufferedReader(new FileReader(file));
+                response.setContentType("application/force-download");
+                response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
                 bw = new BufferedWriter(response.getWriter());
                 String s = null;
                 String ws = null;
@@ -380,8 +382,7 @@ public class JobManagerService {
                     }
                 }
             }
-            response.setContentType("application/force-download");
-            response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
+
             return null;
         } else {
             return new ResponseResult(ErrorCode.FILE_ERROR);
