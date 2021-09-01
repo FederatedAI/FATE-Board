@@ -351,18 +351,30 @@ public class JobManagerService {
                     ss.append(s);
                 }
                 JSONObject dataJson =JSON.parseObject(ss.toString());
-                dataJson.remove("initiator");
-                JSONObject role = dataJson.getJSONObject("role");
-                role.remove("guest");
-                role.remove("arbiter");
-                JSONObject component_parameters = dataJson.getJSONObject("component_parameters");
-                JSONObject role1 = component_parameters.getJSONObject("role");
-                role1.remove("guest");
-                ws = dataJson.toString();
-                ws= JsonFormatUtil.format(ws);
-                bw.write(ws);
-                bw.flush();
-                log.info("download success,file :{}", realPath + fileName);
+                if (dataJson!=null){
+                    dataJson.remove("initiator");
+                    JSONObject role = dataJson.getJSONObject("role");
+                    if (role!=null){
+                        role.remove("guest");
+                        role.remove("arbiter");
+                    }
+                    JSONObject component_parameters = dataJson.getJSONObject("component_parameters");
+                    if (component_parameters!=null){
+                        JSONObject role1 = component_parameters.getJSONObject("role");
+                        if (role1!=null){
+                            role1.remove("guest");
+                        }
+                    }
+                    JSONObject role_parameters = dataJson.getJSONObject("role_parameters");
+                    if (role_parameters!=null){
+                        role_parameters.remove("guest");
+                    }
+                    ws = dataJson.toString();
+                    ws= JsonFormatUtil.format(ws);
+                    bw.write(ws);
+                    bw.flush();
+                    log.info("download success,file :{}", realPath + fileName);
+                }
             } catch (Exception e) {
                 log.error("download failed", e);
                 return new ResponseResult(ErrorCode.DOWNLOAD_ERROR);
