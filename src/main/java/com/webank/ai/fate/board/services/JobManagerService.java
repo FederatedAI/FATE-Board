@@ -232,6 +232,7 @@ public class JobManagerService {
         String jobId = downloadQO.getJobId();
         String role = downloadQO.getRole();
         String type = downloadQO.getType();
+        String partyId = downloadQO.getPartyId();
 
         if (StringUtils.isEmpty(jobId)) {
             log.error("parameter null:jobId");
@@ -248,6 +249,10 @@ public class JobManagerService {
 
         if (!LogFileService.checkParameters("^[0-9a-zA-Z\\-_]+$", jobId, role, type)) {
             log.error("parameter error: illegal characters in role or jobId or type");
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
+        }
+        if (StringUtils.isEmpty(partyId)) {
+            log.error("parameter null:partyId");
             return new ResponseResult(ErrorCode.ERROR_PARAMETER);
         }
 
@@ -273,7 +278,7 @@ public class JobManagerService {
 
             } else if ("host".equals(role)) {
                 fileName = "job_runtime_on_party_conf.json";
-                realPath = fatePath + "/jobs/" + jobId + "/" + role + "/";
+                realPath = fatePath + "/jobs/" + jobId + "/" + role + "/"+partyId+"/";
                 fileOutputName = "runtime_config_" + jobId + ".json";
                 return getHostConfig(response, fileName, realPath, fileOutputName);
             } else {
