@@ -18,6 +18,7 @@ package com.webank.ai.fate.board.services;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.webank.ai.fate.board.dao.JobMapper;
@@ -27,7 +28,6 @@ import com.webank.ai.fate.board.log.LogFileService;
 import com.webank.ai.fate.board.pojo.*;
 import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.utils.HttpClientPool;
-import com.webank.ai.fate.board.utils.JsonFormatUtil;
 import com.webank.ai.fate.board.utils.PageBean;
 import com.webank.ai.fate.board.utils.ThreadPoolTaskExecutorUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -369,8 +369,7 @@ public class JobManagerService {
                     if (role_parameters!=null){
                         role_parameters.remove("guest");
                     }
-                    ws = dataJson.toString();
-                    ws= JsonFormatUtil.format(ws);
+                    ws=JSON.toJSONString(dataJson, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
                     bw.write(ws);
                     bw.flush();
                     log.info("download success,file :{}", realPath + fileName);
