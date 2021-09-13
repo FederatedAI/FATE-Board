@@ -33,7 +33,9 @@ public enum ErrorCode {
     DOWNLOAD_ERROR(10011, "Download error!"),
     UPLOAD_ERROR(10012, "Upload error!"),
     RERUN_ERROR(10013, "Rerun job error!"),
-    FILE_ERROR(10014, "File doesn't exist!"),
+    USER_ERROR(10014, "User doesn't exist!"),
+    LOGIN_ERROR(10015, "Please login first!"),
+    FILE_ERROR(10016, "File doesn't exist!"),
     ;
 
 

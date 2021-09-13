@@ -32,6 +32,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     clientLogLevel: 'warning',
     historyApiFallback: true,
     hot: true,
+    https: !!config.dev.httpsProxy,
     compress: true,
     host: HOST || config.dev.host,
     port: PORT || config.dev.port,
@@ -79,7 +80,7 @@ module.exports = new Promise((resolve, reject) => {
           compilationSuccessInfo: {
             messages: [
               `Your application is running here: http://${
-                devWebpackConfig.devServer.host
+              devWebpackConfig.devServer.host
               }:${port}`
             ]
           },

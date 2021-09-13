@@ -4,23 +4,26 @@
         xsi:noNamespaceSchemaLocation="http://www.padual.com/java/logback.xsd"
         debug="false" scan="true" scanPeriod="30 second">
 
-<!--    <property name="PROJECT" value="fateboard"/>-->
+    <!--    <property name="PROJECT" value="fateboard"/>-->
     <property name="ROOT" value="logs/"/>
     <property name="FILESIZE" value="50MB"/>
     <property name="MAXHISTORY" value="100"/>
     <timestamp key="DATETIME" datePattern="yyyy-MM-dd HH:mm:ss"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+        </filter>
         <encoder charset="utf-8">
-            <pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n
-            </pattern>
+            <!--<pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n</pattern>-->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %highlight(%-5level) [%thread] (%file:%line\) - %m%n</pattern>
         </encoder>
     </appender>
 
     <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder charset="utf-8">
-            <pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n
-            </pattern>
+            <!--<pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n</pattern>-->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %highlight(%-5level) [%thread] (%file:%line\) - %m%n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
@@ -30,17 +33,16 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${ROOT}%d/error.%d.log</fileNamePattern>
             <maxHistory>${MAXHISTORY}</maxHistory>
-<!--            <timeBasedFileNamingAndTriggeringPolicy-->
-<!--                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
-<!--                <maxFileSize>${FILESIZE}</maxFileSize>-->
-<!--            </timeBasedFileNamingAndTriggeringPolicy>-->
+            <!--            <timeBasedFileNamingAndTriggeringPolicy-->
+            <!--                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
+            <!--                <maxFileSize>${FILESIZE}</maxFileSize>-->
+            <!--            </timeBasedFileNamingAndTriggeringPolicy>-->
         </rollingPolicy>
     </appender>
 
     <appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder charset="utf-8">
-            <pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n
-            </pattern>
+            <pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>WARN</level>
@@ -50,16 +52,16 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${ROOT}%d/warn.%d.log</fileNamePattern>
             <maxHistory>${MAXHISTORY}</maxHistory>
-<!--            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
-<!--                <maxFileSize>${FILESIZE}</maxFileSize>-->
-<!--            </timeBasedFileNamingAndTriggeringPolicy>-->
+            <!--            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
+            <!--                <maxFileSize>${FILESIZE}</maxFileSize>-->
+            <!--            </timeBasedFileNamingAndTriggeringPolicy>-->
         </rollingPolicy>
     </appender>
 
     <appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder charset="utf-8">
-            <pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n
-            </pattern>
+            <!--<pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n</pattern>-->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %highlight(%-5level) [%thread] (%file:%line\) - %m%n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
@@ -69,15 +71,15 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${ROOT}%d/info.%d.log</fileNamePattern>
             <maxHistory>${MAXHISTORY}</maxHistory>
-<!--            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
-<!--                <maxFileSize>${FILESIZE}</maxFileSize>-->
-<!--            </timeBasedFileNamingAndTriggeringPolicy>-->
+            <!--            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
+            <!--                <maxFileSize>${FILESIZE}</maxFileSize>-->
+            <!--            </timeBasedFileNamingAndTriggeringPolicy>-->
         </rollingPolicy>
     </appender>
     <appender name="DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder charset="utf-8">
-            <pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n
-            </pattern>
+            <!--<pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n</pattern>-->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %highlight(%-5level) [%thread] (%file:%line\) - %m%n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>DEBUG</level>
@@ -87,10 +89,10 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${ROOT}%d/debug.%d.log</fileNamePattern>
             <maxHistory>${MAXHISTORY}</maxHistory>
-<!--            <timeBasedFileNamingAndTriggeringPolicy-->
-<!--                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
-<!--                <maxFileSize>${FILESIZE}</maxFileSize>-->
-<!--            </timeBasedFileNamingAndTriggeringPolicy>-->
+            <!--            <timeBasedFileNamingAndTriggeringPolicy-->
+            <!--                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
+            <!--                <maxFileSize>${FILESIZE}</maxFileSize>-->
+            <!--            </timeBasedFileNamingAndTriggeringPolicy>-->
         </rollingPolicy>
     </appender>
 
@@ -108,10 +110,10 @@
                 class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${ROOT}%d/httpclient.%d.log</fileNamePattern>
             <maxHistory>${MAXHISTORY}</maxHistory>
-<!--            <timeBasedFileNamingAndTriggeringPolicy-->
-<!--                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
-<!--                <maxFileSize>${FILESIZE}</maxFileSize>-->
-<!--            </timeBasedFileNamingAndTriggeringPolicy>-->
+            <!--            <timeBasedFileNamingAndTriggeringPolicy-->
+            <!--                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
+            <!--                <maxFileSize>${FILESIZE}</maxFileSize>-->
+            <!--            </timeBasedFileNamingAndTriggeringPolicy>-->
         </rollingPolicy>
     </appender>
 
@@ -120,14 +122,14 @@
         <appender-ref ref="httpclient"/>
     </logger>
 
-<!--    <logger name="org.mybatis.spring" level="INFO" additivity="false"/>-->
+    <!--    <logger name="org.mybatis.spring" level="INFO" additivity="false"/>-->
 
 
     <root level="INFO">
-<!--        <appender-ref ref="STDOUT"/>-->
+        <appender-ref ref="STDOUT"/>
         <appender-ref ref="ERROR"/>
         <appender-ref ref="WARN"/>
         <appender-ref ref="INFO"/>
-<!--        <appender-ref ref="DEBUG"/>-->
+        <!--        <appender-ref ref="DEBUG"/>-->
     </root>
 </configuration>
