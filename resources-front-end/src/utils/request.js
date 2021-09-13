@@ -23,6 +23,9 @@ import { Message } from 'element-ui'
 // import store from '@/store'
 // import { getToken } from '@/utils/auth'
 import { saveAs } from 'file-saver'
+import router from '../router'
+import { removeLocal } from './localStorage'
+import store from '../store'
 
 // axios.defaults.headers.common['Authorization'] = getToken()
 // create an axios instance
@@ -59,6 +62,7 @@ service.interceptors.response.use(
     const header = response.headers
     const codeCheck = function(res) {
       if (res.code === 0) {
+        // debugger
         return new Promise(resolve => {
           // if (store.getters.isOpenReqSimulate) {
           //   setTimeout(function() {
@@ -88,6 +92,15 @@ service.interceptors.response.use(
         //   // }
         // })
         return Promise.reject('warning')
+      } else if (res.code === 10015) {
+        // 表示当前的内容为没有登录，所以直接跳转到登录界面。
+        // debugger
+        removeLocal('CurrentUser')
+        store.dispatch('removeInfo')
+        router.push({
+          name: 'login'
+        })
+        return Promise.reject('error')
       } else {
         Message({
           message: res.message || res.msg || res.retmsg,
@@ -97,8 +110,9 @@ service.interceptors.response.use(
         return Promise.reject('error')
       }
     }
-    if (header['content-disposition']) {
-      const filename = header['content-disposition'].split('=')[1]
+    // 如果数据是blob则转换完成之后进行下一步骤。
+    if (header['content-disposition'] || data.toString().match(/blob/i)) {
+      const filename = header['content-disposition'] ? header['content-disposition'].split('=')[1] : ''
 
       const reader = new FileReader()
       reader.addEventListener('loadend', function() {
