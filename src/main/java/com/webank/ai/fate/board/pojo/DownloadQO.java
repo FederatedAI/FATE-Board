@@ -36,4 +36,7 @@ public class DownloadQO implements Serializable {
     @NotNull(message = "Type can't be null!")
     private String type;
 
+    @NotNull(message = "partyId can't be null")
+    private String partyId;
+
 }
