@@ -18,6 +18,7 @@ package com.webank.ai.fate.board.services;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.webank.ai.fate.board.dao.JobMapper;
@@ -27,7 +28,6 @@ import com.webank.ai.fate.board.log.LogFileService;
 import com.webank.ai.fate.board.pojo.*;
 import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.utils.HttpClientPool;
-import com.webank.ai.fate.board.utils.JsonFormatUtil;
 import com.webank.ai.fate.board.utils.PageBean;
 import com.webank.ai.fate.board.utils.ThreadPoolTaskExecutorUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -232,6 +232,7 @@ public class JobManagerService {
         String jobId = downloadQO.getJobId();
         String role = downloadQO.getRole();
         String type = downloadQO.getType();
+        String partyId = downloadQO.getPartyId();
 
         if (StringUtils.isEmpty(jobId)) {
             log.error("parameter null:jobId");
@@ -248,6 +249,10 @@ public class JobManagerService {
 
         if (!LogFileService.checkParameters("^[0-9a-zA-Z\\-_]+$", jobId, role, type)) {
             log.error("parameter error: illegal characters in role or jobId or type");
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
+        }
+        if (StringUtils.isEmpty(partyId)) {
+            log.error("parameter null:partyId");
             return new ResponseResult(ErrorCode.ERROR_PARAMETER);
         }
 
@@ -273,7 +278,7 @@ public class JobManagerService {
 
             } else if ("host".equals(role)) {
                 fileName = "job_runtime_on_party_conf.json";
-                realPath = fatePath + "/jobs/" + jobId + "/" + role + "/";
+                realPath = fatePath + "/jobs/" + jobId + "/" + role + "/"+partyId+"/";
                 fileOutputName = "runtime_config_" + jobId + ".json";
                 return getHostConfig(response, fileName, realPath, fileOutputName);
             } else {
@@ -336,6 +341,8 @@ public class JobManagerService {
             BufferedWriter bw = null;
             try {
                 br = new BufferedReader(new FileReader(file));
+                response.setContentType("application/force-download");
+                response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
                 bw = new BufferedWriter(response.getWriter());
                 String s = null;
                 String ws = null;
@@ -344,18 +351,29 @@ public class JobManagerService {
                     ss.append(s);
                 }
                 JSONObject dataJson =JSON.parseObject(ss.toString());
-                dataJson.remove("initiator");
-                JSONObject role = dataJson.getJSONObject("role");
-                role.remove("guest");
-                role.remove("arbiter");
-                JSONObject component_parameters = dataJson.getJSONObject("component_parameters");
-                JSONObject role1 = component_parameters.getJSONObject("role");
-                role1.remove("guest");
-                ws = dataJson.toString();
-                ws= JsonFormatUtil.format(ws);
-                bw.write(ws);
-                bw.flush();
-                log.info("download success,file :{}", realPath + fileName);
+                if (dataJson!=null){
+                    dataJson.remove("initiator");
+                    JSONObject role = dataJson.getJSONObject("role");
+                    if (role!=null){
+                        role.remove("guest");
+                        role.remove("arbiter");
+                    }
+                    JSONObject component_parameters = dataJson.getJSONObject("component_parameters");
+                    if (component_parameters!=null){
+                        JSONObject role1 = component_parameters.getJSONObject("role");
+                        if (role1!=null){
+                            role1.remove("guest");
+                        }
+                    }
+                    JSONObject role_parameters = dataJson.getJSONObject("role_parameters");
+                    if (role_parameters!=null){
+                        role_parameters.remove("guest");
+                    }
+                    ws=JSON.toJSONString(dataJson, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
+                    bw.write(ws);
+                    bw.flush();
+                    log.info("download success,file :{}", realPath + fileName);
+                }
             } catch (Exception e) {
                 log.error("download failed", e);
                 return new ResponseResult(ErrorCode.DOWNLOAD_ERROR);
@@ -375,8 +393,7 @@ public class JobManagerService {
                     }
                 }
             }
-            response.setContentType("application/force-download");
-            response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
+
             return null;
         } else {
             return new ResponseResult(ErrorCode.FILE_ERROR);
