@@ -16,6 +16,7 @@
 package com.webank.ai.fate.board.utils;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.Charsets;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
@@ -43,11 +44,18 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class HttpClientPool implements InitializingBean {
@@ -57,13 +65,48 @@ public class HttpClientPool implements InitializingBean {
     private PoolingHttpClientConnectionManager poolConnManager;
     private RequestConfig requestConfig;
     private CloseableHttpClient httpClient;
+    @Value("${HTTP_SECRET_KEY:\"\"}")
+    public String HTTP_SECRET_KEY;
+    @Value("${HTTP_APP_KEY:\"\"}")
+    public String HTTP_APP_KEY;
 
-    private static void config(HttpRequestBase httpRequestBase) {
+    private void config(HttpRequestBase httpRequestBase, Object requestData) {
         RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectionRequestTimeout(20000)
                 .setConnectTimeout(20000)
                 .setSocketTimeout(20000).build();
         httpRequestBase.addHeader("Content-Type", "application/json;charset=UTF-8");
+
+        if (HTTP_SECRET_KEY != null && HTTP_SECRET_KEY.length() > 0 && HTTP_APP_KEY != null && HTTP_APP_KEY.length() > 0) {
+            String timestamp = System.currentTimeMillis()+"";
+            String nonce = UUID.randomUUID().toString();
+            String ENCODING = "ascii";
+            String ALGORITHM = "HmacSHA1";
+            String signature = null;
+            try {
+                Mac mac = Mac.getInstance(ALGORITHM);
+                mac.init(new SecretKeySpec(HTTP_SECRET_KEY.getBytes(ENCODING),ALGORITHM));
+                String[] array = new String[]{
+                        timestamp,
+                        nonce,
+                        HTTP_APP_KEY,
+                        httpRequestBase.getURI().toURL().toString(),
+                        requestData.toString(),
+                        " ",
+                };
+                String text = String.join("\n", array);
+                byte[] signData = mac.doFinal(text.getBytes(ENCODING));
+                signature = new String(Base64.encodeBase64(signData), ENCODING);
+            } catch (NoSuchAlgorithmException | InvalidKeyException | UnsupportedEncodingException | MalformedURLException e) {
+                e.printStackTrace();
+            }
+            httpRequestBase.addHeader("TIMESTAMP", timestamp);
+            httpRequestBase.addHeader("NONCE", nonce);
+            httpRequestBase.addHeader("APP_KEY", HTTP_APP_KEY);
+            httpRequestBase.addHeader("SIGNATURE", signature);
+        }
+
+
         httpRequestBase.setConfig(requestConfig);
     }
 
@@ -105,7 +148,7 @@ public class HttpClientPool implements InitializingBean {
 
     public String post(String url, Map<String, Object> requestData) {
         HttpPost httpPost = new HttpPost(url);
-        config(httpPost);
+        config(httpPost, requestData);
         StringEntity stringEntity = new StringEntity(JSON.toJSONString(requestData), "UTF-8");
         stringEntity.setContentEncoding(Charsets.UTF_8.toString());
         httpPost.setEntity(stringEntity);
@@ -116,7 +159,7 @@ public class HttpClientPool implements InitializingBean {
     public String post(String url, String requestData) {
 
         HttpPost httpPost = new HttpPost(url);
-        config(httpPost);
+        config(httpPost, requestData);
         StringEntity stringEntity = new StringEntity(requestData, Charsets.UTF_8.toString());
         stringEntity.setContentEncoding("UTF-8");
         httpPost.setEntity(stringEntity);
@@ -127,7 +170,7 @@ public class HttpClientPool implements InitializingBean {
 
     public String get(String url) {
         HttpGet httpGet = new HttpGet(url);
-        config(httpGet);
+        config(httpGet, null);
         return getResponse(httpGet);
     }
 
@@ -143,7 +186,7 @@ public class HttpClientPool implements InitializingBean {
 
             return result;
         } catch (IOException e) {
-            logger.error("send http error",e);
+            logger.error("send http error", e);
             return "";
         } finally {
             try {
