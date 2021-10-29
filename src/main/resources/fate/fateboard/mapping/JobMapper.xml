@@ -29,7 +29,7 @@
 
     <select id="countJob" parameterType="com.webank.ai.fate.board.pojo.PagedJobQO" resultType="java.lang.Long">
         <if test="partner == null or partner == ''">
-            select count(1) from t_job
+            select count(1) from t_job where f_tag != 'submit_failed'
             <where>
                 <if test="jobId != null and jobId != ''">
                     and f_job_id like #{jobId}
@@ -54,7 +54,7 @@
         </if>
 
         <if test="partner != null and partner != ''">
-            select count(1) from t_job a,
+            select count(1) from t_job a where a.f_tag != 'submit_failed',
             (SELECT f_job_id, f_party_id, f_role,CASE f_role
             WHEN 'guest' THEN
             json_remove(f_roles, CONCAT('$.', 'guest') )
@@ -98,7 +98,7 @@
     <select id="queryPagedJobs" resultMap="BaseResultMap">
 
         <if test="pagedJobQO.partner == null or pagedJobQO.partner == ''">
-            select * from t_job
+            select * from t_job where f_tag != 'submit_failed'
             <where>
                 <if test="pagedJobQO.jobId != null and pagedJobQO.jobId != ''">
                     and f_job_id like #{pagedJobQO.jobId}
@@ -134,7 +134,7 @@
             a.f_job_id,a.f_role,a.f_party_id,a.f_name,a.f_description,a.f_tag,a.f_dsl,a.f_runtime_conf,a.f_train_runtime_conf,a.f_work_mode,a.f_initiator_role,
             a.f_initiator_party_id,a.f_status,a.f_is_initiator,a.f_progress,a.f_create_time,a.f_update_time,a.f_start_time,a.f_end_time,a.f_elapsed,
             b.f_roles
-            from t_job a,
+            from t_job a where a.f_tag != 'submit_failed',
             (SELECT f_job_id, f_party_id, f_role,CASE f_role
             WHEN 'guest' THEN
             json_remove(f_roles, CONCAT('$.', 'guest') )
@@ -186,19 +186,19 @@
 
     <select id="queryJobStatus" resultMap="BaseResultMap">
 
-        select * from t_job where f_status in ('waiting','running') order by f_status, f_start_time desc;
+        select * from t_job where  f_tag != 'submit_failed' and f_status in ('waiting','running') order by f_status, f_start_time desc;
 
     </select>
 
     <select id="queryJobByConditions" resultMap="BaseResultMap">
 
-        select * from t_job where f_job_id = #{jobId} and f_role = #{role} and f_party_id =#{partyId};
+        select * from t_job where f_tag != 'submit_failed' and f_job_id = #{jobId} and f_role = #{role} and f_party_id =#{partyId};
 
     </select>
 
     <select id="queryTodayCompletedJobs" resultMap="BaseResultMap">
 
-        select * from t_job where f_end_time between #{timeTodayStart} and #{timeStampNow};
+        select * from t_job where f_tag != 'submit_failed' and f_end_time between #{timeTodayStart} and #{timeStampNow};
 
     </select>
 
