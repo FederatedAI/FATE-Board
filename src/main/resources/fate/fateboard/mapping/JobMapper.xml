@@ -29,8 +29,11 @@
 
     <select id="countJob" parameterType="com.webank.ai.fate.board.pojo.PagedJobQO" resultType="java.lang.Long">
         <if test="partner == null or partner == ''">
-            select count(1) from t_job where f_tag != 'submit_failed'
+            select count(1) from t_job
             <where>
+                <if test="true">
+                    and f_tag != 'submit_failed'
+                </if>
                 <if test="jobId != null and jobId != ''">
                     and f_job_id like #{jobId}
                 </if>
@@ -54,7 +57,7 @@
         </if>
 
         <if test="partner != null and partner != ''">
-            select count(1) from t_job a where a.f_tag != 'submit_failed',
+            select count(1) from t_job a ,
             (SELECT f_job_id, f_party_id, f_role,CASE f_role
             WHEN 'guest' THEN
             json_remove(f_roles, CONCAT('$.', 'guest') )
@@ -65,6 +68,9 @@
             END  AS f_roles
             from t_job ) b
             <where>
+                <if test="true">
+                    and a.f_tag != 'submit_failed'
+                </if>
                 <if test="jobId != null and jobId != ''">
                     and a.f_job_id like #{jobId}
                 </if>
@@ -98,8 +104,11 @@
     <select id="queryPagedJobs" resultMap="BaseResultMap">
 
         <if test="pagedJobQO.partner == null or pagedJobQO.partner == ''">
-            select * from t_job where f_tag != 'submit_failed'
+            select * from t_job
             <where>
+                <if test="true">
+                    and f_tag != 'submit_failed'
+                </if>
                 <if test="pagedJobQO.jobId != null and pagedJobQO.jobId != ''">
                     and f_job_id like #{pagedJobQO.jobId}
                 </if>
@@ -134,7 +143,7 @@
             a.f_job_id,a.f_role,a.f_party_id,a.f_name,a.f_description,a.f_tag,a.f_dsl,a.f_runtime_conf,a.f_train_runtime_conf,a.f_work_mode,a.f_initiator_role,
             a.f_initiator_party_id,a.f_status,a.f_is_initiator,a.f_progress,a.f_create_time,a.f_update_time,a.f_start_time,a.f_end_time,a.f_elapsed,
             b.f_roles
-            from t_job a where a.f_tag != 'submit_failed',
+            from t_job a ,
             (SELECT f_job_id, f_party_id, f_role,CASE f_role
             WHEN 'guest' THEN
             json_remove(f_roles, CONCAT('$.', 'guest') )
@@ -145,6 +154,9 @@
             END  AS f_roles
             from t_job ) b
             <where>
+                <if test="true">
+                    and a.f_tag != 'submit_failed'
+                </if>
                 <if test="pagedJobQO.jobId != null and pagedJobQO.jobId != ''">
                     and a.f_job_id like #{pagedJobQO.jobId}
                 </if>
