@@ -70,6 +70,8 @@ public class JobManagerController {
 
     @RequestMapping(value = "/query/status", method = RequestMethod.GET)
     public ResponseResult queryJobStatus() {
+        ResponseResult responseResult = checkAppKey();
+        if (responseResult != null) return responseResult;
         List<JobDO> jobs = jobManagerService.queryJobStatus();
         return new ResponseResult<>(ErrorCode.SUCCESS, jobs);
     }
@@ -174,6 +176,8 @@ public class JobManagerController {
 
     @RequestMapping(value = "/query/page/new", method = RequestMethod.POST)
     public ResponseResult<PageBean<Map<String, Object>>> queryPagedJob(@RequestBody PagedJobQO pagedJobQO) {
+        ResponseResult responseResult = checkAppKey();
+        if (responseResult != null) return responseResult;
         List<String> roles = pagedJobQO.getRole();
         List<String> status = pagedJobQO.getStatus();
         if (roles != null) {
@@ -273,6 +277,24 @@ public class JobManagerController {
     public ResponseResult download(@RequestBody DownloadQO downloadQO, HttpServletResponse response) {
         return jobManagerService.download(downloadQO, response);
 
+    }
+    private ResponseResult checkAppKey() {
+        String result;
+        try {
+            JobStopDTO jobStopDTO = new JobStopDTO();
+            jobStopDTO.setJob_id("0");
+            result = httpClientPool.post(fateUrl + Dict.URL_JOB_STOP, JSON.toJSONString(jobStopDTO));
+        } catch (Exception e) {
+            logger.error("connect fateflow error:", e);
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+        }
+        JSONObject resultObject = JSON.parseObject(result);
+        Integer retCode = resultObject.getInteger(Dict.RETCODE);
+        if (400 == retCode || 401 == retCode || 425 == retCode || 403 == retCode) {
+            logger.error(resultObject.getString(Dict.RETMSG));
+            return new ResponseResult<>(retCode,resultObject.getString(Dict.RETMSG));
+        }
+        return null;
     }
 
 }
