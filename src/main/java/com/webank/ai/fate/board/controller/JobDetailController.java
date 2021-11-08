@@ -292,8 +292,8 @@ public class JobDetailController {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
         }
-
-        return ResponseUtil.buildResponse(result, null);
+        String s = result.replaceAll("-Infinity", "\"-Infinity\"");
+        return ResponseUtil.buildResponse(s, null);
     }
 
     @RequestMapping(value = "/tracking/component/metric_data/batch", method = RequestMethod.POST)
