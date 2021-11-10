@@ -45,7 +45,7 @@ import java.util.Map;
 public class LogFileService {
 
     final static String DEFAULT_COMPONENT_ID = "default";
-    @Value("${FATE_DEPLOY_PREFIX}")
+    @Value("${FATE_DEPLOY_PREFIX:\"\"}")
     String FATE_DEPLOY_PREFIX;
 
     @Autowired
@@ -179,7 +179,7 @@ public class LogFileService {
             default:
                 logRelativePath = jobId + "/" + role + "/" + partyId + "/" + componentId + "/";
         }
-        if(StringUtils.isBlank(FATE_DEPLOY_PREFIX)) {
+        if(FATE_DEPLOY_PREFIX==null||FATE_DEPLOY_PREFIX.length()>0) {
             Map<String, Object> params = Maps.newHashMap();
             params.put(Dict.JOBID, jobId);
             String result;
