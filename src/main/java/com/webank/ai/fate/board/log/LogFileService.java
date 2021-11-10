@@ -179,7 +179,7 @@ public class LogFileService {
             default:
                 logRelativePath = jobId + "/" + role + "/" + partyId + "/" + componentId + "/";
         }
-        if(FATE_DEPLOY_PREFIX==null||FATE_DEPLOY_PREFIX.length()>0) {
+        if(FATE_DEPLOY_PREFIX==null||FATE_DEPLOY_PREFIX.length()<=0) {
             String webPath = System.getProperty("user.dir");
             int i1 = webPath.lastIndexOf("/");
             FATE_DEPLOY_PREFIX = webPath.substring(0, i1)+"/fateflow/logs/";
