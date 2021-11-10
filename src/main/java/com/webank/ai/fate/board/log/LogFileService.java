@@ -16,6 +16,7 @@
 package com.webank.ai.fate.board.log;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -26,6 +27,7 @@ import com.webank.ai.fate.board.pojo.*;
 import com.webank.ai.fate.board.services.JobManagerService;
 import com.webank.ai.fate.board.ssh.SshService;
 import com.webank.ai.fate.board.global.Dict;
+import com.webank.ai.fate.board.utils.HttpClientPool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +45,7 @@ import java.util.Map;
 public class LogFileService {
 
     final static String DEFAULT_COMPONENT_ID = "default";
-    @Value("${FATE_DEPLOY_PREFIX:/data/projects/fate/logs/}")
+    @Value("${FATE_DEPLOY_PREFIX}")
     String FATE_DEPLOY_PREFIX;
 
     @Autowired
@@ -51,6 +53,11 @@ public class LogFileService {
     Logger logger = LoggerFactory.getLogger(LogFileService.class);
     @Autowired
     JobManagerService jobManagerService;
+
+    @Value("${fateflow.url}")
+    String fateUrl;
+    @Autowired
+    HttpClientPool httpClientPool;
 
     public static String toJsonString(String content,
                                       long bytesize,
@@ -153,7 +160,7 @@ public class LogFileService {
         return result;
     }
 
-    public String buildLogPath(String jobId, String role, String partyId, String componentId, String type) {
+    public String buildLogPath(String jobId, String role, String partyId, String componentId, String type) throws Exception {
         Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentId, type));
         Preconditions.checkArgument(checkPathParameters(jobId, role, partyId, componentId, type));
 
@@ -172,7 +179,31 @@ public class LogFileService {
             default:
                 logRelativePath = jobId + "/" + role + "/" + partyId + "/" + componentId + "/";
         }
-
+        if(StringUtils.isBlank(FATE_DEPLOY_PREFIX)) {
+            Map<String, Object> params = Maps.newHashMap();
+            params.put(Dict.JOBID, jobId);
+            String result;
+            try {
+                result = httpClientPool.post(fateUrl + Dict.URL_JOB_LOG_PATH, JSON.toJSONString(params));
+            } catch (Exception e) {
+                logger.error("connect fateflow error:", e);
+                throw new Exception(e);
+            }
+            JSONObject jsonObject = JSON.parseObject(result);
+            Integer retcode = jsonObject.getInteger(Dict.RETCODE);
+            String retmsg = jsonObject.getString(Dict.RETMSG);
+            if (retcode==0){
+                JSONObject data = jsonObject.getJSONObject(Dict.DATA);
+                String logs_directory = data.getString("logs_directory");
+                int i1 = logs_directory.lastIndexOf("/");
+                FATE_DEPLOY_PREFIX = logs_directory.substring(0, i1)+"/";
+            }else {
+                logger.error("fateflow error:",retmsg);
+                String webPath = System.getProperty("user.dir");
+                int i1 = webPath.lastIndexOf("/");
+                FATE_DEPLOY_PREFIX = webPath.substring(0, i1)+"/fateflow/logs/";
+            }
+        }
         String logPath = FATE_DEPLOY_PREFIX + logRelativePath + Dict.logMap.get(type);
         return logPath;
     }

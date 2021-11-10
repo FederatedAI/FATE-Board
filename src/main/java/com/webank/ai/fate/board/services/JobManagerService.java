@@ -259,7 +259,7 @@ public class JobManagerService {
         //get fate path
         String webPath = System.getProperty("user.dir");
         int i1 = webPath.lastIndexOf("/");
-        String fatePath = webPath.substring(0, i1);
+        String fatePath = webPath.substring(0, i1)+"/fateflow";
 
         //build file path
         String fileName = "";
