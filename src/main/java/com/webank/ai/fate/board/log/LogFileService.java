@@ -180,6 +180,10 @@ public class LogFileService {
                 logRelativePath = jobId + "/" + role + "/" + partyId + "/" + componentId + "/";
         }
         if(FATE_DEPLOY_PREFIX==null||FATE_DEPLOY_PREFIX.length()>0) {
+            String webPath = System.getProperty("user.dir");
+            int i1 = webPath.lastIndexOf("/");
+            FATE_DEPLOY_PREFIX = webPath.substring(0, i1)+"/fateflow/logs/";
+
             Map<String, Object> params = Maps.newHashMap();
             params.put(Dict.JOBID, jobId);
             String result;
@@ -189,19 +193,25 @@ public class LogFileService {
                 logger.error("connect fateflow error:", e);
                 throw new Exception(e);
             }
-            JSONObject jsonObject = JSON.parseObject(result);
-            Integer retcode = jsonObject.getInteger(Dict.RETCODE);
-            String retmsg = jsonObject.getString(Dict.RETMSG);
-            if (retcode==0){
-                JSONObject data = jsonObject.getJSONObject(Dict.DATA);
-                String logs_directory = data.getString("logs_directory");
-                int i1 = logs_directory.lastIndexOf("/");
-                FATE_DEPLOY_PREFIX = logs_directory.substring(0, i1)+"/";
-            }else {
-                logger.error("fateflow error:",retmsg);
-                String webPath = System.getProperty("user.dir");
-                int i1 = webPath.lastIndexOf("/");
-                FATE_DEPLOY_PREFIX = webPath.substring(0, i1)+"/fateflow/logs/";
+            if(result!=null&&result.length()>0){
+                JSONObject jsonObject = null;
+                try {
+                    jsonObject = JSON.parseObject(result);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if(jsonObject!=null&&!jsonObject.isEmpty()){
+                    Integer retcode = jsonObject.getInteger(Dict.RETCODE);
+                    String retmsg = jsonObject.getString(Dict.RETMSG);
+                    if (retcode==0){
+                        JSONObject data = jsonObject.getJSONObject(Dict.DATA);
+                        String logs_directory = data.getString("logs_directory");
+                        int i2 = logs_directory.lastIndexOf("/");
+                        FATE_DEPLOY_PREFIX = logs_directory.substring(0, i2)+"/";
+                    }else {
+                        logger.error("fateflow error:",retmsg);
+                    }
+                }
             }
         }
         String logPath = FATE_DEPLOY_PREFIX + logRelativePath + Dict.logMap.get(type);
