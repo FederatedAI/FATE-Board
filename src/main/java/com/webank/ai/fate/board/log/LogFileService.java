@@ -22,18 +22,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.Session;
-import com.webank.ai.fate.board.dao.TaskMapper;
-import com.webank.ai.fate.board.pojo.*;
+import com.webank.ai.fate.board.global.Dict;
+import com.webank.ai.fate.board.pojo.JobDO;
+import com.webank.ai.fate.board.pojo.SshInfo;
 import com.webank.ai.fate.board.services.JobManagerService;
 import com.webank.ai.fate.board.ssh.SshService;
-import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.utils.HttpClientPool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -179,42 +178,43 @@ public class LogFileService {
             default:
                 logRelativePath = jobId + "/" + role + "/" + partyId + "/" + componentId + "/";
         }
-        if(FATE_DEPLOY_PREFIX==null||FATE_DEPLOY_PREFIX.length()<=0) {
-            String webPath = System.getProperty("user.dir");
-            int i1 = webPath.lastIndexOf("/");
-            FATE_DEPLOY_PREFIX = webPath.substring(0, i1)+"/fateflow/logs/";
+        String FATE_DEPLOY_PREFIX2 = "";
+//        if (FATE_DEPLOY_PREFIX2 == null || FATE_DEPLOY_PREFIX2.length() <= 0) {
+//            String webPath = System.getProperty("user.dir");
+//            int i1 = webPath.lastIndexOf("/");
+//            FATE_DEPLOY_PREFIX2 = webPath.substring(0, i1) + "/fateflow/logs/";
 
-            Map<String, Object> params = Maps.newHashMap();
-            params.put(Dict.JOBID, jobId);
-            String result;
+        Map<String, Object> params = Maps.newHashMap();
+        params.put(Dict.JOBID, jobId);
+        String result;
+        try {
+            result = httpClientPool.post(fateUrl + Dict.URL_JOB_LOG_PATH, JSON.toJSONString(params));
+        } catch (Exception e) {
+            logger.error("connect fateflow error:", e);
+            throw new Exception(e);
+        }
+        if (result != null && result.length() > 0) {
+            JSONObject jsonObject = null;
             try {
-                result = httpClientPool.post(fateUrl + Dict.URL_JOB_LOG_PATH, JSON.toJSONString(params));
+                jsonObject = JSON.parseObject(result);
             } catch (Exception e) {
-                logger.error("connect fateflow error:", e);
-                throw new Exception(e);
+                e.printStackTrace();
             }
-            if(result!=null&&result.length()>0){
-                JSONObject jsonObject = null;
-                try {
-                    jsonObject = JSON.parseObject(result);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if(jsonObject!=null&&!jsonObject.isEmpty()){
-                    Integer retcode = jsonObject.getInteger(Dict.RETCODE);
-                    String retmsg = jsonObject.getString(Dict.RETMSG);
-                    if (retcode==0){
-                        JSONObject data = jsonObject.getJSONObject(Dict.DATA);
-                        String logs_directory = data.getString("logs_directory");
-                        int i2 = logs_directory.lastIndexOf("/");
-                        FATE_DEPLOY_PREFIX = logs_directory.substring(0, i2)+"/";
-                    }else {
-                        logger.error("fateflow error:",retmsg);
-                    }
+            if (jsonObject != null && !jsonObject.isEmpty()) {
+                Integer retcode = jsonObject.getInteger(Dict.RETCODE);
+                String retmsg = jsonObject.getString(Dict.RETMSG);
+                if (retcode == 0) {
+                    JSONObject data = jsonObject.getJSONObject(Dict.DATA);
+                    String logs_directory = data.getString("logs_directory");
+                    int i2 = logs_directory.lastIndexOf("/");
+                    FATE_DEPLOY_PREFIX2 = logs_directory.substring(0, i2) + "/";
+                } else {
+                    logger.error("fateflow error:", retmsg);
                 }
             }
         }
-        String logPath = FATE_DEPLOY_PREFIX + logRelativePath + Dict.logMap.get(type);
+//        }
+        String logPath = FATE_DEPLOY_PREFIX2 + logRelativePath + Dict.logMap.get(type);
         return logPath;
     }
 
