@@ -69,9 +69,9 @@ public class HttpClientPool implements InitializingBean {
     private PoolingHttpClientConnectionManager poolConnManager;
     private RequestConfig requestConfig;
     private CloseableHttpClient httpClient;
-    @Value("${HTTP_SECRET_KEY:\"\"}")
+    @Value("${HTTP_SECRET_KEY:}")
     public String HTTP_SECRET_KEY;
-    @Value("${HTTP_APP_KEY:\"\"}")
+    @Value("${HTTP_APP_KEY:}")
     public String HTTP_APP_KEY;
 
     private void config(HttpRequestBase httpRequestBase, String requestData) {

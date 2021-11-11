@@ -45,7 +45,7 @@ import java.util.Map;
 public class LogFileService {
 
     final static String DEFAULT_COMPONENT_ID = "default";
-    @Value("${FATE_DEPLOY_PREFIX:\"\"}")
+    @Value("${FATE_DEPLOY_PREFIX:}")
     String FATE_DEPLOY_PREFIX;
 
     @Autowired
@@ -179,7 +179,7 @@ public class LogFileService {
             default:
                 logRelativePath = jobId + "/" + role + "/" + partyId + "/" + componentId + "/";
         }
-        if(FATE_DEPLOY_PREFIX==null||FATE_DEPLOY_PREFIX.length()<=2) {
+        if(FATE_DEPLOY_PREFIX==null||FATE_DEPLOY_PREFIX.length()<=0) {
             String webPath = System.getProperty("user.dir");
             int i1 = webPath.lastIndexOf("/");
             FATE_DEPLOY_PREFIX = webPath.substring(0, i1)+"/fateflow/logs/";
