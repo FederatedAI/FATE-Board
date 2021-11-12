@@ -45,8 +45,6 @@ import java.util.Map;
 public class LogFileService {
 
     final static String DEFAULT_COMPONENT_ID = "default";
-    @Value("${FATE_DEPLOY_PREFIX:}")
-    String FATE_DEPLOY_PREFIX;
 
     @Autowired
     SshService sshService;
@@ -92,10 +90,8 @@ public class LogFileService {
         return file.exists();
     }
 
-    public String getJobDir(String jobId) {
-
-        return FATE_DEPLOY_PREFIX + jobId + "/";
-
+    public String getJobDir(String jobId) throws Exception {
+        return getLogPath(jobId) + "/";
     }
 
     public static boolean checkPathParameters(String... parameters) {
@@ -135,7 +131,8 @@ public class LogFileService {
     }
 
 
-    public String buildFilePath(String jobId, String componentId, String type, String role, String partyId) {
+    public String buildFilePath(String jobId, String componentId, String type, String role, String partyId)
+    throws Exception {
 
         Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, componentId, type, role, partyId));
         Preconditions.checkArgument(checkPathParameters(jobId, componentId, type, role, partyId));
@@ -155,35 +152,13 @@ public class LogFileService {
             filePath = jobId + "/" + role + "/" + partyId + "/" + componentId + "/" + "INFO";
         }
 
-        String result = FATE_DEPLOY_PREFIX + filePath + ".log";
+        String result = getLogPath(jobId) + filePath + ".log";
         logger.info("build filePath result {}", result);
         return result;
     }
 
-    public String buildLogPath(String jobId, String role, String partyId, String componentId, String type) throws Exception {
-        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentId, type));
-        Preconditions.checkArgument(checkPathParameters(jobId, role, partyId, componentId, type));
-
-        String logRelativePath;
-        switch (type) {
-            case "jobSchedule":
-            case "jobError":
-                logRelativePath = jobId + "/";
-                break;
-            case "partyError":
-            case "partyWarning":
-            case "partyInfo":
-            case "partyDebug":
-                logRelativePath = jobId + "/" + role + "/" + partyId + "/";
-                break;
-            default:
-                logRelativePath = jobId + "/" + role + "/" + partyId + "/" + componentId + "/";
-        }
-        String FATE_DEPLOY_PREFIX2 = "";
-//        if (FATE_DEPLOY_PREFIX2 == null || FATE_DEPLOY_PREFIX2.length() <= 0) {
-//            String webPath = System.getProperty("user.dir");
-//            int i1 = webPath.lastIndexOf("/");
-//            FATE_DEPLOY_PREFIX2 = webPath.substring(0, i1) + "/fateflow/logs/";
+    public String getLogPath(String jobId) throws Exception {
+        String logPath = "";
 
         Map<String, Object> params = Maps.newHashMap();
         params.put(Dict.JOBID, jobId);
@@ -194,6 +169,7 @@ public class LogFileService {
             logger.error("connect fateflow error:", e);
             throw new Exception(e);
         }
+
         if (result != null && result.length() > 0) {
             JSONObject jsonObject = null;
             try {
@@ -206,16 +182,38 @@ public class LogFileService {
                 String retmsg = jsonObject.getString(Dict.RETMSG);
                 if (retcode == 0) {
                     JSONObject data = jsonObject.getJSONObject(Dict.DATA);
-                    String logs_directory = data.getString("logs_directory");
-                    int i2 = logs_directory.lastIndexOf("/");
-                    FATE_DEPLOY_PREFIX2 = logs_directory.substring(0, i2) + "/";
+                    logPath = data.getString("logs_directory");
                 } else {
                     logger.error("fateflow error:", retmsg);
                 }
             }
         }
-//        }
-        String logPath = FATE_DEPLOY_PREFIX2 + logRelativePath + Dict.logMap.get(type);
+
+        return logPath;
+    }
+
+    public String buildLogPath(String jobId, String role, String partyId, String componentId, String type)
+    throws Exception {
+        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentId, type));
+        Preconditions.checkArgument(checkPathParameters(jobId, role, partyId, componentId, type));
+
+        String logRelativePath;
+        switch (type) {
+            case "jobSchedule":
+            case "jobError":
+                logRelativePath = "/";
+                break;
+            case "partyError":
+            case "partyWarning":
+            case "partyInfo":
+            case "partyDebug":
+                logRelativePath = "/" + role + "/" + partyId + "/";
+                break;
+            default:
+                logRelativePath = "/" + role + "/" + partyId + "/" + componentId + "/";
+        }
+
+        String logPath = getLogPath(jobId) + logRelativePath + Dict.logMap.get(type);
         return logPath;
     }
 
