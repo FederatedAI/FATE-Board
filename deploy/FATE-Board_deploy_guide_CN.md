@@ -101,14 +101,13 @@
    | ------------------------ | -------------------------------------------- |
    | -Dspring.config.location | FATE-Board的application.properties文件路径   |
    | -Dssh_config_file        | FATE-Board的ssh.properties文件所在文件夹路径 |
-   | -DFATE_DEPLOY_PREFIX     | fate_flow产生的日志文件夹路径                |
 
    命令行示例:
 
     注意: 请用实际的FATE-Board版本替换下面命令行中的${version}.
 
    ```
-   nohup java -Dspring.config.location=FATE/fateboard/src/main/resources/application.properties -DFATE_DEPLOY_PREFIX=FATE/logs/  -Dssh_config_file=FATE-Board/src/main/resources/  -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -jar FATE-Board/target/fateboard-${version}.jar  >/dev/null 2>&1 &
+   nohup java -Dspring.config.location=FATE/fateboard/src/main/resources/application.properties -Dssh_config_file=FATE-Board/src/main/resources/  -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -jar FATE-Board/target/fateboard-${version}.jar  >/dev/null 2>&1 &
    ```
 
 5. 停止服务
