@@ -70,7 +70,8 @@ public class SshLogScanner implements Runnable, LogScanner {
     public SshLogScanner(javax.websocket.Session webSocketSession,
                          LogFileService logFileService,
                          SshInfo sshInfo,
-                         String jobId, String componentId, String type, String role, String partyId, Integer beginLine) {
+                         String jobId, String componentId, String type, String role, String partyId, Integer beginLine)
+                         throws Exception {
         Preconditions.checkArgument(jobId != null && !jobId.equals(""));
         this.jobId = jobId;
         Preconditions.checkArgument(componentId != null && !componentId.equals(""));
