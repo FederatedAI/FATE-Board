@@ -105,14 +105,13 @@ Launch a FATE-Board service by following steps.
    | ------------------------ | -------------------------------------------------- |
    | -Dspring.config.location | path of application.properties of FATE-Board       |
    | -Dssh_config_file        | path of directory which ssh.properties lies in     |
-   | -DFATE_DEPLOY_PREFIX     | path of logs directory which produced by fate_flow |
 
    command example:
 
     NOTES: Please replace ${version} in command below with the real FATE-Board version you use.
 
    ```
-   nohup java -Dspring.config.location=FATE/fateboard/src/main/resources/application.properties -DFATE_DEPLOY_PREFIX=FATE/logs/  -Dssh_config_file=FATE-Board/src/main/resources/  -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -jar FATE-Board/target/fateboard-${version}.jar  >/dev/null 2>&1 &
+   nohup java -Dspring.config.location=FATE/fateboard/src/main/resources/application.properties -Dssh_config_file=FATE-Board/src/main/resources/  -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -jar FATE-Board/target/fateboard-${version}.jar  >/dev/null 2>&1 &
    ```
 
 5. Stop the service
