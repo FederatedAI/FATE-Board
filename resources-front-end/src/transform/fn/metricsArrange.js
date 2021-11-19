@@ -21,7 +21,8 @@ const DEF = {
   $curves: ['roc', 'ks', 'lift', 'gain', ['precision', 'recall'], 'accuracy'],
   $loss: ['loss'],
   $stepwise: ['stepwise'],
-  $dbi: ['dbi']
+  $dbi: ['dbi'],
+  $iter: ['init_iter']
 }
 const result = new Map()
 
@@ -180,6 +181,7 @@ function splitVariable(variables, nameSpace) {
       toTheType(val, nameSpace, 'loss') ||
       toTheType(val, nameSpace, 'stepwise') ||
       toTheType(val, nameSpace, 'dbi') ||
+      toTheType(val, nameSpace, 'iter') ||
       toTheType(val, nameSpace)
   }
 }

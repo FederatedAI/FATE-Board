@@ -58,6 +58,7 @@ function distanceMeasure(data, param) {
     }
     group.push(...createTable(distanceMeasureHeader, tableData, 'Distance Measure'))
   }
+
   return group
 }
 

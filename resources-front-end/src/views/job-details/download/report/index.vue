@@ -99,14 +99,15 @@ async function mkzip(res, name, filterFunction) {
           intoCheck || ''
         )
       } else if (key.match('.csv') && obj[key]) {
+        const keyForFile = `${key}${into ? '_' + into : ''}`
         const file =
-					eachFile.get(key) || new CSVConut(key, intoCheck || '', true)
+					eachFile.get(keyForFile) || new CSVConut(key, intoCheck || '', true)
         // du.addCSV((obj.title ? obj.title + '_' : '') + key, obj[key], obj.title
         file.add(
           notNull(obj.title) ? obj.title.toString().replace('|', '_') : '',
           filterFunction ? filterFunction(obj[key]) : obj[key]
         )
-        eachFile.set(key, file)
+        eachFile.set(keyForFile, file)
       } else if (Array.isArray(obj[key]) && obj[key].length > 0) {
         for (const val of obj[val]) {
           eachItem(val, obj.title)
@@ -354,6 +355,8 @@ export default {
       args.imply = implyList
       args.compare = this.filterLogics()
       args.needExport = downlist
+      console.log(this)
+
       this.$nextTick(() => {
         setTimeout(() => {
           vm.$emit('download', args)

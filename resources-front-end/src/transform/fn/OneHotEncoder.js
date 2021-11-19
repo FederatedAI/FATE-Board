@@ -70,7 +70,8 @@ const fn = (modelData) => {
         type: 'table',
         props: {
           data: variableData,
-          header: getHeaders()
+          header: getHeaders(),
+          export: 'encode_detail'
         }
       }]
     }]

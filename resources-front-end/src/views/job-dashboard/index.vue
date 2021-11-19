@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container bg-dark app-container">
     <breadcrumb-ext
-      :breads="[{type:'content', val:'Dashboard'}, {type:'content', val:'Job: ' + jobId}]"
+      :breads="[{type:'content', val:'Dashboard'}]"
     />
     <board v-bind="ids" />
 

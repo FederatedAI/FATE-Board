@@ -25,15 +25,15 @@ const TO = 'modified'
 // const KEY = 'prop'
 // const COMPARE = 'compare'
 
-function checkAll(allDatas, cb, ...args) {
+function checkAll(header, allDatas, cb, ...args) {
   let res = {}
   if (!Array.isArray(allDatas)) {
     for (const key in allDatas) {
-      res[key] = cb(addIndex(allDatas[key]), ...args)
+      res[key] = cb(header, addIndex(allDatas[key]), ...args)
     }
   } else {
     res = {
-      default: cb(addIndex(allDatas), ...args)
+      default: cb(header, addIndex(allDatas), ...args)
     }
   }
   return res
@@ -138,7 +138,7 @@ const dataRequest = {
       return this.name
     },
 
-    tableImplyTo(list, imply) {
+    tableImplyTo(_header, list, imply) {
       let deleted = []
       const imp = deepClone(imply)
       const isArr = Array.isArray(imp)
@@ -171,7 +171,12 @@ const dataRequest = {
               deleted.push(implying)
             } else {
               for (const key in item) {
-                if (item[key] && item[key].match && item[key].match(val[ORIGIN]) && item[key] === val[ORIGIN]) {
+                const title = _header.find(val => val.prop === key)
+                if (item[key] &&
+                  item[key].match &&
+                  item[key].match(val[ORIGIN]) &&
+                  (item[key] === val[ORIGIN] || title.matching)
+                ) {
                   item[key] = item[key].replace(val[ORIGIN], val[TO])
                 }
               }
@@ -228,7 +233,7 @@ const dataRequest = {
       return res
     },
 
-    filterWithProps(list, compare) {
+    filterWithProps(_header, list, compare) {
       if (list.length === 0) {
         return []
       }
@@ -256,12 +261,12 @@ const dataRequest = {
       return res
     },
 
-    filterForAllProperty(allDatas, compare) {
-      return checkAll(allDatas, this.filterWithProps, compare)
+    filterForAllProperty(allDatas, compare, header) {
+      return checkAll(header, allDatas, this.filterWithProps, compare)
     },
 
-    tablesImplyTo(allDatas, imply) {
-      return checkAll(allDatas, this.tableImplyTo, imply)
+    tablesImplyTo(allDatas, imply, header) {
+      return checkAll(header, allDatas, this.tableImplyTo, imply)
     },
 
     tablesHeaderTo(allHeaders, allDatas) {
@@ -288,10 +293,10 @@ const dataRequest = {
       let resData = Array.isArray(this.data) ? deepClone(this.currentDatas) : deepClone(this.data)
       resData = this.checkFormatData(resData)
       if (compare && Object.keys(compare).length > 0) {
-        resData = this.filterForAllProperty(resData, compare)
+        resData = this.filterForAllProperty(resData, compare, this.header)
       }
       if (imply) {
-        this.tablesImplyTo(resData, imply)
+        this.tablesImplyTo(resData, imply, this.header)
       }
       if (Array.isArray(resData)) {
         resData = {
@@ -373,7 +378,7 @@ const dataRequest = {
     handleFilterLogic(filters) {
       let resData = deepClone(this.data)
       if (filters && Object.keys(filters).length > 0) {
-        resData = this.filterForAllProperty(resData, filters)
+        resData = this.filterForAllProperty(resData, filters, this.header)
       }
       let res = resData
       if (typeof resData === 'object') {

@@ -56,7 +56,12 @@ const app = {
       statistic: 'DataStatistics',
       reader: 'Reader',
       scorecard: 'Scorecard',
-      transformer: 'Transformer'
+      transformer: 'Transformer',
+      modelLoader: 'ModelLoader',
+      featureImputation: 'FeatureImputation',
+      LabelTransform: 'LabelTransform',
+      heteroSSHELR: 'HeteroSSHELR',
+      CacheLoader: 'CacheLoader'
     },
     metricTypeMap: {
       dataIOTable: 'DATAIO_TABLE',
@@ -84,7 +89,11 @@ const app = {
       F1Score: 'F1_SCORE',
       ConfusionMat: 'CONFUSION_MAT',
       quantilePr: 'QUANTILE_PR',
-      PSI: 'PSI'
+      PSI: 'PSI',
+      ModelLoader: 'MODEL_LOADER',
+      FeatureImputation: 'FEATURE_IMPUTATION',
+      LabelTransform: 'LABEL_TRANSFORM',
+      CacheLoader: 'CACHE_LOADER'
     },
     icons: {
       normal: {
