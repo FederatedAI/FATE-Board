@@ -76,8 +76,9 @@ export default {
   watch: {
     options: {
       handler() {
+        const choosed = this.currentChoose
         this.init()
-        this.setDefault()
+        this.setDefault(choosed)
       }
     }
   },
@@ -121,8 +122,8 @@ export default {
       })
     },
 
-    setDefault() {
-      this.currentChoose = 0
+    setDefault(choosed) {
+      this.currentChoose = choosed || 0
       this.request()
       return true
     },

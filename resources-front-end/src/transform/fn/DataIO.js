@@ -122,7 +122,8 @@ function dataIOHandler(modelData) {
           data: imputerData,
           header: getIndexedHeaderByType('imputer'),
           pageSize: 10,
-          zeroFormat: '0'
+          zeroFormat: '0',
+          export: 'missing_fill_detail'
         }
       }
     ]))
@@ -139,12 +140,12 @@ function dataIOHandler(modelData) {
           data: outlierData,
           header: getIndexedHeaderByType('outlier'),
           pageSize: 10,
-          zeroFormat: '0'
+          zeroFormat: '0',
+          export: 'outlier_replace_detail'
         }
       }
     ]))
   }
-
   return group
 }
 

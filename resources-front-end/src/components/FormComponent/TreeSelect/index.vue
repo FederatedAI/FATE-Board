@@ -11,6 +11,12 @@
           class="label-container"
           @change="labelChange"
         />
+        <span
+          v-if="labels.length > 0 && showlabel"
+          class="label-span"
+        >
+          model label:{{ modelLabel }}
+        </span>
       </div>
       <div class="cus-tree__header-right">
         <div v-show="isTreeBtnLikeLine" class="cus-tree__gradient">
@@ -124,6 +130,10 @@ export default {
     basicColor: {
       type: String | Object,
       default: () => {}
+    },
+    showlabel: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -179,6 +189,12 @@ export default {
           return this.maxmium[this.property]
         }
       }
+    },
+    modelLabel() {
+      const item = this.labels.find((val) => {
+        return val.value === this.property
+      })
+      return item ? (item.name || item.value) : ''
     }
   },
   methods: {
@@ -410,6 +426,9 @@ export default {
 			.label-container {
 				margin-left: 12px;
 			}
+      .label-span {
+        margin-left: 12px;
+      }
 		}
 		.cus-tree__header-right {
 			@include flex(row, flex-end, center);

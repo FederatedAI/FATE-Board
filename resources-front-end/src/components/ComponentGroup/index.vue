@@ -38,6 +38,10 @@ export default {
     options: {
       type: Array,
       default: () => []
+    },
+    unique: {
+      type: String,
+      default: 'Cgroup'
     }
   },
   data() {
@@ -176,16 +180,30 @@ export default {
       }
     },
 
-    setDefault() {
+    setDefault(setting) {
+      const config = setting && setting[this.unique]
       for (let i = 0; i < this.currentList.length; i++) {
         const val = this.currentList[i]
-        if (['form', 'chart', 'table'].indexOf(val.type) >= 0) {
-          if (!this.refOpera('comp' + i, 'setDefault', status)) {
+        if (['form', 'group', 'chart', 'table'].indexOf(val.type) >= 0) {
+          if (!this.refOpera('comp' + i, 'setDefault', config)) {
             return false
           }
         }
       }
       return true
+    },
+
+    getSelected() {
+      let result = {}
+      for (let i = 0; i < this.currentList.length; i++) {
+        const val = this.currentList[i]
+        if (['form', 'group', 'async'].indexOf(val.type) >= 0) {
+          result = Object.assign(result, this.refOpera('comp' + i, 'getSelected'))
+        }
+      }
+      return {
+        [this.unique]: result
+      }
     },
 
     addEvents(obj, operation) {
@@ -260,7 +278,7 @@ export default {
       for (let i = 0; i < this.currentList.length; i++) {
         const val = this.currentList[i]
         const variable = {
-          props: val.props,
+          props: Object.assign({ unique: `child${i}` }, val.props),
           // attrs: val.props,
           ref: 'comp' + i,
           key: i,

@@ -15,6 +15,7 @@
         :group="item.group || {}"
         :single="false"
         :class="className"
+        :unique="item.value"
         class="checkbox-group__box"
         @change="boxChange(arguments, item.value)"
         @form="boxForm(arguments, item.value)"
@@ -28,6 +29,7 @@
       :value="options.value"
       :group="options.group || {}"
       :class="className"
+      :unique="options.value"
       @change="boxChange(arguments, options.value)"
       @form="boxForm(arguments, options.value)"
       @search="boxSearch"
@@ -83,6 +85,10 @@ export default {
     groupClassName: {
       type: String,
       default: ''
+    },
+    unique: {
+      type: String,
+      default: 'CusCheckbox'
     }
   },
   data() {
@@ -217,20 +223,44 @@ export default {
     getParam() {
       return this.formResult
     },
-    setDefault() {
+    setDefault(setting) {
+      const config = setting && setting[this.unique]
       const list = this.toArr(this.options)
-      this.selected = Array.isArray(this.options) ? [this.options[0].value] : []
+      if (!setting) {
+        this.selected = Array.isArray(this.options) ? [this.options[0].value] : []
+      } else {
+        const result = []
+        for (const key in config) {
+          const val = config[key]
+          if (val.checkbox === true) {
+            result.push(key)
+          }
+        }
+        this.selected = result
+      }
       for (const val of list) {
-        if (!this.refOpera(val.value, 'setDefault')) {
+        if (!this.refOpera(val.value, 'setDefault', config)) {
           return false
         }
-        if (this.selected.indexOf(val.value) >= 0) {
-          this.refOpera(val.value, 'choosedChange')
-        } else {
-          this.refOpera(val.value, 'boxDisable')
+        if (!setting) {
+          if (this.selected.indexOf(val.value) >= 0) {
+            this.refOpera(val.value, 'choosedChange')
+          } else {
+            this.refOpera(val.value, 'boxDisable')
+          }
         }
       }
       return true
+    },
+    getSelected() {
+      const list = this.toArr(this.options)
+      let result = {}
+      for (const val of list) {
+        result = Object.assign(result, this.refOpera(val.value, 'getSelected'))
+      }
+      return {
+        [this.unique]: result
+      }
     },
     setOptions(res) {
       this.selected = Array.isArray(res) ? res : [res]

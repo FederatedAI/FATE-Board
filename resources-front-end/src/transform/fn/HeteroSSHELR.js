@@ -1,8 +1,4 @@
-<template>
-  <crefresh v-show="showing" class="refresh-container" @refresh="refreshAll" />
-</template>
 
-<script>
 /**
  *
  *  Copyright 2019 The FATE Authors. All Rights Reserved.
@@ -21,27 +17,4 @@
  *
  */
 
-export default {
-  name: 'WholeRefresh',
-  components: {
-    crefresh: () => import('@/components/FormComponent/Refresh')
-  },
-  props: {
-    showing: {
-      type: Boolean,
-      default: true
-    }
-  },
-  methods: {
-    refreshAll() {
-      this.$emit('refresh')
-    }
-  }
-}
-</script>
-
-<style scoped lang="scss">
-.refresh-container {
-	margin-right: 24px;
-}
-</style>
+export { default } from './HeteroLR'
