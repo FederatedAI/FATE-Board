@@ -1,3 +1,24 @@
+# Release 1.7.0
+
+#### Major Features and Improvements
+**Major Features**
+
+* Add new components
+* Components display optimization
+* Hetero binning supports multi-category display
+* Embodiment of warm start mechanism
+* Interaction optimization
+
+# Release 1.6.1
+
+#### Major Features and Improvements
+**Major Features**
+
+* Support HTTPS protocol
+* Scientific notation display optimization
+* Anonymous display optimization
+* Fix routing issues
+
 # Release 1.6.0
 
 #### Major Features and Improvements
