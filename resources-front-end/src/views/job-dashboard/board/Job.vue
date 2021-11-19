@@ -1,6 +1,6 @@
 <template>
   <div class="col job flex-center justify-center pos-r">
-    <h3 class="list-title">Job</h3>
+    <h3 class="list-title">Job: {{ jobId }}</h3>
     <div v-if="isDone" class="job-end-container flex flex-col flex-center">
       <img
         :key="jobStatus"
@@ -94,7 +94,9 @@ export default {
     }
   },
   data() {
-    return {}
+    return {
+      jobId: this.$route.query.job_id
+    }
   },
   computed: {
     ...mapGetters(['icons']),

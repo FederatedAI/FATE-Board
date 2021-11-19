@@ -21,6 +21,7 @@ import com.google.common.base.Preconditions;
 import com.webank.ai.fate.board.pojo.SshInfo;
 import com.webank.ai.fate.board.ssh.SshService;
 import com.webank.ai.fate.board.global.Dict;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ public class LogService implements Runnable {
         this.sshService = sshService;
     }
 
+    @SneakyThrows
     @Override
     public void run() {
         HashMap<String, String> logPathMap = new HashMap<>();

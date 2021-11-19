@@ -68,6 +68,10 @@ export default {
     className: {
       type: String,
       default: ''
+    },
+    unique: {
+      type: String,
+      default: 'radioSingle'
     }
   },
   data() {
@@ -126,12 +130,18 @@ export default {
       this.disabled = false
       this.refOpera('cusGroup', 'able')
     },
-    setDefault() {
-      this.choosed = false
+    setDefault(setting) {
+      const config = setting && setting[this.unique]
+      this.$set(this, 'choosed', config && config.radio || false)
       if (Object.keys(this.group).length > 0) {
-        return this.refOpera('cusGroup', 'setDefault')
+        return this.refOpera('cusGroup', 'setDefault', config)
       }
       return true
+    },
+    getSelected() {
+      return {
+        [this.unique]: Object.assign({}, this.refOpera('cusGroup', 'getSelected'), { 'radio': this.choosed })
+      }
     },
     choosedRadio() {
       if (this.single) {

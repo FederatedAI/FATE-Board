@@ -115,6 +115,8 @@ export const constantRouterMap = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
+const HAS_LOGIN = true
+
 const router = new Router({
   // mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
@@ -122,6 +124,13 @@ const router = new Router({
 })
 let preUrl = null
 router.beforeEach((to, from, next) => {
+  if (!HAS_LOGIN) {
+    if (to.name === 'login') {
+      return next(false)
+    } else {
+      return next()
+    }
+  }
   if (getLocal('CurrentUser')) {
     if (preUrl) {
       const mid = preUrl

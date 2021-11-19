@@ -18,9 +18,23 @@
  */
 
 const dataReportor = {
+  props: {
+    deepReport: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      isSteping: false
+    }
+  },
   methods: {
     allSteps(args, comp) {
-      this.refOpera('asyncGroup', 'allSteps', args, comp)
+      if (!this.isSteping) {
+        this.isSteping = true
+        this.refOpera('asyncGroup', 'allSteps', args, comp)
+      }
     },
     getNames() {
       const list = Array.isArray(this.options) ? this.options : [this.options]
@@ -33,16 +47,24 @@ const dataReportor = {
           res.push(item.export + '.png')
         }
       })
+      if (this.deepReport) {
+        res.push(...this.refOpera('asyncGroup', 'getNames'))
+      }
       return Array.from(new Set(res))
     },
     asyncReport(res, type) {
+      this.isSteping = false
       this.$emit('reporter', res, type)
     },
     clearImply() {
       this.$refs.asyncGroup.clearImply()
     },
     getVariableMap() {
-      return this.variableMap
+      const res = [...this.variableMap]
+      if (this.deepReport) {
+        res.push(...this.refOpera('asyncGroup', 'getVariableMap'))
+      }
+      return res
     }
   }
 }

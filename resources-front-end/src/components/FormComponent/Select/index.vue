@@ -64,6 +64,10 @@ export default {
     supportFilter: {
       type: Boolean,
       default: false
+    },
+    unique: {
+      type: String,
+      default: 'select'
     }
   },
   data() {
@@ -125,8 +129,10 @@ export default {
     setParam(value) {
       this.selected = value
     },
-    setDefault() {
-      if (this.opts.length > 0) {
+    setDefault(setting) {
+      if (setting && setting[this.unique]) {
+        this.$set(this, 'selected', setting[this.unique])
+      } else if (this.opts.length > 0) {
         if (!this.multiple) {
           this.selected = this.opts[0].value
         } else {
@@ -134,6 +140,11 @@ export default {
         }
       }
       return true
+    },
+    getSelected() {
+      return {
+        [this.unique]: this.selected
+      }
     },
     byChange(prop) {
       this.setProperty(prop)

@@ -98,17 +98,24 @@ export function combineForPerformanceSum(othersTable) {
   each(data, item => {
     if (!doNotHaveSum) {
       const np = item.metric_namespace
-      res[np] = res[np] || {
-        'auc': { data: [], meta: { curve_name: 'auc' }},
-        'ks': { data: [], meta: { curve_name: 'ks' }}
-      }
-      if (!item.auc || !item.ks) {
+      // res[np] = res[np] || {
+      //   'auc': { data: [], meta: { curve_name: 'auc' }},
+      //   'ks': { data: [], meta: { curve_name: 'ks' }}
+      // }
+      res[np] = res[np] || {}
+      if (!item.auc && !item.ks) {
         doNotHaveSum = true
       }
       const mn = item.metric_name.toLowerCase()
       if (!(mn.match('fold') && mn.match('iteration'))) {
+        if (!res[np]['auc'] && item.auc) {
+          res[np]['auc'] = { data: [], meta: { curve_name: 'auc' }}
+        }
         res[np]['auc'].data.push([item.metric_name, item.auc])
-        res[np]['ks'].data.push([item.metric_name, item.ks])
+        if (!res[np]['ks'] && item.ks) {
+          res[np]['ks'] = { data: [], meta: { curve_name: 'ks' }}
+        }
+        res[np]['ks'] && res[np]['ks'].data.push([item.metric_name, item.ks])
         xAxis.push(item.metric_name)
       }
     }
