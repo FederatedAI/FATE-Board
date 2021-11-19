@@ -13,6 +13,7 @@
       :disabled="disabled"
       :default="true"
       :class-name="group.className"
+      :unique="'cusGroup'"
       class="box__group"
       @change="groupChange"
       @form="groupForm"
@@ -70,6 +71,10 @@ export default {
     className: {
       type: String,
       default: ''
+    },
+    unique: {
+      type: String,
+      default: 'checkboxSingle'
     }
   },
   data() {
@@ -128,12 +133,18 @@ export default {
       this.disabled = false
       this.refOpera('cusGroup', 'able')
     },
-    setDefault() {
-      this.choosed = false
+    setDefault(setting) {
+      const config = setting && setting[this.unique]
+      this.choosed = config && config.checkbox || false
       if (Object.keys(this.group).length > 0) {
-        return this.refOpera('cusGroup', 'setDefault')
+        return this.refOpera('cusGroup', 'setDefault', config)
       }
       return true
+    },
+    getSelected() {
+      return {
+        [this.unique]: Object.assign({}, this.refOpera('cusGroup', 'getSelected'), { 'checkbox': this.choosed })
+      }
     },
     choosedCheckbox() {
       if (this.single) {

@@ -381,7 +381,7 @@ class CompExpression {
     const deps = dep[name]
     if (dep[name] && dep[name].length > 0) {
       for (const val of deps) {
-        if (['model', 'data'].indexOf(val.type) < 0) {
+        if (['model', 'data', 'cache'].indexOf(val.type) < 0) {
           return true
         }
       }
@@ -397,17 +397,19 @@ class CompExpression {
     const VALDATA = { name: 'validate_datainput', tooltip: 'Validation Data Input', type: 'data' }
     const DATAINPUT = { name: 'datainput', tooltip: 'Data Input', type: 'data' }
     const DATAOUTPUT = { name: 'data0output', tooltip: 'Data Output', type: 'data' }
+    const CACHEINPUT = { name: 'cacheinput', tooltip: 'Cache Input', type: 'cache' }
+    const CACHEOUTPUT = { name: 'cache0output', tooltip: 'Cache Output', type: 'cache' }
     const MODELINPUT = { name: 'modelinput', tooltip: 'Model Input', type: 'model' }
     const MODELOUTPUT = { name: 'model0output', tooltip: 'Model Output', type: 'model' }
     if (this.checkSetPort(this.name, this.belone, dep)) {
       this.input.push(...[TRAINDATA, VALDATA])
-    } else if (!this.belone.toLowerCase().match('reader')) {
+    } else if (!this.belone.toLowerCase().match(/(reader|modelloader|cacheloader)/)) {
       this.input.push(DATAINPUT)
     }
     if (this.belone.toLowerCase().match(/evaluation|union/i)) {
       this.input[0].mult = ports.get('MULT_DATA_PORT')
     }
-    if (!this.belone.toLowerCase().match(/(evaluation|upload|download|pearson|datasplit|statistics|psi|kmeans)/i)) {
+    if (!this.belone.toLowerCase().match(/(evaluation|upload|download|pearson|datasplit|statistics|psi|kmeans|modelloader|cacheloader)/i)) {
       this.output.push(DATAOUTPUT)
     }
     if (this.belone.toLowerCase().match(/(kmeans)/i)) {
@@ -426,8 +428,14 @@ class CompExpression {
         name: 'data2output', tooltip: 'Test Data Output', type: 'data'
       }])
     }
-    if (!this.belone.toLowerCase().match(/(intersection|federatedsample|evaluation|upload|download|rsa|datasplit|reader|union|scorecard|sampleweight)/i)) {
-      if (!this.belone.toLowerCase().match(/(statistics|pearson|psi)/i)) {
+    if (this.belone.toLowerCase().match(/(intersection|cacheloader)/)) {
+      if (this.belone.toLowerCase().match(/(intersection)/)) {
+        this.input.push(CACHEINPUT)
+      }
+      this.output.push(CACHEOUTPUT)
+    }
+    if (!this.belone.toLowerCase().match(/(intersection|evaluation|upload|download|rsa|datasplit|reader|union|scorecard|cacheloader)/i)) {
+      if (!this.belone.toLowerCase().match(/(statistics|pearson|psi|modelloader)/i)) {
         this.input.push(MODELINPUT)
       }
       // if (!this.belone.toLowerCase().match(/(transformer)/)) {

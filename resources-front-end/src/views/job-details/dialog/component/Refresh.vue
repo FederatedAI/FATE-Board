@@ -1,5 +1,5 @@
 <template>
-  <crefresh class="refresh-container" @refresh="refreshAll" />
+  <crefresh v-show="showing" class="refresh-container" @refresh="refreshAll" />
 </template>
 
 <script>
@@ -25,6 +25,12 @@ export default {
   name: 'WholeRefresh',
   components: {
     crefresh: () => import('@/components/FormComponent/Refresh')
+  },
+  props: {
+    showing: {
+      type: Boolean,
+      default: true
+    }
   },
   methods: {
     refreshAll() {
