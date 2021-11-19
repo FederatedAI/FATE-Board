@@ -77,6 +77,10 @@ export default {
     hidden: {
       type: Function,
       default: () => {}
+    },
+    continue: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -142,13 +146,29 @@ export default {
     }
   },
   created() {
-    this.init()
+    this.$nextTick(() => {
+      this.init(true)
+    })
   },
   methods: {
-    init() {
+    init(loading) {
       this.loading = this.needLoad
       this.combine().then(params => {
+        // 获取原有的选择信息
+        let selected = null
+        if (this.continue && !loading) {
+          selected = this.refOpera('asyncGroup', 'getSelected')
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.refOpera('asyncGroup', 'setDefault', selected)
+              this.$nextTick(() => {
+                this.loading = false
+              })
+            }, 10)
+          })
+        }
         this.displayParam = params
+        // 设置新的选择信息
       })
     },
     async requesting(opt, name) {
@@ -187,19 +207,21 @@ export default {
       const newParam = setting || [...this.getDataParam]
       for (let i = 0; i < newParam.length; i++) {
         const val = newParam[i]
-        if (!this.cacheData.get(val.name)) {
-          await this.requesting(val.opts, val.name)
-        }
-        const res = this.cacheData.get(val.name)
-        this.hiddenCheck = !!this.hidden()
-        if (Array.isArray(res)) {
-          for (const item of res) {
-            if (item.props) item.props.name = val.name
+        if (val.name) {
+          if (!this.cacheData.get(val.name)) {
+            await this.requesting(val.opts, val.name)
           }
-          newParam.splice(i, 1, ...res)
-        } else {
-          if (res.props) res.props.name = val.name
-          newParam.splice(i, 1, res)
+          const res = this.cacheData.get(val.name)
+          this.hiddenCheck = !!this.hidden()
+          if (Array.isArray(res)) {
+            for (const item of res) {
+              if (item.props) item.props.name = val.name
+            }
+            newParam.splice(i, 1, ...res)
+          } else {
+            if (res.props) res.props.name = val.name
+            newParam.splice(i, 1, res)
+          }
         }
       }
       return newParam
@@ -259,7 +281,9 @@ export default {
     },
     finishLoading() {
       this.$nextTick(() => {
-        this.loading = false
+        if (!this.continue) {
+          this.loading = false
+        }
         if (!this.noNeedToRefresh) {
           this.$emit('refreshed')
         } else {

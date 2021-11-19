@@ -24,6 +24,7 @@ import { METRIC_TYPES } from './const'
 import { wrapGroupComponent, oneVsRestResultHandler, weightHandler, createAsyncComponent } from './common'
 import arrangeMetric from './metricsArrange'
 import { explainCurves } from './metricsArrange'
+// import { combineForPerformanceSum } from './metricsCombine'
 
 function bestIterationHandler(group, bestIteration) {
   if (bestIteration > -1 && group.length) {
@@ -72,6 +73,13 @@ async function HeteroLRHandler(modelData, metricsData, partyId, role, componentN
   let stepwiseTransFn
   let stepComponent = []
 
+  let warmStartRequest
+  let warmStartResult
+  let warmStartTransFn
+  let warmStartCompoent = []
+
+  let hasStepwise = false
+
   if (metricsData && !metricsData.msg.match('no data')) {
     metricsData = arrangeMetric(metricsData.data)
     each(metricsData, md => {
@@ -81,11 +89,18 @@ async function HeteroLRHandler(modelData, metricsData, partyId, role, componentN
           ...params
         })
       } else if (md.name === 'stepwise') {
+        hasStepwise = true
         stepwiseRequest = getMetricsData.bind(null, {
           metrics: md.options,
           ...params
         })
         stepwiseTransFn = getTransformMetricFn(md.name)
+      } else if (md.name === 'iter') {
+        warmStartRequest = getMetricsData.bind(null, {
+          metrics: md.options,
+          ...params
+        })
+        warmStartTransFn = getTransformMetricFn('warmStart')
       } else if (md.name === 'curves' || md.name === 'loss') {
         const form = {
           type: 'form',
@@ -123,7 +138,7 @@ async function HeteroLRHandler(modelData, metricsData, partyId, role, componentN
     const { weight, oneVsRestResult } = responseData
 
     if (oneVsRestResult) {
-      modelComponent = oneVsRestResultHandler(responseData, role, !!metricsData.find(md => md.name === 'stepwise'))
+      modelComponent = oneVsRestResultHandler(responseData, role, hasStepwise)
     } else if (!isEmpty(weight)) {
       modelComponent = weightHandler(responseData)
     } else {
@@ -149,11 +164,18 @@ async function HeteroLRHandler(modelData, metricsData, partyId, role, componentN
 
   if (othersResult) {
     const transformFn = getTransformMetricFn(METRIC_TYPES.EVALUATION_SUMMARY)
-    const table = transformFn(othersResult.data)
-    if (group.length > 1) {
-      group.splice(1, 0, wrapGroupComponent(table))
-    } else {
-      group.push(wrapGroupComponent(table))
+    const table = transformFn(othersResult.data) || []
+    // TODO: Combining others result for performance sum
+    // const asyncSum = combineForPerformanceSum(table) || []
+    // let combine = [...table, ...asyncSum]
+    let combine = [...table]
+    combine = combine.length > 0 ? wrapGroupComponent(combine) : null
+    if (combine) {
+      if (group.length > 1) {
+        group.splice(1, 0, combine)
+      } else {
+        group.push(combine)
+      }
     }
   }
 
@@ -164,6 +186,19 @@ async function HeteroLRHandler(modelData, metricsData, partyId, role, componentN
   if (stepwiseTransFn) {
     stepComponent = stepwiseTransFn(stepwiseResult, role)
     group.push(...stepComponent)
+  }
+  if (warmStartRequest) {
+    warmStartResult = await warmStartRequest()
+  }
+  if (warmStartTransFn) {
+    warmStartCompoent = warmStartTransFn(warmStartResult)
+    if (group.length === 0) {
+      group.push(wrapGroupComponent(warmStartCompoent))
+    } else if (group[0].options && Array.isArray(group[0].options)) {
+      group[0].options.unshift(...warmStartCompoent)
+    } else if (Array.isArray(group[0])) {
+      group[0].unshift(...warmStartCompoent)
+    }
   }
 
   return group

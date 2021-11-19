@@ -21,7 +21,9 @@ import { formatFloat } from '@/utils'
 import evaluationFunc from './_evaluation'
 
 export default function(response) {
-  return evaluationFunc('loss', { yAxis: { name: 'loss' }, xAxis: { minInterval: 1 }}, undefined, () => (params) => {
+  return evaluationFunc('loss', { yAxis: { name: 'loss' }, xAxis: { minInterval: 1, min: function() {
+    return (response.data && response.data.train && response.data.train.loss && response.data.train.loss.data && response.data.train.loss.data[0] && response.data.train.loss.data[0][0]) || 0
+  } }}, undefined, () => (params) => {
     let str = ''
     const xValue = params[0].axisValue
     str += `iteration: ${xValue}<br>`

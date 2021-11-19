@@ -43,6 +43,7 @@ const fn = async(modelData, metricsData, partyId, role, componentName, jobId) =>
     const others = await othersHandler()
     group.push(...others)
   }
+
   return group
 }
 

@@ -29,28 +29,28 @@ export default function(data, role, partyId, featureNameFidMapping, splitMaskdic
   let maxDepth = 0
   const pushData = ({ arr, node, grandChildrenArr = [], depth = 0, rootNode }) => {
     const variable = featureNameFidMapping[node.fid]
-    const splitValue = outputType !== modelNameMap.homoBoost ? splitMaskdict[node.id] : parseFloat(node.bid).toFixed(6)
+    const splitValue = !(outputType.toLowerCase().match(modelNameMap.homoBoost.toLowerCase())) ? parseFloat(splitMaskdict[node.id]).toFixed(6) : parseFloat(node.bid).toFixed(6)
     const nodeRole = node.sitename.split(':')[0]
     const nodePartyId = node.sitename.split(':')[1]
     let name = rootNode && splitValue === undefined ? rootNode + '\n' : `ID: ${node.id}\n`
     // console.log(nodeRole, role, nodePartyId, partyId)
-    if (nodeRole === role && nodePartyId === partyId && !node.isLeaf && outputType !== modelNameMap.homoBoost) {
+    if (nodeRole === role && nodePartyId === partyId && !node.isLeaf && !(outputType.toLowerCase().match(modelNameMap.homoBoost.toLowerCase()))) {
       name += `${variable} <= ${splitValue !== undefined ? splitValue : node.bid || 0}`
       if ((missingDirMaskdict[node.id] || node.missingDir) !== 1) {
         name += '\nor missing'
       }
       name += '\n'
-    } else if (outputType === modelNameMap.homoBoost && !node.isLeaf && variable) {
+    } else if (outputType.toLowerCase().match(modelNameMap.homoBoost.toLowerCase()) && !node.isLeaf && variable) {
       name += `${variable} <= ${splitValue || node.bid || 0}`
       if (node.missingDir === -1) {
         name += '\nis a missing value'
       }
       name += '\n'
     }
-    if (((node.isLeaf && role === 'guest') || (node.isLeaf && outputType === modelNameMap.homoBoost)) && !rootNode) {
+    if (((node.isLeaf && role === 'guest') || (node.isLeaf && outputType.toLowerCase().match(modelNameMap.homoBoost.toLowerCase()))) && !rootNode) {
       name += `weight: ${formatFloat(node.weight)}\n`
     }
-    if (modelNameMap.homoBoost !== outputType) {
+    if (!(outputType.toLowerCase().match(modelNameMap.homoBoost.toLowerCase()))) {
       name += workmode.toLowerCase() === 'mix' && role.toLowerCase().match('guest') && node.leftNodeid === -1 && node.rightNodeid === -1 && depth === 0
         ? 'HOST' + (defPartId ? (':' + defPartId) : '')
         : `${nodeRole && nodeRole.toUpperCase()} ${nodePartyId ? (':' + nodePartyId) : (defPartId ? (':' + defPartId) : '')}`

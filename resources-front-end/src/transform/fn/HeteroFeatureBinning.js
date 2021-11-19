@@ -18,17 +18,25 @@
  */
 
 import handleBinningData from './binningDataHandler'
-import { head, isEmpty, each } from './uitls'
-import { wrapGroupComponent } from './common'
+import { head, isEmpty, each, sortByName } from './uitls'
+import { createAsyncComponent, wrapGroupComponent } from './common'
 
 const createFormComponent = (type, name, props, other) => {
-  return {
+  return Object.assign({
     type,
     name,
-    props,
-    ...other
-  }
+    props
+  }, other)
 }
+
+const createAsyncOption = (name, props, method, transform, exportName, detail) => ({
+  name,
+  props,
+  method,
+  transform,
+  export: exportName,
+  detail: detail
+})
 
 const createHeader = (prop, label, other) => {
   if (label == null) {
@@ -47,12 +55,101 @@ const createOption = (label, value) => {
   }
 }
 
-function binningHandler(responseData, metricsData, partyId, crole) {
+function subHost(hostResults, partyIds, index) {
+  const checked = []
+  const whichOne = {}
+  const finalList = []
+  for (const val of hostResults) {
+    whichOne[val.partyId] = (whichOne[val.partyId] || 0) + 1
+    if (whichOne[val.partyId] === index && !checked.some((item) => item === val.partyId)) {
+      checked.push(val.partyId)
+      finalList.push(val)
+      if (checked.length === partyIds.length) {
+        break
+      }
+    }
+  }
+  return finalList
+}
+
+function binningMultClass(responseData, metricsData, partyId, crole) {
   if (responseData.msg.toString().toLowerCase().match('no data')) {
     return []
   }
-  const { binningResult, hostResults: hostData, header, headerAnonymous } = responseData.data && responseData.data.data
+  const { multiClassResult, header, headerAnonymous } = responseData.data && responseData.data.data
   const { skipStatic } = responseData.data && responseData.data.meta && responseData.data.meta.meta_data
+  const result = []
+  const selections = []
+  const { hostResults, results, labels, binningResult, hostPartyIds } = multiClassResult || (responseData.data && responseData.data.data)
+  let hostIndex = 1
+  if (labels && labels.length !== 0) {
+    for (let i = 0, l = labels.length; i < l; i++) {
+      if (hostResults[i] && results[i]) {
+        const hostList = subHost(hostResults, hostPartyIds, hostIndex)
+        result.push(binningHandler(results[i], hostList, header, headerAnonymous, skipStatic, crole))
+        selections.push({
+          value: labels[i],
+          label: labels[i]
+        })
+        hostIndex++
+      }
+    }
+  } else {
+    result.push(binningHandler((results && results[0]) || binningResult, hostResults, header, headerAnonymous, skipStatic, crole))
+  }
+
+  const options = []
+  if (result.length === 1) {
+    return [wrapGroupComponent(result[0])]
+  } else {
+    result.map((val, index) => {
+      const label = selections[index].value
+      options.push(createAsyncOption(
+        label,
+        val,
+        null,
+        (rest) => rest,
+        '',
+        false
+      ))
+    })
+  }
+  sortByName(selections, 'label')
+  const group = [{
+    type: 'form',
+    props: {
+      form: [createFormComponent(
+        'f-select',
+        'tagSelection',
+        {
+          options: selections,
+          multiple: false,
+          label: 'label index'
+        },
+        {
+          connect: ['labeltext']
+        }
+      ), createFormComponent(
+        'text',
+        'labeltext',
+        {
+          content: 'target label: {t}',
+          data: {
+            '{t}': (dataParam) => dataParam
+          },
+          className: 'small-form-text',
+          inner: true
+        }
+      )],
+      inrow: 'left'
+    }
+  }, createAsyncComponent(options, true, {
+    deepReport: true
+  })]
+  return [wrapGroupComponent(group)]
+}
+
+function binningHandler(binningResult, hostData, header, headerAnonymous, skipStatic, crole) {
   let data = binningResult
   let guestPartyId = 0
   let role = ''
@@ -141,7 +238,6 @@ function binningHandler(responseData, metricsData, partyId, crole) {
     } else {
       tableData1 = table.sourceData
     }
-
     const options4form2 = {
       guest: table.options
     }
@@ -203,7 +299,7 @@ function binningHandler(responseData, metricsData, partyId, crole) {
 
   const header2 = [
     createHeader('', 'index', { type: 'index' }),
-    createHeader('binning'),
+    createHeader('binning', 'binning', { matching: true }),
     createHeader('iv'),
     createHeader('woe'),
     createHeader('event_count'),
@@ -335,8 +431,13 @@ function binningHandler(responseData, metricsData, partyId, crole) {
   ]
 
   return group.map(g => {
-    return wrapGroupComponent(g)
+    return {
+      type: 'group',
+      props: {
+        options: g
+      }
+    }
   })
 }
 
-export default binningHandler
+export default binningMultClass

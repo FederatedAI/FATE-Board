@@ -53,8 +53,18 @@ export const sendMetricsDataRequest = (param) => {
 
 export const textTransform = (data) => {
   const content = []
+  const exchangeTo = (str) => {
+    const mid = parseFloat(str)
+    if (!isNaN(mid)) {
+      return (mid * 100).toFixed(4) + '%'
+    } else {
+      return str
+    }
+  }
   data.forEach(item => {
-    content.push(`${item[0]}: ${item[1]}`)
+    const key = `${item[0].replace('_', ' ')}: `
+    const value = key.match('rate') ? exchangeTo(item[1]) : item[1]
+    content.push(`${key}${value}`)
   })
   return content
 }
@@ -236,8 +246,16 @@ export function oneVsRestResultHandler(responseData, role, hasStepwise) {
         props: {
           content: 'model label: {modelLabel}',
           data: {
-            '{modelLabel}': val => val.replace(/\:.+/, '')
+            '{modelLabel}': (val) => {
+              const list = val.split(':')
+              if (classed && classed.length > 0) {
+                return list[1]
+              } else {
+                return val.replace(/\:.+/, '')
+              }
+            }
           },
+          className: 'small-form-text',
           inner: true
         }
       },
@@ -249,6 +267,7 @@ export function oneVsRestResultHandler(responseData, role, hasStepwise) {
           data: {
             '{iterations}': val => iters[val]
           },
+          className: 'small-form-text',
           inner: true
         }
       },
@@ -260,6 +279,7 @@ export function oneVsRestResultHandler(responseData, role, hasStepwise) {
           data: {
             '{converged}': val => converged[val]
           },
+          className: 'small-form-text',
           inner: true
         }
       }, {
@@ -336,9 +356,9 @@ const defaultRefreshing = async({ name, originParam }) => {
   return final
 }
 
-export const createAsyncComponent = (options, refreshing = true) => ({
+export const createAsyncComponent = (options, refreshing = true, setting = {}) => ({
   type: 'async',
-  props: {
+  props: Object.assign({
     options,
     refresh: refreshing ? async(params) => {
       if (isFunction(refreshing)) {
@@ -347,5 +367,5 @@ export const createAsyncComponent = (options, refreshing = true) => ({
         await defaultRefreshing(params)
       }
     } : ''
-  }
+  }, setting)
 })

@@ -1,6 +1,6 @@
 <template>
   <div class="report-nav">
-    <crefresh @refresh="refreshAll" />
+    <crefresh :showing="showRefresh" @refresh="refreshAll" />
     <span v-if="reportType.has" class="nav-item-wrap">
       <span class="title">downLoad:</span>
       <span
@@ -101,6 +101,10 @@ export default {
     noDataOutput: {
       type: Boolean,
       default: false
+    },
+    showRefresh: {
+      type: Boolean,
+      default: true
     }
   },
   computed: {

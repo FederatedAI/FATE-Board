@@ -208,10 +208,11 @@ export default {
         this.setProperty(this.property)
         if (this.async) {
           this.searchAfter()
-          this.$nextTick(() => {
-            this.tableLoading = false
-          })
         }
+        this.$nextTick(() => {
+          this.tableLoading = false
+          this.$emit('refreshed')
+        })
       }
     },
     currentPage: {
@@ -240,6 +241,7 @@ export default {
         this.request()
       } else {
         this.tableLoading = false
+        this.$emit('refreshed')
       }
     },
     showNoData() {

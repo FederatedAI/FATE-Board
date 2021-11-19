@@ -22,6 +22,7 @@ import { getTransformMetricFn } from '../index'
 import { each, isEmpty } from '../fn/uitls'
 import { wrapGroupComponent } from '../fn/common'
 import { METRIC_TYPES } from '../fn/const'
+// import { combineForPerformanceSum } from '../fn/metricsCombine'
 
 const SORTLIST = [METRIC_TYPES.CLUSTERING_EVALUATION_SUMMARY, METRIC_TYPES.DISTANCE_MEASURE, METRIC_TYPES.CONTINGENCY_MATRIX]
 
@@ -93,8 +94,17 @@ async function handler(metricsData, params) {
 
   if (!isEmpty(summary)) {
     const fn = getTransformMetricFn(METRIC_TYPES.EVALUATION_SUMMARY)
-    const component = fn(summary, !isEmpty(quantilePR) ? quantilePR : undefined, params.isEvaluation)
-    group.push({ title: METRIC_TYPES.EVALUATION_SUMMARY, content: wrapGroupComponent(component) })
+    const component = fn(summary, !isEmpty(quantilePR) ? quantilePR : undefined, params.isEvaluation) || []
+    // const asyncSum = combineForPerformanceSum(component) || []
+    // if (asyncSum.length > 0 && !params.isEvaluation) {
+    //   component.push(...asyncSum)
+    // }
+    if (component && component.length > 0) {
+      group.push({ title: METRIC_TYPES.EVALUATION_SUMMARY, content: wrapGroupComponent(component) })
+    }
+    // if (asyncSum.length > 0 && !params.isEvaluation) {
+    //   group.push({ title: METRIC_TYPES.PERFORMANCE_SUM, content: wrapGroupComponent(asyncSum) })
+    // }
   }
 
   if (!isEmpty(confusionMatrix)) {

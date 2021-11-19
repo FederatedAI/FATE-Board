@@ -19,28 +19,53 @@
 
 import { formatFloat } from '@/utils'
 import { each } from './uitls'
-import { createHeader } from './common'
-import curry, { placeholder as _ } from 'lodash/curry'
 
-const createHeaderItem = curry(createHeader)(_, _, { align: 'center' })
+const getHeaders = () => [{
+  type: 'index',
+  label: 'index',
+  width: 100
+}, {
+  prop: 'variable',
+  label: 'variable',
+  sortable: true
+},
+{
+  prop: 'ratio',
+  label: 'imputer value ratio',
+  sortable: true
+},
+{
+  prop: 'mode',
+  label: 'impute mode',
+  sortable: true
+},
+{
+  prop: 'value',
+  label: 'imputed value'
+}]
 
-const getHeaderByType = type => [
-  createHeaderItem('variable', 'variable'),
-  createHeaderItem(`${type} value ratio`, 'ratio'),
-  createHeaderItem('fill_value', 'value')
-]
-
-const getIndexedHeaderByType = type => {
-  return [
-    {
-      label: 'index',
-      width: 100,
-      type: 'index'
-    },
-    ...getHeaderByType(type)
-  ]
+const iteratee = collection => {
+  return (val, key) => {
+    collection.push({
+      variable: key,
+      'ratio': formatFloat(val.ratio) * 100 + '%',
+      'value': val.value || '',
+      'mode': val.mode
+    })
+  }
 }
 
+const combineTo = (ratio, value, mode) => {
+  const result = {}
+  for (const key in ratio) {
+    result[key] = {
+      ratio: ratio[key],
+      value: value[key],
+      mode: mode[key]
+    }
+  }
+  return result
+}
 const getForm = title => ({
   type: 'form',
   props: {
@@ -57,28 +82,6 @@ const getForm = title => ({
     ]
   }
 })
-
-const iteratee = collection => {
-  return (val, key) => {
-    collection.push({
-      variable: key,
-      ratio: formatFloat(val.ratio),
-      value: formatFloat(val.value)
-    })
-  }
-}
-
-const combineTo = (ratio, value) => {
-  const result = {}
-  for (const key in ratio) {
-    result[key] = {
-      ratio: ratio[key],
-      value: value[key]
-    }
-  }
-  return result
-}
-
 const sortBy = (list, name, sort) => {
   list.sort((a, b) => {
     const aIndex = sort.indexOf(a[name])
@@ -98,7 +101,7 @@ const wrapComponent = options => ({
   options
 })
 
-function dataIOHandler(modelData) {
+function FeatureImputationHandler(modelData) {
   const { data, meta } = modelData.data
   const originSort = data.header
   const imputerData = []
@@ -111,44 +114,44 @@ function dataIOHandler(modelData) {
   const group = []
 
   if (isExistImputerParams) {
-    each(combineTo(imputerParam.missingValueRatio, imputerParam.missingReplaceValue), iteratee(imputerData))
+    each(combineTo(imputerParam.missingValueRatio, imputerParam.missingReplaceValue, imputerParam.colsReplaceMethod), iteratee(imputerData))
     sortBy(imputerData, 'variable', originSort)
     group.push(wrapComponent([
-      getForm('Missing Fill Detail'),
+      getForm(),
       {
         type: 'table',
         props: {
           name: 'imputer',
           data: imputerData,
-          header: getIndexedHeaderByType('imputer'),
+          header: getHeaders(),
           pageSize: 10,
           zeroFormat: '0',
-          export: 'missing_fill_detail'
+          export: 'impute_detail'
+
         }
+
       }
     ]))
   }
   if (isExistOutlierParams) {
-    each(combineTo(outlierParam.outlierValueRatio, outlierParam.outlierReplaceValue), iteratee(outlierData))
+    each(combineTo(outlierParam.outlierValueRatio, outlierParam.outlierReplaceValue, imputerParam.colsReplaceMethod), iteratee(outlierData))
     sortBy(outlierData, 'variable', originSort)
     group.push(wrapComponent([
-      getForm('Outlier Replace Detail'),
+      getForm(),
       {
         type: 'table',
         props: {
           name: 'outlier',
           data: outlierData,
-          header: getIndexedHeaderByType('outlier'),
+          header: getHeaders(),
           pageSize: 10,
           zeroFormat: '0',
-          export: 'outlier_replace_detail'
+          export: 'impute_detail'
         }
       }
     ]))
   }
-  console.log(group)
-
   return group
 }
 
-export default dataIOHandler
+export default FeatureImputationHandler

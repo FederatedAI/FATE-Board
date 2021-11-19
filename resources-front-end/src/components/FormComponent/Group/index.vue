@@ -76,12 +76,16 @@ export default {
       default: false
     },
     inrow: {
-      type: Boolean,
+      type: Boolean | String,
       default: false
     },
     rowDir: {
       type: String,
       default: 'mid'
+    },
+    unique: {
+      type: String,
+      default: 'formGroup'
     }
   },
   data() {
@@ -189,7 +193,8 @@ export default {
       return this.formParam
     },
 
-    setDefault() {
+    setDefault(setting) {
+      const config = setting && setting[this.unique]
       if (this.default) {
         if (!(Object.keys(this.$refs).length >= this.finalList.length)) {
           return false
@@ -197,13 +202,26 @@ export default {
         for (let i = 0; i < this.finalList.length; i++) {
           const val = this.finalList[i]
           if (val.type.toString().match('-')) {
-            if (!this.refOpera(val.name || 'comp' + i, 'setDefault')) {
+            if (!this.refOpera(val.name || 'comp' + i, 'setDefault', config)) {
               return false
             }
           }
         }
       }
       return true
+    },
+
+    getSelected() {
+      let result = {}
+      for (let i = 0; i < this.finalList.length; i++) {
+        const val = this.finalList[i]
+        if (val.type.toString().match('-')) {
+          result = Object.assign(result, this.refOpera(val.name || 'comp' + i, 'getSelected'))
+        }
+      }
+      return {
+        [this.unique]: result
+      }
     },
 
     disable() {
@@ -514,8 +532,14 @@ export default {
 			margin-right: 0px;
 		}
 	}
+  .filter__container {
+    width: auto;
+  }
 }
 .group__inrow-right {
 	@include flex(row, flex-end, center);
+  .filter__container {
+    width: auto;
+  }
 }
 </style>

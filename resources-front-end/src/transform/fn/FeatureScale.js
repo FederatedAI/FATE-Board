@@ -117,7 +117,8 @@ async function scaleHandler(modelData, metricsData, partyId, role, componentName
             header: getHeaders(),
             data: table,
             pageSize: 10,
-            zeroFormat: '0'
+            zeroFormat: '0',
+            export: 'scale_detail'
           }
         }
       ]

@@ -30,7 +30,7 @@ import isNil from 'lodash/isNil'
 import { METRIC_TYPES } from './const'
 import { getMetricsData } from '@/api/chart'
 import { explainCurves } from './metricsArrange'
-import { combineForPerformanceSum } from './metricsCombine'
+// import { combineForPerformanceSum } from './metricsCombine'
 
 const createComponent = (type, name, props, other) => {
   return {
@@ -122,12 +122,12 @@ function classLabel(role, classes, treeDim) {
   if (treeDim >= 3) {
     if (role === 'guest') {
       classes.forEach((item, i) => {
-        const label = `${i}: ${item}`
-        classOptions.push({ value: i, label })
+        const label = `model_${i}`
+        classOptions.push({ value: i, label, name: item })
       })
     } else if (role === 'host') {
       for (let i = 0; i < treeDim; i++) {
-        classOptions.push({ value: i, label: i })
+        classOptions.push({ value: i, label: i, name: i })
       }
     }
   }
@@ -333,7 +333,8 @@ function TreeSetting(modelData, partyId, role) {
           treeList: treesData.treeList,
           treeLine: treesData.treeLines,
           maxmium: treesData.maxmium,
-          basicColor: treesData.colors
+          basicColor: treesData.colors,
+          showlabel: !!role.toLowerCase().match('guest')
         })
       ]
     }),
@@ -573,6 +574,11 @@ async function metricsTransform(group, metricsData, partyId, role, componentName
   let othersResult
   const metricsComponent = []
 
+  let warmStartRequest
+  let warmStartResult
+  let warmStartTransFn
+  let warmStartCompoent = []
+
   if (metricsData && !metricsData.msg.match('no data')) {
     metricsData = metricArrange(metricsData.data)
     each(metricsData, md => {
@@ -581,6 +587,12 @@ async function metricsTransform(group, metricsData, partyId, role, componentName
           metrics: md.options,
           ...params
         })
+      } else if (md.name === 'iter') {
+        warmStartRequest = getMetricsData.bind(null, {
+          metrics: md.options,
+          ...params
+        })
+        warmStartTransFn = getTransformMetricFn('warmStart')
       } else if (md.name === 'curves' || md.name === 'loss') {
         const form = {
           type: 'form',
@@ -625,19 +637,32 @@ async function metricsTransform(group, metricsData, partyId, role, componentName
 
     if (othersResult) {
       const transformFn = getTransformMetricFn(METRIC_TYPES.EVALUATION_SUMMARY)
-      const table = transformFn(othersResult.data)
+      const table = transformFn(othersResult.data) || []
       // TODO: Combining others result for performance sum
-      const asyncSum = combineForPerformanceSum(table)
-      if (group.length > 1) {
-        group.splice(1, 0, table)
-        if (asyncSum.length > 0) {
-          group.splice(2, 0, asyncSum)
+      // const asyncSum = combineForPerformanceSum(table) || []
+      // let combine = [...table, ...asyncSum]
+      let combine = [...table]
+      combine = combine.length > 0 ? group.length === 0 ? wrapGroupComponent(combine) : combine : null
+      if (combine) {
+        if (group.length > 1) {
+          group.splice(1, 0, combine)
+        } else {
+          group.push(combine)
         }
-      } else {
-        group.push(table)
-        if (asyncSum.length > 0) {
-          group.push(asyncSum)
-        }
+      }
+    }
+
+    if (warmStartRequest) {
+      warmStartResult = await warmStartRequest()
+    }
+    if (warmStartTransFn) {
+      warmStartCompoent = warmStartTransFn(warmStartResult)
+      if (group.length === 0) {
+        group.push(wrapGroupComponent(warmStartCompoent))
+      } else if (group[0].options && Array.isArray(group[0].options)) {
+        group[0].options.unshift(...warmStartCompoent)
+      } else if (Array.isArray(group[0])) {
+        group[0].unshift(...warmStartCompoent)
       }
     }
   }

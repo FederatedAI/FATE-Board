@@ -85,6 +85,12 @@ const dataFormat = {
             }
             const toNum = parseFloat(val[key])
             if (typeof val[key] === 'number' || val[key].toString().match(/[0-9]+e/)) {
+              if (typeof val[key] === 'number') {
+                const sp = toNum.toString().split('.')
+                if (sp[1] && sp[1].length > 6) {
+                  val[key] = parseFloat(val[key].toFixed(6))
+                }
+              }
               continue
             }
             if (toNum && toNum.toString() === val[key].toString()) {

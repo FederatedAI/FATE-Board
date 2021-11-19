@@ -17,10 +17,7 @@
             </li>
             <li style="position:relative;">
               <div class="prop">notes:</div>
-              <div class="prop-content notes-content">
-                <p id="notesP" :class="{'notes-content-fold': foldPForNote, 'notes-content-unfold': !foldPForNote}">{{ jobInfo.notes }}</p>
-              </div>
-              <span v-if="noteHint" class="notes-can-fold" @click="foldForNotes">{{ foldButtonForNote ? 'unfold' : 'fold' }}</span>
+              <notes ref="notes" :job-info="jobInfo"/>
             </li>
             <li>
               <hr class="hr-style">
@@ -242,7 +239,8 @@ export default {
     OverflowTooltip,
     DownloadReport,
     DownloadData,
-    Confirm
+    Confirm,
+    Notes: () => import('./notes/index')
   },
   data() {
     return {
@@ -386,7 +384,7 @@ export default {
   },
   beforeMount() {
     this.breads = [
-      { type: 'content', val: 'Job Overview', click: this.toHistory },
+      // { type: 'content', val: 'Job Overview', click: this.toHistory },
       { type: 'content', val: 'Dashboard', click: this.toDashboard },
       { type: 'content', val: 'Job detail' }
     ]
@@ -399,20 +397,20 @@ export default {
     toDashboard() {
       this.toPrevPage('dashboard')
     },
-    shouldShowPopover(item, id) {
-      const ctx = document.getElementById('historyForDetail').getContext('2d')
-      for (let i = 0; i < this.showingRoleList.length; i++) {
-        const width = this.measureText(ctx, this.showingRoleList[i] || '', { font: (12 * 1.14) + 'px Arial' }).width
-        const acWidth = parseInt(getComputedStyle(document.getElementById('spanPopOver' + i)).width.replace('px', ''))
-        this.popover.splice(i, 1, acWidth > width)
-      }
-    },
-    notesHint() {
-      const cvs = document.getElementById('historyForDetail').getContext('2d')
-      const width = this.measureText(cvs, this.jobInfo.notes || '', { size: 14, weight: 'bold' }).width
-      const acWidth = parseInt(getComputedStyle(document.getElementById('notesP')).width.replace('px', ''))
-      this.noteHint = width > (acWidth * 3) - 45
-    },
+    // shouldShowPopover(item, id) {
+    //   const ctx = document.getElementById('historyForDetail').getContext('2d')
+    //   for (let i = 0; i < this.showingRoleList.length; i++) {
+    //     const width = this.measureText(ctx, this.showingRoleList[i] || '', { font: (12 * 1.14) + 'px Arial' }).width
+    //     const acWidth = parseInt(getComputedStyle(document.getElementById('spanPopOver' + i)).width.replace('px', ''))
+    //     this.popover.splice(i, 1, acWidth > width)
+    //   }
+    // },
+    // notesHint() {
+    //   const cvs = document.getElementById('historyForDetail').getContext('2d')
+    //   const width = this.measureText(cvs, this.jobInfo.notes || '', { size: 14, weight: 'bold' }).width
+    //   const acWidth = parseInt(getComputedStyle(document.getElementById('notesP')).width.replace('px', ''))
+    //   this.noteHint = width > (acWidth * 3) - 45
+    // },
     measureText(ctx, text, style) {
       for (const key in style) {
         ctx[key] = style[key]
@@ -465,7 +463,9 @@ export default {
     },
 
     getDagInstance(data) {
-      if (data.model === this.modelNameMap.correlation || data.model === this.modelNameMap.evaluation) {
+      if (
+        data.model === this.modelNameMap.correlation ||
+        data.model === this.modelNameMap.evaluation) {
         this.dataOutputShow = false
       } else {
         this.dataOutputShow = true
@@ -706,9 +706,9 @@ export default {
       }
       if (job) {
         this.jobInfo = this.transformJobInfo(job)
-        this.$nextTick(() => {
-          this.notesHint()
-        })
+        // this.$nextTick(() => {
+        //   this.notesHint()
+        // })
       }
       if (dependency_data) {
         this.DAGData = this.transformDAGData(dependency_data)
@@ -858,6 +858,7 @@ export default {
         jobDownload({
           jobId: this.jobId,
           role: this.role,
+          partyId: this.partyId,
           type
         })
       }

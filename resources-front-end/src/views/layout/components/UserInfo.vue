@@ -7,14 +7,14 @@
           <span class="name">{{ username }}</span>
         </el-col>
       </el-row>
-      <el-row class="content-row">
+      <!-- <el-row class="content-row">
         <el-col :span="8">
           <span class="subtitle">roles</span>
         </el-col>
         <el-col :span="16">
           <span class="content">{{ roles ? roles.join(',') : 'no roles' }}</span>
         </el-col>
-      </el-row>
+      </el-row> -->
       <el-row>
         <el-col :span="24">
           <el-button type="primary" size="mini" class="btn" @click="logout">Exit</el-button>

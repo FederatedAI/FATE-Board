@@ -20,7 +20,7 @@
 import camelCase from 'lodash/camelCase'
 
 export default function getTransformFn(modelType) {
-  const textOutput = ['Intersection', 'Upload', 'Download']
+  const textOutput = ['Upload', 'Download']
   const dataSplit = ['HomoDataSplit', 'HeteroDataSplit']
   const secureBoost = ['HomoSecureBoost', 'HeteroSecureBoost', 'HomoSecureboost', 'HeteroSecureboost', 'HeteroFastSecureBoost', 'HomoFastSecureBoost', 'HeteroFastSecureboost', 'HomoFastSecureboost']
   const pearson = ['HeteroPearson', 'HomoPearson']

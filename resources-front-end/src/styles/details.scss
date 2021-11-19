@@ -127,6 +127,13 @@ $link: #409eff;
               margin-bottom: 12px;
             }
           }
+          .prop-notes {
+            max-width: 100%;
+            min-width: 100%;
+            .prop-dataset-item {
+              margin-bottom: 0px;
+            }
+          }
         }
         .log-list {
           padding: 24px;
@@ -381,7 +388,7 @@ $link: #409eff;
     opacity: 1;
     background: #EBEDF0;
     top: 48px;
-  } 
+  }
 }
 
 .dialog-tabs{

@@ -81,6 +81,10 @@ export default {
     styles: {
       type: Object | String,
       default: ''
+    },
+    unique: {
+      type: String,
+      default: 'selection'
     }
   },
   data() {
@@ -228,17 +232,30 @@ export default {
       this.refOpera('cusSelect', 'able')
       this.refOpera('cusBox', 'able')
     },
-    setDefault() {
+    setDefault(setting) {
+      const choosed = setting && setting[this.unique || 'selection']
       if (this.boxes) {
-        if (!this.refOpera('cusBox', 'setDefault')) {
+        if (!this.refOpera('cusBox', 'setDefault', choosed)) {
           return false
         }
-      } else if (Object.keys(this.others).length > 0) {
-        if (!this.refOpera('cusSelect', 'setDefault')) {
+      }
+      if (Object.keys(this.others).length > 0) {
+        if (choosed) {
+          this.$nextTick(() => {
+            this.refOpera('cusSelect', 'setDefault', choosed)
+          })
+        } else if (!this.refOpera('cusSelect', 'setDefault', choosed)) {
           return false
         }
       }
       return true
+    },
+    getSelected() {
+      const choosed = this.refOpera('cusBox', 'getSelected')
+      const selected = this.refOpera('cusSelect', 'getSelected')
+      return {
+        [this.unique || 'selection']: Object.assign({}, choosed, selected)
+      }
     },
     allSteps(args, list) {
       const res = {}

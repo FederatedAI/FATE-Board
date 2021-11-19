@@ -183,6 +183,7 @@ async function handler(modelData, metricsData, partyId, role, componentName, job
         }
         const options = []
         each(md.options, (metrics, name) => {
+          console.log(md.name, 'nams')
           options.push(createAsyncOption(
             name,
             {
@@ -202,6 +203,7 @@ async function handler(modelData, metricsData, partyId, role, componentName, job
 
   if (othersHandler) {
     const others = await othersHandler()
+
     group.push(...others)
     ovrData = findOutOvr(group)
   }
