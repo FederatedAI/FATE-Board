@@ -24,6 +24,7 @@ import metricsArrange from './metricsArrange'
 import { getTransformMetricFn } from '../index'
 import { METRIC_TYPES } from './const'
 import { explainCurves } from './metricsArrange'
+// import { combineForPerformanceSum } from './metricsCombine'
 
 function bestIterationHandler(group, bestIteration) {
   if (bestIteration > -1 && group.length) {
@@ -70,6 +71,12 @@ const fn = async(modelData, metricsData, partyId, role, componentName, jobId) =>
   let othersResult
   const metricsComponent = []
   const group = []
+
+  let warmStartRequest
+  let warmStartResult
+  let warmStartTransFn
+  let warmStartCompoent = []
+
   if (metricsData && !metricsData.msg.match('no data')) {
     metricsData = metricsArrange(metricsData.data)
     each(metricsData, md => {
@@ -78,6 +85,12 @@ const fn = async(modelData, metricsData, partyId, role, componentName, jobId) =>
           metrics: md.options,
           ...params
         })
+      } else if (md.name === 'iter') {
+        warmStartRequest = getMetricsData.bind(null, {
+          metrics: md.options,
+          ...params
+        })
+        warmStartTransFn = getTransformMetricFn('warmStart')
       } else if (md.name === 'stepwise') {
         stepwiseRequest = getMetricsData.bind(null, {
           metrics: md.options,
@@ -147,11 +160,18 @@ const fn = async(modelData, metricsData, partyId, role, componentName, jobId) =>
 
   if (othersResult) {
     const transformFn = getTransformMetricFn(METRIC_TYPES.EVALUATION_SUMMARY)
-    const table = transformFn(othersResult.data)
-    if (group.length > 1) {
-      group.splice(1, 0, wrapGroupComponent(table))
-    } else {
-      group.push(wrapGroupComponent(table))
+    const table = transformFn(othersResult.data) || []
+    // TODO: Combining others result for performance sum
+    // const asyncSum = combineForPerformanceSum(table) || []
+    // let combine = [...table, ...asyncSum]
+    let combine = [...table]
+    combine = combine.length > 0 ? wrapGroupComponent(combine) : null
+    if (combine) {
+      if (group.length > 1) {
+        group.splice(1, 0, combine)
+      } else {
+        group.push(combine)
+      }
     }
   }
 
@@ -162,6 +182,20 @@ const fn = async(modelData, metricsData, partyId, role, componentName, jobId) =>
   if (stepwiseTransFn) {
     stepComponent = stepwiseTransFn(stepwiseResult, role)
     group.push(...stepComponent)
+  }
+
+  if (warmStartRequest) {
+    warmStartResult = await warmStartRequest()
+  }
+  if (warmStartTransFn) {
+    warmStartCompoent = warmStartTransFn(warmStartResult)
+    if (group.length === 0) {
+      group.push(wrapGroupComponent(warmStartCompoent))
+    } else if (group[0].options && Array.isArray(group[0].options)) {
+      group[0].options.unshift(...warmStartCompoent)
+    } else if (Array.isArray(group[0])) {
+      group[0].unshift(...warmStartCompoent)
+    }
   }
 
   return group

@@ -92,7 +92,7 @@ const fn = (response) => {
       header: getHeader(),
       data: tableData,
       zeroFormat: '0',
-      export: 'sample'
+      export: 'sample_detail'
     }
   }]
 }

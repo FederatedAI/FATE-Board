@@ -81,9 +81,15 @@ export default {
   methods: {
     tabChoose(tab) {
       // 选择标签内容展示相应元素。
+      const oldSelected = this.refOpera(`comp${this.currentValue}`, 'getSelected')
       this.currentLabel = tab.label
       this.currentValue = tab.value
       this.originLabel = tab
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.refOpera(`comp${this.currentValue}`, 'setDefault', oldSelected)
+        }, 10)
+      })
     },
     setDefault() {
       this.currentLabel = this.options[0].label

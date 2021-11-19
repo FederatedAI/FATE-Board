@@ -16,6 +16,7 @@
     />
     <div class="dialog-content">
       <report-nav
+        :show-refresh="showRefresh"
         :model-type="modelType"
         :report-type="reportType"
         :no-report-data="noReportData"
@@ -141,7 +142,8 @@ export default {
       noReportData: false,
       noModelData: false,
       noDataOutput: false,
-      dataOutputResponse: null
+      dataOutputResponse: null,
+      showRefresh: true
     }
   },
   computed: {
@@ -174,8 +176,8 @@ export default {
       return name
     },
     reportType() {
-      const componentHasReport = ['binning', 'selection', 'evaluation']
-      const componentHasData = ['binning', 'selection', 'secureboost', 'lr']
+      const componentHasReport = ['binning', 'selection', 'evaluation', 'featureimputation', 'labeltransform', 'datatransform', 'dataio', 'federatedsample', 'scale', 'onehot']
+      const componentHasData = ['binning', 'selection', 'secureboost', 'lr', 'featureimputation', 'labeltransform', 'datatransform', 'dataio', 'intersection', 'federatedsample', 'scale', 'onehot']
       const componentHasModel = ['secureboost', 'lr']
       const hasReport = !!this.modelType
         .toLowerCase()
@@ -194,7 +196,9 @@ export default {
         'correlation',
         'evaluation',
         'psi',
-        'statistic'
+        'statistic',
+        'modelLoader',
+        'CacheLoader'
       ]
       return !this.joinComponents(componentNotHasDataOutput).match(
         this.modelType
@@ -220,6 +224,7 @@ export default {
   },
   created() {
     this.currentActiveName()
+    this.transformFn = getTransformFn(this.modelType)
   },
   methods: {
     refresh() {
@@ -261,7 +266,17 @@ export default {
     joinComponents(components) {
       return components.map(component => this.modelNameMap[component]).join('|')
     },
+
     getResults(param) {
+      // this.transformFn(
+      //   {},
+      //   {},
+      //   this.partyId,
+      //   this.role,
+      //   this.componentName,
+      //   this.jobId,
+      //   this.modelType
+      // )
       Promise.all([getModelOutput(param), getMetrics(param)]).then(values => {
         const [modelData, metricsData] = values
         let transformResult = ''
@@ -299,6 +314,7 @@ export default {
             this.modelType
           )
         }
+
         if (Array.isArray(transformResult)) {
           this.cList = transformResult
           if (transformResult.length === 0) {
@@ -324,9 +340,11 @@ export default {
     },
     changeTabs(tab) {
       this.tabIndex = +tab.index
+      this.showRefresh = true
       switch (+tab.index) {
         case 1:
           this.getDataOutputData()
+          this.showRefresh = false
           break
         default:
           break
@@ -334,6 +352,7 @@ export default {
       switch (tab.name) {
         case 'log':
           this.logInited = true
+          this.showRefresh = false
           break
         default:
           break

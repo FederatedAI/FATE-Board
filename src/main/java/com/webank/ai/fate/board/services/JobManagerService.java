@@ -18,6 +18,7 @@ package com.webank.ai.fate.board.services;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.webank.ai.fate.board.dao.JobMapper;
@@ -231,6 +232,7 @@ public class JobManagerService {
         String jobId = downloadQO.getJobId();
         String role = downloadQO.getRole();
         String type = downloadQO.getType();
+        String partyId = downloadQO.getPartyId();
 
         if (StringUtils.isEmpty(jobId)) {
             log.error("parameter null:jobId");
@@ -249,11 +251,15 @@ public class JobManagerService {
             log.error("parameter error: illegal characters in role or jobId or type");
             return new ResponseResult(ErrorCode.ERROR_PARAMETER);
         }
+        if (StringUtils.isEmpty(partyId)) {
+            log.error("parameter null:partyId");
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
+        }
 
         //get fate path
         String webPath = System.getProperty("user.dir");
         int i1 = webPath.lastIndexOf("/");
-        String fatePath = webPath.substring(0, i1);
+        String fatePath = webPath.substring(0, i1)+"/fateflow";
 
         //build file path
         String fileName = "";
@@ -272,8 +278,9 @@ public class JobManagerService {
 
             } else if ("host".equals(role)) {
                 fileName = "job_runtime_on_party_conf.json";
-                realPath = fatePath + "/jobs/" + jobId + "/" + role + "/";
+                realPath = fatePath + "/jobs/" + jobId + "/" + role + "/"+partyId+"/";
                 fileOutputName = "runtime_config_" + jobId + ".json";
+                return getHostConfig(response, fileName, realPath, fileOutputName);
             } else {
                 log.error("download error: role:{} doesn't support", role);
                 return new ResponseResult(ErrorCode.ERROR_PARAMETER);
@@ -325,6 +332,72 @@ public class JobManagerService {
             return new ResponseResult(ErrorCode.FILE_ERROR);
         }
 
+    }
+
+    private ResponseResult getHostConfig(HttpServletResponse response, String fileName, String realPath, String fileOutputName) {
+        File file = new File(realPath, fileName);
+        if (file.exists()) {
+            BufferedReader br = null;
+            BufferedWriter bw = null;
+            try {
+                br = new BufferedReader(new FileReader(file));
+                response.setContentType("application/force-download");
+                response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
+                bw = new BufferedWriter(response.getWriter());
+                String s = null;
+                String ws = null;
+                StringBuilder ss = new StringBuilder();
+                while ((s = br.readLine()) != null) {
+                    ss.append(s);
+                }
+                JSONObject dataJson =JSON.parseObject(ss.toString());
+                if (dataJson!=null){
+                    dataJson.remove("initiator");
+                    JSONObject role = dataJson.getJSONObject("role");
+                    if (role!=null){
+                        role.remove("guest");
+                        role.remove("arbiter");
+                    }
+                    JSONObject component_parameters = dataJson.getJSONObject("component_parameters");
+                    if (component_parameters!=null){
+                        JSONObject role1 = component_parameters.getJSONObject("role");
+                        if (role1!=null){
+                            role1.remove("guest");
+                        }
+                    }
+                    JSONObject role_parameters = dataJson.getJSONObject("role_parameters");
+                    if (role_parameters!=null){
+                        role_parameters.remove("guest");
+                    }
+                    ws=JSON.toJSONString(dataJson, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
+                    bw.write(ws);
+                    bw.flush();
+                    log.info("download success,file :{}", realPath + fileName);
+                }
+            } catch (Exception e) {
+                log.error("download failed", e);
+                return new ResponseResult(ErrorCode.DOWNLOAD_ERROR);
+            } finally {
+                if (br != null) {
+                    try {
+                        br.close();
+                    } catch (IOException e) {
+                        log.error("download io close failed", e);
+                    }
+                }
+                if (bw != null) {
+                    try {
+                        bw.close();
+                    } catch (IOException e) {
+                        log.error("download io close failed", e);
+                    }
+                }
+            }
+
+            return null;
+        } else {
+            return new ResponseResult(ErrorCode.FILE_ERROR);
+        }
     }
 
 }

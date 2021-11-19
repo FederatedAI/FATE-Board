@@ -9,6 +9,7 @@
         :value="item.value"
         :group="item.group || {}"
         :single="false"
+        :unique="item.value"
         class="radio-group__box"
         @change="boxChange(arguments, item.value)"
         @form="boxForm(arguments, item.value)"
@@ -21,6 +22,7 @@
       :label="options.label"
       :value="options.value"
       :group="options.group || {}"
+      :unique="options.value"
       @change="boxChange(arguments, options.value)"
       @form="boxForm(arguments, options.value)"
       @search="boxSearch"
@@ -64,6 +66,10 @@ export default {
       // eslint-disable-next-line vue/require-prop-type-constructor
       type: Boolean | Array,
       default: false
+    },
+    unique: {
+      type: String,
+      default: 'CusRadio'
     }
   },
   data() {
@@ -178,19 +184,41 @@ export default {
     getParam() {
       return this.formResult
     },
-    setDefault() {
+    setDefault(setting) {
+      const config = setting && setting[this.unique]
       const list = this.toArr(this.options)
-      this.selected = this.options[0].value
+      if (!setting) {
+        this.selected = !setting ? this.options[0].value : null
+      } else {
+        for (const key in config) {
+          if (config[key].radio === true) {
+            this.selected = key
+            break
+          }
+        }
+      }
       for (const val of list) {
-        if (!this.refOpera(val.value, 'setDefault')) {
+        if (!this.refOpera(val.value, 'setDefault', config)) {
           return false
         }
-        if (val.value === this.selected) {
-          this.refOpera(val.value, 'chooseBox')
+        if (!setting) {
+          if (val.value === this.selected) {
+            this.refOpera(val.value, 'chooseBox')
+          }
+          this.refOpera(val.value, 'boxDisable')
         }
-        this.refOpera(val.value, 'boxDisable')
       }
       return true
+    },
+    getSelected() {
+      const list = this.toArr(this.options)
+      let result = {}
+      for (const val of list) {
+        result = Object.assign(result, this.refOpera(val.value, 'getSelected'))
+      }
+      return {
+        [this.unique]: result
+      }
     },
     allSteps() {
       const list = this.toArr(this.options)

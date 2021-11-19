@@ -72,6 +72,7 @@ const TOOLTIP_RADIUS = 4
 const TOOLTIP_BACKGROUND = 'rgba(127,125,142,0.7)'
 const TOOLTIP_FONT_STYLE = 'rgba(255,255,255,1)'
 const DATA_PORT_COLOR = '#E6B258'
+const CACHE_PORT_COLOR = '#bcf500'
 // const SPECIAL_DATA_PORT_COLOR = '#E6B258'
 const MODEL_PORT_COLOR = '#00cbff'
 const DISABLE_INIT_COLOR = '#7F7D8E'
@@ -505,7 +506,7 @@ function struct() {
                 ? (type !== progressComp.type.UNRUN
                   ? DISABLE_INIT_COLOR
                   : DISABLE_NO_INIT_COLOR)
-                : (input[i].type === 'data' ? DATA_PORT_COLOR : MODEL_PORT_COLOR)
+                : (input[i].type === 'data' ? DATA_PORT_COLOR : input[i].type === 'cache' ? CACHE_PORT_COLOR : MODEL_PORT_COLOR)
             },
             fill: true
           }
@@ -562,7 +563,7 @@ function struct() {
                 ? (type !== progressComp.UNRUN
                   ? DISABLE_INIT_COLOR
                   : DISABLE_NO_INIT_COLOR)
-                : (output[i].type === 'data' ? DATA_PORT_COLOR : MODEL_PORT_COLOR)
+                : (output[i].type === 'data' ? DATA_PORT_COLOR : output[i].type === 'cache' ? CACHE_PORT_COLOR : MODEL_PORT_COLOR)
             },
             fill: true
           }

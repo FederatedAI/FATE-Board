@@ -16,7 +16,10 @@
 package com.webank.ai.fate.board.utils;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.Charsets;
+import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -43,11 +46,20 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class HttpClientPool implements InitializingBean {
@@ -57,13 +69,48 @@ public class HttpClientPool implements InitializingBean {
     private PoolingHttpClientConnectionManager poolConnManager;
     private RequestConfig requestConfig;
     private CloseableHttpClient httpClient;
+    @Value("${HTTP_SECRET_KEY:}")
+    public String HTTP_SECRET_KEY;
+    @Value("${HTTP_APP_KEY:}")
+    public String HTTP_APP_KEY;
 
-    private static void config(HttpRequestBase httpRequestBase) {
+    private void config(HttpRequestBase httpRequestBase, String requestData) {
         RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectionRequestTimeout(20000)
                 .setConnectTimeout(20000)
                 .setSocketTimeout(20000).build();
         httpRequestBase.addHeader("Content-Type", "application/json;charset=UTF-8");
+        if (!StringUtils.isAnyBlank(HTTP_SECRET_KEY, HTTP_APP_KEY)) {
+            String timestamp = System.currentTimeMillis() + "";
+            String nonce = UUID.randomUUID().toString();
+            String ENCODING = "ascii";
+            String ALGORITHM = "HmacSHA1";
+            String signature = null;
+            try {
+                Mac mac = Mac.getInstance(ALGORITHM);
+                mac.init(new SecretKeySpec(HTTP_SECRET_KEY.getBytes(ENCODING), ALGORITHM));
+                String[] array = new String[]{
+                        new String(timestamp.getBytes(ENCODING)),
+                        new String(nonce.getBytes(ENCODING)),
+                        new String(HTTP_APP_KEY.getBytes(ENCODING)),
+                        new String(httpRequestBase.getURI().getPath().getBytes(ENCODING)),
+                        new String(requestData.getBytes(ENCODING)),
+                        "",
+                };
+                String text = String.join("\n", array);
+                byte[] signData = mac.doFinal(text.getBytes());
+                byte[] bytes = Base64.encodeBase64(signData);
+                signature = new String(Base64.encodeBase64(signData), ENCODING);
+            } catch (NoSuchAlgorithmException | InvalidKeyException | UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            httpRequestBase.setHeader("TIMESTAMP", timestamp);
+            httpRequestBase.setHeader("NONCE", nonce);
+            httpRequestBase.setHeader("APP_KEY", HTTP_APP_KEY);
+            httpRequestBase.setHeader("SIGNATURE", signature);
+        }
+
+
         httpRequestBase.setConfig(requestConfig);
     }
 
@@ -105,7 +152,7 @@ public class HttpClientPool implements InitializingBean {
 
     public String post(String url, Map<String, Object> requestData) {
         HttpPost httpPost = new HttpPost(url);
-        config(httpPost);
+        config(httpPost, requestData.toString());
         StringEntity stringEntity = new StringEntity(JSON.toJSONString(requestData), "UTF-8");
         stringEntity.setContentEncoding(Charsets.UTF_8.toString());
         httpPost.setEntity(stringEntity);
@@ -116,7 +163,7 @@ public class HttpClientPool implements InitializingBean {
     public String post(String url, String requestData) {
 
         HttpPost httpPost = new HttpPost(url);
-        config(httpPost);
+        config(httpPost, requestData);
         StringEntity stringEntity = new StringEntity(requestData, Charsets.UTF_8.toString());
         stringEntity.setContentEncoding("UTF-8");
         httpPost.setEntity(stringEntity);
@@ -127,7 +174,7 @@ public class HttpClientPool implements InitializingBean {
 
     public String get(String url) {
         HttpGet httpGet = new HttpGet(url);
-        config(httpGet);
+        config(httpGet, null);
         return getResponse(httpGet);
     }
 
@@ -143,7 +190,7 @@ public class HttpClientPool implements InitializingBean {
 
             return result;
         } catch (IOException e) {
-            logger.error("send http error",e);
+            logger.error("send http error", e);
             return "";
         } finally {
             try {

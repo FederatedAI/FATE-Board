@@ -184,8 +184,9 @@ export default {
       seriess = seriess || this.currentOptions
       if (Object.keys(seriess).length > 0 || !this.noData) {
         if (
-          seriess.series.length <= 1 &&
-					Object.keys(seriess.series[0] || {}).length === 0
+          !seriess.series ||
+          (seriess.series.length === 1 &&
+					(Object.keys(seriess.series ? (seriess.series[0] || {}) : {})).length === 0)
         ) {
           this.showNoData = true
           return false

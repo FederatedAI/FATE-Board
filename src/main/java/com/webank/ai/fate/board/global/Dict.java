@@ -64,6 +64,7 @@ public class Dict {
     static public final String REMOTE_RETURN_MSG = "retmsg";
     static public final String URL_JOB_UPDATE = "/v1/job/update";
     static public final String URL_JOB_RERUN = "/v1/job/rerun";
+    static public final String URL_JOB_LOG_PATH = "/v1/job/log/path";
 
     static public final String SSH_IP = "ip";
     static public final String SSH_USER = "user";

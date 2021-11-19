@@ -52,6 +52,7 @@ export default function(data, header, type, partyId, role, Currentrole, skipStat
       const formatterArr = []
       let min = -9999
       const iterationArr = data[key].ivArray.length > 0 ? data[key].ivArray : data[key].splitPoints
+      const hasMissingValue = data[key].splitPoints.length < data[key].ivArray.length
       iterationArr.forEach((item, index, self) => {
         let point = formatFloat(data[key].splitPoints[index])
         if (!point && point !== 0) {
@@ -63,9 +64,12 @@ export default function(data, header, type, partyId, role, Currentrole, skipStat
           if (min === -9999) {
             binning = `${key} <= ${point}`
             formatterBinning = `(-∞,${point}]`
-          } else if (index === self.length - 1) {
+          } else if ((!hasMissingValue && index === self.length - 1) || (hasMissingValue && index === self.length - 2)) {
             binning = `${key} > ${min}`
             formatterBinning = `(${min}, +∞)`
+          } else if (hasMissingValue && index === self.length - 1) {
+            binning = 'missing_value'
+            formatterBinning = 'missing_value'
           } else {
             binning = `${min} < ${key} <= ${point}`
             formatterBinning = `(${min},${point}]`

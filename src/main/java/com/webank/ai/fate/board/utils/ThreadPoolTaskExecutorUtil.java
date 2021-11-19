@@ -15,8 +15,8 @@
  */
 package com.webank.ai.fate.board.utils;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -26,7 +26,7 @@ import java.util.concurrent.Callable;
 
 public class ThreadPoolTaskExecutorUtil {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(ThreadPoolTaskExecutorUtil.class);
 
     public static ListenableFuture<?> submitListenable(ThreadPoolTaskExecutor executor, Callable callable, int[] sleepTimes, int[] tryCount) {
 
@@ -51,7 +51,7 @@ public class ThreadPoolTaskExecutorUtil {
                         resultListenableFuture = executor.submitListenable(callable);
                         return resultListenableFuture;
                     } catch (TaskRejectedException taskException) {
-                        LOGGER.error("[FEDERATION][THREADPOOL] submit exception,sleep {} tryCount {}", sleepTime, count);
+                        logger.error("[FEDERATION][THREADPOOL] submit exception,sleep {} tryCount {}", sleepTime, count);
                     }
                 } while (count < tryNum);
             }
@@ -85,7 +85,7 @@ public class ThreadPoolTaskExecutorUtil {
                         resultListenableFuture = executor.submitListenable(callable);
                         return resultListenableFuture;
                     } catch (TaskRejectedException taskException) {
-                        LOGGER.error("[FEDERATION][THREADPOOL] submit exception,sleep {} tryCount {}", sleepTime, count);
+                        logger.error("[FEDERATION][THREADPOOL] submit exception,sleep {} tryCount {}", sleepTime, count);
                     }
                 } while (count < tryNum);
             }

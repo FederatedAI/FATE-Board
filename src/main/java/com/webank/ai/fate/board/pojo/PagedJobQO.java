@@ -15,6 +15,7 @@
  */
 package com.webank.ai.fate.board.pojo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.io.Serializable;
@@ -35,6 +36,7 @@ public class PagedJobQO implements Serializable {
     private List<String> status;
     private String orderField;
     private String orderRule;
+    @JsonProperty(value = "fDescription")
     private String fDescription;
     private String partner;
 
