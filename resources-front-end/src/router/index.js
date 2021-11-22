@@ -52,7 +52,7 @@ export const constantRouterMap = [
     children: [
       {
         path: '/running',
-        name: 'RUNNINNG',
+        name: 'RUNNING',
         component: () => import('@/views/job-running')
       },
       {
@@ -148,7 +148,7 @@ router.beforeEach((to, from, next) => {
       next()
     } else if (to.name === 'login') {
       next({
-        name: 'RUNNINNG'
+        name: 'RUNNING'
       })
     } else {
       next()
