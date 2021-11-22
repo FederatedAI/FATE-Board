@@ -200,7 +200,7 @@ export default {
             this.setAccount()
           }
           this.$router.push({
-            name: 'RUNNINNG'
+            name: 'RUNNING'
           })
         } else {
           this.errorHint('Incorrect username or password')
