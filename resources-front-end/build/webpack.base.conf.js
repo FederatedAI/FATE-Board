@@ -44,12 +44,12 @@ module.exports = {
     rules: [
       ...(config.dev.useEslint ? [createLintingRule()] : []),
       {
-        test: /\.vue$/,
+        test: /\.vue$/i,
         loader: 'vue-loader',
         options: vueLoaderConfig
       },
       {
-        test: /\.js$/,
+        test: /\.js$/i,
         loader: 'babel-loader',
         include: [
           resolve('src'),
@@ -67,7 +67,7 @@ module.exports = {
       //   }
       // },
       {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/i,
         loader: 'url-loader',
         // exclude: [resolve('src/icons')],
         options: {
@@ -76,7 +76,7 @@ module.exports = {
         }
       },
       {
-        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/i,
         loader: 'url-loader',
         options: {
           limit: 10000,
@@ -84,7 +84,7 @@ module.exports = {
         }
       },
       {
-        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/i,
         loader: 'url-loader',
         options: {
           limit: 10000,
