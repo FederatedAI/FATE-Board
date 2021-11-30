@@ -18,7 +18,6 @@ package com.webank.ai.fate.board.utils;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
@@ -48,31 +47,28 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
 @Service
 public class HttpClientPool implements InitializingBean {
     @Value("${fateflow.url}")
-    public String fateUrl;
+    private String fateUrl;
+    @Value("${fateflow.http_app_key}")
+    private String flowAppKey;
+    @Value("${fateflow.http_secret_key}")
+    private String flowSecretKey;
+
     Logger logger = LoggerFactory.getLogger(HttpClientPool.class);
     private PoolingHttpClientConnectionManager poolConnManager;
     private RequestConfig requestConfig;
     private CloseableHttpClient httpClient;
-    @Value("${HTTP_SECRET_KEY:}")
-    public String HTTP_SECRET_KEY;
-    @Value("${HTTP_APP_KEY:}")
-    public String HTTP_APP_KEY;
 
     private void config(HttpRequestBase httpRequestBase, String requestData) {
         RequestConfig requestConfig = RequestConfig.custom()
@@ -80,7 +76,7 @@ public class HttpClientPool implements InitializingBean {
                 .setConnectTimeout(20000)
                 .setSocketTimeout(20000).build();
         httpRequestBase.addHeader("Content-Type", "application/json;charset=UTF-8");
-        if (!StringUtils.isAnyBlank(HTTP_SECRET_KEY, HTTP_APP_KEY)) {
+        if (!StringUtils.isAnyBlank(flowAppKey, flowSecretKey)) {
             String timestamp = System.currentTimeMillis() + "";
             String nonce = UUID.randomUUID().toString();
             String ENCODING = "ascii";
@@ -88,11 +84,11 @@ public class HttpClientPool implements InitializingBean {
             String signature = null;
             try {
                 Mac mac = Mac.getInstance(ALGORITHM);
-                mac.init(new SecretKeySpec(HTTP_SECRET_KEY.getBytes(ENCODING), ALGORITHM));
+                mac.init(new SecretKeySpec(flowSecretKey.getBytes(ENCODING), ALGORITHM));
                 String[] array = new String[]{
                         new String(timestamp.getBytes(ENCODING)),
                         new String(nonce.getBytes(ENCODING)),
-                        new String(HTTP_APP_KEY.getBytes(ENCODING)),
+                        new String(flowAppKey.getBytes(ENCODING)),
                         new String(httpRequestBase.getURI().getPath().getBytes(ENCODING)),
                         new String(requestData.getBytes(ENCODING)),
                         "",
@@ -106,7 +102,7 @@ public class HttpClientPool implements InitializingBean {
             }
             httpRequestBase.setHeader("TIMESTAMP", timestamp);
             httpRequestBase.setHeader("NONCE", nonce);
-            httpRequestBase.setHeader("APP_KEY", HTTP_APP_KEY);
+            httpRequestBase.setHeader("APP_KEY", flowAppKey);
             httpRequestBase.setHeader("SIGNATURE", signature);
         }
 
