@@ -5,9 +5,9 @@
   "description": "aisp-scvmadm-web",
   "author": "webank",
   "scripts": {
-    "dev": "NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
+    "dev": "NODE_OPTIONS=\"--openssl-legacy-provider $NODE_OPTIONS\" webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
-    "build": "node build/build.js",
+    "build": "NODE_OPTIONS=\"--openssl-legacy-provider $NODE_OPTIONS\" node build/build.js",
     "build:report": "npm_config_report=true npm run build",
     "lint": "eslint --ext .js,.vue src",
     "test": "npm run lint",

@@ -31,8 +31,8 @@ import store from '../store'
 // create an axios instance
 // console.log(window.location.origin)
 const service = axios.create({
-  baseURL: window.location.origin,
-  withCredentials: false,
+  baseURL: process.env.BASE_API || window.location.origin,
+  withCredentials: process.env.CORS,
   timeout: 20000 // request timeout
 })
 // request interceptor
