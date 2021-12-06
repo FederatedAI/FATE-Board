@@ -29,6 +29,5 @@ jobs:
       - name: archive artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: dist
-          path: |
-            target/fateboard-1.7.0.jar
+          name: target
+          path: target/fateboard-[0-9].[0-9].[0-9].jar
