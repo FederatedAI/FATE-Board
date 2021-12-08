@@ -38,6 +38,24 @@ Launch a FATE-Board service by following steps.
    | fateboard.datasource.password       | password of database        | none                                                         |
    | server.tomcat.max-threads           | max threads of tomcat       | 1000                                                         |
    | server.tomcat.max-connections       | max connections of tomcat   | 2000                                                         |
+   | spring.servlet.multipart.max-file-size |max-file-size|10MB|
+   |spring.servlet.multipart.max-request-size|max-request-size|100MB|
+   |spring.datasource.druid.filter.config.enabled|Druid set|false|
+   |spring.datasource.druid.web-stat-filter.enabled|Druid set|false|
+   |spring.datasource.druid.stat-view-servlet.enabled|Druid set|false|
+   |server.compression.enabled|compression|true|
+   |server.compression.mime-types|compression.mime-types|application/json,application/xml,text/html,text/xml,text/plain|
+   |server.board.login.username|username|admin|
+   |server.board.login.password|password|admin|
+   |management.endpoints.web.exposure.exclude|web.exposure.exclude|*|
+   |spring.session.store-type|open spring session|jdbc|
+   |spring.session.jdbc.initialize-schema|initialize spring session|always|
+   |#server.ssl.key-store=classpath:|key-store classpath ||
+   |#server.ssl.key-store-password=|key-store-password||
+   |#server.ssl.key-password=|key-password||
+   |#server.ssl.key-alias=|key-alias||
+   |#HTTP_APP_KEY=|APP_KEY||
+   |#HTTP_SECRET_KEY=|be same with the HTTP_SECRET_KEY of flow||
 
    - example1 (database: mysql)
 
@@ -53,6 +71,24 @@ Launch a FATE-Board service by following steps.
      fateboard.datasource.password=fate_dev
      server.tomcat.max-threads=1000
      server.tomcat.max-connections=20000
+     spring.servlet.multipart.max-file-size=10MB
+     spring.servlet.multipart.max-request-size=100MB
+     spring.datasource.druid.filter.config.enabled=false
+     spring.datasource.druid.web-stat-filter.enabled=false
+     spring.datasource.druid.stat-view-servlet.enabled=false
+     server.compression.enabled=true
+     server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain
+     server.board.login.username=admin
+     server.board.login.password=admin
+     management.endpoints.web.exposure.exclude=*
+     spring.session.store-type=jdbc
+     spring.session.jdbc.initialize-schema=always
+     #server.ssl.key-store=classpath:
+     #server.ssl.key-store-password=
+     #server.ssl.key-password=
+     #server.ssl.key-alias=
+     #HTTP_APP_KEY=
+     #HTTP_SECRET_KEY=
      ```
 
    - example2(database:sqlite)
@@ -69,6 +105,24 @@ Launch a FATE-Board service by following steps.
      fateboard.datasource.password=
      server.tomcat.max-threads=1000
      server.tomcat.max-connections=20000
+     spring.servlet.multipart.max-file-size=10MB
+     spring.servlet.multipart.max-request-size=100MB
+     spring.datasource.druid.filter.config.enabled=false
+     spring.datasource.druid.web-stat-filter.enabled=false
+     spring.datasource.druid.stat-view-servlet.enabled=false
+     server.compression.enabled=true
+     server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain
+     server.board.login.username=admin
+     server.board.login.password=admin
+     management.endpoints.web.exposure.exclude=*
+     spring.session.store-type=jdbc
+     spring.session.jdbc.initialize-schema=always
+     #server.ssl.key-store=classpath:
+     #server.ssl.key-store-password=
+     #server.ssl.key-password=
+     #server.ssl.key-alias=
+     #HTTP_APP_KEY=
+     #HTTP_SECRET_KEY=
      ```
 
      
