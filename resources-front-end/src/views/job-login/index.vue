@@ -63,7 +63,7 @@
         <el-checkbox v-model="willCache" class="checked">remember me</el-checkbox>
       </el-form-item> -->
       <!-- login -->
-      <el-form-item>
+      <el-form-item class="form-item-center">
         <el-button :type="btnType" :disabled="btnDisable" size="mini" class="btn" @click="signIn">Sign in</el-button>
       </el-form-item>
     </el-form>
@@ -313,5 +313,9 @@ export default {
 	.hint-def {
 		color: #bbb;
 	}
+}
+.form-item-center {
+  display: flex;
+  justify-content: center;
 }
 </style>
