@@ -34,6 +34,25 @@
    | fateboard.datasource.password       | 数据库密码         | 无                                                           |
    | server.tomcat.max-threads           | tomcat最大线程数   | 1000                                                         |
    | server.tomcat.max-connections       | tomcat最大连接数   | 2000                                                         |
+   | spring.servlet.multipart.max-file-size |最大上传文件大小|10MB|
+   |spring.servlet.multipart.max-request-size|单次请求的文件的总大小|100MB|
+   |spring.datasource.druid.filter.config.enabled|Druid配置|false|
+   |spring.datasource.druid.web-stat-filter.enabled|Druid配置|false|
+   |spring.datasource.druid.stat-view-servlet.enabled|Druid配置|false|
+   |server.compression.enabled|是否开启压缩|true|
+   |server.compression.mime-types|要压缩的MIME type|application/json,application/xml,text/html,text/xml,text/plain|
+   |server.board.login.username|用户名|admin|
+   |server.board.login.password|用户密码|admin|
+   |management.endpoints.web.exposure.exclude|http方式排除需要公开的端点|*|
+   |spring.session.store-type|开启spring session|jdbc|
+   |spring.session.jdbc.initialize-schema|初始化spring session|always|
+   |#server.ssl.key-store=classpath:|证书仓库路径||
+   |#server.ssl.key-store-password=|证书仓库密码||
+   |#server.ssl.key-password=|证书密码||
+   |#server.ssl.key-alias=|证书别名||
+   |#HTTP_APP_KEY=|APP_KEY||
+   |#HTTP_SECRET_KEY=|与flow的HTTP_SECRET_KEY保持一致||
+   
 
    - 例子1(数据库: mysql)
 
@@ -49,6 +68,24 @@
      fateboard.datasource.password=fate_dev
      server.tomcat.max-threads=1000
      server.tomcat.max-connections=20000
+     spring.servlet.multipart.max-file-size=10MB
+     spring.servlet.multipart.max-request-size=100MB
+     spring.datasource.druid.filter.config.enabled=false
+     spring.datasource.druid.web-stat-filter.enabled=false
+     spring.datasource.druid.stat-view-servlet.enabled=false
+     server.compression.enabled=true
+     server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain
+     server.board.login.username=admin
+     server.board.login.password=admin
+     management.endpoints.web.exposure.exclude=*
+     spring.session.store-type=jdbc
+     spring.session.jdbc.initialize-schema=always
+     #server.ssl.key-store=classpath:
+     #server.ssl.key-store-password=
+     #server.ssl.key-password=
+     #server.ssl.key-alias=
+     #HTTP_APP_KEY=
+     #HTTP_SECRET_KEY=
      ```
 
    - 例子2(数据库: sqlite)
@@ -65,6 +102,24 @@
      fateboard.datasource.password=
      server.tomcat.max-threads=1000
      server.tomcat.max-connections=20000
+     spring.servlet.multipart.max-file-size=10MB
+     spring.servlet.multipart.max-request-size=100MB
+     spring.datasource.druid.filter.config.enabled=false
+     spring.datasource.druid.web-stat-filter.enabled=false
+     spring.datasource.druid.stat-view-servlet.enabled=false
+     server.compression.enabled=true
+     server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain
+     server.board.login.username=admin
+     server.board.login.password=admin
+     management.endpoints.web.exposure.exclude=*
+     spring.session.store-type=jdbc
+     spring.session.jdbc.initialize-schema=always
+     #server.ssl.key-store=classpath:
+     #server.ssl.key-store-password=
+     #server.ssl.key-password=
+     #server.ssl.key-alias=
+     #HTTP_APP_KEY=
+     #HTTP_SECRET_KEY=
      ```
 
      
