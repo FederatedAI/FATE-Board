@@ -1,3 +1,12 @@
+# Release 1.7.1
+
+#### Major Features and Improvements
+**Major Features**
+
+* Disable password storage to avoid security problem
+* Update DOM structure for login-form
+
+
 # Release 1.7.0
 
 #### Major Features and Improvements
