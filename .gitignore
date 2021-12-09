@@ -19,3 +19,4 @@ yarn.lock
 *.zip
 *.7z
 /.idea/
+*.iml

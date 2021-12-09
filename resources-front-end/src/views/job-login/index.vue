@@ -13,51 +13,60 @@
       <i slot="prefix" :class="'el-icon-' + hintType" />
     </hint>
     <!-- username -->
-    <el-autocomplete
-      v-model="username"
-      :fetch-suggestions="queryValue"
-      :class="{
-        ['input_'+hintType]: usernameHint
-      }"
-      size="mini"
-      placeholder="Username/Email/Phone"
-      class="input"
-      @select="handleSelector"
-      @input="errorHintHide"
-    >
-      <template slot-scope="{ item }">
-        <div class="auto-container">
-          <div class="auto-info">
-            <div class="name">{{ item.username }}</div>
-            <span class="addr">{{ item.passwordSec }}</span>
-          </div>
-          <span v-if="item.default" class="hint-def">(Default)</span>
-        </div>
-      </template>
-    </el-autocomplete>
-    <!-- password -->
-    <el-input
-      v-model="password"
-      :type="inputType"
-      :class="{
-        ['input_'+hintType]: passwordHint
-      }"
-      placeholder="password"
-      size="mini"
-      class="input"
-      @input="errorHintHide"
-    >
-      <img
-        slot="suffix"
-        :src="inputType==='text' ? eyeOnSee : eyeUnSee"
-        class="eye_hint"
-        @click="exchangeType"
-      >
-    </el-input>
-    <!-- 缓存当前账号 -->
-    <el-checkbox v-model="willCache" class="checked">remember me</el-checkbox>
-    <!-- login -->
-    <el-button :type="btnType" :disabled="btnDisable" size="mini" class="btn" @click="signIn">Sign in</el-button>
+    <el-form size="mini">
+      <el-form-item>
+        <el-input
+          v-model="username"
+          :class="{
+            ['input_'+hintType]: usernameHint
+          }"
+          size="mini"
+          placeholder="Username/Email/Phone"
+          class="input"
+          @select="handleSelector"
+          @input="errorHintHide"
+        >
+          <!-- <template slot-scope="{ item }">
+            <div class="auto-container">
+              <div class="auto-info">
+                <div class="name">{{ item.username }}</div>
+                <span class="addr">{{ item.passwordSec }}</span>
+              </div>
+              <span v-if="item.default" class="hint-def">(Default)</span>
+            </div>
+          </template> -->
+        </el-input>
+      </el-form-item>
+      <el-form-item>
+        <!-- password -->
+        <el-input
+          v-model="password"
+          :type="inputType"
+          :class="{
+            ['input_'+hintType]: passwordHint
+          }"
+          placeholder="password"
+          size="mini"
+          class="input"
+          @input="errorHintHide"
+        >
+          <img
+            slot="suffix"
+            :src="inputType==='text' ? eyeOnSee : eyeUnSee"
+            class="eye_hint"
+            @click="exchangeType"
+          >
+        </el-input>
+      </el-form-item>
+      <!-- 缓存当前账号 -->
+      <!-- <el-form-item>
+        <el-checkbox v-model="willCache" class="checked">remember me</el-checkbox>
+      </el-form-item> -->
+      <!-- login -->
+      <el-form-item class="form-item-center">
+        <el-button :type="btnType" :disabled="btnDisable" size="mini" class="btn" @click="signIn">Sign in</el-button>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
@@ -197,7 +206,7 @@ export default {
       const afterRequest = bool => {
         if (bool) {
           if (this.willCache) {
-            this.setAccount()
+            // this.setAccount()
           }
           this.$router.push({
             name: 'RUNNING'
@@ -275,7 +284,6 @@ export default {
 	.input {
 		width: 30%;
 		min-width: 300px;
-		margin-top: 24px;
 	}
 	.input_error {
 		input {
@@ -286,12 +294,6 @@ export default {
 		input {
 			border-color: #ffd1cb !important;
 		}
-	}
-	.checked {
-		margin-top: 24px;
-	}
-	.btn {
-		margin-top: 48px;
 	}
 	.eye_hint {
 		width: 20px;
@@ -311,5 +313,9 @@ export default {
 	.hint-def {
 		color: #bbb;
 	}
+}
+.form-item-center {
+  display: flex;
+  justify-content: center;
 }
 </style>
