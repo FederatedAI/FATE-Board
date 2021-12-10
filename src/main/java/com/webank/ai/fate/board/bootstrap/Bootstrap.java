@@ -41,7 +41,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
 @Configuration
 @EnableScheduling
-@MapperScan("com/webank/ai/fate/board/dao")
+//@MapperScan("com/webank/ai/fate/board/dao")
 public class Bootstrap {
 
     public static void main(String[] args) {
