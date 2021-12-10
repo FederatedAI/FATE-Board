@@ -18,6 +18,7 @@ package com.webank.ai.fate.board.services;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -33,6 +34,7 @@ import com.webank.ai.fate.board.utils.ThreadPoolTaskExecutorUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -48,6 +50,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -62,8 +65,8 @@ public class JobManagerService {
         }
     };
     private final Logger logger = LoggerFactory.getLogger(JobManagerService.class);
-    @Autowired
-    JobMapper jobMapper;
+    //    @Autowired
+//    JobMapper jobMapper;
     @Autowired
     HttpClientPool httpClientPool;
     @Value("${fateflow.url}")
@@ -74,45 +77,152 @@ public class JobManagerService {
 
     public List<JobDO> queryJobStatus() {
 
-        List<JobDO> jobDOS = jobMapper.queryJobStatus();
-        return jobDOS;
+//        List<JobDO> jobDOS = jobMapper.queryJobStatus();
+//        return jobDOS;
 
+        List<String> list = new ArrayList<>();
+        list.add("waiting");
+        list.add("running");
+
+        FlowJobQO flowJobQO = new FlowJobQO();
+        flowJobQO.setStatus(list);
+        Map<String, Object> jobMap = getJobDOS(flowJobQO);
+        if (jobMap != null) {
+            return (List<JobDO>) jobMap.get("list");
+        }
+        return null;
+    }
+
+
+    private Map<String, Object> getJobDOS(Object query) {
+        String result = null;
+        try {
+            result = httpClientPool.post(fateUrl + Dict.URL_JOB_QUERY, JSON.toJSONString(query));
+        } catch (Exception e) {
+            logger.error("connect fateflow error:", e);
+            //todo
+
+//            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+        }
+        if (result != null) {
+            JSONObject dataObject = JSON.parseObject(result).getJSONObject(Dict.DATA);
+            Integer count = dataObject.getInteger("count");
+            JSONArray jobs = dataObject.getJSONArray("jobs");
+
+            List<FlowJobDO> flowJobDOList = JSON.parseObject(JSON.toJSONString(jobs), new TypeReference<List<FlowJobDO>>() {
+            });
+
+            List<JobDO> jobDOList = flowJobDOList.stream().map(flowJobDO -> {
+                JobDO jobDO = new JobDO();
+                jobDO.setfJobId(flowJobDO.getJob_id());
+                jobDO.setfRole(flowJobDO.getRole());
+                jobDO.setfPartyId(flowJobDO.getParty_id());
+                jobDO.setfName(flowJobDO.getName());
+                jobDO.setfDescription(flowJobDO.getDescription());
+                jobDO.setfTag(flowJobDO.getTag());
+                jobDO.setfDsl(flowJobDO.getDsl());
+                jobDO.setfRuntimeConf(flowJobDO.getRuntime_conf());
+                jobDO.setfTrainRuntimeConf(flowJobDO.getTrain_runtime_conf());
+                jobDO.setfRoles(flowJobDO.getRoles());
+                jobDO.setfWorkMode(flowJobDO.getWork_mode());
+                jobDO.setfInitiatorRole(flowJobDO.getInitiator_role());
+                jobDO.setfInitiatorPartyId(flowJobDO.getInitiator_party_id());
+                jobDO.setfStatus(flowJobDO.getStatus());
+                jobDO.setfIsInitiator(flowJobDO.getIs_initiator());
+                jobDO.setfProgress(flowJobDO.getProgress());
+                jobDO.setfCreateTime(flowJobDO.getCreate_time());
+                jobDO.setfUpdateTime(flowJobDO.getUpdate_time());
+                jobDO.setfStartTime(flowJobDO.getStart_time());
+                jobDO.setfEndTime(flowJobDO.getEnd_time());
+                jobDO.setfElapsed(flowJobDO.getElapsed());
+                return jobDO;
+            }).collect(Collectors.toList());
+            Map<String, Object> map = new HashMap();
+            map.put("list", jobDOList);
+            map.put("count", count);
+            return map;
+
+        }
+        return null;
     }
 
     public JobDO queryJobByConditions(String jobId, String role, String partyId) {
 
-        JobDO jobDO = jobMapper.queryJobByConditions(jobId, role, partyId);
-        return jobDO;
+//        JobDO jobDO = jobMapper.queryJobByConditions(jobId, role, partyId);
+//        return jobDO;
+        FlowJobDO flowJobQO = new FlowJobDO();
+        flowJobQO.setJob_id(jobId);
+        flowJobQO.setRole(role);
+        flowJobQO.setParty_id(partyId);
+        Map<String, Object> jobMap = getJobDOS(flowJobQO);
+        if (jobMap != null && jobMap.get("list") != null) {
+            return ((List<JobDO>) jobMap.get("list")).get(0);
+        }
+
+        return null;
     }
 
 
     public PageBean<Map<String, Object>> queryPagedJobs(PagedJobQO pagedJobQO) {
         String jobId = pagedJobQO.getJobId();
+        FlowJobQO flowJobQO = new FlowJobQO();
         if (jobId != null && 0 != jobId.trim().length()) {
             Preconditions.checkArgument(LogFileService.checkPathParameters(jobId));
-            pagedJobQO.setJobId("%" + jobId + "%");
+//            pagedJobQO.setJobId("%" + jobId + "%");
+            flowJobQO.setJob_id(pagedJobQO.getJobId());
         }
         String partyId = pagedJobQO.getPartyId();
         if (partyId != null && 0 != partyId.trim().length()) {
             Preconditions.checkArgument(LogFileService.checkPathParameters(partyId));
-            pagedJobQO.setPartyId("%" + partyId + "%");
+//            pagedJobQO.setPartyId("%" + partyId + "%");
+            flowJobQO.setParty_id(pagedJobQO.getPartyId());
         }
         String partner = pagedJobQO.getPartner();
         if (partner != null && partner.trim().length() != 0) {
             Preconditions.checkArgument(LogFileService.checkPathParameters(partner));
-            pagedJobQO.setPartner("%" + partner + "%");
+//            pagedJobQO.setPartner("%" + partner + "%");
         }
         String fDescription = pagedJobQO.getFDescription();
         if (fDescription != null && 0 != fDescription.trim().length()) {
             Preconditions.checkArgument(LogFileService.checkParameters("^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5\\s]+$", fDescription));
 //            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getfDescription()));
-            pagedJobQO.setFDescription("%" + fDescription + "%");
+//            pagedJobQO.setFDescription("%" + fDescription + "%");
+            flowJobQO.setDescription(pagedJobQO.getFDescription());
         }
 
-        long jobSum = this.countJob(pagedJobQO);
-        PageBean<Map<String, Object>> listPageBean = new PageBean<>(pagedJobQO.getPageNum(), pagedJobQO.getPageSize(), jobSum);
-        long startIndex = listPageBean.getStartIndex();
-        List<JobDO> jobWithBLOBs = jobMapper.queryPagedJobs(pagedJobQO, startIndex);
+
+        flowJobQO.setLimit(pagedJobQO.getPageSize().intValue());
+        flowJobQO.setPage(pagedJobQO.getPageNum().intValue());
+        if (pagedJobQO.getRole().size() > 0) {
+            flowJobQO.setRole(pagedJobQO.getRole());
+        }
+        if (pagedJobQO.getStatus().size() > 0) {
+            flowJobQO.setStatus(pagedJobQO.getStatus());
+        }
+
+
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(pagedJobQO.getOrderField())) {
+//          todo
+//            flowJobQO.setOrder_by(pagedJobQO.getOrderField().replaceFirst("f_",""));
+        }
+
+        flowJobQO.setOrder(pagedJobQO.getOrderRule());
+
+//todo
+//        flowJobQO.setPartner(pagedJobQO.getPartner());
+        Map<String, Object> jobMap = getJobDOS(flowJobQO);
+        List<JobDO> jobWithBLOBs = new ArrayList<>();
+        long count = 0;
+        if (jobMap != null) {
+            jobWithBLOBs = (List<JobDO>) jobMap.get("list");
+            count = ((Integer) jobMap.get("count"));
+        }
+
+
+//        long jobSum = this.countJob(pagedJobQO);
+        PageBean<Map<String, Object>> listPageBean = new PageBean<>(pagedJobQO.getPageNum(), pagedJobQO.getPageSize(), count);
+//        long startIndex = listPageBean.getStartIndex();
+//        List<JobDO> jobWithBLOBs = jobMapper.queryPagedJobs(pagedJobQO, startIndex);
         LinkedList<Map<String, Object>> jobList = new LinkedList<>();
         Map<JobDO, Future> jobDataMap = new LinkedHashMap<>();
         for (JobDO jobWithBLOB : jobWithBLOBs) {
@@ -194,9 +304,9 @@ public class JobManagerService {
         return listPageBean;
     }
 
-    public long countJob(PagedJobQO pagedJobQO) {
-        return jobMapper.countJob(pagedJobQO);
-    }
+//    public long countJob(PagedJobQO pagedJobQO) {
+//        return jobMapper.countJob(pagedJobQO);
+//    }
 
     public Map<String, List<String>> queryFields() {
         return Dict.fieldMap;
@@ -259,7 +369,7 @@ public class JobManagerService {
         //get fate path
         String webPath = System.getProperty("user.dir");
         int i1 = webPath.lastIndexOf("/");
-        String fatePath = webPath.substring(0, i1)+"/fateflow";
+        String fatePath = webPath.substring(0, i1) + "/fateflow";
 
         //build file path
         String fileName = "";
@@ -278,7 +388,7 @@ public class JobManagerService {
 
             } else if ("host".equals(role)) {
                 fileName = "job_runtime_on_party_conf.json";
-                realPath = fatePath + "/jobs/" + jobId + "/" + role + "/"+partyId+"/";
+                realPath = fatePath + "/jobs/" + jobId + "/" + role + "/" + partyId + "/";
                 fileOutputName = "runtime_config_" + jobId + ".json";
                 return getHostConfig(response, fileName, realPath, fileOutputName);
             } else {
@@ -292,7 +402,7 @@ public class JobManagerService {
         // download
         File file = new File(realPath, fileName);
         if (file.exists()) {
-            response.setBufferSize(1024*1000);
+            response.setBufferSize(1024 * 1000);
             byte[] buffer = new byte[1024];
             FileInputStream fis = null;
             BufferedInputStream bis = null;
@@ -334,7 +444,8 @@ public class JobManagerService {
 
     }
 
-    private ResponseResult getHostConfig(HttpServletResponse response, String fileName, String realPath, String fileOutputName) {
+    private ResponseResult getHostConfig(HttpServletResponse response, String fileName, String realPath, String
+            fileOutputName) {
         File file = new File(realPath, fileName);
         if (file.exists()) {
             BufferedReader br = null;
@@ -350,26 +461,26 @@ public class JobManagerService {
                 while ((s = br.readLine()) != null) {
                     ss.append(s);
                 }
-                JSONObject dataJson =JSON.parseObject(ss.toString());
-                if (dataJson!=null){
+                JSONObject dataJson = JSON.parseObject(ss.toString());
+                if (dataJson != null) {
                     dataJson.remove("initiator");
                     JSONObject role = dataJson.getJSONObject("role");
-                    if (role!=null){
+                    if (role != null) {
                         role.remove("guest");
                         role.remove("arbiter");
                     }
                     JSONObject component_parameters = dataJson.getJSONObject("component_parameters");
-                    if (component_parameters!=null){
+                    if (component_parameters != null) {
                         JSONObject role1 = component_parameters.getJSONObject("role");
-                        if (role1!=null){
+                        if (role1 != null) {
                             role1.remove("guest");
                         }
                     }
                     JSONObject role_parameters = dataJson.getJSONObject("role_parameters");
-                    if (role_parameters!=null){
+                    if (role_parameters != null) {
                         role_parameters.remove("guest");
                     }
-                    ws=JSON.toJSONString(dataJson, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
+                    ws = JSON.toJSONString(dataJson, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
                     bw.write(ws);
                     bw.flush();
                     log.info("download success,file :{}", realPath + fileName);

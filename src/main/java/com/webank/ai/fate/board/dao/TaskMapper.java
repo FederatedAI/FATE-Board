@@ -24,6 +24,6 @@ import java.util.List;
 
 public interface TaskMapper {
 
-    List<TaskDO> findTask(@Param("jobId") String jobId, @Param("role") String role,@Param("partyId") String partyId, @Param("componentName") String componentName);
+        List<TaskDO> findTask(@Param("jobId") String jobId, @Param("role") String role,@Param("partyId") String partyId, @Param("componentName") String componentName);
 
 }
