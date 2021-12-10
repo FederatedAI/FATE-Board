@@ -35,7 +35,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 
 @Configuration
-@MapperScan(basePackages = "com.webank.ai.fate.board.dao", sqlSessionFactoryRef = "fateboardSqlSessionFactory")
+//@MapperScan(basePackages = "com.webank.ai.fate.board.dao", sqlSessionFactoryRef = "fateboardSqlSessionFactory")
 public class WebConfiguration implements WebMvcConfigurer {
 
 //    @Override
@@ -43,20 +43,20 @@ public class WebConfiguration implements WebMvcConfigurer {
 //        registry.addMapping("/**").allowedMethods("*").allowedOrigins("*").allowCredentials(true);
 //    }
 
-    @Bean("fateboardDataSource")
-    @ConfigurationProperties(prefix = "fateboard.datasource")
-    public DataSource fateboardDataSource() {
-        return DataSourceBuilder.create().build();
-    }
-
-    @Bean("fateboardSqlSessionFactory")
-    public SqlSessionFactory sqlSessionFactory(@Qualifier("fateboardDataSource") DataSource dataSource) throws Exception {
-        SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
-        sessionFactory.setDataSource(dataSource);
-        //sessionFactory.setTypeAliasesPackage(env.getProperty("mybatis.typeAliasesPackage"));
-        sessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("fate/fateboard/mapping/*"));
-        return sessionFactory.getObject();
-    }
+//    @Bean("fateboardDataSource")
+//    @ConfigurationProperties(prefix = "fateboard.datasource")
+//    public DataSource fateboardDataSource() {
+//        return DataSourceBuilder.create().build();
+//    }
+//
+//    @Bean("fateboardSqlSessionFactory")
+//    public SqlSessionFactory sqlSessionFactory(@Qualifier("fateboardDataSource") DataSource dataSource) throws Exception {
+//        SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+//        sessionFactory.setDataSource(dataSource);
+//        //sessionFactory.setTypeAliasesPackage(env.getProperty("mybatis.typeAliasesPackage"));
+//        sessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("fate/fateboard/mapping/*"));
+//        return sessionFactory.getObject();
+//    }
 
 
     @Bean
