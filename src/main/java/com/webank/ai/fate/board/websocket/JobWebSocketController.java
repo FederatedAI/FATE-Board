@@ -53,19 +53,23 @@ import java.util.concurrent.*;
 @ServerEndpoint(value = "/websocket/progress/{jobId}/{role}/{partyId}", configurator = Configurator.class)
 @Component
 public class JobWebSocketController implements InitializingBean, ApplicationContextAware {
-
     private static Logger logger = LoggerFactory.getLogger(JobWebSocketController.class);
-
     private static JobManagerService jobManagerService;
-
     private static ApplicationContext applicationContext;
-
     private static JobDetailController jobDetailController;
-
     private static JobManagerController jobManagerController;
-
     private static ThreadPoolTaskExecutor asyncServiceExecutor;
-
+    @Override
+    public void afterPropertiesSet() {
+        JobWebSocketController.jobManagerService = (JobManagerService) applicationContext.getBean("jobManagerService");
+        JobWebSocketController.jobDetailController = (JobDetailController) applicationContext.getBean("jobDetailController");
+        JobWebSocketController.asyncServiceExecutor = (ThreadPoolTaskExecutor) applicationContext.getBean("asyncServiceExecutor");
+        JobWebSocketController.jobManagerController = (JobManagerController) applicationContext.getBean("jobManagerController");
+    }
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        JobWebSocketController.applicationContext = applicationContext;
+    }
 
     /**
      * call method when building connection
@@ -115,17 +119,6 @@ public class JobWebSocketController implements InitializingBean, ApplicationCont
 
 
 
-    @Override
-    public void afterPropertiesSet() {
-        JobWebSocketController.jobManagerService = (JobManagerService) applicationContext.getBean("jobManagerService");
-        JobWebSocketController.jobDetailController = (JobDetailController) applicationContext.getBean("jobDetailController");
-        JobWebSocketController.asyncServiceExecutor = (ThreadPoolTaskExecutor) applicationContext.getBean("asyncServiceExecutor");
-        JobWebSocketController.jobManagerController = (JobManagerController) applicationContext.getBean("jobManagerController");
-    }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        JobWebSocketController.applicationContext = applicationContext;
-    }
 }
 

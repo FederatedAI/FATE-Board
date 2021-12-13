@@ -156,6 +156,10 @@ public class HttpClientPool implements InitializingBean {
     }
 
 
+    public String postToFlowApi(String urlFlowApi, String requestData) {
+        return post(fateUrl+urlFlowApi, requestData);
+    }
+
     public String post(String url, String requestData) {
 
         HttpPost httpPost = new HttpPost(url);

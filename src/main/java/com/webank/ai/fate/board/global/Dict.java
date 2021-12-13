@@ -87,6 +87,7 @@ public class Dict {
 
     static public final HashMap<String, String> logMap = new HashMap<>();
 
+
     static {
         logMap.put("jobSchedule", "fate_flow_schedule.log");
         logMap.put("jobError", "fate_flow_schedule_error.log");
@@ -95,6 +96,17 @@ public class Dict {
         logMap.put("partyInfo", "INFO.log");
         logMap.put("partyDebug", "DEBUG.log");
         logMap.put("componentInfo", "INFO.log");
+    }
+//前端传来的logType和flow的logType对应表
+    static public final HashMap<String, String> logTypeMap = new HashMap<>();
+    static {
+        logTypeMap.put("jobSchedule", "jobSchedule");
+        logTypeMap.put("jobError", "jobScheduleError");
+        logTypeMap.put("partyError", "partyError");
+        logTypeMap.put("partyWarning", "partyWarning");
+        logTypeMap.put("partyInfo", "partyInfo");
+        logTypeMap.put("partyDebug", "partyDebug");
+        logTypeMap.put("componentInfo", "componentInfo");
     }
 
     //the fields for job search

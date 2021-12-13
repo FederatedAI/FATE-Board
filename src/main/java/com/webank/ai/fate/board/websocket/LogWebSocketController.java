@@ -17,6 +17,7 @@ package com.webank.ai.fate.board.websocket;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.jcraft.jsch.Channel;
@@ -29,6 +30,7 @@ import com.webank.ai.fate.board.pojo.SshInfo;
 import com.webank.ai.fate.board.services.JobManagerService;
 import com.webank.ai.fate.board.ssh.SshService;
 import com.webank.ai.fate.board.utils.GetSystemInfo;
+import com.webank.ai.fate.board.utils.HttpClientPool;
 import com.webank.ai.fate.board.utils.LogHandle;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -51,6 +53,22 @@ import java.util.Map;
 @Component
 public class LogWebSocketController implements InitializingBean, ApplicationContextAware {
     private static final Logger logger = LoggerFactory.getLogger(LogWebSocketController.class);
+    private static ApplicationContext applicationContext;
+    private static HttpClientPool httpClientPool;
+    private static JobManagerService jobManagerService;
+    @Override
+    public void afterPropertiesSet() {
+        LogWebSocketController.httpClientPool = (HttpClientPool) applicationContext.getBean("httpClientPool");
+        LogWebSocketController.jobManagerService = (JobManagerService) applicationContext.getBean("jobManagerService");
+
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        LogWebSocketController.applicationContext = applicationContext;
+    }
+
+
 
     /**
      * call method when connection build
@@ -63,7 +81,7 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
     ) throws Exception {
         Preconditions.checkArgument(StringUtils.isNoneEmpty(jobId, role, partyId, componentId));
         logger.info("input: {},{},{},{}", jobId, role, partyId, componentId);
-        LogService logService = new LogService(jobId, role, partyId, componentId, session, logFileService, sshService);
+        LogService logService = new LogService(jobId, role, partyId, componentId, session,httpClientPool,jobManagerService,true);
 
         new Thread(logService).start();
     }
@@ -109,107 +127,25 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
 
             Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentId, type));
 
+            Map<String, Object> reqMap = new HashMap<>();
+            reqMap.put("job_id", jobId);
+            reqMap.put("log_type", Dict.logTypeMap.get(type));
+            reqMap.put("role", role);
+            reqMap.put("party_id", Integer.valueOf(partyId));
+            reqMap.put("component_name", componentId);
+            reqMap.put("begin", begin);
+            reqMap.put("end", end);
 
-            //build log path
-            String logPath = logFileService.buildLogPath(jobId, role, partyId, componentId, type);
-            Preconditions.checkArgument(StringUtils.isNoneEmpty(logPath));
-
-            List<Map<String, Object>> logResults = Lists.newArrayList();
-
-            //judge log location and get logs
-            File file = new File(logPath);
-            if (file.exists()) {
-
-                String[] cmd = {"sh", "-c", "tail -n +" + begin + " " + logPath + " | head -n " + (end - begin + 1)};
-
-                Process process = Runtime.getRuntime().exec(cmd);
-                InputStream inputStream = process.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                try {
-                    String content = null;
-                    int lineNumber = begin;
-                    do {
-                        content = reader.readLine();
-                        if (content != null) {
-
-                            //replace sensitive information
-                            String finalLog = LogHandle.handleLog(content);
-                            logResults.add(LogFileService.toLogMap(finalLog, lineNumber));
-                            lineNumber++;
-                        }
-                    } while (content != null);
-                    logger.info("execute  cmd : {} ", (Object) cmd);
-                } finally {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        process.destroyForcibly();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            } else {
-                //get remote ip
-                String jobIp = logFileService.getJobIp(jobId, role, partyId);
-                if (StringUtils.isEmpty(jobIp)) {
-                    logger.error("remote ip {} doesn't exist", jobIp);
-                } else {
-                    SshInfo sshInfo = sshService.getSSHInfo(jobIp);
-                    if (sshInfo != null) {
-                        com.jcraft.jsch.Session jschSession = sshService.connect(sshInfo);
-
-                        String cmd = "tail -n +" + begin + " " + logPath + " | head -n " + (end - begin + 1);
-                        Channel channel = sshService.executeCmd(jschSession, cmd);
-
-                        InputStream inputStream = channel.getInputStream();
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                        try {
-                            String content;
-                            int lineNumber = begin;
-                            do {
-                                content = reader.readLine();
-                                if (content != null) {
-                                    //replace sensitive information
-                                    String finalLog = LogHandle.handleLog(content);
-                                    logResults.add(LogFileService.toLogMap(finalLog, lineNumber));
-                                    lineNumber++;
-                                }
-                            } while (content != null);
-                        } finally {
-                            try {
-                                reader.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                inputStream.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                channel.disconnect();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        //pull logs to local
-                        String jobStatus = logFileService.getJobStatus(jobId, role, partyId);
-                        if (Dict.JOB_FINISHED_STATUS.contains(jobStatus)) {
-                            String jobDir = logFileService.getJobDir(jobId);
-                            logFileTransferEventProducer.onData(sshInfo, jobDir, jobDir);
-                        }
-                    }
-                }
+            String resultFlow = null;
+            try {
+                resultFlow = httpClientPool.postToFlowApi(Dict.URL_LOG_CAT, JSON.toJSONString(reqMap));
+            } catch (Exception e) {
+                logger.error("connect fateflow error:", e);
+//                    return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
             }
+
+            String s1 = JSON.toJSONString(JSON.parseObject(resultFlow).getJSONArray(Dict.DATA)).replaceAll("line_num", "lineNum");
+            List<Map<String, Object>> logResults = JSON.parseObject(s1, new TypeReference<List<Map<String, Object>>>() {});
             //format result to push
             HashMap<String, Object> result = new HashMap<>();
             result.put("type", type);
@@ -243,22 +179,6 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
         }
     }
 
-    @Override
-    public void afterPropertiesSet() {
-        LogWebSocketController.logFileService = (LogFileService) applicationContext.getBean("logFileService");
-        LogWebSocketController.sshService = (SshService) applicationContext.getBean("sshService");
-        LogWebSocketController.logFileTransferEventProducer = (LogFileTransferEventProducer) applicationContext.getBean("logFileTransferEventProducer");
 
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        LogWebSocketController.applicationContext = applicationContext;
-    }
-
-    private static ApplicationContext applicationContext;
-    private static SshService sshService;
-    private static LogFileService logFileService;
-    private static LogFileTransferEventProducer logFileTransferEventProducer;
 
 }

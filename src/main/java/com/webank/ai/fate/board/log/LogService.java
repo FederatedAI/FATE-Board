@@ -17,10 +17,16 @@ package com.webank.ai.fate.board.log;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Preconditions;
+import com.webank.ai.fate.board.global.ErrorCode;
+import com.webank.ai.fate.board.global.ResponseResult;
+import com.webank.ai.fate.board.pojo.JobDO;
 import com.webank.ai.fate.board.pojo.SshInfo;
+import com.webank.ai.fate.board.services.JobManagerService;
 import com.webank.ai.fate.board.ssh.SshService;
 import com.webank.ai.fate.board.global.Dict;
+import com.webank.ai.fate.board.utils.HttpClientPool;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -40,74 +46,74 @@ public class LogService implements Runnable {
     private String partyId;
     private String componentId;
     private Session session;
-    private LogFileService logFileService;
-    private SshService sshService;
+    private HttpClientPool httpClientPool;
+    private JobManagerService jobManagerService;
+    private boolean queryJob;
 
-    public LogService(String jobId, String role, String partyId, String componentId, Session session, LogFileService logFileService, SshService sshService) {
+    public LogService(String jobId, String role, String partyId, String componentId, Session session, HttpClientPool httpClientPool, JobManagerService jobManagerService, boolean queryJob) {
         this.jobId = jobId;
         this.role = role;
         this.partyId = partyId;
         this.componentId = componentId;
         this.session = session;
-        this.logFileService = logFileService;
-        this.sshService = sshService;
+        this.httpClientPool = httpClientPool;
+        this.jobManagerService = jobManagerService;
+        this.queryJob = queryJob;
     }
 
     @SneakyThrows
     @Override
     public void run() {
-        HashMap<String, String> logPathMap = new HashMap<>();
-        if(Dict.DEFAULT.equals(componentId)){
-            Set<String> logTypes = Dict.logMap.keySet();
+        HashMap<String, String> typeMap = new HashMap<>();
+        if (Dict.DEFAULT.equals(componentId)) {
+            Set<String> logTypes = Dict.logTypeMap.keySet();
             for (String type : logTypes) {
-                if (!"componentInfo".equals(type)){
-                    String logPath = logFileService.buildLogPath(jobId, role, partyId, componentId, type);
-                    logPathMap.put(type,logPath);
+                if (!"componentInfo".equals(type)) {
+                    typeMap.put(type, Dict.logTypeMap.get(type));
                 }
             }
-        }else {
-            String logPath = logFileService.buildLogPath(jobId, role, partyId, componentId, "componentInfo");
-            logPathMap.put("componentInfo",logPath);
+        } else {
+            typeMap.put("componentInfo", Dict.logTypeMap.get("componentInfo"));
         }
 
-        //get remote ip
-        String jobIp = logFileService.getJobIp(jobId, role, partyId);
-        Preconditions.checkArgument(StringUtils.isNoneEmpty(jobIp));
 
         //get size of logs
         while (session.isOpen()) {
             HashMap<String, Integer> logSizeMap = new HashMap<>();
-            Set<Map.Entry<String, String>> entries = logPathMap.entrySet();
+            Set<Map.Entry<String, String>> entries = typeMap.entrySet();
             for (Map.Entry<String, String> entry : entries) {
                 String logType = entry.getKey();
-                String logPath = entry.getValue();
-                File file = new File(logPath);
-                Integer lineSum = 0;
-
-                //judge the location of log and get log size
-                if (file.exists()) {
-                    try {
-                        lineSum = LogFileService.getLocalFileLineCount(file);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        logger.error("read local log error : path {}", logPath);
+                String flowLogType = entry.getValue();
+                Map<String, Object> reqMap = new HashMap<>();
+                reqMap.put("job_id", jobId);
+                reqMap.put("log_type", flowLogType);
+                reqMap.put("role", role);
+                reqMap.put("party_id", Integer.valueOf(partyId));
+                reqMap.put("component_name", componentId);
+                String result = null;
+                try {
+                    result = httpClientPool.postToFlowApi(Dict.URL_LOG_SIZE, JSON.toJSONString(reqMap));
+                } catch (Exception e) {
+                    logger.error("connect fateflow error:", e);
+//                    return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+                }
+                JSONObject data = JSON.parseObject(result).getJSONObject(Dict.DATA);
+                Integer size = data.getInteger("size");
+                logSizeMap.put(logType, size);
+            }
+            if (queryJob) {
+                //get job information
+                JobDO job = jobManagerService.queryJobByConditions(jobId, role, String.valueOf(partyId));
+                if (job != null) {
+                    //get status
+                    String status = job.getfStatus();
+                    if (status.equals(Dict.TIMEOUT)) {
+                        status = Dict.FAILED;
                     }
-                } else {
-                    logger.info("local file path {} is not exist,try to find remote file", file);
-                    SshInfo sshInfo = sshService.getSSHInfo(jobIp);
-                    if (sshInfo == null) {
-                        logger.info("remote {} connection info doesn't exist,file {} doesn't exist", jobIp,file);
-                    } else {
-                        try {
-                            lineSum = logFileService.getRemoteFileLineCount(sshInfo, logPath);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            logger.error("read remote log error: ip {}, path {}", jobIp, logPath);
-                        }
+                    if (Dict.JOB_FINISHED_STATUS.contains(status)) {
+                        queryJob = false;
                     }
                 }
-
-                logSizeMap.put(logType, lineSum);
             }
 
             HashMap<String, Object> result = new HashMap<>();
@@ -121,8 +127,11 @@ public class LogService implements Runnable {
             }
             try {
                 Thread.sleep(3000);
+                if (!queryJob){
+                    Thread.sleep(30000);
+                }
             } catch (InterruptedException e) {
-                logger.error("thread sleep error",e);
+                logger.error("thread sleep error", e);
             }
         }
     }

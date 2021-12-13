@@ -203,8 +203,9 @@ public class JobManagerService {
 
         if (org.apache.commons.lang3.StringUtils.isNotBlank(pagedJobQO.getOrderField())) {
 //          todo
-//            flowJobQO.setOrder_by(pagedJobQO.getOrderField().replaceFirst("f_",""));
+//            flowJobQO.setOrder_by(pagedJobQO.getOrderField().replaceFirst("f_","")); cannot be job_id
         }
+        //jobid partyid 不支持模糊查询
 
         flowJobQO.setOrder(pagedJobQO.getOrderRule());
 
