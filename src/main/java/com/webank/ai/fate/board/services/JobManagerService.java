@@ -22,7 +22,6 @@ import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-import com.webank.ai.fate.board.dao.JobMapper;
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.log.LogFileService;
@@ -32,9 +31,9 @@ import com.webank.ai.fate.board.utils.HttpClientPool;
 import com.webank.ai.fate.board.utils.PageBean;
 import com.webank.ai.fate.board.utils.ThreadPoolTaskExecutorUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.jni.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -42,9 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -86,7 +83,7 @@ public class JobManagerService {
 
         FlowJobQO flowJobQO = new FlowJobQO();
         flowJobQO.setStatus(list);
-        Map<String, Object> jobMap = getJobDOS(flowJobQO);
+        Map<String, Object> jobMap = getJobMap(flowJobQO);
         if (jobMap != null) {
             return (List<JobDO>) jobMap.get("list");
         }
@@ -94,7 +91,7 @@ public class JobManagerService {
     }
 
 
-    private Map<String, Object> getJobDOS(Object query) {
+    private Map<String, Object> getJobMap(Object query) {
         String result = null;
         try {
             result = httpClientPool.post(fateUrl + Dict.URL_JOB_QUERY, JSON.toJSONString(query));
@@ -154,7 +151,7 @@ public class JobManagerService {
         flowJobQO.setJob_id(jobId);
         flowJobQO.setRole(role);
         flowJobQO.setParty_id(partyId);
-        Map<String, Object> jobMap = getJobDOS(flowJobQO);
+        Map<String, Object> jobMap = getJobMap(flowJobQO);
         if (jobMap != null && jobMap.get("list") != null) {
             return ((List<JobDO>) jobMap.get("list")).get(0);
         }
@@ -201,9 +198,10 @@ public class JobManagerService {
         }
 
 
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(pagedJobQO.getOrderField())) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(pagedJobQO.getOrderField()) && !"f_job_id".equals(pagedJobQO.getOrderField())) {
 //          todo
 //            flowJobQO.setOrder_by(pagedJobQO.getOrderField().replaceFirst("f_","")); cannot be job_id
+            flowJobQO.setOrder_by(pagedJobQO.getOrderField().replaceFirst("f_", ""));
         }
         //jobid partyid 不支持模糊查询
 
@@ -211,7 +209,7 @@ public class JobManagerService {
 
 //todo
 //        flowJobQO.setPartner(pagedJobQO.getPartner());
-        Map<String, Object> jobMap = getJobDOS(flowJobQO);
+        Map<String, Object> jobMap = getJobMap(flowJobQO);
         List<JobDO> jobWithBLOBs = new ArrayList<>();
         long count = 0;
         if (jobMap != null) {
@@ -367,31 +365,37 @@ public class JobManagerService {
             return new ResponseResult(ErrorCode.ERROR_PARAMETER);
         }
 
-        //get fate path
-        String webPath = System.getProperty("user.dir");
-        int i1 = webPath.lastIndexOf("/");
-        String fatePath = webPath.substring(0, i1) + "/fateflow";
 
-        //build file path
-        String fileName = "";
-        String realPath = "";
+        Map<String, Object> query = new HashMap<>();
+        query.put("job_id", jobId);
+        String result = null;
+        try {
+            result = httpClientPool.post(fateUrl + Dict.URL_CONFIG_CAT, JSON.toJSONString(query));
+        } catch (Exception e) {
+            logger.error("connect fateflow error:", e);
+            //todo
+//            throw new Exception(ErrorCode.FATEFLOW_ERROR_CONNECTION.getMsg());
+//            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+        }
+        JSONObject resultObject = JSON.parseObject(result);
+        JSONObject dataObject = resultObject.getJSONObject(Dict.DATA);
+        JSONObject dslObject = dataObject.getJSONObject("dsl");
+        JSONObject runtime_confObject = dataObject.getJSONObject("runtime_conf");
+        JSONObject responseObject;
+
+
         String fileOutputName = "";
 
         if ("dsl".equals(type)) {
-            fileName = "job_dsl.json";
-            realPath = fatePath + "/jobs/" + jobId + "/";
             fileOutputName = "job_dsl_" + jobId + ".json";
+            responseObject = dslObject;
         } else {
             if ("guest".equals(role) || "local".equals(role)) {
-                fileName = "job_runtime_conf.json";
-                realPath = fatePath + "/jobs/" + jobId + "/";
                 fileOutputName = "runtime_config_" + jobId + ".json";
-
+                responseObject = runtime_confObject;
             } else if ("host".equals(role)) {
-                fileName = "job_runtime_on_party_conf.json";
-                realPath = fatePath + "/jobs/" + jobId + "/" + role + "/" + partyId + "/";
                 fileOutputName = "runtime_config_" + jobId + ".json";
-                return getHostConfig(response, fileName, realPath, fileOutputName);
+                responseObject = getHostConfig(runtime_confObject);
             } else {
                 log.error("download error: role:{} doesn't support", role);
                 return new ResponseResult(ErrorCode.ERROR_PARAMETER);
@@ -400,48 +404,46 @@ public class JobManagerService {
         }
 
 
-        // download
-        File file = new File(realPath, fileName);
-        if (file.exists()) {
-            response.setBufferSize(1024 * 1000);
-            byte[] buffer = new byte[1024];
-            FileInputStream fis = null;
-            BufferedInputStream bis = null;
-            try {
-                fis = new FileInputStream(file);
-                bis = new BufferedInputStream(fis);
-                OutputStream os = response.getOutputStream();
-                int i = bis.read(buffer);
-                while (i != -1) {
-                    os.write(buffer, 0, i);
-                    i = bis.read(buffer);
-                }
-                log.info("download success,file :{}", realPath + fileName);
-            } catch (Exception e) {
-                log.error("download failed", e);
-                return new ResponseResult(ErrorCode.DOWNLOAD_ERROR);
-            } finally {
-                if (bis != null) {
-                    try {
-                        bis.close();
-                    } catch (IOException e) {
-                        log.error("download io close failed", e);
-                    }
-                }
-                if (fis != null) {
-                    try {
-                        fis.close();
-                    } catch (IOException e) {
-                        log.error("download io close failed", e);
-                    }
+
+        response.setBufferSize(1024 * 1000);
+        response.setContentType("application/force-download");
+        response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
+        try {
+            OutputStream os = response.getOutputStream();
+            os.write(JSON.toJSONBytes(responseObject, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat));
+//            os.flush();
+//            os.close();
+               log.info("download success,file :{}", fileOutputName);
+        } catch (Exception e) {
+            log.error("download failed", e);
+            return new ResponseResult(ErrorCode.DOWNLOAD_ERROR);
+        }
+        return null;
+    }
+
+    //host端需过滤掉其他方信息
+    private JSONObject getHostConfig(JSONObject runtime_confObject) {
+        if (runtime_confObject != null) {
+            runtime_confObject.remove("initiator");
+            JSONObject role = runtime_confObject.getJSONObject("role");
+            if (role != null) {
+                role.remove("guest");
+                role.remove("arbiter");
+            }
+            JSONObject component_parameters = runtime_confObject.getJSONObject("component_parameters");
+            if (component_parameters != null) {
+                JSONObject role1 = component_parameters.getJSONObject("role");
+                if (role1 != null) {
+                    role1.remove("guest");
                 }
             }
-            response.setContentType("application/force-download");
-            response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
-            return null;
-        } else {
-            return new ResponseResult(ErrorCode.FILE_ERROR);
+            JSONObject role_parameters = runtime_confObject.getJSONObject("role_parameters");
+            if (role_parameters != null) {
+                role_parameters.remove("guest");
+            }
+            return runtime_confObject;
         }
+        return null;
 
     }
 
