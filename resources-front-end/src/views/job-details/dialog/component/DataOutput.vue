@@ -90,7 +90,9 @@ export default {
             })
             body.push(newRow)
           })
-          header.unshift({ type: 'index', label: 'index' })
+          if (header.length && header.length > 0) {
+            header.unshift({ type: 'index', label: 'index' })
+          }
           tableHeader[this.data.meta.names[i]] = header
           if (this.data.meta.header.length === 1) {
             tableBody = body
