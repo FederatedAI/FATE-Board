@@ -409,7 +409,7 @@ class CompExpression {
     if (this.belone.toLowerCase().match(/evaluation|union/i)) {
       this.input[0].mult = ports.get('MULT_DATA_PORT')
     }
-    if (!this.belone.toLowerCase().match(/(evaluation|upload|download|pearson|datasplit|statistics|psi|kmeans|modelloader|cacheloader)/i)) {
+    if (!this.belone.toLowerCase().match(/(evaluation|upload|download|pearson|datasplit|psi|kmeans|modelloader|cacheloader)/i)) {
       this.output.push(DATAOUTPUT)
     }
     if (this.belone.toLowerCase().match(/(kmeans)/i)) {

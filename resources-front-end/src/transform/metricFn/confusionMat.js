@@ -80,26 +80,22 @@ function handler(confusionMat, f1Score) {
       const arr2 = []
       const arr3 = []
       let step = 0
-      let i = thresholds.length - 1
       while (step <= 100) {
         const key = step / 100
-        if (thresholds[i] >= key || i === 0) {
-          const _fn = fn[i]
-          const _fp = fp[i]
-          const _tn = tn[i]
-          const _tp = tp[i]
-          f1score.push([key, originF1score[i]])
-          arr0.push([key, `${_tn}(${(_tn / sum(_fn, _fp, _tn, _tp) * 100).toFixed(4)}%)`])
-          arr1.push([key, `${_fp}(${(_fp / sum(_fn, _fp, _tn, _tp) * 100).toFixed(4)}%)`])
-          arr2.push([key, `${_fn}(${(_fn / sum(_fn, _fp, _tn, _tp) * 100).toFixed(4)}%)`])
-          arr3.push([key, `${_tp}(${(_tp / sum(_fn, _fp, _tn, _tp) * 100).toFixed(4)}%)`])
-        } else {
-          i -= 1
-          continue
-        }
+        const i = thresholds.findIndex((val) => val === key)
+        // if (thresholds[i] === key || i === 0) {
+        const _fn = fn[i]
+        const _fp = fp[i]
+        const _tn = tn[i]
+        const _tp = tp[i]
+        f1score.push([key, originF1score[i]])
+        arr0.push([key, `${_tn}(${(_tn / sum(_fn, _fp, _tn, _tp) * 100).toFixed(4)}%)`])
+        arr1.push([key, `${_fp}(${(_fp / sum(_fn, _fp, _tn, _tp) * 100).toFixed(4)}%)`])
+        arr2.push([key, `${_fn}(${(_fn / sum(_fn, _fp, _tn, _tp) * 100).toFixed(4)}%)`])
+        arr3.push([key, `${_tp}(${(_tp / sum(_fn, _fp, _tn, _tp) * 100).toFixed(4)}%)`])
+        // }
         step += 1
       }
-
       tableData.push(Object.assign({
         labels: '0',
         0: arr0,
