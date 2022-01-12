@@ -1,3 +1,13 @@
+# Release 1.7.2
+
+#### Major Features and Improvements
+**Major Features**
+
+* Confusion matrix data display upgrade
+* Component port bug fixed
+* No data prompt upgrade
+
+
 # Release 1.7.1
 
 #### Major Features and Improvements
