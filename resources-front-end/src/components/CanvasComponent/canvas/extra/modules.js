@@ -129,7 +129,7 @@ const progressComp = {
     },
     linkChoose(point, afterChoose, ...props) {
       const lay = this
-      if (lay.$here(point)) {
+      if (lay.$here(point) && lay.$visiable) {
         lay.setCus('choose', () => {
           if (afterChoose && typeof afterChoose === 'function') afterChoose(lay.$parent.text, lay.$here(point), true)
         })
