@@ -1,3 +1,12 @@
+# Release 1.7.2.1
+
+#### Major Features and Improvements
+**Major Features**
+
+* Dependent package version update
+
+
+
 # Release 1.7.2
 
 #### Major Features and Improvements
