@@ -3,7 +3,7 @@
 #### Major Features and Improvements
 **Major Features**
 
-* Detail finalization
+* Detail finalization and Configuration calibration
 
 
 # Release 1.7.2.1
