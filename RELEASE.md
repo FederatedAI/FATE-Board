@@ -1,3 +1,11 @@
+# Release 1.7.2.2
+
+#### Major Features and Improvements
+**Major Features**
+
+* Detail finalization
+
+
 # Release 1.7.2.1
 
 #### Major Features and Improvements
