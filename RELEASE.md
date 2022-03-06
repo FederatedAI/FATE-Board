@@ -1,3 +1,20 @@
+# Release 1.7.2.2
+
+#### Major Features and Improvements
+**Major Features**
+
+* Detail finalization and Configuration calibration
+
+
+# Release 1.7.2.1
+
+#### Major Features and Improvements
+**Major Features**
+
+* Update shelljs from 0.8.3 to 0.8.5
+* Update spring-core from 5.2.9Release to 5.3.14
+
+
 # Release 1.7.2
 
 #### Major Features and Improvements
