@@ -60,14 +60,17 @@ function getHeartCheckObj(ws) {
   }
 }
 
+function isHttps() {
+  return window.location.protocol === 'https:'
+}
+
 export default class ReconnectingWebSocket {
   static CONNECTING = WebSocket.CONNECTING
   static OPEN = WebSocket.OPEN
   static CLOSING = WebSocket.CLOSING
   static CLOSE = WebSocket.CLOSE
-  static baseUrl = process.env.WEBSOCKET_BASE_API ||
-    (process.env.BASE_API || window.location.origin).replace(/^http/, 'ws')
-
+  static PROTOCOL = isHttps() ? 'wss://' : 'ws://'
+  static baseUrl = `${ReconnectingWebSocket.PROTOCOL}${location.host}`
   constructor(url, protocols, options = {}) {
     this.url = url
     this.protocols = protocols
