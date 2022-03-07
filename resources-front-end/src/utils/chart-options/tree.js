@@ -24,12 +24,26 @@ export function getTreeOptions() {
       trigger: 'item',
       triggerOn: 'mousemove',
       formatter: params => {
+        const node = params.data.meta
         const strArr = params.data.name.split('\n')
         let str = ''
         strArr.forEach((item, index, arr) => {
-          str += item
-          if (index < arr.length - 1) {
-            str += '<br>'
+          if (item.match(/[a-z]/i)) {
+            if (node.isLeaf && item.match(/weight/i)) {
+              if (node.moWeight && node.moWeight.length && node.moWeight.length > 0) {
+                str += `weight: ${node.moWeight.length > 1 ? '<br>' : ''}`
+                for (let i = 0; i < node.moWeight.length; i++) {
+                  str += `"${i}": ${node.moWeight[i]}${i < node.moWeight.length - 1 ? '<br>' : ''}`
+                }
+              } else {
+                str += `weight: ${node.weight}`
+              }
+            } else {
+              str += item
+            }
+            if (index < arr.length - 1) {
+              str += '<br>'
+            }
           }
         })
         return str

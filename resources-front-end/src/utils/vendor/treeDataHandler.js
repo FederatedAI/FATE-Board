@@ -29,7 +29,11 @@ export default function(data, role, partyId, featureNameFidMapping, splitMaskdic
   let maxDepth = 0
   const pushData = ({ arr, node, grandChildrenArr = [], depth = 0, rootNode }) => {
     const variable = featureNameFidMapping[node.fid]
-    const splitValue = !(outputType.toLowerCase().match(modelNameMap.homoBoost.toLowerCase())) ? parseFloat(splitMaskdict[node.id]).toFixed(6) : parseFloat(node.bid).toFixed(6)
+    const splitValue = !(outputType.toLowerCase().match(modelNameMap.homoBoost.toLowerCase()))
+      ? (splitMaskdict[node.id]
+        ? parseFloat(splitMaskdict[node.id]).toFixed(6)
+        : undefined
+      ) : parseFloat(node.bid).toFixed(6)
     const nodeRole = node.sitename.split(':')[0]
     const nodePartyId = node.sitename.split(':')[1]
     let name = rootNode && splitValue === undefined ? rootNode + '\n' : `ID: ${node.id}\n`
@@ -48,7 +52,11 @@ export default function(data, role, partyId, featureNameFidMapping, splitMaskdic
       name += '\n'
     }
     if (((node.isLeaf && role === 'guest') || (node.isLeaf && outputType.toLowerCase().match(modelNameMap.homoBoost.toLowerCase()))) && !rootNode) {
-      name += `weight: ${formatFloat(node.weight)}\n`
+      if (node.moWeight && node.moWeight.length > 0) {
+        name += `Weight: \n "0":${formatFloat(node.moWeight[0])}${node.moWeight.length > 1 ? '...' : ''}\n`
+      } else {
+        name += `weight: ${formatFloat(node.weight)}\n`
+      }
     }
     if (!(outputType.toLowerCase().match(modelNameMap.homoBoost.toLowerCase()))) {
       name += workmode.toLowerCase() === 'mix' && role.toLowerCase().match('guest') && node.leftNodeid === -1 && node.rightNodeid === -1 && depth === 0
@@ -58,6 +66,7 @@ export default function(data, role, partyId, featureNameFidMapping, splitMaskdic
     arr.push({
       treeid: node.id,
       name,
+      meta: node,
       children: grandChildrenArr
     })
     if (depth > maxDepth) {
@@ -67,9 +76,9 @@ export default function(data, role, partyId, featureNameFidMapping, splitMaskdic
   }
   const rootNode = data.find(item => item.id === data[0].id)
   const treeData = []
-  const mixecheck = pushData({ arr: treeData, node: rootNode, rootNode: workmode.toLowerCase() === 'mix' && role.toLowerCase().match('guest') ? 'Multi nodes' : '' })
+  const mixecheck = pushData({ arr: treeData, node: rootNode, rootNode: workmode && workmode.toLowerCase() === 'mix' && role.toLowerCase().match('guest') ? 'Multi nodes' : '' })
   let treeWidth = 0
-  if (workmode.toLowerCase() === 'mix' && !mixecheck && role.toLowerCase().match('guest')) {
+  if (workmode && workmode.toLowerCase() === 'mix' && !mixecheck && role.toLowerCase().match('guest')) {
     const insertLeafs = (arr, list) => {
       for (const val of list) {
         if (val.isLeaf) {

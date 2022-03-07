@@ -137,7 +137,7 @@ function classLabel(role, classes, treeDim) {
 function modelTreeData(modelData, partyId, role) {
   const mData = modelData.data.data
   const mMeta = modelData.data.meta
-  const workMode = mMeta.meta_data.workMode
+  const workMode = mMeta.meta_data.boostingStrategy
   const type = mMeta.module_name
   // model data transform
   const { featureNameFidMapping, trees, classes, treeDim, treePlan } = mData
@@ -428,7 +428,7 @@ function impotanceAsync(responseData, role) {
   ]
   const gainTable = hasGain(dataList)
 
-  if (gainTable) {
+  if (gainTable && role.match(/guest/i)) {
     const formList2 = [
       createComponent('text', '', {
         content: `{t} features involved in model splitting`,
@@ -674,7 +674,7 @@ const fn = async(modelData, metricData, partyId, role, componentName, jobId) => 
     const outputType = modelData.data.meta.module_name
     const workMode = modelData.data.meta.meta_data.workMode
     finalSetting.push(TreeSetting(modelData, partyId, role))
-    if (role === 'guest' || workMode.toLowerCase().match('mix')) {
+    if (role !== 'host' || !outputType.toLowerCase().match('homo')) {
       const featureImportances = importanceSetting(modelData.data.data, role)
       if (featureImportances) {
         finalSetting.push(featureImportances)
