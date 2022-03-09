@@ -16,4 +16,4 @@
  *
  */
 
- export { default as default } from './Intersection'
+export { default as default } from './Intersection'
