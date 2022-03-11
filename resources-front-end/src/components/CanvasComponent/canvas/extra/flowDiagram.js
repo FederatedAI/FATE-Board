@@ -409,7 +409,7 @@ class CompExpression {
     if (this.belone.toLowerCase().match(/evaluation|union/i)) {
       this.input[0].mult = ports.get('MULT_DATA_PORT')
     }
-    if (!this.belone.toLowerCase().match(/(evaluation|upload|download|pearson|datasplit|psi|kmeans|modelloader|cacheloader|shap|statistics)/i)) {
+    if (!this.belone.toLowerCase().match(/(evaluation|upload|download|pearson|datasplit|psi|kmeans|modelloader|cacheloader|shap|statistics|writer)/i)) {
       this.output.push(DATAOUTPUT)
     }
     if (this.belone.toLowerCase().match(/(kmeans)/i)) {
@@ -434,7 +434,7 @@ class CompExpression {
       }
       this.output.push(CACHEOUTPUT)
     }
-    if (!this.belone.toLowerCase().match(/(intersection|evaluation|upload|download|rsa|datasplit|reader|union|scorecard|cacheloader)/i)) {
+    if (!this.belone.toLowerCase().match(/(intersection|evaluation|upload|download|rsa|datasplit|reader|union|scorecard|cacheloader|writer)/i)) {
       if (!this.belone.toLowerCase().match(/(statistics|pearson|psi|modelloader)/i)) {
         this.input.push(MODELINPUT)
       }
