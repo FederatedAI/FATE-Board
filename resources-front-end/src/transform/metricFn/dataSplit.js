@@ -92,7 +92,7 @@ const fn = (response, params) => {
               total[h.prop] = 'Total'
             }
           } else {
-            dataItem[h.prop] = label_info[h.prop][index]
+            dataItem[h.prop] = label_info[h.prop][name]
             if (index === 0) {
               if (h.prop !== 'original') {
                 total[h.prop] = count_info[h.prop] + '(' + (ratio_info[h.prop] * 100).toFixed(4) + '%)'
