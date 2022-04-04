@@ -48,7 +48,7 @@ export default {
     },
     content: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     },
     inrow: {
       type: Boolean | String,

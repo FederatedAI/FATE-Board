@@ -45,8 +45,7 @@ export default {
   mixins: [dataFilter, basicOperation, disableCheck],
   props: {
     options: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Array | Object,
+      type: [Array, Object],
       default: () => []
     },
     multiple: {

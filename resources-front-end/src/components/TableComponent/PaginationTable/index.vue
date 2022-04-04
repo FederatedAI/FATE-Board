@@ -66,18 +66,15 @@ export default {
   mixins: [dataSort, tableSearch, dataReporter],
   props: {
     data: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Array | Object,
+      type: [Array, Object],
       default: () => []
     },
     header: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Array | Object,
+      type: [Array, Object],
       default: () => []
     },
     pageSize: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Number | String,
+      type: [Number, String],
       default: 10
     },
     total: {
@@ -85,8 +82,7 @@ export default {
       default: 10
     },
     async: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Function | Boolean,
+      type: [Function, Boolean],
       default: false
     },
 
@@ -111,8 +107,7 @@ export default {
       default: true
     },
     size: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Number | Boolean,
+      type: [Number, Boolean],
       default: 6
     },
     name: {

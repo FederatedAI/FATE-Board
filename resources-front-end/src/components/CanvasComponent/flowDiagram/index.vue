@@ -42,7 +42,7 @@ export default {
   props: {
     dagInfo: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     },
     purePic: {
       type: Boolean,

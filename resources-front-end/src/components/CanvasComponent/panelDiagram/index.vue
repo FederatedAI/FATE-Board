@@ -31,7 +31,7 @@ export default {
       default: 0
     },
     time: {
-      type: Number | String,
+      type: [Number, String],
       default: '00:00:00'
     }
   },

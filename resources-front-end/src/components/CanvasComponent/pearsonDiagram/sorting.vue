@@ -81,7 +81,7 @@ export default {
   },
   props: {
     nums: {
-      type: Array | Object,
+      type: [Array, Object],
       default: () => []
     },
     features: {

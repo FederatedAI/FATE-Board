@@ -116,7 +116,7 @@ export default {
       default: () => []
     },
     treeList: {
-      type: Array | Object,
+      type: [Array, Object],
       default: () => []
     },
     treeLine: {
@@ -128,8 +128,8 @@ export default {
       default: 0
     },
     basicColor: {
-      type: String | Object,
-      default: () => {}
+      type: [String, Object],
+      default: () => ({})
     },
     showlabel: {
       type: Boolean,

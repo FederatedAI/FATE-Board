@@ -33,8 +33,8 @@ export default {
   },
   props: {
     data: {
-      type: Object | Array,
-      default: () => {}
+      type: [Object, Array],
+      default: () => ({})
     }
   },
   data() {

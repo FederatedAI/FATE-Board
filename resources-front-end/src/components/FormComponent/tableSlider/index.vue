@@ -74,7 +74,7 @@ export default {
       default: ''
     },
     outSide: {
-      type: Function | Boolean,
+      type: [Function, Boolean],
       default: false
     }
   },

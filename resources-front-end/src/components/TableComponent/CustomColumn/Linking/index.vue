@@ -43,13 +43,12 @@ export default {
       default: 'primary'
     },
     content: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: String | Function,
+      type: [String, Function],
       default: ''
     },
     cell: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     }
   },
   data() {

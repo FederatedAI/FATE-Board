@@ -133,7 +133,7 @@ export default {
       default: () => []
     },
     nums: {
-      type: Array | Object,
+      type: [Array, Object],
       default: () => []
     },
     role: {

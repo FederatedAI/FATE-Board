@@ -32,8 +32,7 @@ export default {
       default: 'Total: {t}'
     },
     value: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: String | Object | Array | Boolean | Number,
+      type: [String, Object, Array, Boolean, Number],
       default: 0
     }
   },

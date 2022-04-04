@@ -84,11 +84,10 @@ export default {
   props: {
     setting: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     },
     options: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Object | Array,
+      type: [Object, Array],
       default: () => []
     },
     group: {
@@ -100,8 +99,7 @@ export default {
       default: 'line'
     },
     legend: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: String | Boolean,
+      type: [String, Boolean],
       default: true
     },
     name: {
@@ -113,15 +111,15 @@ export default {
       default: false
     },
     width: {
-      type: Number | String | Object,
+      type: [Number, String, Object],
       default: ''
     },
     height: {
-      type: Number | String | Object,
+      type: [Number, String, Object],
       default: ''
     },
     containerHeight: {
-      type: Number | String | Object,
+      type: [Number, String, Object],
       default: 500
     },
     noData: {

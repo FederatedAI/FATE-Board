@@ -59,9 +59,8 @@ export default {
       default: ''
     },
     group: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Object | Array,
-      default: () => {}
+      type: [Object, Array],
+      default: () => ({})
     },
     single: {
       type: Boolean,

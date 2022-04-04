@@ -88,7 +88,7 @@ export default {
     },
     reportType: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     },
     noReportData: {
       type: Boolean,

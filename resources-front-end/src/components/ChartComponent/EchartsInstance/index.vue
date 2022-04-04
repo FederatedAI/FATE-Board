@@ -53,22 +53,22 @@ export default {
   props: {
     options: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     },
     width: {
-      type: Number | String,
+      type: [Number, String],
       default: ''
     },
     height: {
-      type: Number | String,
+      type: [Number, String],
       default: ''
     },
     containerHeight: {
-      type: Number | String,
+      type: [Number, String],
       default: 500
     },
     noData: {
-      type: String | Boolean,
+      type: [String, Boolean],
       default: false
     },
     legend: {

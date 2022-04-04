@@ -52,18 +52,15 @@ export default {
   mixins: [dataFilter, basicOperation, dataReporter],
   props: {
     options: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Array | Object,
-      default: () => {}
+      type: [Array, Object],
+      default: () => ({})
     },
     afterRequestForParent: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Function | String,
+      type: [Function, String],
       default: () => {}
     },
     refresh: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Function | String,
+      type: [Function, String],
       default: () => {}
     },
     variableMap: {

@@ -59,8 +59,7 @@ export default {
       default: true
     },
     size: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Number | Boolean,
+      type: [Number, Boolean],
       default: 6
     }
   },

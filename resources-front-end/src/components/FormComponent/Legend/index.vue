@@ -103,8 +103,7 @@ export default {
       default: () => []
     },
     filter: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Boolean | Number,
+      type: [Boolean, Number],
       default: 12
     }
   },

@@ -58,7 +58,7 @@ export default {
   props: {
     jobInfo: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     }
   },
   data() {

@@ -66,13 +66,11 @@ export default {
       default: ''
     },
     confirmBtn: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: String | Boolean,
+      type: [String, Boolean],
       default: false
     },
     resetBtn: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: String | Boolean,
+      type: [String, Boolean],
       default: false
     },
     inrow: {

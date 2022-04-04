@@ -33,7 +33,7 @@ export default {
       default: ''
     },
     styles: {
-      type: String | Object,
+      type: [String, Object],
       default: ''
     }
   },

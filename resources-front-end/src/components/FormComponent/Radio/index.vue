@@ -58,13 +58,11 @@ export default {
   mixins: [basicOperation],
   props: {
     options: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Array | Object,
+      type: [Array, Object],
       default: () => []
     },
     disabled: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Boolean | Array,
+      type: [Boolean, Array],
       default: false
     },
     unique: {

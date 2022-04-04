@@ -68,7 +68,7 @@ export default {
     },
     marks: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     },
     tip: {
       type: String,

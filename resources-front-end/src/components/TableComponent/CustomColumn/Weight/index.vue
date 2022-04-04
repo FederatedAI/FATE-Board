@@ -28,7 +28,7 @@ export default {
   name: 'WeightCol',
   props: {
     total: {
-      type: Number | String,
+      type: [Number, String],
       default: 100
     },
     showWeight: {
@@ -37,7 +37,7 @@ export default {
     },
     cell: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     }
   },
   methods: {

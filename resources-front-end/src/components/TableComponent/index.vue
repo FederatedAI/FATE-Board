@@ -38,18 +38,15 @@ export default {
   },
   props: {
     header: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Object | Array,
+      type: [Object, Array],
       default: () => []
     },
     data: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Object | Array,
+      type: [Object, Array],
       default: () => []
     },
     async: {
-      // eslint-disable-next-line vue/require-prop-type-constructor
-      type: Object | Boolean,
+      type: [Object, Boolean],
       default: false
     },
     name: {
