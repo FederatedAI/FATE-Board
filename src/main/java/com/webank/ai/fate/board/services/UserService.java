@@ -19,6 +19,7 @@ import com.webank.ai.fate.board.pojo.UserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.apache.commons.codec.binary.Hex;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -26,7 +27,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
+import java.sql.Timestamp;
+import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.Mac;
 
 @Service
 public class UserService {
@@ -37,20 +42,21 @@ public class UserService {
     //UserMapper userMapper;
     public boolean login(UserDTO userDTO, HttpServletRequest httpServletRequest) {
 
-        String username = userDTO.getName();
+        String username = userDTO.getUsername();
         String password = userDTO.getPassword();
+        String nonce = userDTO.getNonce();
+        Long timestamp = userDTO.getTimestamp();
 
         //String md5Password = DigestUtils.md5DigestAsHex(password.getBytes());
         //userDTO.setPassword(md5Password);
         //List<UserDO> userDOS = userMapper.find(userDTO);
-        if (!checkUser(username, password)) {
+        if (!checkUser(username, password, nonce, timestamp)) {
             return false;
         } else {
             HttpSession session = httpServletRequest.getSession();
             session.setAttribute("USER", userDTO);
             return true;
         }
-
     }
 
     public void logout(HttpServletRequest httpServletRequest) {
@@ -58,11 +64,40 @@ public class UserService {
         session.invalidate();
     }
 
-    public boolean checkUser(String username, String password) {
+    public String computeDigest(String message, String secret) throws Exception {
+        SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), "HmacSHA1");
+
+        Mac mac = Mac.getInstance("HmacSHA1");
+        mac.init(secretKey);
+
+        byte[] digest = mac.doFinal(message.getBytes());
+        byte[] hexDigest = new Hex().encode(digest);
+
+        return new String(hexDigest, StandardCharsets.ISO_8859_1);
+    }
+
+    public boolean checkUser(String username, String password, String nonce, Long timestamp) {
         updateConfig();
         String usernameValue = getValue("server.board.login.username");
         String passwordValue = getValue("server.board.login.password");
-        return username.equals(usernameValue) && password.equals(passwordValue);
+
+        if (!username.equals(usernameValue)) {
+            return false;
+        }
+
+        Long timestampValue = new Timestamp(System.currentTimeMillis()).getTime();
+        if (timestamp < timestampValue - 60000 || timestamp > timestampValue + 60000) {
+            return false;
+        }
+
+        String digest;
+        try {
+            digest = computeDigest(nonce + timestamp, passwordValue);
+        } catch (Exception e) {
+            return false;
+        }
+
+        return password.equals(digest);
     }
 
     public static void updateConfig() {
