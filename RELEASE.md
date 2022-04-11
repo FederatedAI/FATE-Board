@@ -1,3 +1,15 @@
+# Release 1.8.0
+
+#### Major Features and Improvements
+**Major Features**
+
+* Support GBDTMO mode for Secureboost
+* Add SSHE Linr component
+* Add Writer component
+* Delete data-output port for data-statistic compoent
+* Fix display bug and optimize transport protocal support
+
+
 # Release 1.7.2.2
 
 #### Major Features and Improvements
