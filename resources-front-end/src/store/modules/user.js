@@ -79,6 +79,7 @@ const user = {
     Login({ commit }, userInfo) {
       const username = userInfo.username.trim()
       const saltp = saltPassword(userInfo.password.trim())
+
       return new Promise((resolve, reject) => {
         login(username, saltp.password, saltp.nonce, saltp.timestamp).then(response => {
           const data = response.data
@@ -148,4 +149,5 @@ const user = {
     }
   }
 }
+
 export default user
