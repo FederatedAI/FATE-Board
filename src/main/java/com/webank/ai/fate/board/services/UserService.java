@@ -15,7 +15,6 @@
  */
 package com.webank.ai.fate.board.services;
 
-import com.webank.ai.fate.board.pojo.UserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -80,7 +79,6 @@ public class UserService {
         updateConfig();
         String usernameValue = getValue("server.board.login.username");
         String passwordValue = getValue("server.board.login.password");
-
         if (!username.equals(usernameValue)) {
             return false;
         }
