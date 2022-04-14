@@ -21,6 +21,7 @@ import { login, logout, getInfo } from '@/api/login'
 // import { getToken } from '@/utils/auth'
 import { getLocal, setLocal, removeLocal } from '../../utils/localStorage'
 import HmacSha1 from 'hmac_sha1'
+
 function nonceCreate(length) {
   if (length > 0) {
     var data = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
@@ -46,6 +47,7 @@ function saltPassword(password) {
     password: hmacSha1.digest(password, nonce + timestamp)
   }
 }
+
 const user = {
   state: {
     token: '',
@@ -54,6 +56,7 @@ const user = {
     avatar: '',
     roles: ''
   },
+
   mutations: {
     SET_TOKEN: (state, token) => {
       state.token = token
@@ -71,6 +74,7 @@ const user = {
       state.username = username
     }
   },
+
   actions: {
     Login({ commit }, userInfo) {
       const username = userInfo.username.trim()
@@ -90,6 +94,7 @@ const user = {
         })
       })
     },
+
     GetInfo({ commit }) {
       return new Promise((resolve, reject) => {
         getInfo().then(response => {
@@ -107,6 +112,7 @@ const user = {
         })
       })
     },
+
     LogOut({ commit }) {
       return new Promise((resolve, reject) => {
         logout().then(res => {
@@ -127,11 +133,13 @@ const user = {
         })
       })
     },
+
     setInfo({ commit }, username) {
       // 临时用于信息设置
       commit('SET_USERNAME', username)
       commit('SET_TOKEN', username)
     },
+
     removeInfo({ commit }) {
       // 删除当前的存储的信息
       commit('SET_USERNAME', '')
