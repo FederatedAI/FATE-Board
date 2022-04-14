@@ -15,10 +15,12 @@
  */
 package com.webank.ai.fate.board.controller;
 
+
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.pojo.UserDTO;
 import com.webank.ai.fate.board.services.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -39,7 +42,6 @@ public class UserController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseResult login(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult, HttpServletRequest httpServletRequest) {
-
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
             return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
@@ -51,20 +53,12 @@ public class UserController {
             return new ResponseResult(ErrorCode.SUCCESS,true);
         } else {
             return new ResponseResult(ErrorCode.SUCCESS,false);
-
         }
-
     }
-
 
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public ResponseResult logout(HttpServletRequest httpServletRequest) {
-
         userService.logout(httpServletRequest);
-
         return new ResponseResult(ErrorCode.SUCCESS);
-
-
     }
-
 }
