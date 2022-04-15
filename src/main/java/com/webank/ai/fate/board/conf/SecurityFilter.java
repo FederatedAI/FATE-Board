@@ -15,6 +15,7 @@
  */
 package com.webank.ai.fate.board.conf;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -25,6 +26,10 @@ import java.io.IOException;
 @Component
 @WebFilter(urlPatterns={"/**"}, filterName="ClickHijackingFilter")
 public class SecurityFilter implements Filter {
+    @Value("${fateboard.front_end.cors}")
+    private Boolean allowCORS;
+    @Value("${fateboard.front_end.url}")
+    private String frontEndUrl;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -35,9 +40,16 @@ public class SecurityFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
         HttpServletResponse rep = (HttpServletResponse) servletResponse;
-        rep.addHeader("X-Frame-Options","DENY");
-        filterChain.doFilter(servletRequest,servletResponse);
+        rep.addHeader("X-Frame-Options", "DENY");
 
+        if (allowCORS) {
+            rep.addHeader("Access-Control-Allow-Origin", frontEndUrl);
+            rep.addHeader("Access-Control-Allow-Credentials", "true");
+            rep.addHeader("Access-Control-Allow-Headers", "Content-Type");
+            rep.addHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH");
+        }
+
+        filterChain.doFilter(servletRequest, servletResponse);
     }
 
     @Override

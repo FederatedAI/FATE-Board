@@ -176,9 +176,34 @@ export default {
       return name
     },
     reportType() {
-      const componentHasReport = ['binning', 'selection', 'evaluation', 'featureimputation', 'labeltransform', 'datatransform', 'dataio', 'federatedsample', 'scale', 'onehot']
-      const componentHasData = ['binning', 'selection', 'secureboost', 'lr', 'featureimputation', 'labeltransform', 'datatransform', 'dataio', 'intersection', 'federatedsample', 'scale', 'onehot']
-      const componentHasModel = ['secureboost', 'lr']
+      const componentHasReport = [
+        'binning', 'selection',
+        'evaluation', 'featureimputation',
+        'labeltransform', 'datatransform',
+        'dataio', 'federatedsample',
+        'scale', 'onehot',
+        'union', 'split',
+        'sampleweight', 'statistics',
+        'transformer'
+      ]
+      const componentHasData = [
+        'binning', 'selection',
+        'secureboost', 'lr',
+        'featureimputation', 'labeltransform',
+        'datatransform', 'dataio',
+        'intersection', 'federatedsample',
+        'scale', 'onehot',
+        'linr', 'union',
+        'split', 'sampleweight',
+        'statistics', 'psi',
+        'transformer', 'possion',
+        'nn', 'kmeans'
+      ]
+      const componentHasModel = [
+        'secureboost', 'lr',
+        'linr', 'possion',
+        'nn', 'kmeans'
+      ]
       const hasReport = !!this.modelType
         .toLowerCase()
         .match(new RegExp('(' + componentHasReport.join('|') + ')'))

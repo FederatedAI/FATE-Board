@@ -66,6 +66,12 @@ public class Dict {
     static public final String URL_JOB_RERUN = "/v1/job/rerun";
     static public final String URL_JOB_LOG_PATH = "/v1/job/log/path";
 
+    static public final String URL_JOB_QUERY = "/v1/job/list/job";
+    static public final String URL_TASK_QUERY = "/v1/job/list/task";
+    static public final String URL_LOG_SIZE = "/v1/log/size";
+    static public final String URL_LOG_CAT = "/v1/log/cat";
+    static public final String URL_CONFIG_CAT = "/v1//job/config";
+
     static public final String SSH_IP = "ip";
     static public final String SSH_USER = "user";
     static public final String SSH_PASSWORD = "password";
@@ -81,6 +87,7 @@ public class Dict {
 
     static public final HashMap<String, String> logMap = new HashMap<>();
 
+
     static {
         logMap.put("jobSchedule", "fate_flow_schedule.log");
         logMap.put("jobError", "fate_flow_schedule_error.log");
@@ -89,6 +96,17 @@ public class Dict {
         logMap.put("partyInfo", "INFO.log");
         logMap.put("partyDebug", "DEBUG.log");
         logMap.put("componentInfo", "INFO.log");
+    }
+//前端传来的logType和flow的logType对应表
+    static public final HashMap<String, String> logTypeMap = new HashMap<>();
+    static {
+        logTypeMap.put("jobSchedule", "jobSchedule");
+        logTypeMap.put("jobError", "jobScheduleError");
+        logTypeMap.put("partyError", "partyError");
+        logTypeMap.put("partyWarning", "partyWarning");
+        logTypeMap.put("partyInfo", "partyInfo");
+        logTypeMap.put("partyDebug", "partyDebug");
+        logTypeMap.put("componentInfo", "componentInfo");
     }
 
     //the fields for job search
