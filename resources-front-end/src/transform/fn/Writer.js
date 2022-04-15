@@ -1,4 +1,3 @@
-
 /**
  *
  *  Copyright 2019 The FATE Authors. All Rights Reserved.
@@ -17,31 +16,4 @@
  *
  */
 
-import request from '@/utils/request'
-
-export function login(username, password, nonce, timestamp) {
-  return request({
-    url: '/user/login',
-    method: 'post',
-    data: {
-      username,
-      password,
-      nonce,
-      timestamp
-    }
-  })
-}
-
-export function getInfo() {
-  return request({
-    url: '/admin/info',
-    method: 'get'
-  })
-}
-
-export function logout() {
-  return request({
-    url: '/user/logout',
-    method: 'post'
-  })
-}
+export { default as default } from './Intersection'

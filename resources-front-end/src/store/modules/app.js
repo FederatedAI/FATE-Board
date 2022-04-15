@@ -61,7 +61,10 @@ const app = {
       featureImputation: 'FeatureImputation',
       LabelTransform: 'LabelTransform',
       heteroSSHELR: 'HeteroSSHELR',
-      CacheLoader: 'CacheLoader'
+      CacheLoader: 'CacheLoader',
+      SSHELinR: 'SSHELinR',
+      SSHEPoissonR: 'SSHEPoissonR',
+      Writer: 'Writer'
     },
     metricTypeMap: {
       dataIOTable: 'DATAIO_TABLE',

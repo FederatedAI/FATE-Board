@@ -409,7 +409,7 @@ class CompExpression {
     if (this.belone.toLowerCase().match(/evaluation|union/i)) {
       this.input[0].mult = ports.get('MULT_DATA_PORT')
     }
-    if (!this.belone.toLowerCase().match(/(evaluation|upload|download|pearson|datasplit|psi|kmeans|modelloader|cacheloader)/i)) {
+    if (!this.belone.toLowerCase().match(/(evaluation|upload|download|pearson|datasplit|psi|kmeans|modelloader|cacheloader|shap|statistics|writer)/i)) {
       this.output.push(DATAOUTPUT)
     }
     if (this.belone.toLowerCase().match(/(kmeans)/i)) {
@@ -434,13 +434,13 @@ class CompExpression {
       }
       this.output.push(CACHEOUTPUT)
     }
-    if (!this.belone.toLowerCase().match(/(intersection|evaluation|upload|download|rsa|datasplit|reader|union|scorecard|cacheloader)/i)) {
+    if (!this.belone.toLowerCase().match(/(intersection|evaluation|upload|download|rsa|datasplit|reader|union|scorecard|cacheloader|writer)/i)) {
       if (!this.belone.toLowerCase().match(/(statistics|pearson|psi|modelloader)/i)) {
         this.input.push(MODELINPUT)
       }
-      // if (!this.belone.toLowerCase().match(/(transformer)/)) {
-      this.output.push(MODELOUTPUT)
-      // }
+      if (!this.belone.toLowerCase().match(/(shap)/)) {
+        this.output.push(MODELOUTPUT)
+      }
       if (this.belone.toLowerCase().match(/(selection)/i)) {
         this.input[1].mult = ports.get('MULT_MODEL_PORT')
       }
