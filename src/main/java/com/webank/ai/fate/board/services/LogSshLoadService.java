@@ -32,29 +32,29 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.util.List;
 
-@Service
+//@Service
 public class LogSshLoadService {
 
-    @Autowired
-    JobMapper jobMapper;
-
-    @Autowired
-    LogFileService logFileService;
-
-    @Autowired
-    SshService sshService;
-
-    @Autowired
-    LogFileTransferEventProducer logFileTransferEventProducer;
-
-
-    private List<JobDO> queryJobSuccessToday() {
-        long timeStampNow = System.currentTimeMillis();
-        long timeTodayStart = timeStampNow / (24 * 60 * 60 * 1000) * (24 * 60 * 60 * 1000) - 8 * 60 * 60 * 1000;
-
-
-        return jobMapper.queryTodayCompletedJobs(timeTodayStart,timeStampNow);
-    }
+//    @Autowired
+//    JobMapper jobMapper;
+//
+//    @Autowired
+//    LogFileService logFileService;
+//
+//    @Autowired
+//    SshService sshService;
+//
+//    @Autowired
+//    LogFileTransferEventProducer logFileTransferEventProducer;
+//
+//
+//    private List<JobDO> queryJobSuccessToday() {
+//        long timeStampNow = System.currentTimeMillis();
+//        long timeTodayStart = timeStampNow / (24 * 60 * 60 * 1000) * (24 * 60 * 60 * 1000) - 8 * 60 * 60 * 1000;
+//
+//
+//        return jobMapper.queryTodayCompletedJobs(timeTodayStart,timeStampNow);
+//    }
 
 
 }

@@ -1,0 +1,33 @@
+name: compile the source code
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - '**'
+
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    name: compile the source code
+    runs-on: ubuntu-latest
+    steps:
+      - name: check out the repo
+        uses: actions/checkout@v2
+
+      - name: compile node.js code
+        working-directory: resources-front-end
+        run: |
+          npm install
+          npm run build
+
+      - name: compile java code
+        run: mvn clean package
+
+      - name: archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: target
+          path: target/fateboard-[0-9].[0-9].[0-9].jar
