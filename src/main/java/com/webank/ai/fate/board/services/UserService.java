@@ -38,8 +38,6 @@ public class UserService {
     private final static Properties config = new Properties();
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    //@Autowired
-    //UserMapper userMapper;
     public boolean login(UserDTO userDTO, HttpServletRequest httpServletRequest) {
 
         String username = userDTO.getUsername();
@@ -47,9 +45,6 @@ public class UserService {
         String nonce = userDTO.getNonce();
         Long timestamp = userDTO.getTimestamp();
 
-        //String md5Password = DigestUtils.md5DigestAsHex(password.getBytes());
-        //userDTO.setPassword(md5Password);
-        //List<UserDO> userDOS = userMapper.find(userDTO);
         if (!checkUser(username, password, nonce, timestamp)) {
             return false;
         } else {
@@ -80,6 +75,7 @@ public class UserService {
         updateConfig();
         String usernameValue = getValue("server.board.login.username");
         String passwordValue = getValue("server.board.login.password");
+
         if (!username.equals(usernameValue)) {
             return false;
         }

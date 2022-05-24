@@ -17,22 +17,16 @@ package com.webank.ai.fate.board.bootstrap;
 
 
 import org.apache.catalina.Context;
-import org.apache.catalina.connector.Connector;
-import org.apache.tomcat.util.descriptor.web.SecurityCollection;
-import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.websocket.server.WsSci;
-import org.mybatis.spring.annotation.MapperScan;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -42,46 +36,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
 @Configuration
 @EnableScheduling
-//@MapperScan("com/webank/ai/fate/board/dao")
 public class Bootstrap {
-
     public static void main(String[] args) {
         try {
             ConfigurableApplicationContext context = SpringApplication.run(Bootstrap.class, args);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-
-//    @Bean
-//    public TomcatServletWebServerFactory tomcatServletWebServerFactory() {
-//        TomcatServletWebServerFactory tomcatServletWebServerFactory = new TomcatServletWebServerFactory() {
-//            @Override
-//            protected void postProcessContext(Context context) {
-//                SecurityConstraint securityConstraint = new SecurityConstraint();
-//                securityConstraint.setUserConstraint("CONFIDENTIAL");
-//                SecurityCollection securityCollection = new SecurityCollection();
-//                securityCollection.addPattern("/*");
-//                securityConstraint.addCollection(securityCollection);
-//                context.addConstraint(securityConstraint);
-//            }
-//        };
-//        tomcatServletWebServerFactory.addAdditionalTomcatConnectors(httpConnector());
-//        return tomcatServletWebServerFactory;
-//    }
-//
-//
-//    @Bean
-//    public Connector httpConnector() {
-//        Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
-//        connector.setScheme("http");
-//        connector.setPort(8080);
-//        connector.setSecure(false);
-//        connector.setRedirectPort(8443);
-//        return connector;
-//    }
-
 
     @Bean
     public TomcatContextCustomizer tomcatContextCustomizer() {
@@ -93,6 +55,3 @@ public class Bootstrap {
         };
     }
 }
-
-
-
