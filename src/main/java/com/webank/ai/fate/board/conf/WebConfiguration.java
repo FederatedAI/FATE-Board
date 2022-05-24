@@ -15,59 +15,19 @@
  */
 package com.webank.ai.fate.board.conf;
 
-import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+
 import com.webank.ai.fate.board.intercept.UserInterceptor;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.SqlSessionFactoryBean;
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
-
-import javax.sql.DataSource;
-import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
-
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
-
 
 
 @Configuration
-//@MapperScan(basePackages = "com.webank.ai.fate.board.dao", sqlSessionFactoryRef = "fateboardSqlSessionFactory")
 public class WebConfiguration implements WebMvcConfigurer {
-
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry) {
-//        registry.addMapping("/**").allowedMethods("*").allowedOrigins("*").allowCredentials(true);
-//    }
-
-//    @Bean("fateboardDataSource")
-//    @ConfigurationProperties(prefix = "fateboard.datasource")
-//    public DataSource fateboardDataSource() {
-//        return DataSourceBuilder.create().build();
-//    }
-//
-//    @Bean("fateboardSqlSessionFactory")
-//    public SqlSessionFactory sqlSessionFactory(@Qualifier("fateboardDataSource") DataSource dataSource) throws Exception {
-//        SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
-//        sessionFactory.setDataSource(dataSource);
-//        //sessionFactory.setTypeAliasesPackage(env.getProperty("mybatis.typeAliasesPackage"));
-//        sessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("fate/fateboard/mapping/*"));
-//        return sessionFactory.getObject();
-//    }
-
-
     @Bean
     public ServerEndpointExporter serverEndpointExporter() {
         return new ServerEndpointExporter();
@@ -95,7 +55,5 @@ public class WebConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(getUserInterceptor())
                 .addPathPatterns("/job/**")
                 .addPathPatterns("/v1/**");
-//                .addPathPatterns("/**").excludePathPatterns("/static/*").excludePathPatterns("user/login","/user/logout");
     }
-
 }
