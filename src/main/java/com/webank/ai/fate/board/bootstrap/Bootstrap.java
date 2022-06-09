@@ -44,14 +44,4 @@ public class Bootstrap {
             e.printStackTrace();
         }
     }
-
-    @Bean
-    public TomcatContextCustomizer tomcatContextCustomizer() {
-        return new TomcatContextCustomizer() {
-            @Override
-            public void customize(Context context) {
-                context.addServletContainerInitializer(new WsSci(), null);
-            }
-        };
-    }
 }
