@@ -18,8 +18,8 @@ package com.webank.ai.fate.board.services;
 import com.webank.ai.fate.board.pojo.UserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.apache.commons.codec.binary.Hex;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -27,25 +27,25 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
-import java.sql.Timestamp;
-import javax.crypto.spec.SecretKeySpec;
-import javax.crypto.Mac;
 
 @Service
 public class UserService {
     private final static Properties config = new Properties();
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    @Autowired
+    private SecurityService securityService;
+
+    public String getCurrentPublicKey() throws Exception {
+        return securityService.getEncryptKey();
+    }
 
     public boolean login(UserDTO userDTO, HttpServletRequest httpServletRequest) {
 
         String username = userDTO.getUsername();
         String password = userDTO.getPassword();
-        String nonce = userDTO.getNonce();
-        Long timestamp = userDTO.getTimestamp();
 
-        if (!checkUser(username, password, nonce, timestamp)) {
+        if (!checkUser(username, password)) {
             return false;
         } else {
             HttpSession session = httpServletRequest.getSession();
@@ -59,19 +59,7 @@ public class UserService {
         session.invalidate();
     }
 
-    public String computeDigest(String message, String secret) throws Exception {
-        SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), "HmacSHA1");
-
-        Mac mac = Mac.getInstance("HmacSHA1");
-        mac.init(secretKey);
-
-        byte[] digest = mac.doFinal(message.getBytes());
-        byte[] hexDigest = new Hex().encode(digest);
-
-        return new String(hexDigest, StandardCharsets.ISO_8859_1);
-    }
-
-    public boolean checkUser(String username, String password, String nonce, Long timestamp) {
+    public boolean checkUser(String username, String password) {
         updateConfig();
         String usernameValue = getValue("server.board.login.username");
         String passwordValue = getValue("server.board.login.password");
@@ -79,20 +67,13 @@ public class UserService {
         if (!username.equals(usernameValue)) {
             return false;
         }
-
-        Long timestampValue = new Timestamp(System.currentTimeMillis()).getTime();
-        if (timestamp < timestampValue - 60000 || timestamp > timestampValue + 60000) {
-            return false;
-        }
-
-        String digest;
         try {
-            digest = computeDigest(nonce + timestamp, passwordValue);
+            return securityService.compareValue(password, passwordValue);
         } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("decrypt password error");
             return false;
         }
-
-        return password.equals(digest);
     }
 
     public static void updateConfig() {
@@ -111,7 +92,7 @@ public class UserService {
         }
     }
 
-    public static String getValue(String key){
+    public static String getValue(String key) {
         return config.getProperty(key);
     }
 }
