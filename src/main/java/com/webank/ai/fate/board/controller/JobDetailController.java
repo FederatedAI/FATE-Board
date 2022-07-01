@@ -24,10 +24,10 @@ import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.log.LogFileService;
 import com.webank.ai.fate.board.pojo.*;
+import com.webank.ai.fate.board.services.FlowFeign;
 import com.webank.ai.fate.board.services.JobDetailService;
 import com.webank.ai.fate.board.services.TaskManagerService;
 import com.webank.ai.fate.board.global.Dict;
-import com.webank.ai.fate.board.utils.HttpClientPool;
 import com.webank.ai.fate.board.utils.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -56,15 +56,16 @@ public class JobDetailController {
     private final Logger logger = LoggerFactory.getLogger(JobDetailController.class);
 
     @Autowired
-    HttpClientPool httpClientPool;
-
-    @Autowired
     TaskManagerService taskManagerService;
+
     @Autowired
     JobDetailService jobDetailService;
 
     @Value("${fateflow.url}")
     String fateUrl;
+
+    @Autowired
+    FlowFeign flowFeign;
 
     @ResponseBody
     @RequestMapping(value = "/tracking/component/metrics", method = RequestMethod.POST)
@@ -79,7 +80,7 @@ public class JobDetailController {
 
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_COPONENT_METRIC, JSON.toJSONString(componentQueryDTO));
+            result = flowFeign.post(Dict.URL_COPONENT_METRIC, JSON.toJSONString(componentQueryDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -99,7 +100,7 @@ public class JobDetailController {
 
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_COPONENT_METRIC_DATA, JSON.toJSONString(metricDTO));
+            result = flowFeign.post(Dict.URL_COPONENT_METRIC_DATA, JSON.toJSONString(metricDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -120,7 +121,7 @@ public class JobDetailController {
 
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_COPONENT_PARAMETERS, JSON.toJSONString(componentQueryDTO));
+            result = flowFeign.post(Dict.URL_COPONENT_PARAMETERS, JSON.toJSONString(componentQueryDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -154,7 +155,7 @@ public class JobDetailController {
 
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_DAG_DEPENDENCY, JSON.toJSONString(jobQueryDTO));
+            result = flowFeign.post(Dict.URL_DAG_DEPENDENCY, JSON.toJSONString(jobQueryDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -208,7 +209,7 @@ public class JobDetailController {
 
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_DAG_DEPENDENCY, JSON.toJSONString(jsonObject));
+            result = flowFeign.post(Dict.URL_DAG_DEPENDENCY, JSON.toJSONString(jsonObject));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -266,7 +267,7 @@ public class JobDetailController {
 
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_OUTPUT_MODEL, JSON.toJSONString(componentQueryDTO));
+            result = flowFeign.post(Dict.URL_OUTPUT_MODEL, JSON.toJSONString(componentQueryDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -287,7 +288,7 @@ public class JobDetailController {
 
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_OUTPUT_DATA, JSON.toJSONString(componentQueryDTO));
+            result = flowFeign.post(Dict.URL_OUTPUT_DATA, JSON.toJSONString(componentQueryDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -320,6 +321,18 @@ public class JobDetailController {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
         }
         return new ResponseResult<>(ErrorCode.SUCCESS, batchMetricInfo);
+    }
+
+    @RequestMapping(value = "/server/fateflow/info", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseResult flowInfo() {
+        String result = flowFeign.post(Dict.URL_FLOW_INFO, "");
+        JSONObject jsonObject = JSON.parseObject(result);
+        Integer retCode = jsonObject.getInteger(Dict.RETCODE);
+        if (retCode != 0) {
+            return new ResponseResult<>(retCode,jsonObject.getString(Dict.RETMSG));
+        }
+        return new ResponseResult(ErrorCode.SUCCESS.getCode(), jsonObject.get(Dict.DATA));
     }
 
 }

@@ -40,11 +40,21 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @RequestMapping(value = "/getKey", method = RequestMethod.POST)
+    public ResponseResult<String> getPublicKey() {
+        try {
+            return new ResponseResult<>(userService.getCurrentPublicKey());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseResult.error(ErrorCode.SYSTEM_ERROR.getCode(), "generate key failed");
+        }
+    }
+
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseResult login(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult, HttpServletRequest httpServletRequest) {
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
-            return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
+            return new ResponseResult(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
 
         boolean result = userService.login(userDTO, httpServletRequest);
