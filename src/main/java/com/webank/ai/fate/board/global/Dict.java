@@ -70,7 +70,9 @@ public class Dict {
     static public final String URL_TASK_QUERY = "/v1/job/list/task";
     static public final String URL_LOG_SIZE = "/v1/log/size";
     static public final String URL_LOG_CAT = "/v1/log/cat";
-    static public final String URL_CONFIG_CAT = "/v1//job/config";
+    static public final String URL_CONFIG_CAT = "/v1/job/config";
+
+    static public final String URL_FLOW_INFO = "/v1/server/fateflow/info";
 
     static public final String SSH_IP = "ip";
     static public final String SSH_USER = "user";
