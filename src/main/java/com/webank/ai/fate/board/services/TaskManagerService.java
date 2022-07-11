@@ -65,6 +65,8 @@ public class TaskManagerService {
         flowTaskQO.setRole(role);
         flowTaskQO.setParty_id(partyId);
         flowTaskQO.setComponent_name(componentName);
+        flowTaskQO.setOrder_by("task_version");
+        flowTaskQO.setOrder("desc");
 
 //        FateFlowResponse fateFlowResponse = fateFlowApiService.sendPost(Integer.valueOf(partyId), BoardDict.URL_TASK_QUERY, JSON.toJSONString(flowTaskQO), null);
 //        if (com.webank.ai.studio.common.enums.Dict.SUCCESS_CODE != fateFlowResponse.getRetcode()) {

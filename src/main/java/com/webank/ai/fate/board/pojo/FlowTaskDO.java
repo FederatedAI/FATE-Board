@@ -66,4 +66,7 @@ public class FlowTaskDO implements Serializable {
     private Long end_time;
 
     private Long elapsed;
+
+    private String order_by;
+    private String order;
 }
