@@ -57,6 +57,14 @@ export default {
     title: {
       type: String,
       default: ''
+    },
+    needRefresh: {
+      type: Boolean,
+      default: false
+    },
+    sameSelection: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -68,7 +76,8 @@ export default {
       listData: [],
       originLabel: '',
       tabExchangeIndex: -1,
-      argsCheck: ''
+      argsCheck: '',
+      inited: {}
     }
   },
 
@@ -81,14 +90,24 @@ export default {
   methods: {
     tabChoose(tab) {
       // 选择标签内容展示相应元素。
-      const oldSelected = this.refOpera(`comp${this.currentValue}`, 'getSelected')
-      this.currentLabel = tab.label
-      this.currentValue = tab.value
-      this.originLabel = tab
-      this.$nextTick(() => {
-        setTimeout(() => {
-          this.refOpera(`comp${this.currentValue}`, 'setDefault', oldSelected)
-        }, 10)
+      const _t = this
+      return new Promise((resolve, reject) => {
+        const oldSelected = this.refOpera(`comp${this.currentValue}`, 'getSelected')
+        this.currentLabel = tab.label
+        this.currentValue = tab.value
+        this.originLabel = tab
+        this.$nextTick(() => {
+          setTimeout(() => {
+            if (_t.needRefresh && !_t.inited[_t.currentLabel]) {
+              _t.inited[_t.currentLabel] = true
+              _t.refOpera(`comp${_t.currentValue}`, 'resize')
+            }
+            if (_t.sameSelection) {
+              _t.refOpera(`comp${_t.currentValue}`, 'setDefault', oldSelected)
+            }
+            resolve()
+          }, 10)
+        })
       })
     },
     setDefault() {
@@ -110,15 +129,24 @@ export default {
       const _this = this
       this.tabExchangeIndex += 1
       if (this.options[this.tabExchangeIndex]) {
-        this.tabChoose(this.options[this.tabExchangeIndex])
-        this.$nextTick(() => {
-          _this.refOpera(
-            'comp' + _this.currentValue,
-            'allSteps',
-            args || this.argsCheck
-          )
+        this.tabChoose(this.options[this.tabExchangeIndex]).then(() => {
+          this.$nextTick(() => {
+            _this.refOpera(
+              'comp' + _this.currentValue,
+              'allSteps',
+              args || this.argsCheck
+            )
+          })
         })
       }
+    },
+    getVariableMap() {
+      const list = []
+      const keys = Object.keys(this.content)
+      keys.forEach((val, key) => {
+        list.push(...this.refOpera('comp' + val, 'getVariableMap'))
+      })
+      return list
     },
     combineData(data) {
       this.gotData -= 1

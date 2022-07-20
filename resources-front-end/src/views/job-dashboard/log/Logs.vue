@@ -1,14 +1,27 @@
 <template>
   <div :class="{ 'log-expanded': expandAll }" class="log-wrapper">
     <!-- main tab -->
-    <div class="log-type flex flex-row">
-      <span
-        v-for="(value, key) in mainTabs"
-        :key="key"
-        :class="{'type-name-active': currentMainTab === key}"
-        class="type-name"
-        @click="changeMainTab(key)"
-      >{{ key | capitalize }} Log</span>
+    <div class="flex flex-row flex-center flex-start">
+      <div class="log-type flex flex-row">
+        <span
+          v-for="(value, key) in mainTabs"
+          :key="key"
+          :class="{'type-name-active': currentMainTab === key}"
+          class="type-name"
+          @click="changeMainTab(key)"
+        >{{ key | capitalize }} Log</span>
+      </div>
+      <el-select
+        v-model="currentInstanceId"
+        :size="'mini'"
+      >
+        <el-option
+          v-for="item in instanceSelection"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
     </div>
 
     <!-- sub tab -->
@@ -30,7 +43,7 @@
           v-for="type in LOG_TYPES"
           v-show="currentLogType === type"
           :key="type"
-          :logs="logs[type]"
+          :logs="logs[type + '_' + currentInstanceId]"
           @scroll-top="handleScrollTop(type)"
         />
       </div>
@@ -77,6 +90,7 @@ import { mapGetters } from 'vuex'
 import IconHoverAndActive from '@/components/IconHoverAndActive'
 import Log from '@/components/Log'
 import ReconnectingWebSocket from '@/utils/ReconnectingWebSocket'
+import { getInstanceId } from '../../../api/chart'
 
 const LOG_TYPES = [
   'partyError',
@@ -153,7 +167,13 @@ export default {
       logs: {},
       counts: {},
       logSizeHasRecevied: false,
-      expandAll: false
+      expandAll: false,
+
+      // 高可用支持，多台机器，多份日志展示
+      instanceId: [],
+      currentInstanceId: '',
+
+      runningInterval: null
     }
   },
   computed: {
@@ -172,6 +192,16 @@ export default {
         this.mainTabs[this.currentMainTab] &&
 				this.mainTabs[this.currentMainTab].current
       )
+    },
+    instanceSelection() {
+      const list = []
+      for (const id of this.instanceId) {
+        list.push({
+          label: id,
+          value: id
+        })
+      }
+      return list
     }
   },
   watch: {
@@ -194,9 +224,12 @@ export default {
     }
   },
   created() {
-    this.initLogSocket()
+    this.getInstanceIdFromFlow().then(() => {
+      this.initLogSocket()
+    })
   },
   beforeDestroy() {
+    this.runningInterval && clearInterval(this.runningInterval)
     this.ws && this.ws.close()
   },
   methods: {
@@ -215,7 +248,18 @@ export default {
       this.shouldInitLogByType(tab)
     },
     shouldInitLogByType(type) {
-      return !this.logs[type] && this.onPull(type)
+      return !this.logs[type + '_' + this.currentInstanceId] && this.onPull(type)
+    },
+    getInstanceIdFromFlow() {
+      return getInstanceId().then((res) => {
+        const machines = res.data
+        const result = []
+        for (const each of machines) {
+          result.push(each.instance_id)
+        }
+        this.instanceId = result
+        this.currentInstanceId = this.instanceId[0]
+      })
     },
     initLogSocket() {
       if (!this.ws) {
@@ -227,8 +271,15 @@ export default {
           `/log/new/${jobId}/${role}/${partyId}/default`
         )
         this.ws.addEventListener('message', event => {
-          this.handleLogMessage(JSON.parse(event.data))
+          const res = { data: JSON.parse(event.data) }
+          if (res.data[JOB_ERROR] !== undefined) {
+            res.type = 'logSize'
+          } else {
+            res.type = 'log'
+          }
+          this.handleLogMessage(res)
         })
+        this.intervalPull()
       }
       return this.ws
     },
@@ -239,7 +290,7 @@ export default {
           this.handleLogSizeResponse(data.data)
           break
         case 'log':
-          this.insertLogs(data)
+          this.insertLogs(data.data)
           break
         default:
           break
@@ -257,7 +308,8 @@ export default {
     onPull(type, backward = true) {
       const count = this.counts[type]
       const size = 50
-      const logs = this.logs[type] || []
+      const logs = this.logs[type + '_' + this.currentInstanceId] || []
+      const instanceId = this.currentInstanceId
       let begin
       let end
       if (!logs.length) {
@@ -280,18 +332,37 @@ export default {
         this.ws &&
 					this.ws.send(
 					  JSON.stringify({
+					    instanceId,
 					    type,
 					    begin,
 					    end
 					  })
 					)
       } else {
-        this.logs[type] = []
+        this.logs[type + '_' + this.currentInstanceId] = []
+      }
+    },
+    onCountPull() {
+      const type = 'logSize'
+      const instanceId = this.currentInstanceId
+      this.ws.send(
+        JSON.stringify({
+          type,
+          instanceId
+        })
+      )
+    },
+    intervalPull() {
+      if (!this.runningInterval) {
+        this.onCountPull()
+        this.runningInterval = setInterval(() => {
+          this.onCountPull()
+        }, 10000)
       }
     },
     insertLogs(data) {
       const { type, data: target } = data
-      const logs = this.logs[type] || []
+      const logs = this.logs[type + '_' + this.currentInstanceId] || []
       let result = []
       if (logs.length) {
         const targetRange = this.getLogsRange(target)
@@ -312,7 +383,7 @@ export default {
         result = target
       }
       result = result.map(item => Object.freeze(item))
-      this.logs = { ...this.logs, [type]: result }
+      this.logs = { ...this.logs, [type + '_' + this.currentInstanceId]: result }
     },
     getLogsRange(arr) {
       return [arr[0].lineNum, arr[arr.length - 1].lineNum]

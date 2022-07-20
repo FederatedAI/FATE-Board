@@ -73,20 +73,116 @@ function subHost(hostResults, partyIds, index) {
 }
 
 function binningMultClass(responseData, metricsData, partyId, crole) {
-  if (responseData.msg.toString().toLowerCase().match('no data')) {
-    return []
+  const predictTab = predictTransform(responseData, crole, 'predict')
+  const runningTab = runningTransform(responseData, crole, predictTab ? 'train' : '')
+  if (predictTab) {
+    const tabs = {
+      type: 'tabs',
+      name: '',
+      props: {
+        options: [{
+          label: 'Predict',
+          value: 'Predict'
+        }, {
+          label: 'Training',
+          value: 'Training'
+        }],
+        content: {
+          Predict: [predictTab],
+          Training: [runningTab]
+        },
+        needRefresh: true,
+        sameSelection: false
+      }
+    }
+    return [wrapGroupComponent([tabs])]
+  } else {
+    return [wrapGroupComponent(runningTab.props.options)]
   }
-  const { multiClassResult, header, headerAnonymous } = responseData.data && responseData.data.data
+}
+
+function runningTransform(responseData, role, pre) {
+  const {
+    multiClassResult,
+    header,
+    headerAnonymous
+  } = responseData.data && responseData.data.data
   const { skipStatic } = responseData.data && responseData.data.meta && responseData.data.meta.meta_data
+  const {
+    hostResults,
+    results,
+    labels,
+    binningResult,
+    hostPartyIds
+  } = multiClassResult || (responseData.data && responseData.data.data)
+  return multiClassTransform(
+    header,
+    headerAnonymous,
+    hostResults,
+    results,
+    labels,
+    binningResult,
+    hostPartyIds,
+    skipStatic,
+    role,
+    pre
+  )
+}
+
+function predictTransform(responseData, role, pre) {
+  const {
+    transformMultiClassResult,
+    header,
+    headerAnonymous
+  } = responseData.data && responseData.data.data
+  const { skipStatic } = responseData.data && responseData.data.meta && responseData.data.meta.meta_data
+  const {
+    results,
+    labels,
+    hostPartyIds
+  } = transformMultiClassResult || (responseData.data && responseData.data.data)
+  let {
+    hostResults,
+    binningResult
+  } = transformMultiClassResult || {}
+  if (!hostResults) hostResults = responseData.data ? responseData.data.data.transformHostResults : null
+  if (!binningResult) binningResult = responseData.data ? responseData.data.data.transformBinningResult : null
+  if (hostResults && binningResult) {
+    return multiClassTransform(
+      header,
+      headerAnonymous,
+      hostResults,
+      results,
+      labels,
+      binningResult,
+      hostPartyIds,
+      skipStatic,
+      role,
+      pre
+    )
+  }
+}
+
+function multiClassTransform(
+  header,
+  headerAnonymous,
+  hostResults,
+  results,
+  labels,
+  binningResult,
+  hostPartyIds,
+  skipStatic,
+  crole,
+  preOfFile
+) {
   const result = []
   const selections = []
-  const { hostResults, results, labels, binningResult, hostPartyIds } = multiClassResult || (responseData.data && responseData.data.data)
   let hostIndex = 1
   if (labels && labels.length !== 0) {
     for (let i = 0, l = labels.length; i < l; i++) {
       if (hostResults[i] && results[i]) {
         const hostList = subHost(hostResults, hostPartyIds, hostIndex)
-        result.push(binningHandler(results[i], hostList, header, headerAnonymous, skipStatic, crole))
+        result.push(binningHandler(results[i], hostList, header, headerAnonymous, skipStatic, crole, preOfFile))
         selections.push({
           value: labels[i],
           label: labels[i]
@@ -95,12 +191,17 @@ function binningMultClass(responseData, metricsData, partyId, crole) {
       }
     }
   } else {
-    result.push(binningHandler((results && results[0]) || binningResult, hostResults, header, headerAnonymous, skipStatic, crole))
+    result.push(binningHandler((results && results[0]) || binningResult, hostResults, header, headerAnonymous, skipStatic, crole, preOfFile))
   }
 
   const options = []
   if (result.length === 1) {
-    return [wrapGroupComponent(result[0])]
+    return {
+      type: 'group',
+      props: {
+        options: result[0]
+      }
+    }
   } else {
     result.map((val, index) => {
       const label = selections[index].value
@@ -146,10 +247,15 @@ function binningMultClass(responseData, metricsData, partyId, crole) {
   }, createAsyncComponent(options, true, {
     deepReport: true
   })]
-  return [wrapGroupComponent(group)]
+  return {
+    type: 'group',
+    props: {
+      options: group
+    }
+  }
 }
 
-function binningHandler(binningResult, hostData, header, headerAnonymous, skipStatic, crole) {
+function binningHandler(binningResult, hostData, header, headerAnonymous, skipStatic, crole, preOfFile) {
   let data = binningResult
   let guestPartyId = 0
   let role = ''
@@ -358,7 +464,7 @@ function binningHandler(binningResult, hostData, header, headerAnonymous, skipSt
         header: header2,
         data: tableData2,
         zeroFormat: '0',
-        export: 'feature_binning_detail',
+        export: (preOfFile ? preOfFile + '_' : '') + 'feature_binning_detail',
         toExp: false
       }
     }
@@ -379,7 +485,7 @@ function binningHandler(binningResult, hostData, header, headerAnonymous, skipSt
       props: {
         setting: stackBarSetting,
         options: stackBarData,
-        export: 'instance_distribution',
+        export: (preOfFile ? preOfFile + '_' : '') + 'instance_distribution',
         detail: false,
         noDataMissing: true
       }
@@ -399,7 +505,7 @@ function binningHandler(binningResult, hostData, header, headerAnonymous, skipSt
       props: {
         setting: woeDataSetting,
         options: woeData,
-        export: 'woe',
+        export: (preOfFile ? preOfFile + '_' : '') + 'woe',
         detail: false,
         noDataMissing: true
       }
@@ -422,7 +528,7 @@ function binningHandler(binningResult, hostData, header, headerAnonymous, skipSt
           header: header1,
           data: tableData1,
           zeroFormat: '0',
-          export: 'feature_summary',
+          export: (preOfFile ? preOfFile + '_' : '') + 'feature_summary',
           toExp: false
         }
       }
@@ -441,3 +547,4 @@ function binningHandler(binningResult, hostData, header, headerAnonymous, skipSt
 }
 
 export default binningMultClass
+

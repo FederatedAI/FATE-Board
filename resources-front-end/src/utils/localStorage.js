@@ -26,7 +26,7 @@ function combine(origin, entity) {
 }
 
 export function setLocal(key, value, entity) {
-  localStorage.setItem(key, combine(value, entity))
+  localStorage.setItem(key, entity ? combine(value, entity) : value)
 }
 
 export function removeLocal(key) {

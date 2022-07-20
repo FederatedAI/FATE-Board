@@ -206,13 +206,13 @@ export default {
       ]
       const hasReport = !!this.modelType
         .toLowerCase()
-        .match(new RegExp('(' + componentHasReport.join('|') + ')'))
+        .match(new RegExp('(' + componentHasReport.join('|') + ')$', 'i'))
       const hasData = !!this.modelType
         .toLowerCase()
-        .match(new RegExp('(' + componentHasData.join('|') + ')'))
+        .match(new RegExp('(' + componentHasData.join('|') + ')$', 'i'))
       const hasModel = !!this.modelType
         .toLowerCase()
-        .match(new RegExp('(' + componentHasModel.join('|') + ')'))
+        .match(new RegExp('(' + componentHasModel.join('|') + ')$', 'i'))
       const has = hasReport || hasData || hasModel
       return { has, hasReport, hasData, hasModel }
     },
