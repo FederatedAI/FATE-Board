@@ -134,7 +134,8 @@ export default class Json2Csv {
         value = `${this.options.quote}${value}${this.options.quote}`
       }
       // value = `${this.options.quote}${value}${this.options.quote}`
-      value = `${value + '\t'}`
+      // value = `${value + '\t'}`
+      value = `${value}`
     }
     return value
   }

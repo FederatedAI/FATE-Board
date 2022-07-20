@@ -196,7 +196,7 @@ export default {
   methods: {
     initing() {
       this.allFeatures()
-      this.correlationFeatures = JSON.parse(JSON.stringify(this.features))
+      // this.correlationFeatures = JSON.parse(JSON.stringify(this.features))
       this.correlation()
     },
     allFeatures() {
@@ -237,6 +237,7 @@ export default {
         }
         final.push(row)
       }
+      console.log(final)
       this.correlationContent = final
     },
 

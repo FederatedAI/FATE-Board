@@ -183,7 +183,7 @@ async function handler(modelData, metricsData, partyId, role, componentName, job
         }
         const options = []
         each(md.options, (metrics, name) => {
-          console.log(md.name, 'nams')
+          // console.log(md.name, 'nams')
           options.push(createAsyncOption(
             name,
             {
