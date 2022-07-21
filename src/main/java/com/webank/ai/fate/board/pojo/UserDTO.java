@@ -28,25 +28,11 @@ public class UserDTO implements Serializable {
     @NotNull(message = "password can't be null!")
     private String password;
 
-    @NotNull(message = "nonce can't be null!")
-    private String nonce;
-
-    @NotNull(message = "timestamp can't be null!")
-    private Long timestamp;
-
     public String getUsername() {
         return username;
     }
 
     public String getPassword() {
         return password;
-    }
-
-    public String getNonce() {
-        return nonce;
-    }
-
-    public Long getTimestamp() {
-        return timestamp;
     }
 }

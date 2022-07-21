@@ -19,17 +19,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.webank.ai.fate.board.controller.JobDetailController;
-import com.webank.ai.fate.board.dao.TaskMapper;
 import com.webank.ai.fate.board.global.Dict;
-import com.webank.ai.fate.board.global.ErrorCode;
-import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.pojo.FlowTaskDO;
-import com.webank.ai.fate.board.pojo.Task;
 import com.webank.ai.fate.board.pojo.TaskDO;
-import com.webank.ai.fate.board.pojo.TaskExample;
-import com.webank.ai.fate.board.utils.HttpClientPool;
-import com.webank.ai.fate.board.utils.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,12 +35,12 @@ import java.util.stream.Collectors;
 @Service
 public class TaskManagerService {
     private final Logger logger = LoggerFactory.getLogger(TaskManagerService.class);
-//    @Autowired
+    //    @Autowired
 //    TaskMapper taskMapper;
     @Value("${fateflow.url}")
     String fateUrl;
     @Autowired
-    HttpClientPool httpClientPool;
+    FlowFeign flowFeign;
 
     public TaskDO findTask(String jobId, String role, String partyId, String componentName) {
 
@@ -75,7 +67,7 @@ public class TaskManagerService {
 
         String result = null;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_TASK_QUERY, JSON.toJSONString(flowTaskQO));
+            result = flowFeign.post(Dict.URL_TASK_QUERY, JSON.toJSONString(flowTaskQO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             //todo
@@ -84,14 +76,15 @@ public class TaskManagerService {
         }
 //        return ResponseUtil.buildResponse(result, Dict.DATA);
         if (StringUtils.isNotBlank(result)) {
-            JSONObject dataObject=JSON.parseObject(result).getJSONObject(Dict.DATA);
+            JSONObject dataObject = JSON.parseObject(result).getJSONObject(Dict.DATA);
 //            JSONObject dataObject = (JSONObject) fateFlowResponse.getData();
             Integer count = dataObject.getInteger("count");
             JSONArray tasks = dataObject.getJSONArray("tasks");
 
-            List<FlowTaskDO> flowTaskDOS = JSON.parseObject(JSON.toJSONString(tasks), new TypeReference<List<FlowTaskDO>>(){});
+            List<FlowTaskDO> flowTaskDOS = JSON.parseObject(JSON.toJSONString(tasks), new TypeReference<List<FlowTaskDO>>() {
+            });
             List<FlowTaskDO> flowTaskDOS2 = flowTaskDOS.stream().filter(flowTaskDO -> componentName.equals(flowTaskDO.getComponent_name())).collect(Collectors.toList());
-            if (flowTaskDOS2.size()!=0){
+            if (flowTaskDOS2.size() != 0) {
                 FlowTaskDO flowTaskDO = flowTaskDOS2.get(0);
                 //            Object task = tasks.get(0);
 //        FlowTaskDO flowTaskDO = EntityUtil.converObject(task, FlowTaskDO.class);
