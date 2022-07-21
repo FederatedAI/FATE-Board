@@ -23,7 +23,6 @@ import com.webank.ai.fate.board.controller.JobManagerController;
 import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.pojo.JobDO;
-import io.swagger.models.auth.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -33,7 +32,6 @@ import javax.websocket.Session;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 public class JobWebSocketService implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(JobWebSocketService.class);

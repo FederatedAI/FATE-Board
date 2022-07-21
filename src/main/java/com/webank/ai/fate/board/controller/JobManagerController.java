@@ -22,35 +22,25 @@ import com.google.common.collect.Maps;
 import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
-import com.webank.ai.fate.board.pojo.*;
 import com.webank.ai.fate.board.log.LogFileService;
-import com.webank.ai.fate.board.pojo.Job;
-import com.webank.ai.fate.board.pojo.JobWithBLOBs;
-import com.webank.ai.fate.board.pojo.PagedJobQO;
+import com.webank.ai.fate.board.pojo.*;
+import com.webank.ai.fate.board.services.FlowFeign;
 import com.webank.ai.fate.board.services.JobManagerService;
-import com.webank.ai.fate.board.utils.*;
-import org.apache.commons.lang3.StringUtils;
+import com.webank.ai.fate.board.utils.PageBean;
+import com.webank.ai.fate.board.utils.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.FileSystem;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -62,7 +52,7 @@ public class JobManagerController {
     JobManagerService jobManagerService;
 
     @Autowired
-    HttpClientPool httpClientPool;
+    FlowFeign flowFeign;
 
     @Value("${fateflow.url}")
     String fateUrl;
@@ -89,7 +79,7 @@ public class JobManagerController {
 
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_STOP, JSON.toJSONString(jobStopDTO));
+            result = flowFeign.post(Dict.URL_JOB_STOP, JSON.toJSONString(jobStopDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -111,7 +101,7 @@ public class JobManagerController {
 
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_DATAVIEW, JSON.toJSONString(jobQueryDTO));
+            result = flowFeign.post(Dict.URL_JOB_DATAVIEW, JSON.toJSONString(jobQueryDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -149,7 +139,7 @@ public class JobManagerController {
 
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_DATAVIEW, JSON.toJSONString(params));
+            result = flowFeign.post(Dict.URL_JOB_DATAVIEW, JSON.toJSONString(params));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -221,7 +211,7 @@ public class JobManagerController {
 
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_UPDATE, JSON.toJSONString(updateNotesDTO));
+            result = flowFeign.post(Dict.URL_JOB_UPDATE, JSON.toJSONString(updateNotesDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -278,12 +268,13 @@ public class JobManagerController {
         return jobManagerService.download(downloadQO, response);
 
     }
+
     private ResponseResult checkAppKey() {
         String result;
         try {
             JobStopDTO jobStopDTO = new JobStopDTO();
             jobStopDTO.setJob_id("0");
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_STOP, JSON.toJSONString(jobStopDTO));
+            result = flowFeign.post(Dict.URL_JOB_STOP, JSON.toJSONString(jobStopDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -292,7 +283,7 @@ public class JobManagerController {
         Integer retCode = resultObject.getInteger(Dict.RETCODE);
         if (400 == retCode || 401 == retCode || 425 == retCode || 403 == retCode) {
             logger.error(resultObject.getString(Dict.RETMSG));
-            return new ResponseResult<>(retCode,resultObject.getString(Dict.RETMSG));
+            return new ResponseResult<>(retCode, resultObject.getString(Dict.RETMSG));
         }
         return null;
     }
