@@ -15,9 +15,7 @@
  */
 package com.webank.ai.fate.board.dao;
 
-import com.webank.ai.fate.board.pojo.Task;
 import com.webank.ai.fate.board.pojo.TaskDO;
-import com.webank.ai.fate.board.pojo.TaskExample;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
