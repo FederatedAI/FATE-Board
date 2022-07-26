@@ -326,7 +326,7 @@ public class JobDetailController {
     @RequestMapping(value = "/server/fateflow/info", method = RequestMethod.POST)
     @ResponseBody
     public ResponseResult flowInfo() {
-        String result = flowFeign.post(Dict.URL_FLOW_INFO, "");
+        String result = flowFeign.post(Dict.URL_FLOW_INFO, "{}");
         JSONObject jsonObject = JSON.parseObject(result);
         Integer retCode = jsonObject.getInteger(Dict.RETCODE);
         if (retCode != 0) {
