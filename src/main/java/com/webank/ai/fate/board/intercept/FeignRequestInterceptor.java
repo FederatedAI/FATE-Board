@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
@@ -31,21 +33,23 @@ public class FeignRequestInterceptor implements RequestInterceptor {
             String ENCODING = "ascii";
             String ALGORITHM = "HmacSHA1";
             String signature = null;
+            String fullUrl = template.feignTarget().url() + template.request().url();
             try {
+                URL url = new URL(fullUrl);
                 Mac mac = Mac.getInstance(ALGORITHM);
                 mac.init(new SecretKeySpec(flowSecretKey.getBytes(ENCODING), ALGORITHM));
                 String[] array = new String[]{
                         new String(timestamp.getBytes(ENCODING)),
                         new String(nonce.getBytes(ENCODING)),
                         new String(flowAppKey.getBytes(ENCODING)),
-                        new String(template.request().url().getBytes(ENCODING)),
+                        new String(url.getPath().getBytes(ENCODING)),
                         new String(template.request().body()),
                         "",
                 };
                 String text = String.join("\n", array);
                 byte[] signData = mac.doFinal(text.getBytes());
                 signature = new String(Base64.encodeBase64(signData), ENCODING);
-            } catch (NoSuchAlgorithmException | InvalidKeyException | UnsupportedEncodingException e) {
+            } catch (NoSuchAlgorithmException | InvalidKeyException | UnsupportedEncodingException | MalformedURLException e) {
                 e.printStackTrace();
             }
             template.header("TIMESTAMP", timestamp);
