@@ -12,6 +12,7 @@
         >{{ key | capitalize }} Log</span>
       </div>
       <el-select
+        v-if="instanceSelection.length > 1"
         v-model="currentInstanceId"
         :size="'mini'"
       >
@@ -279,7 +280,9 @@ export default {
           }
           this.handleLogMessage(res)
         })
-        this.intervalPull()
+        this.ws.addEventListener('open', () => {
+          this.intervalPull()
+        })
       }
       return this.ws
     },
