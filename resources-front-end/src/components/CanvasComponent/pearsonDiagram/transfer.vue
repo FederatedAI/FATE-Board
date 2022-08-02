@@ -72,6 +72,10 @@ export default {
     allInfo: {
       type: Array,
       default: () => []
+    },
+    max: {
+      type: Number,
+      default: 100
     }
   },
 
@@ -81,7 +85,6 @@ export default {
       inited: false,
       infos: [],
       choosed: [],
-      max: 20,
       change: debounce(() => {
         this.$emit('change', this.infos)
       }, 500)

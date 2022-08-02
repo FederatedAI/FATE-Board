@@ -297,7 +297,7 @@
                     <!-- node安装路径 -->
                     <installDirectory>dist</installDirectory>
                     <!-- 前端代码路径 -->
-                    <workingDirectory>resources-front-end</workingDirectory>
+                    <workingDirectory>${project.basedir}/resources-front-end</workingDirectory>
                 </configuration>
             </plugin>
             <plugin>

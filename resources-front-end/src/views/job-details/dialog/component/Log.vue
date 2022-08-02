@@ -28,6 +28,7 @@ import ReconnectingWebSocket from '@/utils/ReconnectingWebSocket'
 
 const getDefaults = data => {
   return {
+    sizeInterval: null,
     logs: null,
     logSize: 0,
     logType: '',
@@ -83,6 +84,7 @@ export default {
     visible: 'visibleHandler'
   },
   beforeDestroy() {
+    this.sizeInterval && clearInterval(this.sizeInterval)
     this.closeSocket()
   },
   methods: {
@@ -98,14 +100,17 @@ export default {
         this.ws.addEventListener('message', event => {
           this.handleLogMessage(JSON.parse(event.data))
         })
+        this.ws.addEventListener('open', () => {
+          this.onSizePull()
+        })
       }
       return this.ws
     },
     handleLogMessage(data) {
-      const type = data.type
+      const type = (parseInt(data.componentInfo) === data.componentInfo) ? 'logSize' : 'componentInfo'
       switch (type) {
         case 'logSize':
-          this.handleLogSizeResponse(data.data)
+          this.handleLogSizeResponse(data)
           break
         case 'componentInfo':
           this.insertLogs(data)
@@ -121,6 +126,18 @@ export default {
     },
     handleScrollTop() {
       this.onPull()
+    },
+    onSizePull() {
+      const pull = () => {
+        this.ws &&
+        this.ws.send(
+          JSON.stringify({
+            type: 'logSize'
+          })
+        )
+      }
+      pull()
+      this.sizeInterval = setInterval(pull, 10000)
     },
     onPull(backward = true) {
       const count = this.logSize
