@@ -259,7 +259,7 @@ class SquareInfo {
   constructor(obj) {
     this.point = obj.point || {}
     this.width = obj.width || 0
-    this.content = obj.content || '-'
+    this.content = obj.content || obj.content === 0 ? obj.content : '-'
     this.featureX = obj.x || ''
     this.featureY = obj.y || ''
     this.contentFont = obj.contentFont

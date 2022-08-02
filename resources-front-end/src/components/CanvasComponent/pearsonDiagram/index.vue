@@ -214,7 +214,7 @@ export default {
     },
     correlation() {
       const fixed = num => {
-        if (num) {
+        if (num || num === 0) {
           return parseFloat(num).toFixed(6)
         } else {
           return '-'
