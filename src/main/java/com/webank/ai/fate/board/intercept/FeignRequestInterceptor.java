@@ -34,6 +34,10 @@ public class FeignRequestInterceptor implements RequestInterceptor {
             String ALGORITHM = "HmacSHA1";
             String signature = null;
             String fullUrl = template.feignTarget().url() + template.request().url();
+            String body = new String(template.request().body());
+            if (body.equals("{}")) {
+                body = "";
+            }
             try {
                 URL url = new URL(fullUrl);
                 Mac mac = Mac.getInstance(ALGORITHM);
@@ -43,7 +47,7 @@ public class FeignRequestInterceptor implements RequestInterceptor {
                         new String(nonce.getBytes(ENCODING)),
                         new String(flowAppKey.getBytes(ENCODING)),
                         new String(url.getPath().getBytes(ENCODING)),
-                        new String(template.request().body()),
+                        body,
                         "",
                 };
                 String text = String.join("\n", array);
