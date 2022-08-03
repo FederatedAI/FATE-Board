@@ -415,8 +415,8 @@ function binningHandler(binningResult, hostData, header, headerAnonymous, skipSt
   ]
 
   if (crole === 'host') {
-    header1.splice(2, 0, createHeader('anonymInGuest', 'anonym in guest'))
-    header2.splice(2, 0, createHeader('anonym in guest', 'anonym in guest'))
+    header1.splice(2, 0, createHeader('anonymInGuest', 'anonym'))
+    header2.splice(2, 0, createHeader('anonym in guest', 'anonym'))
   }
 
   if (crole === 'guest') {

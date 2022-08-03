@@ -20,21 +20,28 @@
 import { createHeader } from '../fn/common.js'
 import { each, sortByName } from '../fn/uitls'
 
-const getHeader = () => {
-  return [
+const getHeader = (hasAnony = false) => {
+  const list = [
     { type: 'index', label: 'index' },
     createHeader('variable', 'variable', { sortable: true }),
     createHeader('samples', 'samples')
   ]
+  if (hasAnony) {
+    list.splice(2, 0, createHeader('anonym', 'anonym'))
+  }
 }
 
 const fn = (response) => {
   const tableInfo = response.reader_name.meta.table_info
+  const tableAnonym = response.reader_name.meta.anonymous_info
   const tableData = []
   each(tableInfo, (samples, variable) => {
     const dataItem = {}
     dataItem['variable'] = variable
     dataItem['samples'] = samples
+    if (tableAnonym) {
+      dataItem['anonym'] = tableAnonym[variable]
+    }
     tableData.push(dataItem)
   })
 
@@ -107,7 +114,7 @@ const fn = (response) => {
         type: 'table',
         props: {
           data: tableData,
-          header: getHeader(),
+          header: getHeader(!!tableAnonym),
           zeroFormat: '0',
           export: response.reader_name.meta.table_name,
           pageSize: -1
