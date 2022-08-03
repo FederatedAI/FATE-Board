@@ -94,9 +94,9 @@ public class FeignConfig {
      * Springboot的代理log
      */
     final class FeignLog extends Logger {
-        private org.slf4j.Logger logger;
-        private Map<Level, List<String>> logLevelMap;
-        private ThreadLocal<Level> localLogLevel = new ThreadLocal<>();
+        private final org.slf4j.Logger logger;
+        private final Map<Level, List<String>> logLevelMap;
+        private final ThreadLocal<Level> localLogLevel = new ThreadLocal<>();
 
         public FeignLog(Class<?> clazz, Map<Level, List<String>> logLevelMap) {
             logger = LoggerFactory.getLogger(clazz);
@@ -130,6 +130,7 @@ public class FeignConfig {
         protected Response logAndRebufferResponse(String configKey, Level logLevel, Response response, long elapsedTime) throws IOException {
             if (localLogLevel.get() != null) {
                 logLevel = localLogLevel.get();
+                localLogLevel.remove();
             }
             if (logLevel == Level.NONE) {
                 return response;
