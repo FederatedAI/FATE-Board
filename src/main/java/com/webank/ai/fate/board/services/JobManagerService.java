@@ -22,6 +22,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import com.webank.ai.fate.board.exceptions.LogicException;
 import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
@@ -95,12 +96,15 @@ public class JobManagerService {
             result = flowFeign.post(Dict.URL_JOB_QUERY, JSON.toJSONString(query));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
-            //todo
-
-//            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+            LogicException.throwError(ErrorCode.FATEFLOW_ERROR_CONNECTION);
         }
         if (result != null) {
-            JSONObject dataObject = JSON.parseObject(result).getJSONObject(Dict.DATA);
+            JSONObject resultObject = JSON.parseObject(result);
+            Integer retCode = resultObject.getInteger(Dict.RETCODE);
+            if (400 == retCode || 401 == retCode || 425 == retCode || 403 == retCode) {
+                LogicException.throwError(retCode, resultObject.getString(Dict.RETMSG));
+            }
+            JSONObject dataObject = resultObject.getJSONObject(Dict.DATA);
             Integer count = dataObject.getInteger("count");
             JSONArray jobs = dataObject.getJSONArray("jobs");
 
@@ -235,7 +239,14 @@ public class JobManagerService {
                 jobParams.put((Dict.ROLE), role1);
                 jobParams.put(Dict.PARTY_ID, partyId1);
                 String result = flowFeign.post(Dict.URL_JOB_DATAVIEW, JSON.toJSONString(jobParams));
-                JSONObject data = JSON.parseObject(result).getJSONObject(Dict.DATA);
+
+                JSONObject resultObject = JSON.parseObject(result);
+                Integer retCode = resultObject.getInteger(Dict.RETCODE);
+                if (400 == retCode || 401 == retCode || 425 == retCode || 403 == retCode) {
+                    logger.error(resultObject.getString(Dict.RETMSG));
+                    LogicException.throwError(retCode, resultObject.getString(Dict.RETMSG));
+                }
+                JSONObject data = resultObject.getJSONObject(Dict.DATA);
 //                JSONObject data=null;
                 return data;
             }, new int[]{500, 1000}, new int[]{3, 3});

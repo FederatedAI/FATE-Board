@@ -3,13 +3,7 @@ package com.webank.ai.fate.board.utils;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
+import java.security.*;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -22,19 +16,6 @@ import java.util.Map;
 public class StandardRSAUtils {
 
     private static Map<Integer, String> keyMap = new HashMap<>();
-
-    public static void main(String[] args) throws Exception {
-        //生成公钥和私钥
-        getKeyPair();
-        //加密字符串
-        String password = "liupengkun";
-        System.out.println("随机生成的公钥为：" + keyMap.get(0));
-        System.out.println("随机生成的私钥为：" + keyMap.get(1));
-        String passwordEn = encrypt(password, keyMap.get(0));
-        System.out.println(password + "\t加密后的字符串为：" + passwordEn);
-        String passwordDe = decrypt(passwordEn, keyMap.get(1));
-        System.out.println("还原后的字符串为：" + passwordDe);
-    }
 
     /**
      * 随机生成密钥对
