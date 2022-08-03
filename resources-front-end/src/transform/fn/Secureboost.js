@@ -97,7 +97,7 @@ const mappingHeader = [
     prop: 'variable'
   },
   {
-    label: 'anonym in guest',
+    label: 'anonym',
     prop: 'featureIndex'
   }
 ]

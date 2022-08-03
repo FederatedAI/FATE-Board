@@ -85,7 +85,7 @@ const getTableHeaderSettingByRole = (role, hostId, guest, host) => {
   } else if (role === 'host') {
     guest.splice(1, 0, {
       prop: 'binding',
-      label: 'anonym in guest'
+      label: 'anonym'
     })
     header['header'] = ([{ type: 'index', label: 'index' }].concat(guest))
   }
