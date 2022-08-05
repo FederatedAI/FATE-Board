@@ -29,23 +29,26 @@ const getHeader = (hasAnony = false) => {
   if (hasAnony) {
     list.splice(2, 0, createHeader('anonym', 'anonym'))
   }
+  return list
 }
 
 const fn = (response) => {
   const tableInfo = response.reader_name.meta.table_info
   const tableAnonym = response.reader_name.meta.anonymous_info
+  const tableAnonymIsNotNull = Object.keys(tableAnonym).length > 0
   const tableData = []
   each(tableInfo, (samples, variable) => {
     const dataItem = {}
     dataItem['variable'] = variable
     dataItem['samples'] = samples
-    if (tableAnonym) {
+    if (tableAnonymIsNotNull) {
       dataItem['anonym'] = tableAnonym[variable]
     }
     tableData.push(dataItem)
   })
 
   sortByName(tableData, 'variable')
+  const tableHeader = getHeader(tableAnonymIsNotNull)
   const group = []
   const meta = response.reader_name && response.reader_name.meta
   if (meta) {
@@ -114,7 +117,7 @@ const fn = (response) => {
         type: 'table',
         props: {
           data: tableData,
-          header: getHeader(!!tableAnonym),
+          header: tableHeader,
           zeroFormat: '0',
           export: response.reader_name.meta.table_name,
           pageSize: -1
