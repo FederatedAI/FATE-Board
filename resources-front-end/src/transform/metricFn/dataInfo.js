@@ -20,7 +20,7 @@
 import { createHeader } from '../fn/common.js'
 import { each, sortByName } from '../fn/uitls'
 
-const getHeader = (hasAnony = false) => {
+const getHeader = (hasAnony = false, hasAttribute = false) => {
   const list = [
     { type: 'index', label: 'index' },
     createHeader('variable', 'variable', { sortable: true }),
@@ -29,13 +29,18 @@ const getHeader = (hasAnony = false) => {
   if (hasAnony) {
     list.splice(2, 0, createHeader('anonym', 'anonym'))
   }
+  if (hasAttribute) {
+    list.splice(3, 0, createHeader('attribute', 'attribute'))
+  }
   return list
 }
 
 const fn = (response) => {
   const tableInfo = response.reader_name.meta.table_info
   const tableAnonym = response.reader_name.meta.anonymous_info
-  const tableAnonymIsNotNull = Object.keys(tableAnonym).length > 0
+  const tableAttribute = response.reader_name.meta.attribute_info
+  const tableAnonymIsNotNull = tableAnonym && Object.keys(tableAnonym).length > 0
+  const tableAttributeIsNotNull = tableAttribute && Object.keys(tableAttribute).length > 0
   const tableData = []
   each(tableInfo, (samples, variable) => {
     const dataItem = {}
@@ -44,11 +49,14 @@ const fn = (response) => {
     if (tableAnonymIsNotNull) {
       dataItem['anonym'] = tableAnonym[variable]
     }
+    if (tableAttributeIsNotNull) {
+      dataItem['attribute'] = tableAttribute[variable]
+    }
     tableData.push(dataItem)
   })
 
   sortByName(tableData, 'variable')
-  const tableHeader = getHeader(tableAnonymIsNotNull)
+  const tableHeader = getHeader(tableAnonymIsNotNull, tableAttributeIsNotNull)
   const group = []
   const meta = response.reader_name && response.reader_name.meta
   if (meta) {
