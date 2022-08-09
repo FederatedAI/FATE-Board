@@ -180,7 +180,7 @@ function multiClassTransform(
   let hostIndex = 1
   if (labels && labels.length !== 0) {
     for (let i = 0, l = labels.length; i < l; i++) {
-      if (hostResults[i] && results[i]) {
+      if (hostResults[i] || results[i]) {
         const hostList = subHost(hostResults, hostPartyIds, hostIndex)
         result.push(binningHandler(results[i], hostList, header, headerAnonymous, skipStatic, crole, preOfFile))
         selections.push({
