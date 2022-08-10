@@ -50,6 +50,7 @@ export default {
 				100
       if (res > 100) res = 100
       else if (res < 0) res = 0
+      else if (isNaN(res)) res = 0
       return res
     },
     spanContent(cell) {
