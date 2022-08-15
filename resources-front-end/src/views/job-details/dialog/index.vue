@@ -183,8 +183,8 @@ export default {
         'dataio', 'federatedsample',
         'scale', 'onehot',
         'union', 'split',
-        'sampleweight', 'statistics',
-        'transformer'
+        'sampleweight', 'statistic',
+        'transformer', 'peason'
       ]
       const componentHasData = [
         'binning', 'selection',
