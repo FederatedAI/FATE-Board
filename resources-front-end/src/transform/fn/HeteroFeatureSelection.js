@@ -72,7 +72,7 @@ const getFormSettingByRole = (role, hostId) => {
 
 const getTableHeaderSettingByRole = (role, hostId, guest, host) => {
   const header = {}
-  if (role === 'guest') {
+  if (role.match('guest')) {
     let commonHeader = [guest, host[0] || []]
     commonHeader = commonHeader.reduce(function(a, b) {
       return a.concat(b)
@@ -82,7 +82,7 @@ const getTableHeaderSettingByRole = (role, hostId, guest, host) => {
     hostId.forEach((id, index) => {
       header.disable[id] = disabledHeader(host[index], commonHeader)
     })
-  } else if (role === 'host') {
+  } else if (role.match('host')) {
     guest.splice(1, 0, {
       prop: 'binding',
       label: 'anonym'
@@ -94,7 +94,7 @@ const getTableHeaderSettingByRole = (role, hostId, guest, host) => {
 
 const getTableDataSettingByRole = (role, hostId, guest, host) => {
   let data = {}
-  if (role === 'guest') {
+  if (role.match('guest')) {
     if (Array.isArray(hostId) && hostId.length > 0) {
       data['guest'] = guest
       hostId.forEach((id, index) => {
@@ -103,7 +103,7 @@ const getTableDataSettingByRole = (role, hostId, guest, host) => {
     } else {
       data = guest
     }
-  } else if (role === 'host') {
+  } else if (role.match('host')) {
     data = guest
   }
   return data
