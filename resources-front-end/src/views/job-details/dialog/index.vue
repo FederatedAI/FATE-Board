@@ -184,7 +184,7 @@ export default {
         'scale', 'onehot',
         'union', 'split',
         'sampleweight', 'statistic',
-        'transformer', 'peason'
+        'transformer', 'pearson', 'psi'
       ]
       const componentHasData = [
         'binning', 'selection',
