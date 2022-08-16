@@ -183,7 +183,7 @@ export default {
         'dataio', 'federatedsample',
         'scale', 'onehot',
         'union', 'split',
-        'sampleweight', 'statistic',
+        'sampleweight', 'statistics',
         'transformer', 'pearson', 'psi'
       ]
       const componentHasData = [
