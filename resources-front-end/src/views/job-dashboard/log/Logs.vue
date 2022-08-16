@@ -389,7 +389,7 @@ export default {
       this.logs = { ...this.logs, [type + '_' + this.currentInstanceId]: result }
     },
     getLogsRange(arr) {
-      return [arr[0].lineNum, arr[arr.length - 1].lineNum]
+      return [parseFloat(arr[0].lineNum), parseFloat(arr[arr.length - 1].lineNum)]
     },
     handleScrollTop(type) {
       this.onPull(type)
