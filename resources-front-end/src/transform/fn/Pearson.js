@@ -112,7 +112,8 @@ function pearsonHandler(modelData, metricData, partyId, role, componentName, job
           type: 'table',
           props: {
             header: anonyHeader,
-            data: anony
+            data: anony,
+            export: 'feature_summary'
           }
         }]
       }
