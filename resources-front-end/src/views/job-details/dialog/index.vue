@@ -184,7 +184,8 @@ export default {
         'scale', 'onehot',
         'union', 'split',
         'sampleweight', 'statistics',
-        'transformer', 'pearson', 'psi'
+        'transformer', 'pearson', 'psi',
+        'split'
       ]
       const componentHasData = [
         'binning', 'selection',
@@ -202,7 +203,7 @@ export default {
       const componentHasModel = [
         'secureboost', 'lr',
         'linr', 'possion',
-        'nn', 'kmeans'
+        'nn', 'kmeans', 'ftl'
       ]
       const hasReport = !!this.modelType
         .toLowerCase()
