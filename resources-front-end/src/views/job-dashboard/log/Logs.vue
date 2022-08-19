@@ -320,10 +320,10 @@ export default {
         begin = Math.max(end - size, 1)
       } else {
         if (backward) {
-          end = logs[0].lineNum - 1
+          end = parseFloat(logs[0].lineNum) - 1
           begin = Math.max(1, end - size)
         } else {
-          begin = logs[logs.length - 1].lineNum + 1
+          begin = parseFloat(logs[logs.length - 1].lineNum) + 1
           end = count
         }
       }
@@ -377,8 +377,8 @@ export default {
         } else {
           const start = Math.max(targetRange[0], originRange[0])
           const end = Math.min(targetRange[1], originRange[1])
-          const startIndex = logs.findIndex(value => value.lineNum === start)
-          const endIndex = logs.findIndex(value => value.lineNum === end)
+          const startIndex = logs.findIndex(value => Math.abs(parseFloat(value.lineNum) - start) < 0.001)
+          const endIndex = logs.findIndex(value => Math.abs(parseFloat(value.lineNum) - end) < 0.001)
           result = logs.slice()
           result.splice(startIndex, endIndex - startIndex + 1, ...target)
         }
