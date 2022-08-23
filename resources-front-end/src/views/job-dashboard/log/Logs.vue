@@ -253,13 +253,17 @@ export default {
     },
     getInstanceIdFromFlow() {
       return getInstanceId().then((res) => {
-        const machines = res.data
         const result = []
-        for (const each of machines) {
-          result.push(each.instance_id)
+        for (const [instance_id, instance] of Object.entries(res.data)) {
+          if (instance.host === window.location.host) {
+            this.currentInstanceId = instance.instance_id
+          }
+          result.push(instance.instance_id)
+        }
+        if (!this.currentInstanceId) {
+          this.currentInstanceId = result[0]
         }
         this.instanceId = result
-        this.currentInstanceId = this.instanceId[0]
       })
     },
     initLogSocket() {
