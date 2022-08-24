@@ -154,8 +154,8 @@ export default {
         'boost',
         'homoBoost',
         'homoLR',
-        'heteroLR',
-        'heteroLinR',
+        'LR',
+        'LinR',
         'sklearnLR',
         'poisson',
         'homoNN',
@@ -165,12 +165,14 @@ export default {
         'heteroMF',
         'heteroSVD',
         'heteroSVDPP',
-        'heteroGMF'
+        'heteroGMF',
+        'heteroSSHELR',
+        'heteroKmeans'
       ]
       const metricsOutputCheck = ['evaluation', 'scorecard']
       if (this.joinComponents(metricsOutputCheck).match(this.modelType)) {
         name = 'metrics'
-      } else if (this.joinComponents(modelOutputCheck).match(this.modelType)) {
+      } else if (this.joinComponents(modelOutputCheck).match(this.modelType, 'i')) {
         name = 'model output'
       }
       return name
