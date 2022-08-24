@@ -180,9 +180,11 @@ class Correlation {
       for (let j = 0; j < this.newFeatures.length; j++) {
         const finalPosX = x + distance.xlength + distance.xlength * lay.featureDistance + (j + 0.5) * eachWidth + textFont
         const comp = this.squareList.get(this.newFeatures[j] + '_' + rever[i])
-        comp.width = eachWidth
-        comp.point = { x: finalPosX, y: finalPosY }
-        comp.getInstance(this.lay)
+        if (comp) {
+          comp.width = eachWidth
+          comp.point = { x: finalPosX, y: finalPosY }
+          comp.getInstance(this.lay)
+        }
       }
     }
   }
