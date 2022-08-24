@@ -113,7 +113,8 @@ function pearsonHandler(modelData, metricData, partyId, role, componentName, job
           props: {
             header: anonyHeader,
             data: anony,
-            export: 'feature_summary'
+            export: 'feature_summary',
+            pagerCount: 4
           }
         }]
       }
