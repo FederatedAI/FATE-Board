@@ -5,6 +5,7 @@
     :header="currentHeader"
     :async="false"
     :page-size="pageSize"
+    :pager-count="pagerCount"
     :total="total"
     :name="name"
     @change="tableChange"
@@ -63,6 +64,10 @@ export default {
     total: {
       type: Number,
       default: 10
+    },
+    pagerCount: {
+      type: Number,
+      default: 7
     }
   },
   data() {
