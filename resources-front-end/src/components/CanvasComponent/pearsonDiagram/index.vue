@@ -167,7 +167,7 @@ export default {
       showTransferDialog: false,
       showSortBy: false,
       showRangefilter: false,
-      transferMax: 100
+      transferMax: 80
     }
   },
   computed: {
@@ -197,7 +197,7 @@ export default {
   methods: {
     initing() {
       this.allFeatures()
-      this.correlationFeatures = JSON.parse(JSON.stringify(this.features))
+      this.correlationFeatures = JSON.parse(JSON.stringify(this.features)).splice(0, this.transferMax)
       this.correlation()
     },
     allFeatures() {
@@ -210,7 +210,7 @@ export default {
       } else {
         final.push(...this.otherVariable)
       }
-      this.features = final.splice(0, this.transferMax)
+      this.features = final
     },
     correlation() {
       const fixed = num => {
