@@ -61,6 +61,8 @@ const app = {
       featureImputation: 'FeatureImputation',
       LabelTransform: 'LabelTransform',
       heteroSSHELR: 'HeteroSSHELR',
+      heteroSSHELinR: 'HeteroSSHELinR',
+      heteroKmeans: 'HeteroKmeans',
       CacheLoader: 'CacheLoader',
       SSHELinR: 'SSHELinR',
       SSHEPoissonR: 'SSHEPoissonR',
