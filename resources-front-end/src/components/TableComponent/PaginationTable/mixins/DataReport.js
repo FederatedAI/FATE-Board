@@ -171,7 +171,7 @@ const dataRequest = {
               deleted.push(implying)
             } else {
               for (const key in item) {
-                const title = _header.find(val => val.prop === key)
+                const title = _header.find ? _header.find(val => val.prop === key) : {}
                 if (item[key] &&
                   item[key].match &&
                   item[key].match(val[ORIGIN]) &&
