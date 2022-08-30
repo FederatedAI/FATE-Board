@@ -13,6 +13,15 @@
 * Differentiated rendering for task components with large amounts of data
 
 
+# Relaese 1.8.0.1
+#### Major Features and Improvements
+**Major Features**
+
+* Fast JSON version update
+* Spring version update
+* Code update because of dependent upgrade
+
+
 # Release 1.8.0
 
 #### Major Features and Improvements
