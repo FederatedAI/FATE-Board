@@ -33,7 +33,7 @@ export default function(data, partyId, role) {
   const guestBody = []
   const hostBody = []
   const hostId = []
-  const { colNames: guestColNames, hostColNames, results, header } = data
+  const { colNames: guestColNames, hostColNames, results, header, colNameToAnonymDict } = data
   guestColNames.forEach(variable => {
     guestBody.push({ variable })
   })
@@ -85,7 +85,7 @@ export default function(data, partyId, role) {
       }
       for (let i = 0; i < data.header.length; i++) {
         if (data.header[i] === variable) {
-          let anony = 'host_' + partyId + '_' + i
+          let anony = colNameToAnonymDict[data.header[i]]
           let anonyIdx = i
           if (hostBody.length > 0) {
             for (const val of hostBody) {

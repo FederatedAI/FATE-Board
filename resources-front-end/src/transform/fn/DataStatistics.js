@@ -61,7 +61,8 @@ const fn = function(modelData) {
         data: tableData,
         header: getHeaders(meta.meta_data.statistics),
         zeroFormat: '0',
-        headerPagination: true
+        headerPagination: true,
+        export: 'statistic_detail'
       }
     }]
   }] : []

@@ -98,11 +98,11 @@
 
     <appender name="httpclient" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder charset="utf-8">
-            <pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n
+            <pattern>[%-5level] %d{${DATETIME}} [%thread] - %m%n
             </pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
+            <level>DEBUG</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
@@ -117,8 +117,7 @@
         </rollingPolicy>
     </appender>
 
-
-    <logger name="com.webank.ai.fate.board.utils.HttpClientPool" level="INFO" additivity="true">
+    <logger name="com.webank.ai.fate.board.conf.FeignConfig" level="DEBUG" additivity="true">
         <appender-ref ref="httpclient"/>
     </logger>
 

@@ -154,8 +154,8 @@ export default {
         'boost',
         'homoBoost',
         'homoLR',
-        'heteroLR',
-        'heteroLinR',
+        'LR',
+        'LinR',
         'sklearnLR',
         'poisson',
         'homoNN',
@@ -165,12 +165,14 @@ export default {
         'heteroMF',
         'heteroSVD',
         'heteroSVDPP',
-        'heteroGMF'
+        'heteroGMF',
+        'heteroSSHELR',
+        'heteroKmeans'
       ]
       const metricsOutputCheck = ['evaluation', 'scorecard']
       if (this.joinComponents(metricsOutputCheck).match(this.modelType)) {
         name = 'metrics'
-      } else if (this.joinComponents(modelOutputCheck).match(this.modelType)) {
+      } else if (this.joinComponents(modelOutputCheck).match(this.modelType, 'i')) {
         name = 'model output'
       }
       return name
@@ -184,7 +186,8 @@ export default {
         'scale', 'onehot',
         'union', 'split',
         'sampleweight', 'statistics',
-        'transformer'
+        'transformer', 'pearson', 'psi',
+        'split'
       ]
       const componentHasData = [
         'binning', 'selection',
@@ -202,17 +205,17 @@ export default {
       const componentHasModel = [
         'secureboost', 'lr',
         'linr', 'possion',
-        'nn', 'kmeans'
+        'nn', 'kmeans', 'ftl'
       ]
       const hasReport = !!this.modelType
         .toLowerCase()
-        .match(new RegExp('(' + componentHasReport.join('|') + ')'))
+        .match(new RegExp('(' + componentHasReport.join('|') + ')$', 'i'))
       const hasData = !!this.modelType
         .toLowerCase()
-        .match(new RegExp('(' + componentHasData.join('|') + ')'))
+        .match(new RegExp('(' + componentHasData.join('|') + ')$', 'i'))
       const hasModel = !!this.modelType
         .toLowerCase()
-        .match(new RegExp('(' + componentHasModel.join('|') + ')'))
+        .match(new RegExp('(' + componentHasModel.join('|') + ')$', 'i'))
       const has = hasReport || hasData || hasModel
       return { has, hasReport, hasData, hasModel }
     },

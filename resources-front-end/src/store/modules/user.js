@@ -20,33 +20,35 @@
 import { login, logout, getInfo } from '@/api/login'
 // import { getToken } from '@/utils/auth'
 import { getLocal, setLocal, removeLocal } from '../../utils/localStorage'
-import HmacSha1 from 'hmac_sha1'
+// import HmacSha1 from 'hmac_sha1'
+import { security } from '../../api/login'
+import rsa from '../../utils/encrypt'
 
-function nonceCreate(length) {
-  if (length > 0) {
-    var data = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-    var nums = ''
-    for (var i = 0; i < length; i++) {
-      var r = parseInt(Math.random() * 61)
-      nums += data[r]
-    }
-    return nums
-  } else {
-    return false
-  }
-}
+// function nonceCreate(length) {
+//   if (length > 0) {
+//     var data = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+//     var nums = ''
+//     for (var i = 0; i < length; i++) {
+//       var r = parseInt(Math.random() * 61)
+//       nums += data[r]
+//     }
+//     return nums
+//   } else {
+//     return false
+//   }
+// }
 
-function saltPassword(password) {
-  const nonce = nonceCreate(12)
-  const timestamp = new Date().getTime()
+// function saltPassword(password) {
+//   const nonce = nonceCreate(12)
+//   const timestamp = new Date().getTime()
 
-  const hmacSha1 = new HmacSha1()
-  return {
-    nonce,
-    timestamp,
-    password: hmacSha1.digest(password, nonce + timestamp)
-  }
-}
+//   const hmacSha1 = new HmacSha1()
+//   return {
+//     nonce,
+//     timestamp,
+//     password: hmacSha1.digest(password, nonce + timestamp)
+//   }
+// }
 
 const user = {
   state: {
@@ -76,24 +78,22 @@ const user = {
   },
 
   actions: {
-    Login({ commit }, userInfo) {
+    async Login({ commit }, userInfo) {
+      // return new Promise((resolve, reject) => {
       const username = userInfo.username.trim()
-      const saltp = saltPassword(userInfo.password.trim())
-
-      return new Promise((resolve, reject) => {
-        login(username, saltp.password, saltp.nonce, saltp.timestamp).then(response => {
-          const data = response.data
-          if (!data) throw new Error('Account is not matched')
-          const token = !data ? username : (data.tokenHead || username) + (data.token || '')
-          // setToken(token, new Date(new Date().getTime() + 30 * 60 * 1000))
-          commit('SET_TOKEN', token)
-          commit('SET_USERNAME', username)
-          setLocal('CurrentUser', username, 29 * 60 * 1000)
-          resolve()
-        }).catch(error => {
-          reject(error)
-        })
-      })
+      const securityInfo = await security()
+      let securityData = ''
+      if (securityInfo && securityInfo.data) securityData = securityInfo.data
+      const password = rsa(securityData, userInfo.password)
+      const response = await login(username, password)
+      const data = response.data
+      if (!data) throw new Error('Account is not matched')
+      const token = !data ? username : (data.tokenHead || username) + (data.token || '')
+      // setToken(token, new Date(new Date().getTime() + 30 * 60 * 1000))
+      commit('SET_TOKEN', token)
+      commit('SET_USERNAME', username)
+      setLocal('CurrentUser', username)
+      return true
     },
 
     GetInfo({ commit }) {

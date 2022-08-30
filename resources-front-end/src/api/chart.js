@@ -19,6 +19,13 @@
 
 import request from '@/utils/request'
 
+export function getInstanceId() {
+  return request({
+    url: '/v1/server/fateflow/info',
+    method: 'post'
+  })
+}
+
 export function getMetrics(data) {
   return request({
     url: '/v1/tracking/component/metrics',

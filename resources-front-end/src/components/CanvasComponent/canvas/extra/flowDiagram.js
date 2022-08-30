@@ -403,7 +403,7 @@ class CompExpression {
     const MODELOUTPUT = { name: 'model0output', tooltip: 'Model Output', type: 'model' }
     if (this.checkSetPort(this.name, this.belone, dep)) {
       this.input.push(...[TRAINDATA, VALDATA])
-    } else if (!this.belone.toLowerCase().match(/(reader|modelloader|cacheloader)/)) {
+    } else if (!this.belone.toLowerCase().match(/(^reader|modelloader|cacheloader)/)) {
       this.input.push(DATAINPUT)
     }
     if (this.belone.toLowerCase().match(/evaluation|union/i)) {
@@ -434,7 +434,7 @@ class CompExpression {
       }
       this.output.push(CACHEOUTPUT)
     }
-    if (!this.belone.toLowerCase().match(/(intersection|evaluation|upload|download|rsa|datasplit|reader|union|scorecard|cacheloader|writer)/i)) {
+    if (!this.belone.toLowerCase().match(/(intersection|evaluation|upload|download|rsa|datasplit|^reader|union|scorecard|cacheloader|writer|sample$)/i)) {
       if (!this.belone.toLowerCase().match(/(statistics|pearson|psi|modelloader)/i)) {
         this.input.push(MODELINPUT)
       }

@@ -180,9 +180,11 @@ class Correlation {
       for (let j = 0; j < this.newFeatures.length; j++) {
         const finalPosX = x + distance.xlength + distance.xlength * lay.featureDistance + (j + 0.5) * eachWidth + textFont
         const comp = this.squareList.get(this.newFeatures[j] + '_' + rever[i])
-        comp.width = eachWidth
-        comp.point = { x: finalPosX, y: finalPosY }
-        comp.getInstance(this.lay)
+        if (comp) {
+          comp.width = eachWidth
+          comp.point = { x: finalPosX, y: finalPosY }
+          comp.getInstance(this.lay)
+        }
       }
     }
   }
@@ -259,7 +261,7 @@ class SquareInfo {
   constructor(obj) {
     this.point = obj.point || {}
     this.width = obj.width || 0
-    this.content = obj.content || '-'
+    this.content = obj.content || obj.content === 0 ? obj.content : '-'
     this.featureX = obj.x || ''
     this.featureY = obj.y || ''
     this.contentFont = obj.contentFont

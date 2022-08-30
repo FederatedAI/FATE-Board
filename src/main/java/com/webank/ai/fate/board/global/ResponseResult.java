@@ -89,4 +89,18 @@ public class ResponseResult<T> {
         this.msg = msg;
     }
 
+    public static <T> ResponseResult<T> success(T data) {
+        ResponseResult<T> responseResult = new ResponseResult<>();
+        responseResult.setData(data);
+        responseResult.setCode(ErrorCode.SUCCESS.getCode());
+        return responseResult;
+    }
+
+    public static <T> ResponseResult<T> error(int errorCode, String message) {
+        ResponseResult<T> responseResult = new ResponseResult<>();
+        responseResult.setCode(errorCode);
+        responseResult.setMsg(message);
+        return responseResult;
+    }
+
 }

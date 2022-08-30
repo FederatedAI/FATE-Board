@@ -168,7 +168,7 @@ export default function({ responseData, output, role, partyId, outputType }) {
   if (responseData.featureNameFidMapping && Object.keys(responseData.featureNameFidMapping).length > 0) {
     const final = JSON.parse(JSON.stringify(responseData.featureNameFidMapping))
     const tBody = []
-    const tHeader = [{ label: 'variable', prop: 'variable' }, { label: 'anonym in guest', prop: 'featureIndex' }]
+    const tHeader = [{ label: 'variable', prop: 'variable' }, { label: 'anonym', prop: 'featureIndex' }]
     for (const key in final) {
       tBody.push({ variable: final[key], featureIndex: role + '_' + partyId + '_' + key })
     }

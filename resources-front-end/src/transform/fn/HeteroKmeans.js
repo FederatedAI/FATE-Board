@@ -142,7 +142,8 @@ const fn = async function(modelData, metricData, partyId, role, componentName, j
         type: 'table',
         props: {
           header: clusterHeader(),
-          data: clusterData(cluData)
+          data: clusterData(cluData),
+          export: 'cluster_detail'
         }
       }]
     })
@@ -167,7 +168,8 @@ const fn = async function(modelData, metricData, partyId, role, componentName, j
         props: {
           header: centroidHeader(cenData),
           data: centroidData(cenData, headers),
-          headerPagination: true
+          headerPagination: true,
+          export: 'centroid_detail'
         }
       }]
     })

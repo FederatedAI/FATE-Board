@@ -26,7 +26,7 @@
           <div class="flex flex-row flex-end title-filter-title">
             <i class="el-icon-close selection-close" @click.stop="showTransferDialog = false" />
           </div>
-          <transfer v-show="showTransferDialog" :all-info="features" @change="changeFeature" />
+          <transfer v-show="showTransferDialog" :all-info="features" :max="transferMax" @change="changeFeature" />
         </div>
       </div>
       <div class="flex flex-row flex-center correlation-operations">
@@ -166,7 +166,8 @@ export default {
 
       showTransferDialog: false,
       showSortBy: false,
-      showRangefilter: false
+      showRangefilter: false,
+      transferMax: 80
     }
   },
   computed: {
@@ -196,7 +197,7 @@ export default {
   methods: {
     initing() {
       this.allFeatures()
-      this.correlationFeatures = JSON.parse(JSON.stringify(this.features))
+      this.correlationFeatures = JSON.parse(JSON.stringify(this.features)).splice(0, this.transferMax)
       this.correlation()
     },
     allFeatures() {
@@ -213,7 +214,7 @@ export default {
     },
     correlation() {
       const fixed = num => {
-        if (num) {
+        if (num || num === 0) {
           return parseFloat(num).toFixed(6)
         } else {
           return '-'

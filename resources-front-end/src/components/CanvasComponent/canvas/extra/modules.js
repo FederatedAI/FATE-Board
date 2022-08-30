@@ -109,7 +109,7 @@ const progressComp = {
   type: {
     UNRUN: 'UNRUN|WAITING',
     RUNNING: 'RUNNING',
-    FAIL: 'FAILED|ERROR|CANCELED',
+    FAIL: 'FAILED|ERROR|CANCELED|TIMEOUT',
     SUCCESS: 'SUCCESS|COMPLETE'
   },
   events: {

@@ -1,6 +1,7 @@
 <template>
   <div
     v-loading="loading"
+    v-if="display"
     :class="{
       'async__def-size':loading || displayParam,
       'async-showing': !hiddenCheck
@@ -92,7 +93,8 @@ export default {
         ? [...this.options]
         : Object.assign({}, this.options),
       noNeedToRefresh: false,
-      hiddenCheck: true
+      hiddenCheck: true,
+      display: true
     }
   },
   computed: {
@@ -169,6 +171,11 @@ export default {
         }
         this.displayParam = params
         // 设置新的选择信息
+      }).catch((err) => {
+        this.display = false
+        this.loading = false
+        this.$emit('displayError')
+        return err
       })
     },
     async requesting(opt, name) {

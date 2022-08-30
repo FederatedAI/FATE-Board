@@ -80,7 +80,7 @@ module.exports = new Promise((resolve, reject) => {
           compilationSuccessInfo: {
             messages: [
               `Your application is running here: http://${
-              devWebpackConfig.devServer.host
+                devWebpackConfig.devServer.host
               }:${port}`
             ]
           },

@@ -48,7 +48,8 @@ export default {
     return {
       currentList: [...this.options],
       timer: new Date().getTime(),
-      needToInRow: ['pearson']
+      needToInRow: ['pearson'],
+      activity: true
     }
   },
   watch: {
@@ -72,7 +73,11 @@ export default {
     // }, 1000)
   },
   methods: {
+    displayErrot() {
+      this.activity = false
+    },
     needDefault() {
+      if (!this.activity) return void 0
       let notFinish = true
       for (let i = 0; i < this.currentList.length; i++) {
         if (!this.$refs['comp' + i]) {
@@ -90,11 +95,13 @@ export default {
       }
     },
     resize() {
+      if (!this.activity) return void 0
       for (let i = 0; i < this.currentList.length; i++) {
         this.refOpera('comp' + i, 'resize')
       }
     },
     filterByForm(param, pos) {
+      if (!this.activity) return void 0
       if (
         ['table', 'chart', 'async', 'echart'].indexOf(
           this.currentList[pos + 1].type
@@ -104,12 +111,14 @@ export default {
       }
     },
     searchByForm(param, pos) {
+      if (!this.activity) return void 0
       if (this.currentList[pos + 1].type === 'table') {
         this.refOpera('comp' + (pos + 1), 'searching', param)
       }
     },
 
     changeByForm(param, pos, noNeedToRefresh) {
+      if (!this.activity) return void 0
       for (let o = pos + 1; o < this.currentList.length; o++) {
         if (
           ['table', 'chart', 'async', 'echart'].indexOf(
@@ -122,6 +131,7 @@ export default {
     },
 
     changeByOutside(param, pos) {
+      if (!this.activity) return void 0
       for (let o = pos - 1; o >= 0; o--) {
         if (this.currentList[o].type === 'form') {
           this.refOpera('comp' + o, 'linkageOutside', param)
@@ -131,6 +141,7 @@ export default {
     },
 
     refreshByForm(pos) {
+      if (!this.activity) return void 0
       for (let o = pos + 1; o < this.currentList.length; o++) {
         if (['async', 'chart'].indexOf(this.currentList[o].type) >= 0) {
           this.refOpera('comp' + o, 'linkageRefresh')
@@ -140,6 +151,7 @@ export default {
     },
 
     rangeByForm(param, pos) {
+      if (!this.activity) return void 0
       for (let o = pos + 1; o < this.currentList.length; o++) {
         if (this.currentList[o].type === 'table') {
           this.refOpera('comp' + o, 'linkageRange', param)
@@ -149,6 +161,7 @@ export default {
     },
 
     headerPageByForm(param, pos) {
+      if (!this.activity) return void 0
       for (let o = pos + 1; o < this.currentList.length; o++) {
         if (this.currentList[o].type === 'table') {
           this.refOpera('comp' + o, 'linkageHeaderPage', param)
@@ -158,6 +171,7 @@ export default {
     },
 
     filterTableByForm(param, pos) {
+      if (!this.activity) return void 0
       for (let o = pos + 1; o < this.currentList.length; o++) {
         if (this.currentList[o].type === 'table') {
           this.refOpera('comp' + o, 'linkageFilterTable', param)
@@ -181,6 +195,7 @@ export default {
     },
 
     setDefault(setting) {
+      if (!this.activity) return void 0
       const config = setting && setting[this.unique]
       for (let i = 0; i < this.currentList.length; i++) {
         const val = this.currentList[i]
@@ -273,6 +288,14 @@ export default {
       })
     },
 
+    addEventForAsync(obj, pos) {
+      this.addEvents(obj, {
+        displayError: () => {
+          this.displayErrot()
+        }
+      })
+    },
+
     children(h) {
       const child = []
       for (let i = 0; i < this.currentList.length; i++) {
@@ -300,6 +323,9 @@ export default {
         }
         if (['table'].indexOf(val.type) >= 0) {
           this.addEventForTable(variable, i)
+        }
+        if (['async'].indexOf(val.type) >= 0) {
+          this.addEventForAsync(variable, i)
         }
         const classDiv = 'comp-group__each' + (' ' + val.type + '_inrow')
         child.push(
@@ -333,7 +359,7 @@ export default {
     }
   },
   render(h) {
-    return this.groups(h)
+    return this.activity ? this.groups(h) : null
   }
 }
 </script>

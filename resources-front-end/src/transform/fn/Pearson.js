@@ -51,7 +51,7 @@ function pearsonHandler(modelData, metricData, partyId, role, componentName, job
   })
   if (!single) {
     anonyHeader.push({
-      label: `anonym in ${(role === 'guest' ? 'host' : 'guest')}`,
+      label: `anonym`,
       prop: 'anonymous',
       width: 115,
       showOverflowTooltip: true
@@ -112,7 +112,9 @@ function pearsonHandler(modelData, metricData, partyId, role, componentName, job
           type: 'table',
           props: {
             header: anonyHeader,
-            data: anony
+            data: anony,
+            export: 'feature_summary',
+            pagerCount: 4
           }
         }]
       }
