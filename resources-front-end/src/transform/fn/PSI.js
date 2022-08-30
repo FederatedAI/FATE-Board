@@ -233,7 +233,8 @@ const fn = (modelData) => {
       props: {
         data: psiSummaryTdata,
         header: getSummaryHeaders(),
-        zeroFormat: '0'
+        zeroFormat: '0',
+        export: 'feature_summary'
       }
     }]
   },
@@ -256,14 +257,16 @@ const fn = (modelData) => {
         data: psiFeatureTdata,
         header: getVariableHeaders(),
         zeroFormat: '0',
-        pageSize: -1
+        pageSize: -1,
+        export: 'psi_detail'
       }
     },
     {
       type: 'chart',
       props: {
         setting: getPsiChartSetting(xAxis, expectedYAxis, actualYAxis, psiYAxis),
-        options: getPsiChartOptions(expectedYAxis, actualYAxis, psiYAxis)
+        options: getPsiChartOptions(expectedYAxis, actualYAxis, psiYAxis),
+        export: 'psi_detail'
       }
     }]
   }]

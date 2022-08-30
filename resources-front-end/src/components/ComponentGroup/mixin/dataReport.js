@@ -252,7 +252,7 @@ const dataReport = {
     getVariableMap() {
       const res = []
       this.currentList.forEach((item, index) => {
-        if (['table', 'group', 'chart', 'async'].indexOf(item.type) >= 0) {
+        if (['table', 'group', 'chart', 'async', 'tabs'].indexOf(item.type) >= 0) {
           const mid = this.refOpera('comp' + index, 'getVariableMap')
           if (Array.isArray(mid) && mid.length > 0) {
             res.push(...mid)

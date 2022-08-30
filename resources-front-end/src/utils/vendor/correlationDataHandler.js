@@ -37,7 +37,7 @@ export default function(data, role) {
   ]
   if (!single) {
     final.anonyHeader.push({
-      label: 'anonym in ' + (role === 'guest' ? 'host' : 'guest'),
+      label: 'anonym',
       prop: 'anonymous',
       width: 150
     })

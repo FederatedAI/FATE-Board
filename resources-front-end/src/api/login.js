@@ -19,15 +19,21 @@
 
 import request from '@/utils/request'
 
-export function login(username, password, nonce, timestamp) {
+export function security() {
+  return request({
+    url: '/user/getKey',
+    method: 'post',
+    params: {}
+  })
+}
+
+export function login(username, password) {
   return request({
     url: '/user/login',
     method: 'post',
     data: {
       username,
-      password,
-      nonce,
-      timestamp
+      password
     }
   })
 }

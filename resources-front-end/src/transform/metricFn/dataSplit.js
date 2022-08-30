@@ -124,7 +124,8 @@ const fn = (response, params) => {
     props: {
       data: tableData,
       header: tableHeader,
-      zeroFormat: '0'
+      zeroFormat: '0',
+      export: 'data_split_detail'
     }
   }]
 }
