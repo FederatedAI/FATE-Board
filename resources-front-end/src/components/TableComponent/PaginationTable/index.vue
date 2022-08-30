@@ -25,6 +25,7 @@
         ref="pagination"
         :layout="'prev, pager, next'"
         :page-size="(pageSize < 0 || typeof pageSize === 'string') ? actualCurrentTotal : pageSize"
+        :pager-count="pagerCount"
         :total="actualCurrentTotal"
         :current-page.sync="currentPage"
         :background="true"
@@ -134,6 +135,10 @@ export default {
     paginationRight: {
       type: Boolean,
       default: false
+    },
+    pagerCount: {
+      type: Number,
+      default: 7
     }
   },
   data() {

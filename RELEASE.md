@@ -1,3 +1,27 @@
+# Release 1.9.0
+
+#### Major Features and Improvements
+**Major Features**
+
+* Add feature number limitation when displaying Pearson component correlation  graph to ensure interactive friendliness
+* Update the login encryption method to reduce the risk caused by the time synchronization between the browser and the server
+* psi, pearson, data statistic and other components are open to download data
+* Feature Anonymous Showcase Upgrade
+* High availability display support
+* Revised and updated display details
+* Rendering component module finishing optimization
+* Differentiated rendering for task components with large amounts of data
+
+
+# Relaese 1.8.0.1
+#### Major Features and Improvements
+**Major Features**
+
+* Fast JSON version update
+* Spring version update
+* Code update because of dependent upgrade
+
+
 # Release 1.8.0
 
 #### Major Features and Improvements

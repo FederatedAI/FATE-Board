@@ -16,17 +16,17 @@
 package com.webank.ai.fate.board.global;
 
 
+import com.webank.ai.fate.board.exceptions.LogicException;
+import feign.FeignException;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.conn.HttpHostConnectException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import java.net.BindException;
+import java.net.ConnectException;
 import java.net.SocketException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
@@ -54,5 +54,23 @@ public class GlobalExceptionHandler {
     public ResponseResult handleParameters(HttpServletRequest req, IllegalArgumentException e) {
         logger.error("error ", e);
         return new ResponseResult<>(ErrorCode.ERROR_PARAMETER);
+    }
+
+    @ExceptionHandler(FeignException.class)
+    public ResponseResult feignException(FeignException e) {
+        logger.error("error ", e);
+        return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+    }
+
+    @ExceptionHandler(ConnectException.class)
+    public ResponseResult connectException(ConnectException e) {
+        logger.error("error ", e);
+        return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+    }
+
+    @ExceptionHandler(LogicException.class)
+    public ResponseResult connectException(LogicException e) {
+        logger.error("error ", e);
+        return new ResponseResult<>(e.getCode(), e.getMessage());
     }
 }

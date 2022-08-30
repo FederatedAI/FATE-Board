@@ -192,7 +192,7 @@ export default function stepwiseDataHandler(originDataList, data, meta, role, pa
           prop: 'effect'
         },
         {
-          label: 'Anonym in ' + (role.toLowerCase().match('host') ? 'guest & ' : 'host & ') + 'arbiter',
+          label: 'Anonym',
           prop: 'anonymInArbiter'
         },
         {
@@ -234,7 +234,7 @@ export default function stepwiseDataHandler(originDataList, data, meta, role, pa
         prop: 'effect'
       },
       {
-        label: 'Anonym in ' + (role.toLowerCase().match('host') ? 'guest & ' : 'host & ') + 'arbiter',
+        label: 'Anonym',
         prop: 'anonymInArbiter'
       },
       {
@@ -260,7 +260,7 @@ export default function stepwiseDataHandler(originDataList, data, meta, role, pa
         prop: 'effect'
       },
       {
-        label: 'Anonym in ' + (role.toLowerCase().match('host') ? 'guest & ' : 'host & ') + 'arbiter',
+        label: 'Anonym',
         prop: 'anonymInArbiter'
       },
       {
@@ -297,7 +297,7 @@ export default function stepwiseDataHandler(originDataList, data, meta, role, pa
         prop: 'effect'
       },
       {
-        label: 'Anonym in ' + (role.toLowerCase().match('host') ? 'guest & ' : 'host & ') + 'arbiter',
+        label: 'Anonym',
         prop: 'anonymInArbiter'
       },
       {
@@ -379,7 +379,7 @@ export default function stepwiseDataHandler(originDataList, data, meta, role, pa
         prop: 'effect'
       },
       {
-        label: 'Anonym in ' + (role.toLowerCase().match('host') ? 'guest & ' : 'host & ') + 'arbiter',
+        label: 'Anonym',
         prop: 'anonymInArbiter'
       },
       {
@@ -416,7 +416,7 @@ export default function stepwiseDataHandler(originDataList, data, meta, role, pa
       prop: 'effect'
     },
     {
-      label: 'Anonym in ' + (role.toLowerCase().match('host') ? 'guest & ' : 'host & ') + 'arbiter',
+      label: 'Anonym',
       prop: 'anonymInArbiter'
     },
     {

@@ -22,18 +22,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.Session;
-import com.webank.ai.fate.board.dao.TaskMapper;
-import com.webank.ai.fate.board.pojo.*;
+import com.webank.ai.fate.board.global.Dict;
+import com.webank.ai.fate.board.pojo.JobDO;
+import com.webank.ai.fate.board.pojo.SshInfo;
+import com.webank.ai.fate.board.services.FlowFeign;
 import com.webank.ai.fate.board.services.JobManagerService;
 import com.webank.ai.fate.board.ssh.SshService;
-import com.webank.ai.fate.board.global.Dict;
-import com.webank.ai.fate.board.utils.HttpClientPool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -55,7 +54,7 @@ public class LogFileService {
     @Value("${fateflow.url}")
     String fateUrl;
     @Autowired
-    HttpClientPool httpClientPool;
+    FlowFeign flowFeign;
 
     public static String toJsonString(String content,
                                       long bytesize,
@@ -164,7 +163,7 @@ public class LogFileService {
         params.put(Dict.JOBID, jobId);
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_LOG_PATH, JSON.toJSONString(params));
+            result = flowFeign.post(Dict.URL_JOB_LOG_PATH, JSON.toJSONString(params));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             throw new Exception(e);

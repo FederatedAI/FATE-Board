@@ -161,7 +161,7 @@ function boostDataHandler({ responseData, role, partyId, outputType }) {
   if (featureNameFidMapping) {
     const final = Object.entries(featureNameFidMapping)
     if (final.length) {
-      const tHeader = [{ label: 'variable', prop: 'variable' }, { label: 'anonym in guest', prop: 'featureIndex' }]
+      const tHeader = [{ label: 'variable', prop: 'variable' }, { label: 'anonym', prop: 'featureIndex' }]
       const tBody = final.map(([key, value]) => {
         return {
           variable: value,

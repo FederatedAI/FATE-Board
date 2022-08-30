@@ -22,16 +22,15 @@ import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import com.webank.ai.fate.board.exceptions.LogicException;
+import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.log.LogFileService;
 import com.webank.ai.fate.board.pojo.*;
-import com.webank.ai.fate.board.global.Dict;
-import com.webank.ai.fate.board.utils.HttpClientPool;
 import com.webank.ai.fate.board.utils.PageBean;
 import com.webank.ai.fate.board.utils.ThreadPoolTaskExecutorUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.jni.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +64,7 @@ public class JobManagerService {
     //    @Autowired
 //    JobMapper jobMapper;
     @Autowired
-    HttpClientPool httpClientPool;
+    FlowFeign flowFeign;
     @Value("${fateflow.url}")
     String fateUrl;
     @Autowired
@@ -94,15 +93,18 @@ public class JobManagerService {
     private Map<String, Object> getJobMap(Object query) {
         String result = null;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_QUERY, JSON.toJSONString(query));
+            result = flowFeign.post(Dict.URL_JOB_QUERY, JSON.toJSONString(query));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
-            //todo
-
-//            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+            LogicException.throwError(ErrorCode.FATEFLOW_ERROR_CONNECTION);
         }
         if (result != null) {
-            JSONObject dataObject = JSON.parseObject(result).getJSONObject(Dict.DATA);
+            JSONObject resultObject = JSON.parseObject(result);
+            Integer retCode = resultObject.getInteger(Dict.RETCODE);
+            if (400 == retCode || 401 == retCode || 425 == retCode || 403 == retCode) {
+                LogicException.throwError(retCode, resultObject.getString(Dict.RETMSG));
+            }
+            JSONObject dataObject = resultObject.getJSONObject(Dict.DATA);
             Integer count = dataObject.getInteger("count");
             JSONArray jobs = dataObject.getJSONArray("jobs");
 
@@ -236,8 +238,15 @@ public class JobManagerService {
                 jobParams.put(Dict.JOBID, jobId1);
                 jobParams.put((Dict.ROLE), role1);
                 jobParams.put(Dict.PARTY_ID, partyId1);
-                String result = httpClientPool.post(fateUrl + Dict.URL_JOB_DATAVIEW, JSON.toJSONString(jobParams));
-                JSONObject data = JSON.parseObject(result).getJSONObject(Dict.DATA);
+                String result = flowFeign.post(Dict.URL_JOB_DATAVIEW, JSON.toJSONString(jobParams));
+
+                JSONObject resultObject = JSON.parseObject(result);
+                Integer retCode = resultObject.getInteger(Dict.RETCODE);
+                if (400 == retCode || 401 == retCode || 425 == retCode || 403 == retCode) {
+                    logger.error(resultObject.getString(Dict.RETMSG));
+                    LogicException.throwError(retCode, resultObject.getString(Dict.RETMSG));
+                }
+                JSONObject data = resultObject.getJSONObject(Dict.DATA);
 //                JSONObject data=null;
                 return data;
             }, new int[]{500, 1000}, new int[]{3, 3});
@@ -315,7 +324,7 @@ public class JobManagerService {
 
         String result;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_JOB_RERUN, JSON.toJSONString(reRunDTO));
+            result = flowFeign.post(Dict.URL_JOB_RERUN, JSON.toJSONString(reRunDTO));
             if (result != null) {
                 JSONObject jsonObject = JSON.parseObject(result);
                 if (0 == jsonObject.getInteger(Dict.RETCODE)) {
@@ -370,7 +379,7 @@ public class JobManagerService {
         query.put("job_id", jobId);
         String result = null;
         try {
-            result = httpClientPool.post(fateUrl + Dict.URL_CONFIG_CAT, JSON.toJSONString(query));
+            result = flowFeign.post(Dict.URL_CONFIG_CAT, JSON.toJSONString(query));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             //todo

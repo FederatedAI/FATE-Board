@@ -388,7 +388,9 @@ export default {
 
 .ctable__cell-normal-deep {
 	background-color: #ebedf0 !important;
-	padding: 0px 12px !important;
+  :first-child {
+	  padding-left: 22px !important;
+  }
 }
 
 .ctable__cell-much-deep {

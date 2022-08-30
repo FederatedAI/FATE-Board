@@ -97,7 +97,7 @@ const mappingHeader = [
     prop: 'variable'
   },
   {
-    label: 'anonym in guest',
+    label: 'anonym',
     prop: 'featureIndex'
   }
 ]
@@ -632,7 +632,11 @@ async function metricsTransform(group, metricsData, partyId, role, componentName
     }
 
     if (othersRequest) {
-      othersResult = await othersRequest()
+      try {
+        othersResult = await othersRequest()
+      } catch (err) {
+        othersResult = null
+      }
     }
 
     if (othersResult) {
@@ -653,7 +657,11 @@ async function metricsTransform(group, metricsData, partyId, role, componentName
     }
 
     if (warmStartRequest) {
-      warmStartResult = await warmStartRequest()
+      try {
+        warmStartResult = await warmStartRequest()
+      } catch (err) {
+        warmStartResult = null
+      }
     }
     if (warmStartTransFn) {
       warmStartCompoent = warmStartTransFn(warmStartResult)

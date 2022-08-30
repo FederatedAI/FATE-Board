@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row">
+  <div class="flex flex-row container">
     <div class="flex flex-col col-list col-left">
       <div class="flex flex-col flex-start title-part text-title">
         <span class="selected-title">Select Variables</span>
@@ -63,6 +63,7 @@
  *  limitations under the License.
  *
  */
+import { debounce } from 'lodash'
 
 export default {
   name: 'Transfer',
@@ -71,6 +72,10 @@ export default {
     allInfo: {
       type: Array,
       default: () => []
+    },
+    max: {
+      type: Number,
+      default: 100
     }
   },
 
@@ -79,7 +84,10 @@ export default {
       searchInput: '',
       inited: false,
       infos: [],
-      choosed: []
+      choosed: [],
+      change: debounce(() => {
+        this.$emit('change', this.infos)
+      }, 500)
     }
   },
 
@@ -101,16 +109,34 @@ export default {
       const final = []
       for (const val of this.allInfo) {
         const item = {}
-        item.checked = true
+        item.checked = false
         item.label = val
         item.key = val
         final.push(item)
       }
+      for (let i = 0; i < final.length; i++) {
+        final[i].checked = true
+        this.choosed.push(i)
+        if (this.choosed.length >= this.max) {
+          break
+        }
+      }
       this.infos = final
+      this.change()
     },
-    chooseing(label, index) {
-      this.infos.splice(index, 1, JSON.parse(JSON.stringify(label)))
-      this.$emit('change', this.infos)
+    chooseing(item, index) {
+      this.infos.splice(index, 1, JSON.parse(JSON.stringify(item)))
+      // 当前选项被选择
+      if (item.checked) {
+        this.choosed.push(index)
+        if (this.choosed.length >= this.max) {
+          this.infos[this.choosed.shift()].checked = false
+        }
+      } else {
+        const i = this.choosed.indexOf(index)
+        this.choosed.splice(i, 1)
+      }
+      this.change()
     },
     disChoosing(label, index) {
       const item = JSON.parse(JSON.stringify(this.infos[index]))
@@ -118,10 +144,17 @@ export default {
       this.chooseing(item, index)
     },
     chooseingAll() {
-      for (const val of this.infos) {
-        val.checked = true
+      for (let i = 0; i < this.infos.length; i++) {
+        this.infos[i].checked = true
+        this.choosed.push(i)
+        if (this.choosed.length >= this.max) {
+          break
+        }
       }
-      this.$emit('change', this.infos)
+      // for (const val of this.infos) {
+      //   val.checked = true
+      // }
+      this.change()
     },
     match(label) {
       if (!this.searchInput) {
@@ -138,6 +171,10 @@ export default {
 </script>
 
 <style lang="scss">
+.container {
+  max-height: 100%;
+  overflow: auto;
+}
 .col-list {
 	width: 50%;
 	max-height: 100%;
