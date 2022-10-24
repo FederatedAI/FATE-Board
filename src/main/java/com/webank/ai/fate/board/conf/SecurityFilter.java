@@ -46,7 +46,7 @@ public class SecurityFilter implements Filter {
             rep.addHeader("Access-Control-Allow-Origin", frontEndUrl);
             rep.addHeader("Access-Control-Allow-Credentials", "true");
             rep.addHeader("Access-Control-Allow-Headers", "Content-Type");
-            rep.addHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH");
+            rep.addHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, CONNECT, PATCH");
         }
 
         filterChain.doFilter(servletRequest, servletResponse);
