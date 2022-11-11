@@ -8,7 +8,6 @@
     :modal-append-to-body="false"
     width="80%"
     top="70px"
-    @open="resizeOpend"
   >
     <view-switch
       :fullscreen="fullscreen"
@@ -256,10 +255,6 @@ export default {
     this.transformFn = getTransformFn(this.modelType)
   },
   methods: {
-    resizeOpen() {
-      // todo resize 当前的组件内容
-      this.$refs.model_output.resize()
-    },
     refresh() {
       const param = {
         job_id: this.jobId,
