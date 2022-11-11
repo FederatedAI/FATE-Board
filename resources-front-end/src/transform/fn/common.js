@@ -62,7 +62,7 @@ export const textTransform = (data) => {
     }
   }
   data.forEach(item => {
-    const key = `${item[0].replace('_', ' ')}: `
+    const key = `${item[0].replace(/_/g, ' ')}: `
     const value = key.match('rate') ? exchangeTo(item[1]) : item[1]
     content.push(`${key}${value}`)
   })
