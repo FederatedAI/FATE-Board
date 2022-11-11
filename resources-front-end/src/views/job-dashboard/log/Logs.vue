@@ -254,7 +254,7 @@ export default {
     getInstanceIdFromFlow() {
       return getInstanceId().then((res) => {
         const result = []
-        for (const [instance_id, instance] of Object.entries(res.data)) {
+        for (const [instance] of Object.entries(res.data)) {
           if (instance.host === window.location.host) {
             this.currentInstanceId = instance.instance_id
           }

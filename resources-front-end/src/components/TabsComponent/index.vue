@@ -161,6 +161,11 @@ export default {
       } else {
         this.allSteps()
       }
+    },
+    resize() {
+      for (const key in this.content) {
+        this.refOpera('comp' + key, 'resize')
+      }
     }
   }
 }
