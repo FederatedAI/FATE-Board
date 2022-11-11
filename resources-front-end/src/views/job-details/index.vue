@@ -508,9 +508,9 @@ export default {
       obj[dataIndex].label = { color: '#fff', backgroundColor: '#494ece' }
     },
     visualization() {
-      if (this.jobInfo.status === 'running' && this.lastComponentName === this.componentName) {
-        this.$refs.outputDialog.refresh()
-      }
+      // if (this.jobInfo.status === 'running' && this.lastComponentName === this.componentName) {
+      //   this.$refs.outputDialog.refresh()
+      // }
       this.outputVisible = true
     },
     closeWebsocket() {
