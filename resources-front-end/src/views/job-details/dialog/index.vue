@@ -305,7 +305,21 @@ export default {
       //   this.jobId,
       //   this.modelType
       // )
-      Promise.all([getModelOutput(param), getMetrics(param)]).then(values => {
+      const Unnecessary = ['nn']
+      const getModel = (param) => {
+        return new Promise((resolve, reject) => {
+          if (!this.joinComponents(Unnecessary).match(
+            this.modelType
+          )) {
+            resolve(getModelOutput(param))
+          } else {
+            resolve({
+              data: null
+            })
+          }
+        })
+      }
+      Promise.all([getModel(param), getMetrics(param)]).then(values => {
         const [modelData, metricsData] = values
         let transformResult = ''
         if (
