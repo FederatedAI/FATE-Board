@@ -1,3 +1,11 @@
+# Release 1.9.1
+
+#### Major Features and Improvements
+**Major Features**
+
+* Fix the problem that the graph shows the mismatch after the binning component detail data is loaded
+* Repair DAG diagram component port display defect
+
 # Release 1.9.0
 
 #### Major Features and Improvements
