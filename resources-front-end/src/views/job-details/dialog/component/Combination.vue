@@ -72,7 +72,9 @@ export default {
   },
   watch: {
     visiable() {
-      this.resize()
+      if (this.visiable) {
+        this.resize()
+      }
     }
   },
   methods: {

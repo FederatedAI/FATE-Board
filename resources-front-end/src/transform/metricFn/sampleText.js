@@ -18,13 +18,18 @@
  */
 
 const fn = (response) => {
-  const content = `${response.random.data[0][0]}: ${response.random.data[0][1]}`
-  return [{
-    type: 'text',
-    props: {
-      content: content
-    }
-  }]
+  const keys = Object.keys(response)
+  const list = []
+  for (const key of keys) {
+    const content = `${response[key].data[0][0]}: ${response[key].data[0][1]}`
+    list.push({
+      type: 'text',
+      props: {
+        content: content
+      }
+    })
+  }
+  return list
 }
 
 export default fn
