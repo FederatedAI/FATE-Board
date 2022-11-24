@@ -434,7 +434,7 @@ class CompExpression {
       }
       this.output.push(CACHEOUTPUT)
     }
-    if (!this.belone.toLowerCase().match(/(intersection|evaluation|upload|download|rsa|datasplit|^reader|union|scorecard|cacheloader|writer|sample$)/i)) {
+    if (!this.belone.toLowerCase().match(/(intersection|evaluation|upload|download|rsa|datasplit|^reader|union|scorecard|cacheloader|writer|sample|positiveunlabeled$)/i)) {
       if (!this.belone.toLowerCase().match(/(statistics|pearson|psi|modelloader)/i)) {
         this.input.push(MODELINPUT)
       }
