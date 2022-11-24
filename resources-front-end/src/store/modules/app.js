@@ -66,7 +66,8 @@ const app = {
       CacheLoader: 'CacheLoader',
       SSHELinR: 'SSHELinR',
       SSHEPoissonR: 'SSHEPoissonR',
-      Writer: 'Writer'
+      Writer: 'Writer',
+      PositiveUnlabeled: 'PositiveUnlabeled'
     },
     metricTypeMap: {
       dataIOTable: 'DATAIO_TABLE',
