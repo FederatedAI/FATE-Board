@@ -45,6 +45,7 @@ export const MODEL_TYPES = {
 }
 
 export const METRIC_TYPES = {
+  POSITIVEUNLABELED: 'PU_MODEL',
   DATAIO_TABLE: 'DATAIO_TABLE',
   SCALE: 'SCALE',
   LOSS: 'LOSS',
