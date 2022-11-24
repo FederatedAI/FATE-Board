@@ -150,6 +150,7 @@ function modelTreeData(modelData, partyId, role) {
   trees.forEach((item, index) => {
     const treeData = {
       tree: item.tree,
+      leafCount: item.leafCount,
       role,
       partyId,
       featureNameFidMapping,
@@ -297,7 +298,7 @@ function setGraphOptions(modelData, partyId, role) {
 }
 
 function transfromTreeData(props) {
-  const opts = handleTreeData(props.tree, props.role, props.partyId, props.featureNameFidMapping, props.splitMaskdict, props.missingDirMaskdict, props.type, props.workMode, props.treePartyId)
+  const opts = handleTreeData(props.tree, props.role, props.partyId, props.featureNameFidMapping, props.splitMaskdict, props.missingDirMaskdict, props.type, props.workMode, props.treePartyId, props.leafCount)
   return [createComponent('chart', '', {
     setting: setTreeDatasDiagram(opts.data, props.color),
     width: opts.treeWidth,
