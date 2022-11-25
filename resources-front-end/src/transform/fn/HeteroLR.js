@@ -54,7 +54,7 @@ const createAsyncOption = (name, props, method, transform, exportName, detail) =
 })
 
 async function HeteroLRHandler(modelData, metricsData, partyId, role, componentName, jobId) {
-  const responseData = modelData.data.data
+  const responseData = modelData.data?.data
   const group = []
   let modelComponent
 
