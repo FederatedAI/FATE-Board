@@ -305,17 +305,17 @@ export default {
       //   this.jobId,
       //   this.modelType
       // )
-      const Unnecessary = ['nn']
+      const Unnecessary = [this.modelNameMap.heteroNN, this.modelNameMap.homoNN]
       const getModel = (param) => {
         return new Promise((resolve, reject) => {
-          if (!this.joinComponents(Unnecessary).match(
+          if ((Unnecessary.join('|')).match(
             this.modelType
           )) {
-            resolve(getModelOutput(param))
-          } else {
             resolve({
               data: null
             })
+          } else {
+            resolve(getModelOutput(param))
           }
         })
       }
