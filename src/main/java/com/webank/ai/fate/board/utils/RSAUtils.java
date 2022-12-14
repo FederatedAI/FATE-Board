@@ -20,7 +20,7 @@ public class RSAUtils {
 
     public static RSAKeyPair getKeyPair() throws Exception{
         KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
-        keyPairGen.initialize(1024, new SecureRandom());
+        keyPairGen.initialize(2048, new SecureRandom());
         KeyPair keyPair = keyPairGen.generateKeyPair();
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey publicKey = keyPair.getPublic();
