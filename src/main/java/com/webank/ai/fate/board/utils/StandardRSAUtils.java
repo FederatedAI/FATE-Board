@@ -25,8 +25,7 @@ public class StandardRSAUtils {
     public static void getKeyPair() throws Exception {
         //KeyPairGenerator类用于生成公钥和密钥对，基于RSA算法生成对象
         KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
-        //初始化密钥对生成器，密钥大小为96-1024位
-        keyPairGen.initialize(1024, new SecureRandom());
+        keyPairGen.initialize(2048, new SecureRandom());
         //生成一个密钥对，保存在keyPair中
         KeyPair keyPair = keyPairGen.generateKeyPair();
         PrivateKey privateKey = keyPair.getPrivate();//得到私钥
