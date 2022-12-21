@@ -17,14 +17,8 @@ jobs:
       - name: check out the repo
         uses: actions/checkout@v2
 
-      - name: compile node.js code
-        working-directory: resources-front-end
-        run: |
-          npm install
-          npm run build
-
-      - name: compile java code
-        run: mvn clean package
+      - name: mvn compile
+        run: mvn -DskipTests clean package
 
       - name: archive artifacts
         uses: actions/upload-artifact@v2
