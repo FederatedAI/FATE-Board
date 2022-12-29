@@ -183,7 +183,7 @@ export default {
         'evaluation', 'featureimputation',
         'labeltransform', 'datatransform',
         'dataio', 'federatedsample',
-        'scale', 'onehot',
+        'scale', 'onehotencoder',
         'union', 'split',
         'sampleweight', 'statistics',
         'transformer', 'pearson', 'psi',
@@ -195,7 +195,7 @@ export default {
         'featureimputation', 'labeltransform',
         'datatransform', 'dataio',
         'intersection', 'federatedsample',
-        'scale', 'onehot',
+        'scale', 'onehotencoder',
         'linr', 'union',
         'split', 'sampleweight',
         'statistics', 'psi',
@@ -305,7 +305,21 @@ export default {
       //   this.jobId,
       //   this.modelType
       // )
-      Promise.all([getModelOutput(param), getMetrics(param)]).then(values => {
+      const Unnecessary = [this.modelNameMap.heteroNN, this.modelNameMap.homoNN]
+      const getModel = (param) => {
+        return new Promise((resolve, reject) => {
+          if ((Unnecessary.join('|')).match(
+            this.modelType
+          )) {
+            resolve({
+              data: null
+            })
+          } else {
+            resolve(getModelOutput(param))
+          }
+        })
+      }
+      Promise.all([getModel(param), getMetrics(param)]).then(values => {
         const [modelData, metricsData] = values
         let transformResult = ''
         if (
