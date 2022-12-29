@@ -22,11 +22,11 @@ import { getStackBarOptions } from '@/utils/chart-options/stackBar'
 import { isEmpty } from './uitls'
 import multiply from 'lodash/multiply'
 
-function formatFloatWithDefault(value, role, flag) {
+function formatFloatWithDefault(value, role, flag, needDisplay = false) {
   if (flag) {
     return '-'
   } else {
-    if (role === 'host') {
+    if (role === 'host' && !needDisplay) {
       return '-'
     } else if (value === undefined || value === null) {
       return '-'
@@ -85,8 +85,9 @@ export default function(data, header, type, partyId, role, Currentrole, skipStat
           event_ratio: event_ratio ? event_ratio.toFixed(4) + '%' : '',
           non_event_count: formatFloatWithDefault(data[key].nonEventCountArray[index], Currentrole, skipStatic),
           non_event_ratio: non_event_ratio ? non_event_ratio.toFixed(4) + '%' : '',
-          woe: formatFloatWithDefault(data[key].woeArray[index], Currentrole, skipStatic),
-          iv: formatFloatWithDefault(data[key].ivArray[index], Currentrole, skipStatic)
+          woe: formatFloatWithDefault(data[key].woeArray[index], Currentrole, skipStatic, true),
+          iv: formatFloatWithDefault(data[key].ivArray[index], Currentrole, skipStatic),
+          optimal_metric: data[key].optimalMetricArray ? formatFloatWithDefault(data[key].optimalMetricArray[index], Currentrole, skipStatic) : ''
         })
         formatterArr.push({
           formatterBinning,

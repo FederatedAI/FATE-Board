@@ -31,7 +31,7 @@ export default function(summary, quantilePR, isEvaluation) {
   const tableData = flattenToTable(summary, (subitem, metric_name, item, metric_namespace, index) => {
     if (index === 0) {
       each(subitem.data, ([name]) => {
-        header.push(createHeader(name, name, { sortable: !isEvaluation }))
+        header.push(createHeader(name, name, { sortable: !(isEvaluation) }))
       })
     }
     // console.log(subitem, metric_name, item, metric_namespace)
@@ -49,7 +49,9 @@ export default function(summary, quantilePR, isEvaluation) {
         {
           type: 'title',
           props: {
-            title: isEvaluation ? 'Evaluation Scores' : 'Performance Scores'
+            title: !(typeof isEvaluation === 'string')
+              ? (isEvaluation ? 'Evaluation Scores' : 'Performance Scores')
+              : isEvaluation
           }
         }
         // {
@@ -68,7 +70,9 @@ export default function(summary, quantilePR, isEvaluation) {
       data: tableData,
       pageSize: 20,
       zeroFormat: '0',
-      export: isEvaluation ? 'evaluation_scores' : 'performance_scores'
+      export: !(typeof isEvaluation === 'string')
+        ? (isEvaluation ? 'evaluation_scores' : 'performance_scores')
+        : isEvaluation
     }
   }
 
