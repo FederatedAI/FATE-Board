@@ -1,3 +1,16 @@
+# Release 1.10.0
+
+#### Major Features and Improvements
+**Major Features**
+
+* Display SBT leaf node data
+* Support result summary display for Sampler's new method 
+* Add model summary for new module Positive Unlabeled Learning
+* Improved table display for Binning
+* Data filtering on requested model proto
+* Adjusted Design
+* Improved Logging display adaptation
+
 # Release 1.9.1
 
 #### Major Features and Improvements

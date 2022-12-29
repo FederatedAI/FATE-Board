@@ -115,6 +115,9 @@ function runningTransform(responseData, role, pre) {
     binningResult,
     hostPartyIds
   } = multiClassResult || (responseData.data && responseData.data.data)
+  const {
+    optimalMetricMethod
+  } = responseData.data && responseData.data.meta && responseData.data.meta.meta_data
   return multiClassTransform(
     header,
     headerAnonymous,
@@ -125,7 +128,8 @@ function runningTransform(responseData, role, pre) {
     hostPartyIds,
     skipStatic,
     role,
-    pre
+    pre,
+    optimalMetricMethod
   )
 }
 
@@ -145,6 +149,9 @@ function predictTransform(responseData, role, pre) {
     hostResults,
     binningResult
   } = transformMultiClassResult || {}
+  const {
+    optimalMetricMethod
+  } = responseData.data && responseData.data.meta && responseData.data.meta.meta_data
   if (!hostResults) hostResults = responseData.data ? responseData.data.data.transformHostResults : null
   if (!binningResult) binningResult = responseData.data ? responseData.data.data.transformBinningResult : null
   if (hostResults && binningResult) {
@@ -158,7 +165,8 @@ function predictTransform(responseData, role, pre) {
       hostPartyIds,
       skipStatic,
       role,
-      pre
+      pre,
+      optimalMetricMethod
     )
   }
 }
@@ -173,7 +181,8 @@ function multiClassTransform(
   hostPartyIds,
   skipStatic,
   crole,
-  preOfFile
+  preOfFile,
+  optimalMetric
 ) {
   const result = []
   const selections = []
@@ -182,7 +191,7 @@ function multiClassTransform(
     for (let i = 0, l = labels.length; i < l; i++) {
       if (hostResults[i] || results[i]) {
         const hostList = subHost(hostResults, hostPartyIds, hostIndex)
-        result.push(binningHandler(results[i], hostList, header, headerAnonymous, skipStatic, crole, preOfFile))
+        result.push(binningHandler(results[i], hostList, header, headerAnonymous, skipStatic, optimalMetric, crole, preOfFile))
         selections.push({
           value: labels[i],
           label: labels[i]
@@ -191,7 +200,7 @@ function multiClassTransform(
       }
     }
   } else {
-    result.push(binningHandler((results && results[0]) || binningResult, hostResults, header, headerAnonymous, skipStatic, crole, preOfFile))
+    result.push(binningHandler((results && results[0]) || binningResult, hostResults, header, headerAnonymous, skipStatic, optimalMetric, crole, preOfFile))
   }
 
   const options = []
@@ -255,7 +264,7 @@ function multiClassTransform(
   }
 }
 
-function binningHandler(binningResult, hostData, header, headerAnonymous, skipStatic, crole, preOfFile) {
+function binningHandler(binningResult, hostData, header, headerAnonymous, skipStatic, optimalMetric, crole, preOfFile) {
   let data = binningResult
   let guestPartyId = 0
   let role = ''
@@ -413,6 +422,10 @@ function binningHandler(binningResult, hostData, header, headerAnonymous, skipSt
     createHeader('non_event_count'),
     createHeader('non_event_ratio')
   ]
+
+  if (optimalMetric) {
+    header2.splice(3, 0, createHeader('optimal_metric', optimalMetric))
+  }
 
   if (crole === 'host') {
     header1.splice(2, 0, createHeader('anonymInGuest', 'anonym'))

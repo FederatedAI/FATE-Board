@@ -22,7 +22,7 @@ import store from '@/store/modules/app'
 
 const { modelNameMap } = store.state
 
-export default function(data, role, partyId, featureNameFidMapping, splitMaskdict, missingDirMaskdict, outputType, workmode, defPartId) {
+export default function(data, role, partyId, featureNameFidMapping, splitMaskdict, missingDirMaskdict, outputType, workmode, defPartId, leafCount) {
   if (data.length === 0) {
     return { data: [], size: 0, maxDepth: 0, treeWidth: 0 }
   }
@@ -60,8 +60,11 @@ export default function(data, role, partyId, featureNameFidMapping, splitMaskdic
     }
     if (!(outputType.toLowerCase().match(modelNameMap.homoBoost.toLowerCase()))) {
       name += workmode.toLowerCase() === 'mix' && role.toLowerCase().match('guest') && node.leftNodeid === -1 && node.rightNodeid === -1 && depth === 0
-        ? 'HOST' + (defPartId ? (':' + defPartId) : '')
-        : `${nodeRole && nodeRole.toUpperCase()} ${nodePartyId ? (':' + nodePartyId) : (defPartId ? (':' + defPartId) : '')}`
+        ? 'HOST' + (defPartId ? (':' + defPartId) : '') + '\n'
+        : `${nodeRole && nodeRole.toUpperCase()} ${nodePartyId ? (':' + nodePartyId) : (defPartId ? (':' + defPartId) : '')}\n`
+    }
+    if (node.isLeaf && leafCount[node.id] !== undefined) {
+      name += `count: ${leafCount[node.id]}`
     }
     arr.push({
       treeid: node.id,
