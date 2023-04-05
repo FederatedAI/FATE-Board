@@ -16,6 +16,8 @@
 package com.webank.ai.fate.board.services;
 
 import com.webank.ai.fate.board.pojo.UserDTO;
+import com.webank.ai.fate.board.utils.StandardRSAUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +65,16 @@ public class UserService {
         updateConfig();
         String usernameValue = getValue("server.board.login.username");
         String passwordValue = getValue("server.board.login.password");
+        String privateKey = getValue("server.board.encrypt.private_key");
+        String encrypted = getValue("server.board.encrypt.enable");
+        if (StringUtils.isNotBlank(privateKey) && "true".equalsIgnoreCase(encrypted)) {
+            try {
+                passwordValue = StandardRSAUtils.decryptByPrivateKey(passwordValue, privateKey);
+            } catch (Exception e) {
+                logger.error("decrypt password error");
+                return false;
+            }
+        }
 
         if (!username.equals(usernameValue)) {
             return false;
