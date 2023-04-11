@@ -1,3 +1,11 @@
+# Release 1.11.0
+
+#### Major Features and Improvements
+**Major Features**
+
+* Binning component display optimization
+* Password configuration item allows encryption
+
 # Release 1.10.0
 
 #### Major Features and Improvements
