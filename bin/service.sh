@@ -60,10 +60,10 @@ status() {
   if [[ -n ${pid} ]]; then
     echo "status:
         $(ps aux | grep ${pid} | grep -v grep)"
-    return 1
+    return 0
   else
     echo "service not running"
-    return 0
+    return 1
   fi
 }
 
