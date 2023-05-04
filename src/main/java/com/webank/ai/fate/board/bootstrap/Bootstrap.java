@@ -20,6 +20,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.session.SessionAutoConfiguration;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,11 +30,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, SessionAutoConfiguration.class})
+@ServletComponentScan(basePackages = {"com.webank.ai.fate.board.conf"})
 @ComponentScan(basePackages = {"com.webank.ai.fate.*"})
 @PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
 @Configuration
 @EnableScheduling
 @EnableFeignClients(basePackages = "com.webank.ai.fate.*")
+
 public class Bootstrap {
     public static void main(String[] args) {
         try {
