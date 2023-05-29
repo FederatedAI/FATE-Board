@@ -1,3 +1,11 @@
+# Release 1.11.1
+
+#### Major Features and Improvements
+**Major Features**
+
+* Optimize authentication mechanism for websocket.
+* Optimize page rendering
+
 # Release 1.11.0
 
 #### Major Features and Improvements
