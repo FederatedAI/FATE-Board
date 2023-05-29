@@ -1,11 +1,3 @@
-# Release 1.11.2
-
-#### Major Features and Improvements
-**Major Features**
-
-* Dependencies updated
-* Display details optimization
-
 # Release 1.11.1
 
 #### Major Features and Improvements
