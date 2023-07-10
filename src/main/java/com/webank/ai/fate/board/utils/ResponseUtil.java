@@ -16,6 +16,7 @@
 package com.webank.ai.fate.board.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.global.ErrorCode;
@@ -27,26 +28,20 @@ public class ResponseUtil {
 
     public static ResponseResult buildResponse(String result, String dataName) {
 
-
-        if(StringUtils.isEmpty(result)){
+        if (StringUtils.isEmpty(result)) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
-
         }
         JSONObject resultObject = JSON.parseObject(result);
 
-        Integer retcode = resultObject.getInteger(Dict.RETCODE);
-
-        JSONObject data = null;
-        if (dataName != null) {
-
-            data = resultObject.getJSONObject(Dict.DATA);
-        } else {
-            data = resultObject;
-        }
-
+        Integer retcode = resultObject.getInteger(Dict.CODE);
         String msg = resultObject.getString(Dict.REMOTE_RETURN_MSG);
 
-        return new ResponseResult<>(retcode, msg, data);
+        if (dataName != null) {
+            JSONArray jsonArray = resultObject.getJSONArray(Dict.DATA);
+            return new ResponseResult<>(retcode, msg, jsonArray);
+        } else {
+            return new ResponseResult<>(retcode, msg, resultObject);
+        }
 
     }
 
