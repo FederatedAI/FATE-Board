@@ -20,14 +20,15 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.base.Preconditions;
+import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.global.ErrorCode;
 import com.webank.ai.fate.board.global.ResponseResult;
 import com.webank.ai.fate.board.log.LogFileService;
 import com.webank.ai.fate.board.pojo.*;
 import com.webank.ai.fate.board.services.FlowFeign;
 import com.webank.ai.fate.board.services.JobDetailService;
+import com.webank.ai.fate.board.services.JobManagerService;
 import com.webank.ai.fate.board.services.TaskManagerService;
-import com.webank.ai.fate.board.global.Dict;
 import com.webank.ai.fate.board.utils.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -61,6 +62,9 @@ public class JobDetailController {
     @Autowired
     JobDetailService jobDetailService;
 
+    @Autowired
+    JobManagerService jobManagerService;
+
     @Value("${fateflow.url}")
     String fateUrl;
 
@@ -80,6 +84,8 @@ public class JobDetailController {
 
         String result;
         try {
+
+            //generateURLParamJobQueryDTO
             result = flowFeign.post(Dict.URL_COPONENT_METRIC, JSON.toJSONString(componentQueryDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
@@ -152,10 +158,14 @@ public class JobDetailController {
         }
         Preconditions.checkArgument(LogFileService.checkPathParameters(jobQueryDTO.getJob_id(), jobQueryDTO.getRole(), jobQueryDTO.getParty_id()));
 
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put(Dict.JOBID, jobQueryDTO.getJob_id());
+        paramMap.put(Dict.ROLE, jobQueryDTO.getRole());
+        paramMap.put(Dict.PARTY_ID, jobQueryDTO.getJob_id());
 
         String result;
         try {
-            result = flowFeign.post(Dict.URL_DAG_DEPENDENCY, JSON.toJSONString(jobQueryDTO));
+            result = flowFeign.get(Dict.URL_DAG_DEPENDENCY, paramMap);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -179,7 +189,7 @@ public class JobDetailController {
             for (Object o : components_list) {
                 HashMap<String, Object> component = new HashMap<>();
                 component.put(Dict.COMPONENT_NAME, o);
-                TaskDO task = taskManagerService.findTask(jobQueryDTO.getJob_id(), jobQueryDTO.getRole(),jobQueryDTO.getParty_id(), (String) o);
+                TaskDO task = taskManagerService.findTask(jobQueryDTO.getJob_id(), jobQueryDTO.getRole(), jobQueryDTO.getParty_id(), (String) o);
                 String taskStatus = null;
                 Long createTime = null;
                 if (task != null) {
@@ -207,9 +217,14 @@ public class JobDetailController {
         String role = jsonObject.getString(Dict.ROLE);
         String partyId = jsonObject.getString(Dict.PARTY_ID);
 
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put(Dict.JOBID, jobId);
+        paramMap.put(Dict.ROLE, role);
+        paramMap.put(Dict.PARTY_ID, partyId);
+
         String result;
         try {
-            result = flowFeign.post(Dict.URL_DAG_DEPENDENCY, JSON.toJSONString(jsonObject));
+            result = flowFeign.get(Dict.URL_DAG_DEPENDENCY, paramMap);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -233,7 +248,7 @@ public class JobDetailController {
             for (Object o : components_list) {
                 HashMap<String, Object> component = new HashMap<>();
                 component.put(Dict.COMPONENT_NAME, o);
-                TaskDO task = taskManagerService.findTask(jobId, role,partyId, (String) o);
+                TaskDO task = taskManagerService.findTask(jobId, role, partyId, (String) o);
                 String taskStatus = null;
                 Long createTime = null;
                 if (task != null) {
@@ -330,7 +345,7 @@ public class JobDetailController {
         JSONObject jsonObject = JSON.parseObject(result);
         Integer retCode = jsonObject.getInteger(Dict.RETCODE);
         if (retCode != 0) {
-            return new ResponseResult<>(retCode,jsonObject.getString(Dict.RETMSG));
+            return new ResponseResult<>(retCode, jsonObject.getString(Dict.RETMSG));
         }
         return new ResponseResult(ErrorCode.SUCCESS.getCode(), jsonObject.get(Dict.DATA));
     }

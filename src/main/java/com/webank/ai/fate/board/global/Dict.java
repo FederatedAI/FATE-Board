@@ -16,19 +16,21 @@
 package com.webank.ai.fate.board.global;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Dict {
+
+    static public final String STATUS_JOB_WAITING = "waiting";
+    static public final String STATUS_JOB_RUNNING = "running";
 
     static public final String ID = "id";
     static public final String NAME = "name";
     static public final String JOBID = "job_id";
     static public final String RETCODE = "retcode";
+    static public final String CODE = "code";
     static public final String DATA = "data";
     static public final String JOB = "job";
     static public final String DATASET = "dataset";
@@ -37,6 +39,14 @@ public class Dict {
     static public final String PARTY_ID = "party_id";
     static public final String RETMSG = "retmsg";
     static public final String NOTES = "notes";
+    static public final String DESCRIPTION = "description";
+    static public final String LIMIT = "limit";
+    static public final String PAGE = "page";
+    static public final String ORDER = "order";
+    static public final String ORDER_BY = "order_by";
+    static public final String COUNT = "count";
+    static public final String PARTNER = "partner";
+
 
     static public final String DEPENDENCY_DATA = "dependency_data";
     static public final String SUMMARY_DATA = "summary_date";
@@ -55,19 +65,23 @@ public class Dict {
 
     static public final String URL_COPONENT_METRIC_DATA = "/v1/tracking/component/metric_data";
     static public final String URL_COPONENT_METRIC = "/v1/tracking/component/metrics";
+
     static public final String URL_COPONENT_PARAMETERS = "/v1/tracking/component/parameters";
-    static public final String URL_DAG_DEPENDENCY = "/v1/pipeline/dag/dependency";
+    static public final String URL_DAG_DEPENDENCY = "/v2/job/dag/dependency";
     static public final String URL_OUTPUT_MODEL = "/v1/tracking/component/output/model";
     static public final String URL_OUTPUT_DATA = "/v1/tracking/component/output/data";
-    static public final String URL_JOB_DATAVIEW = "/v1/tracking/job/data_view";
-    static public final String URL_JOB_STOP = "/v1/job/stop";
     static public final String REMOTE_RETURN_MSG = "retmsg";
-    static public final String URL_JOB_UPDATE = "/v1/job/update";
-    static public final String URL_JOB_RERUN = "/v1/job/rerun";
+
+    static public final String URL_JOB_STOP = "/v2/job/stop";
+    static public final String URL_JOB_UPDATE = "/v2/job/update";
+    static public final String URL_JOB_RERUN = "/v2/job/rerun";
+    static public final String URL_JOB_QUERY = "/v2/job/list/query";
+    static public final String URL_JOB_DATAVIEW = "/v2/job/query";
     static public final String URL_JOB_LOG_PATH = "/v1/job/log/path";
 
-    static public final String URL_JOB_QUERY = "/v2/job/list/job";
-    static public final String URL_TASK_QUERY = "/v1/job/list/task";
+    static public final String URL_TASK_QUERY = "/v2/job/task/list/query";
+    static public final String URL_TASK_DATAVIEW = "/v2/job/task/query";
+
     static public final String URL_LOG_SIZE = "/v1/log/size";
     static public final String URL_LOG_CAT = "/v1/log/cat";
     static public final String URL_CONFIG_CAT = "/v1/job/config";

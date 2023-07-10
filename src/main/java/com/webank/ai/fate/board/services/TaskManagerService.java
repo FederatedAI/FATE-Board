@@ -29,7 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,15 +52,16 @@ public class TaskManagerService {
 //            return tasks.get(0);
 //        }
 //        return null;
-        FlowTaskDO flowTaskQO = new FlowTaskDO();
-        flowTaskQO.setPage(1);
-        flowTaskQO.setLimit(1);
-        flowTaskQO.setJob_id(jobId);
-        flowTaskQO.setRole(role);
-        flowTaskQO.setParty_id(partyId);
-        flowTaskQO.setComponent_name(componentName);
-        flowTaskQO.setOrder_by("task_version");
-        flowTaskQO.setOrder("desc");
+
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put(Dict.PAGE, 1);
+        paramMap.put(Dict.LIMIT, 1);
+        paramMap.put(Dict.JOB, jobId);
+        paramMap.put(Dict.ROLE, role);
+        paramMap.put(Dict.PARTY_ID, partyId);
+        paramMap.put(Dict.COMPONENT_NAME, componentName);
+        paramMap.put(Dict.ORDER_BY, "task_version");
+        paramMap.put(Dict.ORDER, "desc");
 
 //        FateFlowResponse fateFlowResponse = fateFlowApiService.sendPost(Integer.valueOf(partyId), BoardDict.URL_TASK_QUERY, JSON.toJSONString(flowTaskQO), null);
 //        if (com.webank.ai.studio.common.enums.Dict.SUCCESS_CODE != fateFlowResponse.getRetcode()) {
@@ -67,7 +70,7 @@ public class TaskManagerService {
 
         String result = null;
         try {
-            result = flowFeign.post(Dict.URL_TASK_QUERY, JSON.toJSONString(flowTaskQO));
+            result = flowFeign.get(Dict.URL_TASK_QUERY, paramMap);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             //todo
@@ -78,8 +81,8 @@ public class TaskManagerService {
         if (StringUtils.isNotBlank(result)) {
             JSONObject dataObject = JSON.parseObject(result).getJSONObject(Dict.DATA);
 //            JSONObject dataObject = (JSONObject) fateFlowResponse.getData();
-            Integer count = dataObject.getInteger("count");
-            JSONArray tasks = dataObject.getJSONArray("tasks");
+            Integer count = dataObject.getInteger(Dict.COUNT);
+            JSONArray tasks = dataObject.getJSONArray(Dict.DATA);
 
             List<FlowTaskDO> flowTaskDOS = JSON.parseObject(JSON.toJSONString(tasks), new TypeReference<List<FlowTaskDO>>() {
             });

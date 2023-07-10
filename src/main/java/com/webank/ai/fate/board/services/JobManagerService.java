@@ -61,8 +61,7 @@ public class JobManagerService {
         }
     };
     private final Logger logger = LoggerFactory.getLogger(JobManagerService.class);
-    //    @Autowired
-//    JobMapper jobMapper;
+
     @Autowired
     FlowFeign flowFeign;
     @Value("${fateflow.url}")
@@ -72,17 +71,12 @@ public class JobManagerService {
 
 
     public List<JobDO> queryJobStatus() {
-
-//        List<JobDO> jobDOS = jobMapper.queryJobStatus();
-//        return jobDOS;
-
-        List<String> list = new ArrayList<>();
-        list.add("waiting");
-        list.add("running");
-
-        FlowJobQO flowJobQO = new FlowJobQO();
-        flowJobQO.setStatus(list);
-        Map<String, Object> jobMap = getJobMap(flowJobQO);
+        Map<String, Object> param = new HashMap<>();
+        List<String> status = new ArrayList<>();
+        status.add(Dict.STATUS_JOB_WAITING);
+        status.add(Dict.STATUS_JOB_RUNNING);
+        param.put("status", status);
+        Map<String, Object> jobMap = getJobMap(param);
         if (jobMap != null) {
             return (List<JobDO>) jobMap.get("list");
         }
@@ -90,23 +84,23 @@ public class JobManagerService {
     }
 
 
-    private Map<String, Object> getJobMap(Object query) {
+    private Map<String, Object> getJobMap(Map<String, Object> params) {
         String result = null;
         try {
-            result = flowFeign.post(Dict.URL_JOB_QUERY, JSON.toJSONString(query));
+            result = flowFeign.get(Dict.URL_JOB_QUERY, params);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             LogicException.throwError(ErrorCode.FATEFLOW_ERROR_CONNECTION);
         }
         if (result != null) {
             JSONObject resultObject = JSON.parseObject(result);
-            Integer retCode = resultObject.getInteger(Dict.RETCODE);
+            Integer retCode = resultObject.getInteger(Dict.CODE);
             if (400 == retCode || 401 == retCode || 425 == retCode || 403 == retCode) {
                 LogicException.throwError(retCode, resultObject.getString(Dict.RETMSG));
             }
             JSONObject dataObject = resultObject.getJSONObject(Dict.DATA);
-            Integer count = dataObject.getInteger("count");
-            JSONArray jobs = dataObject.getJSONArray("jobs");
+            Integer count = dataObject.getInteger(Dict.COUNT);
+            JSONArray jobs = dataObject.getJSONArray(Dict.DATA);
 
             List<FlowJobDO> flowJobDOList = JSON.parseObject(JSON.toJSONString(jobs), new TypeReference<List<FlowJobDO>>() {
             });
@@ -134,6 +128,7 @@ public class JobManagerService {
                 jobDO.setfStartTime(flowJobDO.getStart_time());
                 jobDO.setfEndTime(flowJobDO.getEnd_time());
                 jobDO.setfElapsed(flowJobDO.getElapsed());
+                jobDO.setPartners(flowJobDO.getPartners());
                 return jobDO;
             }).collect(Collectors.toList());
             Map<String, Object> map = new HashMap();
@@ -147,13 +142,11 @@ public class JobManagerService {
 
     public JobDO queryJobByConditions(String jobId, String role, String partyId) {
 
-//        JobDO jobDO = jobMapper.queryJobByConditions(jobId, role, partyId);
-//        return jobDO;
-        FlowJobDO flowJobQO = new FlowJobDO();
-        flowJobQO.setJob_id(jobId);
-        flowJobQO.setRole(role);
-        flowJobQO.setParty_id(partyId);
-        Map<String, Object> jobMap = getJobMap(flowJobQO);
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put(Dict.JOBID, jobId);
+        reqMap.put(Dict.ROLE, role);
+        reqMap.put(Dict.PARTY_ID, partyId);
+        Map<String, Object> jobMap = getJobMap(reqMap);
         if (jobMap != null && jobMap.get("list") != null) {
             return ((List<JobDO>) jobMap.get("list")).get(0);
         }
@@ -163,67 +156,55 @@ public class JobManagerService {
 
 
     public PageBean<Map<String, Object>> queryPagedJobs(PagedJobQO pagedJobQO) {
+        Map<String, Object> reqMap = new HashMap<>();
         String jobId = pagedJobQO.getJobId();
         FlowJobQO flowJobQO = new FlowJobQO();
         if (jobId != null && 0 != jobId.trim().length()) {
             Preconditions.checkArgument(LogFileService.checkPathParameters(jobId));
-//            pagedJobQO.setJobId("%" + jobId + "%");
-            flowJobQO.setJob_id(pagedJobQO.getJobId());
+            reqMap.put(Dict.JOBID, pagedJobQO.getJobId());
         }
         String partyId = pagedJobQO.getPartyId();
         if (partyId != null && 0 != partyId.trim().length()) {
             Preconditions.checkArgument(LogFileService.checkPathParameters(partyId));
-//            pagedJobQO.setPartyId("%" + partyId + "%");
-            flowJobQO.setParty_id(pagedJobQO.getPartyId());
+            reqMap.put(Dict.PARTY_ID, pagedJobQO.getPartyId());
         }
         String partner = pagedJobQO.getPartner();
         if (partner != null && partner.trim().length() != 0) {
             Preconditions.checkArgument(LogFileService.checkPathParameters(partner));
-//            pagedJobQO.setPartner("%" + partner + "%");
+            reqMap.put(Dict.PARTNER, partner);
         }
+
         String fDescription = pagedJobQO.getFDescription();
         if (fDescription != null && 0 != fDescription.trim().length()) {
             Preconditions.checkArgument(LogFileService.checkParameters("^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5\\s]+$", fDescription));
-//            Preconditions.checkArgument(LogFileService.checkPathParameters(pagedJobQO.getfDescription()));
-//            pagedJobQO.setFDescription("%" + fDescription + "%");
-            flowJobQO.setDescription(pagedJobQO.getFDescription());
+            reqMap.put(Dict.DESCRIPTION, pagedJobQO.getFDescription());
         }
 
+        if (pagedJobQO.getRole() != null && pagedJobQO.getRole().size() > 0) {
+            reqMap.put(Dict.ROLE, pagedJobQO.getRole());
 
-        flowJobQO.setLimit(pagedJobQO.getPageSize().intValue());
-        flowJobQO.setPage(pagedJobQO.getPageNum().intValue());
-        if (pagedJobQO.getRole().size() > 0) {
-            flowJobQO.setRole(pagedJobQO.getRole());
         }
-        if (pagedJobQO.getStatus().size() > 0) {
-            flowJobQO.setStatus(pagedJobQO.getStatus());
+        if (pagedJobQO.getStatus() != null && pagedJobQO.getStatus().size() > 0) {
+            reqMap.put(Dict.STATUS, pagedJobQO.getStatus());
         }
-
 
         if (org.apache.commons.lang3.StringUtils.isNotBlank(pagedJobQO.getOrderField()) && !"f_job_id".equals(pagedJobQO.getOrderField())) {
-//          todo
-//            flowJobQO.setOrder_by(pagedJobQO.getOrderField().replaceFirst("f_","")); cannot be job_id
-            flowJobQO.setOrder_by(pagedJobQO.getOrderField().replaceFirst("f_", ""));
+            reqMap.put(Dict.ORDER_BY, pagedJobQO.getOrderField().replaceFirst("f_", ""));
         }
-        //jobid partyid 不支持模糊查询
 
-        flowJobQO.setOrder(pagedJobQO.getOrderRule());
+        reqMap.put(Dict.LIMIT, pagedJobQO.getPageSize().intValue());
+        reqMap.put(Dict.PAGE, pagedJobQO.getPageNum().intValue());
+        reqMap.put(Dict.ORDER, pagedJobQO.getOrderRule());
 
-//todo
-//        flowJobQO.setPartner(pagedJobQO.getPartner());
-        Map<String, Object> jobMap = getJobMap(flowJobQO);
+        Map<String, Object> jobMap = getJobMap(reqMap);
         List<JobDO> jobWithBLOBs = new ArrayList<>();
         long count = 0;
         if (jobMap != null) {
             jobWithBLOBs = (List<JobDO>) jobMap.get("list");
             count = ((Integer) jobMap.get("count"));
         }
-
-
-//        long jobSum = this.countJob(pagedJobQO);
         PageBean<Map<String, Object>> listPageBean = new PageBean<>(pagedJobQO.getPageNum(), pagedJobQO.getPageSize(), count);
-//        long startIndex = listPageBean.getStartIndex();
-//        List<JobDO> jobWithBLOBs = jobMapper.queryPagedJobs(pagedJobQO, startIndex);
+
         LinkedList<Map<String, Object>> jobList = new LinkedList<>();
         Map<JobDO, Future> jobDataMap = new LinkedHashMap<>();
         for (JobDO jobWithBLOB : jobWithBLOBs) {
@@ -234,11 +215,11 @@ public class JobManagerService {
                 if (jobWithBLOB.getfStatus().equals(Dict.TIMEOUT)) {
                     jobWithBLOB.setfStatus(Dict.FAILED);
                 }
-                HashMap<String, String> jobParams = Maps.newHashMap();
+                HashMap<String, Object> jobParams = Maps.newHashMap();
                 jobParams.put(Dict.JOBID, jobId1);
                 jobParams.put((Dict.ROLE), role1);
                 jobParams.put(Dict.PARTY_ID, partyId1);
-                String result = flowFeign.post(Dict.URL_JOB_DATAVIEW, JSON.toJSONString(jobParams));
+                String result = flowFeign.get(Dict.URL_JOB_DATAVIEW, jobParams);
 
                 JSONObject resultObject = JSON.parseObject(result);
                 Integer retCode = resultObject.getInteger(Dict.RETCODE);
@@ -247,54 +228,10 @@ public class JobManagerService {
                     LogicException.throwError(retCode, resultObject.getString(Dict.RETMSG));
                 }
                 JSONObject data = resultObject.getJSONObject(Dict.DATA);
-//                JSONObject data=null;
                 return data;
             }, new int[]{500, 1000}, new int[]{3, 3});
-//            jobWithBLOB.setfRunIp(null);
             jobWithBLOB.setfDsl(null);
             jobWithBLOB.setfRuntimeConf(null);
-
-            //set partners
-            String role = jobWithBLOB.getfRole();
-            if ("local".equals(role) || "arbiter".equals(role)) {
-                jobWithBLOB.setPartners(null);
-            }
-            HashSet<String> partners = new HashSet<>();
-            String roles = jobWithBLOB.getfRoles();
-            JSONObject jsonObject = JSON.parseObject(roles);
-            if ("guest".equals(role)) {
-
-                JSONArray hosts = jsonObject.getJSONArray("host");
-                if (hosts != null) {
-                    for (int i = 0; i < hosts.size(); i++) {
-                        Object o = hosts.get(i);
-                        partners.add(String.valueOf(o));
-
-                    }
-                }
-
-                JSONArray arbiters = jsonObject.getJSONArray("arbiter");
-                if (arbiters != null) {
-                    for (int i = 0; i < arbiters.size(); i++) {
-                        Object o = arbiters.get(i);
-                        partners.add(String.valueOf(o));
-                    }
-                }
-
-            }
-
-            if ("host".equals(role)) {
-                JSONArray guests = jsonObject.getJSONArray("guest");
-                if (guests != null) {
-                    for (int i = 0; i < guests.size(); i++) {
-                        Object o = guests.get(i);
-                        partners.add(String.valueOf(o));
-                    }
-                }
-
-            }
-            jobWithBLOB.setPartners(partners);
-
             jobDataMap.put(jobWithBLOB, future);
         }
         jobDataMap.forEach((k, v) -> {
@@ -312,9 +249,6 @@ public class JobManagerService {
         return listPageBean;
     }
 
-//    public long countJob(PagedJobQO pagedJobQO) {
-//        return jobMapper.countJob(pagedJobQO);
-//    }
 
     public Map<String, List<String>> queryFields() {
         return Dict.fieldMap;
@@ -413,7 +347,6 @@ public class JobManagerService {
         }
 
 
-
         response.setBufferSize(1024 * 1000);
         response.setContentType("application/force-download");
         response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
@@ -422,7 +355,7 @@ public class JobManagerService {
             os.write(JSON.toJSONBytes(responseObject, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat));
 //            os.flush();
 //            os.close();
-               log.info("download success,file :{}", fileOutputName);
+            log.info("download success,file :{}", fileOutputName);
         } catch (Exception e) {
             log.error("download failed", e);
             return new ResponseResult(ErrorCode.DOWNLOAD_ERROR);
@@ -523,4 +456,18 @@ public class JobManagerService {
         }
     }
 
+
+    public Map<String, Object> generateURLParamJobQueryDTO(JobQueryDTO jobQueryDTO) {
+        Map<String, Object> reqMap = new HashMap<>();
+        if (!StringUtils.hasText(jobQueryDTO.getJob_id())) {
+            reqMap.put(Dict.JOBID, jobQueryDTO.getJob_id());
+        }
+        if (!StringUtils.hasText(jobQueryDTO.getParty_id())) {
+            reqMap.put(Dict.PARTY_ID, jobQueryDTO.getParty_id());
+        }
+        if (!StringUtils.hasText(jobQueryDTO.getRole())) {
+            reqMap.put(Dict.ROLE, jobQueryDTO.getRole());
+        }
+        return reqMap;
+    }
 }
