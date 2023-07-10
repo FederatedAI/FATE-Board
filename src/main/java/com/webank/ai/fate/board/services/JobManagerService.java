@@ -72,10 +72,13 @@ public class JobManagerService {
 
     public List<JobDO> queryJobStatus() {
         Map<String, Object> param = new HashMap<>();
-        List<String> status = new ArrayList<>();
-        status.add(Dict.STATUS_JOB_WAITING);
-        status.add(Dict.STATUS_JOB_RUNNING);
-        param.put("status", status);
+        List<String> statusList = new ArrayList<>();
+        statusList.add(Dict.STATUS_JOB_WAITING);
+        statusList.add(Dict.STATUS_JOB_RUNNING);
+
+        String statusStr = String.join(",", statusList);
+        param.put("status", statusStr);
+
         Map<String, Object> jobMap = getJobMap(param);
         if (jobMap != null) {
             return (List<JobDO>) jobMap.get("list");
@@ -181,11 +184,11 @@ public class JobManagerService {
         }
 
         if (pagedJobQO.getRole() != null && pagedJobQO.getRole().size() > 0) {
-            reqMap.put(Dict.ROLE, pagedJobQO.getRole());
+            reqMap.put(Dict.ROLE, String.join(",",pagedJobQO.getRole()));
 
         }
         if (pagedJobQO.getStatus() != null && pagedJobQO.getStatus().size() > 0) {
-            reqMap.put(Dict.STATUS, pagedJobQO.getStatus());
+            reqMap.put(Dict.STATUS, String.join(",",pagedJobQO.getStatus()));
         }
 
         if (org.apache.commons.lang3.StringUtils.isNotBlank(pagedJobQO.getOrderField()) && !"f_job_id".equals(pagedJobQO.getOrderField())) {
