@@ -66,7 +66,7 @@ public class Dict {
     static public final String URL_JOB_RERUN = "/v1/job/rerun";
     static public final String URL_JOB_LOG_PATH = "/v1/job/log/path";
 
-    static public final String URL_JOB_QUERY = "/v1/job/list/job";
+    static public final String URL_JOB_QUERY = "/v2/job/list/job";
     static public final String URL_TASK_QUERY = "/v1/job/list/task";
     static public final String URL_LOG_SIZE = "/v1/log/size";
     static public final String URL_LOG_CAT = "/v1/log/cat";
