@@ -137,7 +137,7 @@ public class JobDetailController {
 
         }
         JSONObject resultObject = JSON.parseObject(result);
-        Integer retcode = resultObject.getInteger(Dict.RETCODE);
+        Integer retcode = resultObject.getInteger(Dict.CODE);
         String msg = resultObject.getString(Dict.REMOTE_RETURN_MSG);
         JSONObject data = resultObject.getJSONObject(Dict.DATA);
         String dataWithNull = JSON.toJSONString(data, SerializerFeature.WriteMapNullValue);
@@ -176,7 +176,7 @@ public class JobDetailController {
         }
 
         JSONObject resultObject = JSON.parseObject(result);
-        Integer retCode = resultObject.getInteger(Dict.RETCODE);
+        Integer retCode = resultObject.getInteger(Dict.CODE);
         if (retCode == null) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_WRONG_RESULT);
         }
@@ -235,7 +235,7 @@ public class JobDetailController {
         }
 
         JSONObject resultObject = JSON.parseObject(result);
-        Integer retCode = resultObject.getInteger(Dict.RETCODE);
+        Integer retCode = resultObject.getInteger(Dict.CODE);
         if (retCode == null) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_WRONG_RESULT);
         }
@@ -343,7 +343,7 @@ public class JobDetailController {
     public ResponseResult flowInfo() {
         String result = flowFeign.post(Dict.URL_FLOW_INFO, "{}");
         JSONObject jsonObject = JSON.parseObject(result);
-        Integer retCode = jsonObject.getInteger(Dict.RETCODE);
+        Integer retCode = jsonObject.getInteger(Dict.CODE);
         if (retCode != 0) {
             return new ResponseResult<>(retCode, jsonObject.getString(Dict.RETMSG));
         }

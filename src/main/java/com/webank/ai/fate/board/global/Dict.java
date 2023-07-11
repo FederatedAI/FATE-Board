@@ -37,7 +37,7 @@ public class Dict {
     static public final String COMPONENT_NAME = "component_name";
     static public final String ROLE = "role";
     static public final String PARTY_ID = "party_id";
-    static public final String RETMSG = "retmsg";
+    static public final String RETMSG = "message";
     static public final String NOTES = "notes";
     static public final String DESCRIPTION = "description";
     static public final String LIMIT = "limit";

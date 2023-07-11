@@ -177,7 +177,7 @@ public class LogFileService {
                 e.printStackTrace();
             }
             if (jsonObject != null && !jsonObject.isEmpty()) {
-                Integer retcode = jsonObject.getInteger(Dict.RETCODE);
+                Integer retcode = jsonObject.getInteger(Dict.CODE);
                 String retmsg = jsonObject.getString(Dict.RETMSG);
                 if (retcode == 0) {
                     JSONObject data = jsonObject.getJSONObject(Dict.DATA);

@@ -225,12 +225,12 @@ public class JobManagerService {
                 String result = flowFeign.get(Dict.URL_JOB_DATAVIEW, jobParams);
 
                 JSONObject resultObject = JSON.parseObject(result);
-                Integer retCode = resultObject.getInteger(Dict.RETCODE);
+                Integer retCode = resultObject.getInteger(Dict.CODE);
                 if (400 == retCode || 401 == retCode || 425 == retCode || 403 == retCode) {
                     logger.error(resultObject.getString(Dict.RETMSG));
                     LogicException.throwError(retCode, resultObject.getString(Dict.RETMSG));
                 }
-                JSONObject data = resultObject.getJSONObject(Dict.DATA);
+                JSONObject data = (JSONObject)resultObject.getJSONArray(Dict.DATA).get(0);
                 return data;
             }, new int[]{500, 1000}, new int[]{3, 3});
             jobWithBLOB.setfDsl(null);
