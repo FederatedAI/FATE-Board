@@ -147,7 +147,7 @@ public class JobManagerController {
         }
 
         JSONObject resultObject = JSON.parseObject(result);
-        Integer retcode = resultObject.getInteger(Dict.RETCODE);
+        Integer retcode = resultObject.getInteger(Dict.CODE);
         if (retcode == null) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_WRONG_RESULT);
         }

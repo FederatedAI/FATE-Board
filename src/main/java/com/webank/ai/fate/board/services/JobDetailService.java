@@ -76,7 +76,7 @@ public class JobDetailService {
                     String result = responseResultListenableFuture.get();
                     if (result != null && result.trim().length() != 0) {
                         JSONObject resultObject = JSON.parseObject(result);
-                        Integer retCode = resultObject.getInteger(Dict.RETCODE);
+                        Integer retCode = resultObject.getInteger(Dict.CODE);
                         if (retCode == 0) {
                             stringMapHashMap.put(metric,resultObject);
                             continue;
