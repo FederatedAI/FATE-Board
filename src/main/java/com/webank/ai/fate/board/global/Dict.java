@@ -29,7 +29,6 @@ public class Dict {
     static public final String ID = "id";
     static public final String NAME = "name";
     static public final String JOBID = "job_id";
-    static public final String RETCODE = "retcode";
     static public final String CODE = "code";
     static public final String DATA = "data";
     static public final String JOB = "job";
@@ -86,7 +85,7 @@ public class Dict {
     static public final String URL_LOG_CAT = "/v1/log/cat";
     static public final String URL_CONFIG_CAT = "/v1/job/config";
 
-    static public final String URL_FLOW_INFO = "/v1/server/fateflow/info";
+    static public final String URL_FLOW_INFO = "/v2/server/fateflow";
 
     static public final String SSH_IP = "ip";
     static public final String SSH_USER = "user";
