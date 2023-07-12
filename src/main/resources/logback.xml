@@ -117,7 +117,7 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="com.webank.ai.fate.board.conf.FeignConfig" level="DEBUG" additivity="true">
+    <logger name="org.fedai.fate.board.conf.FeignConfig" level="DEBUG" additivity="true">
         <appender-ref ref="httpclient"/>
     </logger>
 
