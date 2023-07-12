@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -341,7 +342,7 @@ public class JobDetailController {
     @RequestMapping(value = "/server/fateflow/info", method = RequestMethod.POST)
     @ResponseBody
     public ResponseResult flowInfo() {
-        String result = flowFeign.post(Dict.URL_FLOW_INFO, "{}");
+        String result = flowFeign.get(Dict.URL_FLOW_INFO, Collections.EMPTY_MAP);
         JSONObject jsonObject = JSON.parseObject(result);
         Integer retCode = jsonObject.getInteger(Dict.CODE);
         if (retCode != 0) {
