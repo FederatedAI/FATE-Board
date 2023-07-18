@@ -105,9 +105,18 @@ public class JobDetailController {
         }
         Preconditions.checkArgument(LogFileService.checkPathParameters(metricDTO.getJob_id(), metricDTO.getRole(), metricDTO.getParty_id(), metricDTO.getComponent_name(), metricDTO.getMetric_name(), metricDTO.getMetric_namespace()));
 
+        Map<String,Object> reqMap = new HashMap<>();
+        reqMap.put(Dict.JOBID,metricDTO.getJob_id());
+
+        reqMap.put(Dict.ROLE,metricDTO.getRole());
+        reqMap.put(Dict.PARTY_ID,metricDTO.getParty_id());
+        reqMap.put(Dict.COMPONENT_NAME,metricDTO.getComponent_name());
+        reqMap.put(Dict.METRIC_NAME,metricDTO.getMetric_name());
+        reqMap.put(Dict.METRIC_NAMESPACE,metricDTO.getMetric_namespace());
         String result;
+
         try {
-            result = flowFeign.post(Dict.URL_COPONENT_METRIC_DATA, JSON.toJSONString(metricDTO));
+            result = flowFeign.get(Dict.URL_COPONENT_METRIC_DATA, reqMap);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -280,10 +289,10 @@ public class JobDetailController {
             return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
         }
         Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id(), componentQueryDTO.getComponent_name()));
-
+        Map<String,Object> reqMap = parseQueryParam(componentQueryDTO);
         String result;
         try {
-            result = flowFeign.post(Dict.URL_OUTPUT_MODEL, JSON.toJSONString(componentQueryDTO));
+            result = flowFeign.get(Dict.URL_OUTPUT_MODEL, reqMap);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -302,9 +311,10 @@ public class JobDetailController {
         }
         Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id(), componentQueryDTO.getComponent_name()));
 
+        Map<String,Object> reqMap = parseQueryParam(componentQueryDTO);
         String result;
         try {
-            result = flowFeign.post(Dict.URL_OUTPUT_DATA, JSON.toJSONString(componentQueryDTO));
+            result = flowFeign.get(Dict.URL_OUTPUT_DATA, reqMap);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -351,4 +361,12 @@ public class JobDetailController {
         return new ResponseResult(ErrorCode.SUCCESS.getCode(), jsonObject.get(Dict.DATA));
     }
 
+    private Map<String,Object> parseQueryParam(ComponentQueryDTO componentQueryDTO) {
+        Map<String,Object> reqMap = new HashMap<>();
+        reqMap.put(Dict.JOBID,componentQueryDTO.getJob_id());
+        reqMap.put(Dict.ROLE,componentQueryDTO.getRole());
+        reqMap.put(Dict.PARTY_ID,componentQueryDTO.getParty_id());
+        reqMap.put(Dict.COMPONENT_NAME,componentQueryDTO.getComponent_name());
+        return reqMap;
+    }
 }

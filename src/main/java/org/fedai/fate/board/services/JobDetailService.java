@@ -60,17 +60,16 @@ public class JobDetailService {
             HashMap<String, JSONObject> stringMapHashMap = new HashMap<>();
             dataObject.put(metricNameSpace,stringMapHashMap);
             for (String metric : metricNames) {
-                JSONObject metricObject = new JSONObject();
-                metricObject.put(Dict.JOBID, jobId);
-                metricObject.put(Dict.ROLE, role);
-                metricObject.put(Dict.PARTY_ID, new Integer(partyId));
-                metricObject.put(Dict.COMPONENT_NAME, componentName);
-                metricObject.put(Dict.METRIC_NAMESPACE, metricNameSpace);
-                metricObject.put(Dict.METRIC_NAME, metric);
+                Map<String,Object> reqMap = new HashMap<>();
+                reqMap.put(Dict.JOBID, jobId);
+                reqMap.put(Dict.ROLE, role);
+                reqMap.put(Dict.PARTY_ID, new Integer(partyId));
+                reqMap.put(Dict.COMPONENT_NAME, componentName);
+                reqMap.put(Dict.METRIC_NAMESPACE, metricNameSpace);
+                reqMap.put(Dict.METRIC_NAME, metric);
                 ListenableFuture<String> responseResultListenableFuture = asyncServiceExecutor.submitListenable(
-                        () -> flowFeign.post(Dict.URL_COPONENT_METRIC_DATA, metricObject.toJSONString())
+                        () -> flowFeign.get(Dict.URL_COPONENT_METRIC_DATA, reqMap)
                 );
-
 
                 try {
                     String result = responseResultListenableFuture.get();
