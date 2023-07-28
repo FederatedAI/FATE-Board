@@ -86,6 +86,9 @@ public class Dict {
 
     static public final String URL_FLOW_INFO = "/v2/server/fateflow";
 
+    static public final String ZK_DATA_HOST = "host";
+    static public final String ZK_DATA_PORT = "http_port";
+
     static public final String SSH_IP = "ip";
     static public final String SSH_USER = "user";
     static public final String SSH_PASSWORD = "password";
