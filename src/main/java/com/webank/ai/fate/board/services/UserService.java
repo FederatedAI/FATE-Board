@@ -16,6 +16,7 @@
 package com.webank.ai.fate.board.services;
 
 import com.webank.ai.fate.board.pojo.UserDTO;
+import com.webank.ai.fate.board.utils.AESUtil;
 import com.webank.ai.fate.board.utils.StandardRSAUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -69,6 +70,7 @@ public class UserService {
         String encrypted = getValue("server.board.encrypt.enable");
         if (StringUtils.isNotBlank(privateKey) && "true".equalsIgnoreCase(encrypted)) {
             try {
+                privateKey = AESUtil.aesDecrypt(privateKey, AESUtil.aesKey);
                 passwordValue = StandardRSAUtils.decryptByPrivateKey(passwordValue, privateKey);
             } catch (Exception e) {
                 logger.error("decrypt password error");
