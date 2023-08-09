@@ -34,6 +34,7 @@ public class Dict {
     static public final String JOB = "job";
     static public final String DATASET = "dataset";
     static public final String COMPONENT_NAME = "component_name";
+    static public final String TASK_NAME = "task_name";
     static public final String ROLE = "role";
     static public final String PARTY_ID = "party_id";
     static public final String RETMSG = "message";
@@ -54,6 +55,7 @@ public class Dict {
     static public final String METRIC_NAME = "metric_name";
     static public final String STATUS = "status";
     static public final String COMPONENT_LIST = "component_list";
+    static public final String COMPONENT_NEED_RUN = "component_need_run";
 
     static public final String SSH_CONFIG_FILE = "ssh_config_file";
     static public final String LOG_LINE_NUM = "lineNum";

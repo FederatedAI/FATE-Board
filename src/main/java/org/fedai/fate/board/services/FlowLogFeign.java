@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 
-@FeignClient(url = RouteTargeter.URL_PLACE_HOLDER + "/v1/log", name = "flowLogFeign", configuration = FeignRequestInterceptor.class)
+@FeignClient(url = RouteTargeter.URL_PLACE_HOLDER + "/v2/log", name = "flowLogFeign", configuration = FeignRequestInterceptor.class)
 public interface FlowLogFeign {
 
-    @RequestMapping(value = "/cat", method = RequestMethod.POST)
+    @RequestMapping(value = "/query", method = RequestMethod.GET)
     FlowResponse<List<FlowLogCatResp>> logCat(FlowLogCatReq request);
 
-    @RequestMapping(value = "/size", method = RequestMethod.POST)
+    @RequestMapping(value = "/count", method = RequestMethod.GET)
     FlowResponse<FlowLogSizeResp> logSize(FlowLogSizeReq request);
 
 }
