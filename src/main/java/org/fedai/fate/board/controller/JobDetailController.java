@@ -368,12 +368,12 @@ public class JobDetailController {
             for (Object o : keys) {
                 HashMap<String, Object> component = new HashMap<>();
                 component.put(Dict.COMPONENT_NAME, o);
-                TaskDO task = taskManagerService.findTask(jobId, role, partyId, (String) o);
+                Map<String, Object> taskDetail = taskManagerService.findTaskDetail(jobId, role, partyId, (String) o);
                 String taskStatus = null;
                 Long createTime = null;
-                if (task != null) {
-                    taskStatus = task.getfStatus();
-                    createTime = task.getfStartTime();
+                if (taskDetail != null) {
+                    taskStatus = String.valueOf(taskDetail.get("status"));
+                    createTime = Long.valueOf(taskDetail.get("time").toString());
                 }
 
                 component.put(Dict.STATUS, taskStatus);
