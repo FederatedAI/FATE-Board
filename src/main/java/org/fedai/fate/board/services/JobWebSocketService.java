@@ -114,7 +114,7 @@ public class JobWebSocketService implements Runnable {
                     param.put(Dict.ROLE, role);
                     param.put(Dict.PARTY_ID, partyId);
                     //Future<?> dependencyFuture = ThreadPoolTaskExecutorUtil.submitListenable(asyncServiceExecutor, () -> jobDetailController.getDagDependencies(JSON.toJSONString(param)), new int[]{500}, new int[]{3});
-                    ListenableFuture<ResponseResult<JSONObject>> dependencyFuture = asyncServiceExecutor.submitListenable(() -> jobDetailController.getDagDependenciesNew(JSON.toJSONString(param)));
+                    ListenableFuture<ResponseResult<JSONObject>> dependencyFuture = asyncServiceExecutor.submitListenable(() -> jobDetailController.getDagDependencies(JSON.toJSONString(param)));
                     ResponseResult<JSONObject> responseResult = dependencyFuture.get();
                     if (0 == responseResult.getCode()) {
                         flushToWebData.put(Dict.DEPENDENCY_DATA, responseResult.getData());
