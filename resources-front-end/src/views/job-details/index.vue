@@ -715,22 +715,29 @@ export default {
       }
     },
     transformDataset({ roles, dataset }) {
-      return Object.keys(roles).map(role => {
-        const datasetList = roles[role].map(name => {
-          let set = ''
-          if (dataset[role]) {
-            set = Object.values(dataset[role][name]).join(', ')
-          }
+      try {
+        return Object.keys(roles).map(role => {
+          const datasetList = roles[role].map(name => {
+            let set = ''
+            if (dataset[role]) {
+              set = Object.values(dataset[role][name]).join(', ')
+            }
+            return {
+              name,
+              dataset: set
+            }
+          })
           return {
-            name,
-            dataset: set
+            role: role.toUpperCase(),
+            datasetList
           }
         })
-        return {
-          role: role.toUpperCase(),
-          datasetList
+      } catch (err) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error(err)
         }
-      })
+        return []
+      }
     },
     transformJobInfo(job) {
       return {
