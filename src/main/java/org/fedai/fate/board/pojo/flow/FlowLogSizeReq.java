@@ -11,5 +11,6 @@ public class FlowLogSizeReq {
     private String party_id;
     private String component_name;
     private String instance_id;
+    private String task_name;
 
 }

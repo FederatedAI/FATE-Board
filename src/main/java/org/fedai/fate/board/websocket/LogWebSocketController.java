@@ -130,7 +130,8 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
             logSizeReq.setLog_type(logTypeEnum.getFlowValue());
             logSizeReq.setRole(role);
             logSizeReq.setParty_id(partyId);
-            logSizeReq.setComponent_name(componentId);
+//            logSizeReq.setComponent_name(componentId);
+            logSizeReq.setTask_name(componentId);
             logSizeReq.setInstance_id(logQuery.getInstanceId());
             FlowResponse<FlowLogSizeResp> resp = flowLogFeign.logSize(logSizeReq);
             switch (logTypeEnum) {
@@ -180,7 +181,7 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
         flowLogCatReq.setLog_type(Dict.logTypeMap.get(logQuery.getType()));
         flowLogCatReq.setRole(role);
         flowLogCatReq.setParty_id(Integer.valueOf(partyId));
-        flowLogCatReq.setComponent_name(componentId);
+        flowLogCatReq.setTask_name(componentId);
         flowLogCatReq.setInstance_id(logQuery.getInstanceId());
         flowLogCatReq.setBegin(logQuery.getBegin());
         flowLogCatReq.setEnd(logQuery.getEnd());
