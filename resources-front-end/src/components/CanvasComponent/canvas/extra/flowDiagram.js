@@ -207,23 +207,31 @@ class DiagramInfo {
     const setChild = (name) => {
       for (const key in this.linking) {
         for (const item of this.linking[key]) {
-          if (item.components[0] === name) {
-            const parent = this.components.get(item.components[0])
-            const child = this.components.get(item.components[1])
-            if (child.level <= parent.level) {
-              child.level = parent.level + 1
-              setChild(item.components[1])
+          try {
+            if (item.components[0] === name) {
+              const parent = this.components.get(item.components[0])
+              const child = this.components.get(item.components[1])
+              if (parent && child && child.level <= parent.level) {
+                child.level = parent.level + 1
+                setChild(item.components[1])
+              }
             }
+          } catch (err) {
+            console.log(`Data of dependencies was wrong`)
+            continue
           }
         }
       }
     }
     for (const name in obj) {
       for (const item of obj[name]) {
-        this.linking[item.type] = this.linking[item.type] || []
-        this.linking[item.type].push({
+        const isData = item.type.match('data')
+        const type = isData ? 'data' : 'model'
+
+        this.linking[type] = this.linking[type] || []
+        this.linking[type].push({
           components: [item.component_name, name],
-          outputType: item.up_output_info ? item.up_output_info.join('') : (item.type + '0')
+          outputType: item.up_output_info ? (type + item.up_output_info.slice(1).join('')) : (type + '0')
         })
         setChild(item.component_name)
       }
