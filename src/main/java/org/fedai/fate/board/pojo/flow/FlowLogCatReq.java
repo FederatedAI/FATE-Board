@@ -10,6 +10,7 @@ public class FlowLogCatReq {
     private String role;
     private Integer party_id;
     private String component_name;
+    private String task_name;
     private String instance_id;
     private Integer begin;
     private Integer end;

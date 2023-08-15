@@ -34,6 +34,7 @@ public class Dict {
     static public final String JOB = "job";
     static public final String DATASET = "dataset";
     static public final String COMPONENT_NAME = "component_name";
+    static public final String TASK_NAME = "task_name";
     static public final String ROLE = "role";
     static public final String PARTY_ID = "party_id";
     static public final String RETMSG = "message";
@@ -54,6 +55,7 @@ public class Dict {
     static public final String METRIC_NAME = "metric_name";
     static public final String STATUS = "status";
     static public final String COMPONENT_LIST = "component_list";
+    static public final String COMPONENT_NEED_RUN = "component_need_run";
 
     static public final String SSH_CONFIG_FILE = "ssh_config_file";
     static public final String LOG_LINE_NUM = "lineNum";
@@ -61,31 +63,33 @@ public class Dict {
     static public final String JOB_PROCESS = "process";
     static public final String JOB_DURATION = "duration";
     static public final String JOB_STATUS = "status";
-
-    static public final String URL_COPONENT_METRIC_DATA = "/v1/tracking/component/metric_data";
-    static public final String URL_COPONENT_METRIC = "/v1/tracking/component/metrics";
-
-    static public final String URL_COPONENT_PARAMETERS = "/v1/tracking/component/parameters";
-    static public final String URL_DAG_DEPENDENCY = "/v2/job/dag/dependency";
-    static public final String URL_OUTPUT_MODEL = "/v1/tracking/component/output/model";
-    static public final String URL_OUTPUT_DATA = "/v1/tracking/component/output/data";
     static public final String REMOTE_RETURN_MSG = "retmsg";
 
+    static public final String URL_COPONENT_METRIC_DATA = "/v2/output/metric/query";
+    static public final String URL_COPONENT_METRIC = "/v1/tracking/component/metrics";
+    static public final String URL_COPONENT_PARAMETERS = "/v1/tracking/component/parameters";
+    static public final String URL_OUTPUT_MODEL = "/v2/output/model/query";
+    static public final String URL_OUTPUT_DATA = "/v2/output/data/display";
+
     static public final String URL_JOB_STOP = "/v2/job/stop";
-    static public final String URL_JOB_UPDATE = "/v2/job/update";
-    static public final String URL_JOB_RERUN = "/v2/job/rerun";
     static public final String URL_JOB_QUERY = "/v2/job/list/query";
     static public final String URL_JOB_DATAVIEW = "/v2/job/query";
-    static public final String URL_JOB_LOG_PATH = "/v1/job/log/path";
-
+    static public final String URL_JOB_UPDATE = "/v2/job/update";
+    static public final String URL_JOB_RERUN = "/v2/job/rerun";
+    static public final String URL_DAG_DEPENDENCY = "/v2/job/dag/dependency";
     static public final String URL_TASK_QUERY = "/v2/job/task/list/query";
     static public final String URL_TASK_DATAVIEW = "/v2/job/task/query";
 
+    static public final String URL_JOB_LOG_PATH = "/v1/job/log/path";
     static public final String URL_LOG_SIZE = "/v1/log/size";
     static public final String URL_LOG_CAT = "/v1/log/cat";
+
     static public final String URL_CONFIG_CAT = "/v1/job/config";
 
     static public final String URL_FLOW_INFO = "/v2/server/fateflow";
+
+    static public final String ZK_DATA_HOST = "host";
+    static public final String ZK_DATA_PORT = "http_port";
 
     static public final String SSH_IP = "ip";
     static public final String SSH_USER = "user";

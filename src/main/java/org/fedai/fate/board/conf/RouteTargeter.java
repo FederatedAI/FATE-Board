@@ -1,5 +1,6 @@
 package org.fedai.fate.board.conf;
 
+import org.fedai.fate.board.services.FlowHighAvailableService;
 import org.fedai.fate.board.utils.TelnetUtil;
 import feign.Feign;
 import feign.Request;
@@ -7,12 +8,17 @@ import feign.RequestTemplate;
 import feign.Target;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.openfeign.FeignClientFactoryBean;
 import org.springframework.cloud.openfeign.FeignContext;
 import org.springframework.cloud.openfeign.Targeter;
 import org.springframework.core.env.Environment;
 
 public class RouteTargeter implements Targeter {
+
+    @Autowired
+    private FlowHighAvailableService zk;
+
     private static Environment environment;
 
     public RouteTargeter(Environment environment) {
@@ -27,12 +33,12 @@ public class RouteTargeter implements Targeter {
         return feign.target(new RouteTarget<>(target));
     }
 
-    public static class RouteTarget<T> implements Target<T> {
+    public class RouteTarget<T> implements Target<T> {
         Logger log = LoggerFactory.getLogger(getClass());
         private Target<T> realTarget;
-
         private String availableFlow = null;
         private Long lastUpdateTime = null;
+        private FlowHighAvailableService flowHighAvailableService = RouteTargeter.this.zk;
         private static final long UPDATE_INTERVAL = 1000 * 30;
 
         public RouteTarget(Target<T> realTarget) {
@@ -75,7 +81,8 @@ public class RouteTargeter implements Targeter {
             } else {
                 flowUrl = flowUrl.replaceAll("http[s]?://", "");
             }
-            String flowUrlList = environment.getProperty("fateflow.url-list");
+//            String flowUrlList = environment.getProperty("fateflow.url-list");
+            String flowUrlList = flowHighAvailableService.getFlowUrlsFromCache();
             if (flowUrlList == null || flowUrlList.trim().isEmpty()) {
                 availableFlow = flowUrl;
             } else if (flowUrlList.trim().split(";").length < 2) {
