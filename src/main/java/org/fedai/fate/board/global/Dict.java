@@ -65,9 +65,9 @@ public class Dict {
     static public final String JOB_STATUS = "status";
     static public final String REMOTE_RETURN_MSG = "retmsg";
 
-    static public final String URL_COPONENT_METRIC_DATA = "/v2/output/metric/query";
-    static public final String URL_COPONENT_METRIC = "/v1/tracking/component/metrics";
-    static public final String URL_COPONENT_PARAMETERS = "/v1/tracking/component/parameters";
+    static public final String URL_COPONENT_METRIC_DATA = "/v2/output/metric/key/query";
+    static public final String URL_COPONENT_METRIC = "/v2/output/metric/query";
+    static public final String URL_COPONENT_PARAMETERS = "/v2/output/metric/key/query";
     static public final String URL_OUTPUT_MODEL = "/v2/output/model/query";
     static public final String URL_OUTPUT_DATA = "/v2/output/data/display";
 
