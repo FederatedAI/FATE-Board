@@ -134,17 +134,18 @@ public class JobDetailController {
         }
         Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id(), componentQueryDTO.getComponent_name()));
 
-        String result;
-        try {
-            result = flowFeign.post(Dict.URL_COPONENT_PARAMETERS, JSON.toJSONString(componentQueryDTO));
-        } catch (Exception e) {
-            logger.error("connect fateflow error:", e);
-            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
-        }
-        if (StringUtils.isEmpty(result)) {
-            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
+        //todo
+        String result = null;
+//        try {
+//            result = flowFeign.post(Dict.URL_COPONENT_PARAMETERS, JSON.toJSONString(componentQueryDTO));
+//        } catch (Exception e) {
+//            logger.error("connect fateflow error:", e);
+//            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+//        }
+//        if (StringUtils.isEmpty(result)) {
+//            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
 
-        }
+//        }
         JSONObject resultObject = JSON.parseObject(result);
         Integer retcode = resultObject.getInteger(Dict.CODE);
         String msg = resultObject.getString(Dict.REMOTE_RETURN_MSG);
@@ -262,40 +263,40 @@ public class JobDetailController {
                 Map<String, String> componentModule = new HashMap<>();
                 Map<String, Object> dependencies = new HashMap<>();
                 for (String taskName : taskNames) {
-                    JSONObject taskInfo = (JSONObject)tasks.get(taskName);
+                    JSONObject taskInfo = (JSONObject) tasks.get(taskName);
 
                     // componentList handle
                     Map<String, Object> taskDetail = taskManagerService.findTaskDetail(jobId, role, partyId, taskName);
-                    taskDetail.put("component_name",taskName);
+                    taskDetail.put("component_name", taskName);
                     componentList.add(taskDetail);
 
                     // componentModule handle
                     String component_ref = taskInfo.getString("component_ref");
-                    componentModule.put(taskName,component_ref);
+                    componentModule.put(taskName, component_ref);
 
                     // dependencies handle
                     JSONArray dependentTasks = taskInfo.getJSONArray("dependent_tasks");
                     if (dependentTasks == null || dependentTasks.size() == 0) {
-                        dependencies.put(taskName,null);
-                    }else {
+                        dependencies.put(taskName, null);
+                    } else {
                         Object o = dependentTasks.get(0);
-                        Map<String,Object> dependencyInfoMap = new HashMap<>();
-                        dependencyInfoMap.put("component_name",o);
-                        dependencyInfoMap.put("up_output_info",null);
-                        dependencyInfoMap.put("type",null);
+                        Map<String, Object> dependencyInfoMap = new HashMap<>();
+                        dependencyInfoMap.put("component_name", o);
+                        dependencyInfoMap.put("up_output_info", null);
+                        dependencyInfoMap.put("type", null);
                         JSONArray array = new JSONArray();
                         array.add(dependencyInfoMap);
-                        dependencies.put(taskName,array);
+                        dependencies.put(taskName, array);
                     }
                 }
 
                 // componentNeedRun handle
                 JSONObject needRunInfo = getNeedRunInfo(paramMap);
 
-                data.put("component_list",componentList);
-                data.put("component_need_run",needRunInfo);
-                data.put("component_module",componentModule);
-                data.put("dependencies",dependencies);
+                data.put("component_list", componentList);
+                data.put("component_need_run", needRunInfo);
+                data.put("component_module", componentModule);
+                data.put("dependencies", dependencies);
                 return new ResponseResult<>(ErrorCode.SUCCESS, data);
             }
         } else {
@@ -372,8 +373,8 @@ public class JobDetailController {
                 String taskStatus = null;
                 Long createTime = null;
                 if (taskDetail != null) {
-                    taskStatus = String.valueOf(taskDetail.get("status"));
-                    createTime = Long.valueOf(taskDetail.get("time").toString());
+                    taskStatus = taskDetail.get("status") == null ? null : String.valueOf(taskDetail.get("status"));
+                    createTime = taskDetail.get("time") == null ? null : Long.valueOf(taskDetail.get("time").toString());
                 }
 
                 component.put(Dict.STATUS, taskStatus);
