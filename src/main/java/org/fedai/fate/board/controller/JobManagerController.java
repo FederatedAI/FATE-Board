@@ -16,6 +16,7 @@
 package org.fedai.fate.board.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -152,8 +153,9 @@ public class JobManagerController {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_WRONG_RESULT);
         }
         if (retcode == 0) {
-            JSONObject data = resultObject.getJSONObject(Dict.DATA);
-            resultMap.put(Dict.JOB, jobWithBLOBs);
+            JSONArray jsonArray = resultObject.getJSONArray(Dict.DATA);
+            JSONObject data = jsonArray == null ? null : (JSONObject)jsonArray.get(0);
+                    resultMap.put(Dict.JOB, jobWithBLOBs);
             resultMap.put(Dict.DATASET, data);
             return new ResponseResult<>(ErrorCode.SUCCESS, resultMap);
         } else {
