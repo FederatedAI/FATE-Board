@@ -130,7 +130,6 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
             logSizeReq.setLog_type(logTypeEnum.getFlowValue());
             logSizeReq.setRole(role);
             logSizeReq.setParty_id(partyId);
-//            logSizeReq.setComponent_name(componentId);
             logSizeReq.setTask_name(componentId);
             logSizeReq.setInstance_id(logQuery.getInstanceId());
             FlowResponse<FlowLogSizeResp> resp = flowLogFeign.logSize(logSizeReq);
@@ -221,12 +220,13 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
     }
 
     public enum LogTypeEnum {
-        JOB_SCHEDULE("jobSchedule", "jobSchedule"),
-        JOB_ERROR("jobError", "jobScheduleError"),
-        PARTY_ERROR("partyError", "partyError"),
-        PARTY_WARNING("partyWarning", "partyWarning"),
-        PARTY_INFO("partyInfo", "partyInfo"),
-        PARTY_DEBUG("partyDebug", "partyDebug"),
+        //"schedule_info", "schedule_error"，"task_error", "task_info", "task_warning", "task_debug"
+        JOB_SCHEDULE("jobSchedule", "schedule_info"),
+        JOB_ERROR("jobError", "schedule_error"),
+        PARTY_ERROR("partyError", "task_error"),
+        PARTY_WARNING("partyWarning", "task_warning"),
+        PARTY_INFO("partyInfo", "task_info"),
+        PARTY_DEBUG("partyDebug", "task_debug"),
         COMPONENT_INFO("componentInfo", "componentInfo"),
         LOG_SIZE("logSize", null),
         ;
