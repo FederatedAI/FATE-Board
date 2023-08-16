@@ -53,20 +53,23 @@ const ascending = (a, b) => {
 
 const getDatasetFromSummary = obj => {
   const { roles, dataset } = obj
-  const result = Object.keys(roles).map(role => {
-    const options = roles[role].map(item => ({ value: item, label: item }))
-    return {
-      role: role.toUpperCase(),
-      options,
-      roleValue: options[0].label,
-      datasetData: dataset[role] || ''
-    }
-  })
-  result.sort((a, b) => {
-    return ascending(ROLE_ORDER_MAP[a.role], ROLE_ORDER_MAP[b.role])
-  })
-
-  return result
+  if (obj && roles && dataset) {
+    const result = Object.keys(roles).map(role => {
+      const options = roles[role].map(item => ({ value: item, label: item }))
+      return {
+        role: role.toUpperCase(),
+        options,
+        roleValue: options[0].label,
+        datasetData: dataset[role] || ''
+      }
+    })
+    result.sort((a, b) => {
+      return ascending(ROLE_ORDER_MAP[a.role], ROLE_ORDER_MAP[b.role])
+    })
+    return result
+  } else {
+    return []
+  }
 }
 
 export default {
