@@ -16,6 +16,8 @@
 package org.fedai.fate.board.websocket;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Preconditions;
 import org.fedai.fate.board.conf.Configurator;
 import org.fedai.fate.board.global.Dict;
@@ -40,7 +42,9 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ServerEndpoint(value = "/log/new/{jobId}/{role}/{partyId}/{componentId}", configurator = Configurator.class)
@@ -125,35 +129,40 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
 
         LogSizeResponse logSizeResponse = new LogSizeResponse();
         for (LogTypeEnum logTypeEnum : logTypes) {
-            FlowLogSizeReq logSizeReq = new FlowLogSizeReq();
-            logSizeReq.setJob_id(jobId);
-            logSizeReq.setLog_type(logTypeEnum.getFlowValue());
-            logSizeReq.setRole(role);
-            logSizeReq.setParty_id(partyId);
-            logSizeReq.setTask_name(componentId);
-            logSizeReq.setInstance_id(logQuery.getInstanceId());
-            FlowResponse<FlowLogSizeResp> resp = flowLogFeign.logSize(logSizeReq);
+            Map<String,Object> reqMap = new HashMap<>();
+            reqMap.put(Dict.JOBID,jobId);
+            reqMap.put("log_type",logTypeEnum.getFlowValue());
+            reqMap.put(Dict.ROLE,role);
+            reqMap.put(Dict.PARTY_ID,partyId);
+            reqMap.put(Dict.TASK_NAME,componentId);
+//            reqMap.put(Dict.i,jobId);
+            String resp = flowLogFeign.logSize(reqMap);
+            JSONObject jsonData = JSON.parseObject(resp);
+            Integer logCount = 0;
+            if (jsonData != null) {
+                logCount = (Integer)jsonData.get(Dict.DATA);
+            }
             switch (logTypeEnum) {
                 case JOB_SCHEDULE:
-                    logSizeResponse.setJobSchedule(resp.getData().getSize());
+                    logSizeResponse.setJobSchedule(logCount);
                     break;
                 case JOB_ERROR:
-                    logSizeResponse.setJobError(resp.getData().getSize());
+                    logSizeResponse.setJobError(logCount);
                     break;
                 case PARTY_ERROR:
-                    logSizeResponse.setPartyError(resp.getData().getSize());
+                    logSizeResponse.setPartyError(logCount);
                     break;
                 case PARTY_WARNING:
-                    logSizeResponse.setPartyWarning(resp.getData().getSize());
+                    logSizeResponse.setPartyWarning(logCount);
                     break;
                 case PARTY_INFO:
-                    logSizeResponse.setPartyInfo(resp.getData().getSize());
+                    logSizeResponse.setPartyInfo(logCount);
                     break;
                 case PARTY_DEBUG:
-                    logSizeResponse.setPartyDebug(resp.getData().getSize());
+                    logSizeResponse.setPartyDebug(logCount);
                     break;
                 case COMPONENT_INFO:
-                    logSizeResponse.setComponentInfo(resp.getData().getSize());
+                    logSizeResponse.setComponentInfo(logCount);
                     break;
             }
         }
@@ -175,23 +184,33 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
 
         Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentId, logQuery.getType()));
 
-        FlowLogCatReq flowLogCatReq = new FlowLogCatReq();
-        flowLogCatReq.setJob_id(jobId);
-        flowLogCatReq.setLog_type(Dict.logTypeMap.get(logQuery.getType()));
-        flowLogCatReq.setRole(role);
-        flowLogCatReq.setParty_id(Integer.valueOf(partyId));
-        flowLogCatReq.setTask_name(componentId);
-        flowLogCatReq.setInstance_id(logQuery.getInstanceId());
-        flowLogCatReq.setBegin(logQuery.getBegin());
-        flowLogCatReq.setEnd(logQuery.getEnd());
+        Map<String,Object> reqMap = new HashMap<>();
+        reqMap.put(Dict.JOBID,jobId);
+        reqMap.put(Dict.LOG_TYPE,Dict.logTypeMap.get(logQuery.getType()));
+        reqMap.put(Dict.ROLE,role);
+        reqMap.put(Dict.PARTY_ID,Integer.valueOf(partyId));
+        reqMap.put(Dict.TASK_NAME,componentId);
+        reqMap.put(Dict.INSTANCE_ID,logQuery.getInstanceId());
+        reqMap.put(Dict.BEGIN,logQuery.getBegin());
+        reqMap.put(Dict.END,logQuery.getEnd());
 
-        FlowResponse<List<FlowLogCatResp>> resultFlow = flowLogFeign.logCat(flowLogCatReq);
+        String resultFlow = flowLogFeign.logCat(reqMap);
+        JSONObject object = JSONObject.parseObject(resultFlow);
+        JSONArray jsonArray = object.getJSONArray(Dict.DATA);
 
+        List<LogContentResponse.LogContent> contentData = new ArrayList<>();
+        for (int i = 0;i<jsonArray.size();i++) {
+            JSONObject logData = (JSONObject)jsonArray.get(i);
+            String content = (String)logData.get(Dict.LOG_CONTENT);
+            String lineNum = (String) logData.get(Dict.LOG_CONTENT);
+            LogContentResponse.LogContent logContent = new LogContentResponse.LogContent();
+            logContent.setContent(content);
+            logContent.setLineNum(lineNum);
+            contentData.add(logContent);
+        }
         LogContentResponse logContentResponse = new LogContentResponse();
         logContentResponse.setType(logQuery.getType());
-        logContentResponse.setData(resultFlow.getData().stream()
-                .map(LogContentResponse.LogContent::fromFlowContent)
-                .collect(Collectors.toList()));
+        logContentResponse.setData(contentData);
         try {
             session.getBasicRemote().sendText(JSON.toJSONString(logContentResponse));
         } catch (IOException e) {
