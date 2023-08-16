@@ -129,18 +129,17 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
 
         LogSizeResponse logSizeResponse = new LogSizeResponse();
         for (LogTypeEnum logTypeEnum : logTypes) {
-            Map<String,Object> reqMap = new HashMap<>();
-            reqMap.put(Dict.JOBID,jobId);
-            reqMap.put("log_type",logTypeEnum.getFlowValue());
-            reqMap.put(Dict.ROLE,role);
-            reqMap.put(Dict.PARTY_ID,partyId);
-            reqMap.put(Dict.TASK_NAME,componentId);
-//            reqMap.put(Dict.i,jobId);
+            Map<String, Object> reqMap = new HashMap<>();
+            reqMap.put(Dict.JOBID, jobId);
+            reqMap.put(Dict.LOG_TYPE, logTypeEnum.getFlowValue());
+            reqMap.put(Dict.ROLE, role);
+            reqMap.put(Dict.PARTY_ID, partyId);
+            reqMap.put(Dict.TASK_NAME, componentId);
             String resp = flowLogFeign.logSize(reqMap);
             JSONObject jsonData = JSON.parseObject(resp);
             Integer logCount = 0;
             if (jsonData != null) {
-                logCount = (Integer)jsonData.get(Dict.DATA);
+                logCount = (Integer) jsonData.get(Dict.DATA);
             }
             switch (logTypeEnum) {
                 case JOB_SCHEDULE:
@@ -184,25 +183,26 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
 
         Preconditions.checkArgument(LogFileService.checkPathParameters(jobId, role, partyId, componentId, logQuery.getType()));
 
-        Map<String,Object> reqMap = new HashMap<>();
-        reqMap.put(Dict.JOBID,jobId);
-        reqMap.put(Dict.LOG_TYPE,Dict.logTypeMap.get(logQuery.getType()));
-        reqMap.put(Dict.ROLE,role);
-        reqMap.put(Dict.PARTY_ID,Integer.valueOf(partyId));
-        reqMap.put(Dict.TASK_NAME,componentId);
-        reqMap.put(Dict.INSTANCE_ID,logQuery.getInstanceId());
-        reqMap.put(Dict.BEGIN,logQuery.getBegin());
-        reqMap.put(Dict.END,logQuery.getEnd());
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put(Dict.JOBID, jobId);
+        reqMap.put(Dict.LOG_TYPE, Dict.logTypeMap.get(logQuery.getType()));
+        reqMap.put(Dict.ROLE, role);
+        reqMap.put(Dict.PARTY_ID, Integer.valueOf(partyId));
+        reqMap.put(Dict.TASK_NAME, componentId);
+        reqMap.put(Dict.INSTANCE_ID, logQuery.getInstanceId());
+        reqMap.put(Dict.BEGIN, logQuery.getBegin());
+        reqMap.put(Dict.END, logQuery.getEnd());
 
         String resultFlow = flowLogFeign.logCat(reqMap);
         JSONObject object = JSONObject.parseObject(resultFlow);
         JSONArray jsonArray = object.getJSONArray(Dict.DATA);
 
         List<LogContentResponse.LogContent> contentData = new ArrayList<>();
-        for (int i = 0;i<jsonArray.size();i++) {
-            JSONObject logData = (JSONObject)jsonArray.get(i);
-            String content = (String)logData.get(Dict.LOG_CONTENT);
-            String lineNum = (String) logData.get(Dict.LOG_CONTENT);
+
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JSONObject logData = (JSONObject) jsonArray.get(i);
+            String content = logData.get(Dict.LOG_CONTENT) == null ? "" : (String) logData.get(Dict.LOG_CONTENT);
+            String lineNum = logData.get(Dict.LOG_CONTENT) == null ? "" : (String) logData.get(Dict.LOG_CONTENT);
             LogContentResponse.LogContent logContent = new LogContentResponse.LogContent();
             logContent.setContent(content);
             logContent.setLineNum(lineNum);
