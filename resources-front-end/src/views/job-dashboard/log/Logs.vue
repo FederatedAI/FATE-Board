@@ -227,6 +227,8 @@ export default {
   created() {
     this.getInstanceIdFromFlow().then(() => {
       this.initLogSocket()
+    }).catch(() => {
+      this.initLogSocket()
     })
   },
   beforeDestroy() {
