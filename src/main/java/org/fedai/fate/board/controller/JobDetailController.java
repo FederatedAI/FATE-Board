@@ -81,12 +81,16 @@ public class JobDetailController {
         }
         Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id(), componentQueryDTO.getComponent_name()));
 
-
+        Map<String,Object> reqMap = new HashMap<>();
+        reqMap.put(Dict.JOBID,componentQueryDTO.getJob_id());
+        reqMap.put(Dict.ROLE,componentQueryDTO.getRole());
+        reqMap.put(Dict.PARTY_ID,componentQueryDTO.getParty_id());
+        reqMap.put(Dict.TASK_NAME,componentQueryDTO.getComponent_name());
         String result;
         try {
 
             //generateURLParamJobQueryDTO
-            result = flowFeign.post(Dict.URL_COPONENT_METRIC, JSON.toJSONString(componentQueryDTO));
+            result = flowFeign.get(Dict.URL_COPONENT_METRIC, reqMap);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -109,7 +113,7 @@ public class JobDetailController {
 
         reqMap.put(Dict.ROLE, metricDTO.getRole());
         reqMap.put(Dict.PARTY_ID, metricDTO.getParty_id());
-        reqMap.put(Dict.COMPONENT_NAME, metricDTO.getComponent_name());
+        reqMap.put(Dict.TASK_NAME, metricDTO.getComponent_name());
         reqMap.put(Dict.METRIC_NAME, metricDTO.getMetric_name());
         reqMap.put(Dict.METRIC_NAMESPACE, metricDTO.getMetric_namespace());
         String result;
@@ -477,7 +481,7 @@ public class JobDetailController {
         reqMap.put(Dict.JOBID, componentQueryDTO.getJob_id());
         reqMap.put(Dict.ROLE, componentQueryDTO.getRole());
         reqMap.put(Dict.PARTY_ID, componentQueryDTO.getParty_id());
-        reqMap.put(Dict.COMPONENT_NAME, componentQueryDTO.getComponent_name());
+        reqMap.put(Dict.TASK_NAME, componentQueryDTO.getComponent_name());
         return reqMap;
     }
 }
