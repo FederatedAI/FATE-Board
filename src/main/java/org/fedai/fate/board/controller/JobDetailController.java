@@ -364,12 +364,27 @@ public class JobDetailController {
 
         if (retCode == 0) {
             JSONObject data = resultObject.getJSONObject(Dict.DATA);
-//            JSONArray components_list = data.getJSONArray(Dict.COMPONENT_LIST);
             JSONObject component_need_run = data.getJSONObject(Dict.COMPONENT_NEED_RUN);
             ArrayList<Map<String, Object>> componentList = new ArrayList<>();
 
-            Set<String> keys = component_need_run.keySet();
+            JSONObject dependencies = data.getJSONObject(Dict.COMPONENT_DEPENDENCIES);
+            Set<String> dependencyKeys = dependencies.keySet();
+            for (String componentName: dependencyKeys) {
+                JSONArray newArray = new JSONArray();
+                JSONArray array = dependencies.getJSONArray(componentName);
 
+                for (int i = 0;i<array.size();i++) {
+                    JSONObject dep = array.getJSONObject(i);
+                    String compName = dep.getString(Dict.COMPONENT_NAME);
+                    if (compName == null || compName.isEmpty()) {
+                        continue;
+                    }
+                    newArray.add(dep);
+                }
+                dependencies.put(componentName,newArray);
+            }
+
+            Set<String> keys = component_need_run.keySet();
             for (Object o : keys) {
                 HashMap<String, Object> component = new HashMap<>();
                 component.put(Dict.COMPONENT_NAME, o);
