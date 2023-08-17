@@ -60,6 +60,7 @@ public class Dict {
     static public final String STATUS = "status";
     static public final String COMPONENT_LIST = "component_list";
     static public final String COMPONENT_NEED_RUN = "component_need_run";
+    static public final String COMPONENT_DEPENDENCIES = "dependencies";
 
     static public final String SSH_CONFIG_FILE = "ssh_config_file";
     static public final String LOG_LINE_NUM = "lineNum";
