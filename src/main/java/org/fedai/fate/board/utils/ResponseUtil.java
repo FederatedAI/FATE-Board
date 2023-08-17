@@ -33,8 +33,8 @@ public class ResponseUtil {
         }
         JSONObject resultObject = JSON.parseObject(result);
 
-        Integer retcode = resultObject.getInteger(Dict.CODE);
-        String msg = resultObject.getString(Dict.REMOTE_RETURN_MSG);
+        Integer retcode = resultObject.getInteger(Dict.CODE) == null ? 200 : resultObject.getInteger(Dict.CODE);
+        String msg = resultObject.getString(Dict.RETMSG) == null ? "ok" : resultObject.getString(Dict.RETMSG);
 
         if (dataName != null) {
             JSONArray jsonArray = resultObject.getJSONArray(Dict.DATA);
