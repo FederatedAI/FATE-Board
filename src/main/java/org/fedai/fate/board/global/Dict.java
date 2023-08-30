@@ -29,12 +29,16 @@ public class Dict {
     static public final String ID = "id";
     static public final String NAME = "name";
     static public final String JOBID = "job_id";
+    static public final String LOG_TYPE = "log_type";
     static public final String CODE = "code";
     static public final String DATA = "data";
     static public final String JOB = "job";
     static public final String DATASET = "dataset";
     static public final String COMPONENT_NAME = "component_name";
     static public final String TASK_NAME = "task_name";
+    static public final String INSTANCE_ID = "instance_id";
+    static public final String BEGIN = "begin";
+    static public final String END = "end";
     static public final String ROLE = "role";
     static public final String PARTY_ID = "party_id";
     static public final String RETMSG = "message";
@@ -65,9 +69,9 @@ public class Dict {
     static public final String JOB_STATUS = "status";
     static public final String REMOTE_RETURN_MSG = "retmsg";
 
-    static public final String URL_COPONENT_METRIC_DATA = "/v2/output/metric/query";
-    static public final String URL_COPONENT_METRIC = "/v1/tracking/component/metrics";
-    static public final String URL_COPONENT_PARAMETERS = "/v1/tracking/component/parameters";
+    static public final String URL_COPONENT_METRIC_DATA = "/v2/output/metric/key/query";
+    static public final String URL_COPONENT_METRIC = "/v2/output/metric/query";
+    static public final String URL_COPONENT_PARAMETERS = "/v2/output/metric/key/query";
     static public final String URL_OUTPUT_MODEL = "/v2/output/model/query";
     static public final String URL_OUTPUT_DATA = "/v2/output/data/display";
 
@@ -119,12 +123,12 @@ public class Dict {
 //前端传来的logType和flow的logType对应表
     static public final HashMap<String, String> logTypeMap = new HashMap<>();
     static {
-        logTypeMap.put("jobSchedule", "jobSchedule");
-        logTypeMap.put("jobError", "jobScheduleError");
-        logTypeMap.put("partyError", "partyError");
-        logTypeMap.put("partyWarning", "partyWarning");
-        logTypeMap.put("partyInfo", "partyInfo");
-        logTypeMap.put("partyDebug", "partyDebug");
+        logTypeMap.put("jobSchedule", "schedule_info");
+        logTypeMap.put("jobError", "schedule_error");
+        logTypeMap.put("partyError", "task_error");
+        logTypeMap.put("partyWarning", "task_warning");
+        logTypeMap.put("partyInfo", "task_info");
+        logTypeMap.put("partyDebug", "task_debug");
         logTypeMap.put("componentInfo", "componentInfo");
     }
 
