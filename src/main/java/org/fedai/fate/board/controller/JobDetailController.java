@@ -138,23 +138,33 @@ public class JobDetailController {
         }
         Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id(), componentQueryDTO.getComponent_name()));
 
+        String taskId = componentQueryDTO.getJob_id() + "_" + componentQueryDTO.getComponent_name();
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put(Dict.JOBID, componentQueryDTO.getJob_id() );
+        paramMap.put(Dict.TASK_ID, taskId);
+
         //todo
         String result = null;
-//        try {
-//            result = flowFeign.post(Dict.URL_COPONENT_PARAMETERS, JSON.toJSONString(componentQueryDTO));
-//        } catch (Exception e) {
-//            logger.error("connect fateflow error:", e);
-//            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
-//        }
-//        if (StringUtils.isEmpty(result)) {
-//            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
-
-//        }
+        try {
+            result = flowFeign.get(Dict.URL_TASK_DATAVIEW,paramMap);
+        } catch (Exception e) {
+            logger.error("connect fateflow error:", e);
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+        }
+        if (StringUtils.isEmpty(result)) {
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
+        }
         JSONObject resultObject = JSON.parseObject(result);
         Integer retcode = resultObject.getInteger(Dict.CODE);
         String msg = resultObject.getString(Dict.REMOTE_RETURN_MSG);
-        JSONObject data = resultObject.getJSONObject(Dict.DATA);
-        String dataWithNull = JSON.toJSONString(data, SerializerFeature.WriteMapNullValue);
+
+//        JSONObject data = resultObject.getJSONObject(Dict.DATA);
+
+        JSONObject detail = (JSONObject)resultObject.getJSONArray(Dict.DATA).get(0);
+        JSONObject newData = detail.getJSONObject(Dict.COMPONENT_PARAMETERS);
+
+//        String dataWithNull = JSON.toJSONString(data, SerializerFeature.WriteMapNullValue);
+        String dataWithNull = JSON.toJSONString(newData, SerializerFeature.WriteMapNullValue);
 
         return new ResponseResult<>(retcode, msg, dataWithNull);
 

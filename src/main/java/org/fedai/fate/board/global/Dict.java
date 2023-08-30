@@ -36,6 +36,8 @@ public class Dict {
     static public final String DATASET = "dataset";
     static public final String COMPONENT_NAME = "component_name";
     static public final String TASK_NAME = "task_name";
+    static public final String TASK_ID = "task_id";
+    static public final String COMPONENT_PARAMETERS = "component_parameters";
     static public final String INSTANCE_ID = "instance_id";
     static public final String BEGIN = "begin";
     static public final String END = "end";
