@@ -227,9 +227,10 @@ class DiagramInfo {
       for (const item of obj[name]) {
         const isData = item.type.match('data')
         const type = isData ? 'data' : 'model'
+        const inputType = item.type
 
-        this.linking[type] = this.linking[type] || []
-        this.linking[type].push({
+        this.linking[inputType] = this.linking[inputType] || []
+        this.linking[inputType].push({
           components: [item.component_name, name],
           outputType: item.up_output_info ? (type + item.up_output_info.slice(1).join('')) : (type + '0')
         })
