@@ -1,12 +1,10 @@
-# Release 2.0.0
+# Release 1.11.2
 
 #### Major Features and Improvements
 **Major Features**
 
-* Refactoring DAG components, adding support for stage status, and displaying dynamic ports.
-* Update the cache structure to optimize issues such as user timeout handling and duplicate storage of configuration information.
-* Optimize some interactive functions.
-* Update the style theme.
+* Dependencies updated
+* Display details optimization
 
 # Release 1.11.1
 
