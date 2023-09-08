@@ -185,7 +185,9 @@ class DiagramInfo {
     this.componentLink(obj.dependencies)
   }
   checkNewPort(obj) {
-    newPort = Object.keys(obj).length > 0 ? !!obj[Object.keys(obj)[0]][0]['up_output_info'] : true
+    newPort = Object.keys(obj).length > 0
+      ? obj[Object.keys(obj)[0]] && obj[Object.keys(obj)[0]][0] && !!obj[Object.keys(obj)[0]][0]['up_output_info']
+      : true
   }
   componentInfo(list) {
     for (const val of list) {
