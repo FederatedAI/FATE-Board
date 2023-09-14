@@ -1,0 +1,93 @@
+component:
+  name: dataframe_transformer
+  description: ''
+  provider: fate
+  version: 2.0.0-beta
+  labels: []
+  roles:
+    - local
+  parameters:
+    namespace:
+      type: parameter_namespace
+      default:
+      optional: true
+      description: ''
+      type_meta:
+        title: parameter_namespace
+        type: object
+        properties:
+          data:
+            title: Data
+            type: string
+        required:
+          - data
+    name:
+      type: parameter_name
+      default:
+      optional: true
+      description: ''
+      type_meta:
+        title: parameter_name
+        type: object
+        properties:
+          data:
+            title: Data
+            type: string
+        required:
+          - data
+    anonymous_role:
+      type: parameter_anonymous_role
+      default:
+      optional: true
+      description: ''
+      type_meta:
+        title: parameter_anonymous_role
+        type: object
+        properties:
+          data:
+            title: Data
+            type: string
+        required:
+          - data
+    anonymous_party_id:
+      type: parameter_anonymous_party_id
+      default:
+      optional: true
+      description: ''
+      type_meta:
+        title: parameter_anonymous_party_id
+        type: object
+        properties:
+          data:
+            title: Data
+            type: string
+        required:
+          - data
+  input_artifacts:
+    data:
+      table:
+        types:
+          - table
+        optional: false
+        stages:
+          - default
+        roles:
+          - local
+        description: ''
+        is_multi: false
+    model: {}
+  output_artifacts:
+    data:
+      dataframe_output:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - default
+        roles:
+          - local
+        description: ''
+        is_multi: false
+    model: {}
+    metric: {}
+schema_version: v1
