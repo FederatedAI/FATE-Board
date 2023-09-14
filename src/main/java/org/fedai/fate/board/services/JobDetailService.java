@@ -17,6 +17,7 @@ package org.fedai.fate.board.services;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.fedai.fate.board.global.Dict;
 import org.fedai.fate.board.pojo.BatchMetricDTO;
 import org.slf4j.Logger;
@@ -26,10 +27,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
+import org.yaml.snakeyaml.Yaml;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.*;
 
 
 @Service
@@ -43,6 +46,27 @@ public class JobDetailService {
 
     @Value("${fateflow.url}")
     String fateUrl;
+
+    String componentConfigPath = "D:\\GoogleDown";
+
+
+    public String getComponentStaticInfo(String componentName) throws Exception {
+        String jsonData = "";
+        String yamlFilePath = componentConfigPath + File.separator + componentName + ".yaml";
+        File file = new File(yamlFilePath);
+        if (!file.exists()) {
+            logger.error("no this file find: {} ", yamlFilePath);
+            return jsonData;
+        }
+
+        Yaml yaml = new Yaml();
+        ObjectMapper objectMapper = new ObjectMapper();
+        InputStream inputStream = new FileInputStream(yamlFilePath);
+        Map<String, Object> yamlData = yaml.load(inputStream);
+        jsonData = objectMapper.writeValueAsString(yamlData);
+
+        return jsonData;
+    }
 
     public JSONObject getBatchMetricInfo(BatchMetricDTO batchMetricDTO) {
 
@@ -58,9 +82,9 @@ public class JobDetailService {
             String metricNameSpace = entry.getKey();
             String[] metricNames = entry.getValue();
             HashMap<String, JSONObject> stringMapHashMap = new HashMap<>();
-            dataObject.put(metricNameSpace,stringMapHashMap);
+            dataObject.put(metricNameSpace, stringMapHashMap);
             for (String metric : metricNames) {
-                Map<String,Object> reqMap = new HashMap<>();
+                Map<String, Object> reqMap = new HashMap<>();
                 reqMap.put(Dict.JOBID, jobId);
                 reqMap.put(Dict.ROLE, role);
                 reqMap.put(Dict.PARTY_ID, new Integer(partyId));
@@ -77,7 +101,7 @@ public class JobDetailService {
                         JSONObject resultObject = JSON.parseObject(result);
                         Integer retCode = resultObject.getInteger(Dict.CODE);
                         if (retCode == 0) {
-                            stringMapHashMap.put(metric,resultObject);
+                            stringMapHashMap.put(metric, resultObject);
                             continue;
                         }
                     }

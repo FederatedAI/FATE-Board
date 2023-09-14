@@ -51,6 +51,16 @@
         </fileSet>
 
         <fileSet>
+            <outputDirectory>/dag</outputDirectory>
+            <directory>static</directory>
+            <includes>
+                <include>*.yaml</include>
+            </includes>
+            <fileMode>755</fileMode>
+            <lineEnding>unix</lineEnding>
+        </fileSet>
+
+        <fileSet>
             <outputDirectory>/conf</outputDirectory>
             <directory>src/main/resources</directory>
             <includes>

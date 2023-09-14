@@ -43,11 +43,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 @Controller
@@ -70,6 +66,20 @@ public class JobDetailController {
 
     @Autowired
     FlowFeign flowFeign;
+
+    @ResponseBody
+    @RequestMapping(value = "/tracking/component/config", method = RequestMethod.GET)
+    public ResponseResult queryJobStatus(@RequestParam("componentName") String componentName) {
+        String result;
+        try {
+            result = jobDetailService.getComponentStaticInfo(componentName);
+        } catch (Exception e) {
+            logger.error("get component file info fail:", e);
+            return new ResponseResult<>(ErrorCode.FILE_ERROR);
+        }
+        return new ResponseResult<>(ErrorCode.SUCCESS, result);
+    }
+
 
     @ResponseBody
     @RequestMapping(value = "/tracking/component/metrics", method = RequestMethod.POST)

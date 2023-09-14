@@ -1,0 +1,51 @@
+component:
+  name: union
+  description: ''
+  provider: fate
+  version: 2.0.0-beta
+  labels: [ ]
+  roles:
+    - guest
+    - host
+  parameters: { }
+  input_artifacts:
+    data:
+      input_data_list:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: true
+    model: { }
+  output_artifacts:
+    data:
+      output_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+    model: { }
+    metric:
+      metric:
+        types:
+          - json_metric
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: metric, invisible for user
+        is_multi: false
+schema_version: v1
