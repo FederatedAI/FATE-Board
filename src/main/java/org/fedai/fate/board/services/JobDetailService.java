@@ -47,7 +47,8 @@ public class JobDetailService {
     @Value("${fateflow.url}")
     String fateUrl;
 
-    String componentConfigPath = "D:\\GoogleDown";
+    @Value("${component.config.dir}")
+    String componentConfigPath;
 
 
     public String getComponentStaticInfo(String componentName) throws Exception {
