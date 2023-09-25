@@ -77,7 +77,9 @@ public class JobDetailController {
             logger.error("get component file info fail:", e);
             return new ResponseResult<>(ErrorCode.FILE_ERROR);
         }
-        return new ResponseResult<>(ErrorCode.SUCCESS, result);
+
+        JSONObject resultObject = JSON.parseObject(result);
+        return new ResponseResult<>(resultObject);
     }
 
 
