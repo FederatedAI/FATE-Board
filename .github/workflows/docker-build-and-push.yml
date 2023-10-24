@@ -1,0 +1,41 @@
+name: docker build and push
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - '**'
+
+  workflow_dispatch: {}
+
+jobs:
+  docker:
+    name: docker build and push
+    runs-on: ubuntu-latest
+    steps:
+      - name: check out the repo
+        uses: actions/checkout@v2
+
+      - name: Prepare the TAG
+        id: prepare-the-tag
+        run: |
+          # strip git ref prefix from version
+          TAG=""
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          if [ $VERSION = "master" ]; then
+            TAG="latest"
+          else
+            TAG=$VERSION
+          fi
+          echo "::set-output name=tag::$TAG"
+      - name: Build image
+        run: |
+          docker build -t federatedai/fateboard:${{steps.prepare-the-tag.outputs.tag}} -f Dockerfile .
+
+      - name: Log into DockerHub
+        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push image
+        run: |
+          docker push federatedai/fateboard:${{steps.prepare-the-tag.outputs.tag}}
