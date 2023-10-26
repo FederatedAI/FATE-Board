@@ -15,4 +15,4 @@ RUN ln -s fateboard-*.jar fateboard.jar
 
 EXPOSE 8080
 
-CMD java -Dspring.config.location=/data/projects/fate/fateboard/conf/application.properties  -Dssh_config_file=/data/projects/fate/fateboard/conf  -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -jar fateboard.jar
+CMD java -Dspring.config.location=/data/projects/fate/fateboard/conf/application.properties -Dssh_config_file=/data/projects/fate/fateboard/ssh/ -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -cp /data/projects/fate/fateboard/lib/*:/data/projects/fate/fateboard/fateboard.jar org.fedai.fate.board.bootstrap.Bootstrap
