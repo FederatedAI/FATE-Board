@@ -43,11 +43,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 @Controller
@@ -72,6 +68,22 @@ public class JobDetailController {
     FlowFeign flowFeign;
 
     @ResponseBody
+    @RequestMapping(value = "/tracking/component/config", method = RequestMethod.GET)
+    public ResponseResult queryJobStatus(@RequestParam("componentName") String componentName) {
+        String result;
+        try {
+            result = jobDetailService.getComponentStaticInfo(componentName);
+        } catch (Exception e) {
+            logger.error("get component file info fail:", e);
+            return new ResponseResult<>(ErrorCode.FILE_ERROR);
+        }
+
+        JSONObject resultObject = JSON.parseObject(result);
+        return new ResponseResult<>(resultObject);
+    }
+
+
+    @ResponseBody
     @RequestMapping(value = "/tracking/component/metrics", method = RequestMethod.POST)
     public ResponseResult getMetaInfo(@Valid @RequestBody ComponentQueryDTO componentQueryDTO, BindingResult bindingResult) {
 
@@ -81,12 +93,16 @@ public class JobDetailController {
         }
         Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id(), componentQueryDTO.getComponent_name()));
 
-
+        Map<String,Object> reqMap = new HashMap<>();
+        reqMap.put(Dict.JOBID,componentQueryDTO.getJob_id());
+        reqMap.put(Dict.ROLE,componentQueryDTO.getRole());
+        reqMap.put(Dict.PARTY_ID,componentQueryDTO.getParty_id());
+        reqMap.put(Dict.TASK_NAME,componentQueryDTO.getComponent_name());
         String result;
         try {
 
             //generateURLParamJobQueryDTO
-            result = flowFeign.post(Dict.URL_COPONENT_METRIC, JSON.toJSONString(componentQueryDTO));
+            result = flowFeign.get(Dict.URL_COPONENT_METRIC, reqMap);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -109,7 +125,7 @@ public class JobDetailController {
 
         reqMap.put(Dict.ROLE, metricDTO.getRole());
         reqMap.put(Dict.PARTY_ID, metricDTO.getParty_id());
-        reqMap.put(Dict.COMPONENT_NAME, metricDTO.getComponent_name());
+        reqMap.put(Dict.TASK_NAME, metricDTO.getComponent_name());
         reqMap.put(Dict.METRIC_NAME, metricDTO.getMetric_name());
         reqMap.put(Dict.METRIC_NAMESPACE, metricDTO.getMetric_namespace());
         String result;
@@ -134,23 +150,33 @@ public class JobDetailController {
         }
         Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id(), componentQueryDTO.getComponent_name()));
 
+        String taskId = componentQueryDTO.getJob_id() + "_" + componentQueryDTO.getComponent_name();
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put(Dict.JOBID, componentQueryDTO.getJob_id() );
+        paramMap.put(Dict.TASK_ID, taskId);
+
         //todo
         String result = null;
-//        try {
-//            result = flowFeign.post(Dict.URL_COPONENT_PARAMETERS, JSON.toJSONString(componentQueryDTO));
-//        } catch (Exception e) {
-//            logger.error("connect fateflow error:", e);
-//            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
-//        }
-//        if (StringUtils.isEmpty(result)) {
-//            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
-
-//        }
+        try {
+            result = flowFeign.get(Dict.URL_TASK_DATAVIEW,paramMap);
+        } catch (Exception e) {
+            logger.error("connect fateflow error:", e);
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+        }
+        if (StringUtils.isEmpty(result)) {
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
+        }
         JSONObject resultObject = JSON.parseObject(result);
         Integer retcode = resultObject.getInteger(Dict.CODE);
         String msg = resultObject.getString(Dict.REMOTE_RETURN_MSG);
-        JSONObject data = resultObject.getJSONObject(Dict.DATA);
-        String dataWithNull = JSON.toJSONString(data, SerializerFeature.WriteMapNullValue);
+
+//        JSONObject data = resultObject.getJSONObject(Dict.DATA);
+
+        JSONObject detail = (JSONObject)resultObject.getJSONArray(Dict.DATA).get(0);
+        JSONObject newData = detail.getJSONObject(Dict.COMPONENT_PARAMETERS);
+
+//        String dataWithNull = JSON.toJSONString(data, SerializerFeature.WriteMapNullValue);
+        String dataWithNull = JSON.toJSONString(newData, SerializerFeature.WriteMapNullValue);
 
         return new ResponseResult<>(retcode, msg, dataWithNull);
 
@@ -360,12 +386,9 @@ public class JobDetailController {
 
         if (retCode == 0) {
             JSONObject data = resultObject.getJSONObject(Dict.DATA);
-//            JSONArray components_list = data.getJSONArray(Dict.COMPONENT_LIST);
             JSONObject component_need_run = data.getJSONObject(Dict.COMPONENT_NEED_RUN);
             ArrayList<Map<String, Object>> componentList = new ArrayList<>();
-
             Set<String> keys = component_need_run.keySet();
-
             for (Object o : keys) {
                 HashMap<String, Object> component = new HashMap<>();
                 component.put(Dict.COMPONENT_NAME, o);
@@ -407,6 +430,12 @@ public class JobDetailController {
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+        }
+
+        JSONObject resultObject = JSON.parseObject(result);
+        Integer retCode = resultObject.getInteger(Dict.CODE);
+        if (retCode != 0) {
+            return ResponseUtil.buildResponse(null, null);
         }
 
         return ResponseUtil.buildResponse(result, null);
@@ -477,7 +506,7 @@ public class JobDetailController {
         reqMap.put(Dict.JOBID, componentQueryDTO.getJob_id());
         reqMap.put(Dict.ROLE, componentQueryDTO.getRole());
         reqMap.put(Dict.PARTY_ID, componentQueryDTO.getParty_id());
-        reqMap.put(Dict.COMPONENT_NAME, componentQueryDTO.getComponent_name());
+        reqMap.put(Dict.TASK_NAME, componentQueryDTO.getComponent_name());
         return reqMap;
     }
 }
