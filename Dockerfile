@@ -7,10 +7,9 @@ FROM mcr.microsoft.com/java/jre:8u192-zulu-alpine
 RUN apk add tzdata
 WORKDIR /data/projects/fate/fateboard/
 
-COPY --from=builder /data/projects/fate/fateboard/target/fateboard-*.jar /data/projects/fate/fateboard
-COPY --from=builder /data/projects/fate/fateboard/src/main/resources/application.properties /data/projects/fate/fateboard/conf/
-COPY --from=builder /data/projects/fate/fateboard/src/main/resources/ssh.properties /data/projects/fate/fateboard/conf/
+COPY --from=builder /data/projects/fate/fateboard/target/fateboard-*.zip /data/projects/fate/fateboard
 
+RUN unzip fateboard-*.zip && rm -rf fateboard-*.zip
 RUN ln -s fateboard-*.jar fateboard.jar
 
 EXPOSE 8080
