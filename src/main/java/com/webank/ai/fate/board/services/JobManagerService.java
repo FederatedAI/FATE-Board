@@ -283,81 +283,47 @@ public class JobManagerService {
 
     public ResponseResult download(DownloadQO downloadQO, HttpServletResponse response) {
 
-        //check input parameters
         String jobId = downloadQO.getJobId();
         String role = downloadQO.getRole();
-        String type = downloadQO.getType();
         String partyId = downloadQO.getPartyId();
 
-        if (StringUtils.isEmpty(jobId)) {
-            log.error("parameter null:jobId");
-            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
-        }
-        if (StringUtils.isEmpty(role)) {
-            log.error("parameter null:role");
-            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
-        }
-        if (StringUtils.isEmpty(type)) {
-            log.error("parameter null:type");
-            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
-        }
-
-        if (!LogFileService.checkParameters("^[0-9a-zA-Z\\-_]+$", jobId, role, type)) {
-            log.error("parameter error: illegal characters in role or jobId or type");
-            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
-        }
-        if (StringUtils.isEmpty(partyId)) {
-            log.error("parameter null:partyId");
-            return new ResponseResult(ErrorCode.ERROR_PARAMETER);
-        }
-
-
-        Map<String, Object> query = new HashMap<>();
-        query.put("job_id", jobId);
+        HashMap<String, Object> jobParams = Maps.newHashMap();
+        jobParams.put(Dict.JOBID, jobId);
+        jobParams.put((Dict.ROLE), role);
+        jobParams.put(Dict.PARTY_ID, partyId);
         String result = null;
         try {
-            result = flowFeign.post(Dict.URL_CONFIG_CAT, JSON.toJSONString(query));
+            result = flowFeign.get(Dict.URL_JOB_DATAVIEW, jobParams);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
-            //todo
-//            throw new Exception(ErrorCode.FATEFLOW_ERROR_CONNECTION.getMsg());
-//            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
         }
+
+        if ((result == null) || (0 == result.trim().length())) {
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
+        }
+
         JSONObject resultObject = JSON.parseObject(result);
-        JSONObject dataObject = resultObject.getJSONObject(Dict.DATA);
-        JSONObject dslObject = dataObject.getJSONObject("dsl");
-        JSONObject runtime_confObject = dataObject.getJSONObject("runtime_conf");
-        JSONObject responseObject;
-
-
-        String fileOutputName = "";
-
-        if ("dsl".equals(type)) {
-            fileOutputName = "job_dsl_" + jobId + ".json";
-            responseObject = dslObject;
+        Integer retcode = resultObject.getInteger(Dict.CODE);
+        if (retcode == null) {
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_WRONG_RESULT);
+        }
+        JSONObject dagInfo;
+        if (retcode == 0) {
+            JSONArray jsonArray = resultObject.getJSONArray(Dict.DATA);
+            JSONObject data = jsonArray == null ? null : (JSONObject)jsonArray.get(0);
+            dagInfo = data.getJSONObject("dag");
         } else {
-            if ("guest".equals(role) || "local".equals(role)) {
-                fileOutputName = "runtime_config_" + jobId + ".json";
-                responseObject = runtime_confObject;
-            } else if ("host".equals(role)) {
-                fileOutputName = "runtime_config_" + jobId + ".json";
-                responseObject = getHostConfig(runtime_confObject);
-            } else {
-                log.error("download error: role:{} doesn't support", role);
-                return new ResponseResult(ErrorCode.ERROR_PARAMETER);
-            }
-
+            return new ResponseResult<>(retcode, resultObject.getString(Dict.RETMSG));
         }
 
-
+        String fileOutputName = jobId + ".yaml";
         response.setBufferSize(1024 * 1000);
         response.setContentType("application/force-download");
         response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
         try {
             OutputStream os = response.getOutputStream();
-            os.write(JSON.toJSONBytes(responseObject, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat));
-//            os.flush();
-//            os.close();
+            os.write(JSON.toJSONBytes(dagInfo, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat));
             log.info("download success,file :{}", fileOutputName);
         } catch (Exception e) {
             log.error("download failed", e);
