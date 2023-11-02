@@ -388,24 +388,6 @@ public class JobDetailController {
             JSONObject data = resultObject.getJSONObject(Dict.DATA);
             JSONObject component_need_run = data.getJSONObject(Dict.COMPONENT_NEED_RUN);
             ArrayList<Map<String, Object>> componentList = new ArrayList<>();
-
-            JSONObject dependencies = data.getJSONObject(Dict.COMPONENT_DEPENDENCIES);
-            Set<String> dependencyKeys = dependencies.keySet();
-            for (String componentName: dependencyKeys) {
-                JSONArray newArray = new JSONArray();
-                JSONArray array = dependencies.getJSONArray(componentName);
-
-                for (int i = 0;i<array.size();i++) {
-                    JSONObject dep = array.getJSONObject(i);
-                    String compName = dep.getString(Dict.COMPONENT_NAME);
-                    if (compName == null || compName.isEmpty()) {
-                        continue;
-                    }
-                    newArray.add(dep);
-                }
-                dependencies.put(componentName,newArray);
-            }
-
             Set<String> keys = component_need_run.keySet();
             for (Object o : keys) {
                 HashMap<String, Object> component = new HashMap<>();
@@ -448,6 +430,12 @@ public class JobDetailController {
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
+        }
+
+        JSONObject resultObject = JSON.parseObject(result);
+        Integer retCode = resultObject.getInteger(Dict.CODE);
+        if (retCode != 0) {
+            return ResponseUtil.buildResponse(null, null);
         }
 
         return ResponseUtil.buildResponse(result, null);
