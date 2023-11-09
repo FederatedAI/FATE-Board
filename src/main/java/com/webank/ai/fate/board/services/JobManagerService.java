@@ -73,7 +73,7 @@ public class JobManagerService {
     public List<JobDO> queryJobStatus() {
         Map<String, Object> param = new HashMap<>();
         List<String> statusList = new ArrayList<>();
-        statusList.add(Dict.STATUS_JOB_WAITING);
+//        statusList.add(Dict.STATUS_JOB_WAITING);
         statusList.add(Dict.STATUS_JOB_RUNNING);
 
         String statusStr = String.join(",", statusList);
