@@ -417,7 +417,6 @@ public class JobDetailController {
     @ResponseBody
     public ResponseResult getModel(@Valid @RequestBody ComponentQueryDTO componentQueryDTO, BindingResult bindingResult) {
 
-
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
             return new ResponseResult<>(ErrorCode.ERROR_PARAMETER, errors.getDefaultMessage());
@@ -434,11 +433,11 @@ public class JobDetailController {
 
         JSONObject resultObject = JSON.parseObject(result);
         Integer retCode = resultObject.getInteger(Dict.CODE);
+        Object o = resultObject.get(Dict.DATA);
         if (retCode != 0) {
             return ResponseUtil.buildResponse(null, null);
         }
-
-        return ResponseUtil.buildResponse(result, null);
+        return new ResponseResult(ErrorCode.SUCCESS.getCode(), resultObject.get(Dict.DATA));
     }
 
     @RequestMapping(value = "/tracking/component/output/data", method = RequestMethod.POST)
