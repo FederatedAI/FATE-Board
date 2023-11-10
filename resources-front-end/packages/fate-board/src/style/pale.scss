@@ -1,0 +1,13 @@
+$pale: 12px;
+
+@mixin padding-pale($upDown, $about) {
+  padding: $upDown $about;
+}
+
+@mixin dialog-pale {
+  @include padding-pale($pale * 2, $pale * 2);
+}
+
+@mixin card-pale {
+  @include padding-pale($pale, $pale);
+}

@@ -1,0 +1,44 @@
+@import './character.scss';
+@import './spacing.scss';
+@import 'element-plus/dist/index.css';
+
+@mixin flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+@mixin flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-start {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@mixin flex-end {
+  align-items: center;
+  justify-content: flex-end;
+}
+
+@mixin flex-space-between {
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-center {
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-freeze {
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+@mixin text-ellipse {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

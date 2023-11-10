@@ -1,0 +1,37 @@
+@import './color.scss';
+
+@mixin text-en {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@mixin text-cn {
+  font-family: '微软雅黑';
+}
+
+@mixin text-size {
+  font-size: 14px;
+}
+@mixin text-size-small {
+  font-size: 12px;
+}
+
+@mixin title-1-size {
+  font-size: 50px;
+}
+@mixin title-2-size {
+  font-size: 28px;
+}
+@mixin title-3-size {
+  font-size: 18px;
+}
+@mixin title-4-size {
+  font-size: 16px;
+}
+
+@mixin text-bold {
+  font-weight: bold;
+}
+
+@mixin text-color($color) {
+  color: $color;
+}
