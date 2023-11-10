@@ -1,0 +1,136 @@
+component:
+  name: statistics
+  description: ''
+  provider: fate
+  version: 2.0.0-beta
+  labels: [ ]
+  roles:
+    - guest
+    - host
+  parameters:
+    metrics:
+      type: typing.Union[typing.List[typing.Union[fate.components.core.params._metrics.StatisticMetrics,
+        fate.components.core.params._metrics.LegalPercentile]], fate.components.core.params._metrics.StatisticMetrics,
+        fate.components.core.params._metrics.LegalPercentile]
+      default:
+        - mean
+        - std
+        - min
+        - max
+      optional: true
+      description: metrics to be computed, default ['count', 'mean', 'std', 'min',
+        'max']
+      type_meta:
+        title: typing.Union[typing.List[typing.Union[fate.components.core.params._metrics.StatisticMetrics,
+          fate.components.core.params._metrics.LegalPercentile]], fate.components.core.params._metrics.StatisticMetrics,
+          fate.components.core.params._metrics.LegalPercentile]
+        anyOf:
+          - type: array
+            items:
+              anyOf:
+                - type: string
+                - type: string
+          - type: string
+          - type: string
+        default:
+          - mean
+          - std
+          - min
+          - max
+        description: metrics to be computed, default ['count', 'mean', 'std', 'min',
+          'max']
+    ddof:
+      type: ConstrainedNumberMeta
+      default: 1
+      optional: true
+      description: Delta Degrees of Freedom for std and var, default 1
+      type_meta:
+        title: ConstrainedNumberMeta
+        minimum: 0
+        type: integer
+    bias:
+      type: bool
+      default: true
+      optional: true
+      description: If False, the calculations of skewness and kurtosis are corrected
+        for statistical bias.
+      type_meta:
+        title: bool
+        type: boolean
+        default: false
+        description: bool, whether interpret `skip_col` as anonymous column names
+    relative_error:
+      type: ConstrainedNumberMeta
+      default: 0.001
+      optional: true
+      description: float, error rate for quantile
+      type_meta:
+        title: ConstrainedNumberMeta
+        exclusiveMinimum: 0
+        maximum: 1
+        type: number
+    skip_col:
+      type: typing.List[str]
+      default:
+      optional: true
+      description: columns to be skipped, default None; if None, statistics will be
+        computed over all columns
+      type_meta:
+        title: typing.List[str]
+        type: array
+        items:
+          type: string
+        default:
+        description: columns to be skipped, default None; if None, statistics will
+          be computed over all columns
+    use_anonymous:
+      type: bool
+      default: false
+      optional: true
+      description: bool, whether interpret `skip_col` as anonymous column names
+      type_meta:
+        title: bool
+        type: boolean
+        default: false
+        description: bool, whether interpret `skip_col` as anonymous column names
+  input_artifacts:
+    data:
+      input_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+    model: { }
+  output_artifacts:
+    data: { }
+    model:
+      output_model:
+        types:
+          - json_model
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+    metric:
+      metric:
+        types:
+          - json_metric
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: metric, invisible for user
+        is_multi: false
+schema_version: v1

@@ -36,6 +36,8 @@ public class Dict {
     static public final String DATASET = "dataset";
     static public final String COMPONENT_NAME = "component_name";
     static public final String TASK_NAME = "task_name";
+    static public final String TASK_ID = "task_id";
+    static public final String COMPONENT_PARAMETERS = "component_parameters";
     static public final String INSTANCE_ID = "instance_id";
     static public final String BEGIN = "begin";
     static public final String END = "end";
@@ -60,6 +62,7 @@ public class Dict {
     static public final String STATUS = "status";
     static public final String COMPONENT_LIST = "component_list";
     static public final String COMPONENT_NEED_RUN = "component_need_run";
+    static public final String COMPONENT_DEPENDENCIES = "dependencies";
 
     static public final String SSH_CONFIG_FILE = "ssh_config_file";
     static public final String LOG_LINE_NUM = "lineNum";
@@ -78,7 +81,7 @@ public class Dict {
     static public final String URL_JOB_STOP = "/v2/job/stop";
     static public final String URL_JOB_QUERY = "/v2/job/list/query";
     static public final String URL_JOB_DATAVIEW = "/v2/job/query";
-    static public final String URL_JOB_UPDATE = "/v2/job/update";
+    static public final String URL_JOB_UPDATE = "/v2/job/notes/add";
     static public final String URL_JOB_RERUN = "/v2/job/rerun";
     static public final String URL_DAG_DEPENDENCY = "/v2/job/dag/dependency";
     static public final String URL_TASK_QUERY = "/v2/job/task/list/query";
