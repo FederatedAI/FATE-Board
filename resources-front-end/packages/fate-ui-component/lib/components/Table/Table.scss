@@ -1,0 +1,67 @@
+@use 'sass:math';
+@import '@/styles/index.scss';
+
+.fb-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+
+  .fb-table-columns {
+    width: 100%;
+    flex: 1 1 95%;
+  }
+
+  .fb-table-pagination {
+    padding: math.div($pale, 2);
+    flex: 0 0 5%;
+  }
+
+  .fb-table-row--filter {
+    background-color: var(--el-color-info);
+  }
+
+  .fb-table-cell--filter {
+    background-color: var(--el-color-info-light-3);
+  }
+
+  .fb-table-action {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+  
+    .fb-table-action-seperator {
+      padding: 0px 4px;
+    }
+  }
+
+  .fb-table-txRow {
+    max-width: calc(100% - $pale * 2);
+  }
+
+  .fb-table-txRow--link {
+    cursor: pointer;
+    color: var(--el-color-primary);
+    &:hover {
+      color: var(--el-color-primary-light-3)
+    }
+  }
+
+  .fb-table-icon {
+    width: $pale;
+    height: $pale;
+    cursor: pointer;
+    color: var(--el-color-primary);
+    &:hover {
+      color: var(--el-color-primary-light-3)
+    }
+  }
+
+  .fb-table-progress-text {
+    height: 100%;
+    @include flex-col();
+    @include flex-center();
+    font-size: $text-size;
+  }
+}

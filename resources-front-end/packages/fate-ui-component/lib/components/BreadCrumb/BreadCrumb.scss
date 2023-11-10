@@ -1,0 +1,13 @@
+@use 'sass:math';
+@import '@/styles/index.scss';
+
+.fb-breadcrumb {
+  .fb-breadcrumb-text {
+    font-size: $text-size * 0.9;
+    line-height: $text-size * 1.2;
+  }
+  .fb-breadcrumb-icon {
+    width: $pale;
+    height: $pale;
+  }
+}

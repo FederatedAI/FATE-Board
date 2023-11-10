@@ -1,0 +1,27 @@
+@import './color.scss';
+
+$radius: 2px;
+
+@mixin border-radius($radius) {
+  border-radius: $radius;
+}
+
+@mixin border-size($size) {
+  border-width: $size;
+}
+
+@mixin no-border {
+  border: 0;
+}
+
+@mixin border-default {
+  border: 1px solid var(--el-color-info);
+}
+
+@mixin border-bold {
+  border: 2px solid var(--el-color-info);
+}
+
+@mixin border-shadow {
+  box-shadow: 1px 1px 3px var(--el-color-info);
+}
