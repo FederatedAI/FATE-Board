@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fateboard</groupId>
     <artifactId>fateboard</artifactId>
-    <version>2.0.0-beta</version>
+    <version>2.0.0</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -330,11 +330,10 @@
                         <configuration>
                             <resources>
                                 <resource>
-                                    <directory>resources-front-end/dist</directory>
+                                    <directory>resources-front-end/packages/fate-board/dist</directory>
                                     <includes>
-                                        <include>static/**</include>
-                                        <include>index.html</include>
-                                        <include>FATE_logo.png</include>
+                                        <include>*</include>
+                                        <include>*/**</include>
                                     </includes>
                                 </resource>
                             </resources>
