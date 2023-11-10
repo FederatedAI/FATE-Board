@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "declarationDir": "./@types",
+    "paths": {
+      "@/*": ["lib/*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "webpack.config.js"
+  ],
+  "include": [
+    "shims.d.ts",
+    "lib/**/*.ts",
+    "lib/**/*.d.ts",
+    "lib/**/*.vue",
+    "lib/**/*.js"
+  ]
+}

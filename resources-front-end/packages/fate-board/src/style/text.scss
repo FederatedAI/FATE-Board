@@ -1,0 +1,76 @@
+@import './color.scss';
+
+.common_paragraph {
+  font-size: 14px;
+  text-rendering: optimizeLegibility;
+  font-family: Arial, sans-serif;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+@mixin text_ellipse {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.t_link {
+  cursor: pointer;
+  color: $gray;
+
+  &:hover {
+    color: $gray-lighter;
+  }
+
+  &:active {
+    color: $white;
+  }
+}
+
+.t_text {
+  color: $tx-context;
+}
+
+.t_title {
+  color: $tx-title;
+}
+
+.t_cancel {
+  color: $origin;
+}
+
+// h-title
+.title-1 {
+  font-size: 50px;
+}
+.title-1_bold {
+  @extend .title-1;
+  @include font-bold();
+}
+
+.title-2 {
+  font-size: 28px;
+}
+.title-2_bold {
+  @extend .title-2;
+  @include font-bold();
+}
+.title-3 {
+  font-size: 18px;
+}
+.title-3_bold {
+  @extend .title-3;
+  @include font-bold();
+}
+.title-4 {
+  font-size: 16px;
+}
+.title-4_bold {
+  @extend .title-4;
+  @include font-bold();
+}
+
+.title-sub {
+  font-size: 12px;
+  color: $gray;
+}

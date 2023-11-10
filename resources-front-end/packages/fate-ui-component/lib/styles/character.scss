@@ -1,0 +1,27 @@
+$text-size: 14px;
+$title-size: 16px;
+
+$primary: #4159d1;
+$primary-dark: #4859de;
+$primary-darker: #3145a6;
+$primary-light: #5e7feb;
+$primary-lighter: #deecfc;
+
+$info: #999ba3;
+$info-dark: #3e4052;
+$info-light: #ebedf0;
+$info-lighter: #f8f9fa;
+
+@mixin font-family {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@mixin font-text {
+  font-size: $text-size;
+}
+@mixin font-title {
+  font-size: $title-size;
+}
+@mixin font-bold {
+  font-weight: bold;
+}
