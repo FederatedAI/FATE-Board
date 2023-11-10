@@ -1,0 +1,26 @@
+{
+  "name": "fate-tools",
+  "version": "1.0.0",
+  "license": "ISC",
+  "main": "dist/main.js",
+  "types": "@types/main.d.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsc && webpack --mode=production",
+    "build:dev": "tsc && webpack --mode=development"
+  },
+  "dependencies": {
+    "axios": "^1.5.1",
+    "encryptlong": "^3.1.4",
+    "file-saver": "^2.0.5"
+  },
+  "peerDependencies": {
+    "lodash": "^4.17.21"
+  }
+}

@@ -1,0 +1,24 @@
+@import './index.scss';
+@import './scroll.scss';
+
+* {
+  margin: 0;
+  padding: 0;
+  
+  @include text-size();
+  @include text-en();
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  position: relative;
+  @include box-stretch();
+  overflow: hidden;
+}
+
+#app {
+  overflow: auto;
+}

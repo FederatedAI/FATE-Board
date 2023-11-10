@@ -1,0 +1,37 @@
+@import '@/style/index.scss';
+
+.f-detail-component {
+  width: 100%;
+  @include flex-col();
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  .f-d-group {
+    width: 100%;
+  }
+
+  .f-d-select {
+    margin-bottom: $pale;
+  }
+
+  .f-d-text {
+    width: 100%;
+    margin-bottom: $pale;
+
+    .f-d-text-label {
+      min-width: 80px;
+      color: var(--el-color-info);
+      font-size: 16px;
+    }
+
+    .f-d-text-content {
+      padding-left: $pale;
+      color: var(--el-color-info-light-3);
+      font-size: 14px;
+    }
+  }
+
+  .f-d-table {
+    width: 100%;
+  }
+}
