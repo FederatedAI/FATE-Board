@@ -4,7 +4,6 @@ import DialogCancel from './DialogCancel';
 import DialogRetry from './DialogRetry';
 import editMsg from './EditMsg';
 
-const newPage = true
 const header = (
   edit: any,
   cancel: any,
@@ -19,7 +18,7 @@ const header = (
       store.commit('SET_JOBID', row.jobId)
       store.commit('SET_JOB_ROLE', row.role)
       store.commit('SET_PARTYID', row.partyId)
-      if (window && newPage) {
+      if (window && store.state.job._blank_) {
         const url = routes.resolve({
           name: 'detail',
           path: '/detail',

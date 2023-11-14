@@ -46,14 +46,14 @@ const download = () => {
     justify-content: flex-start;
     padding-left: 0px;
     cursor: pointer;
-    :deep .f-summary-link {
+    :deep(.f-summary-link)   {
       @include text-size-small();
       color: var(--el-color-primary-light-3);
     }
   }
   
   .f-summary-download-disable {
-    :deep .f-summary-link {
+    :deep(.f-summary-link) {
       color: var(--el-color-info);
     }
   }

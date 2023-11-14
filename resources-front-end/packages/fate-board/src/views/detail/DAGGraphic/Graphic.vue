@@ -57,7 +57,7 @@ const retry = (comp: any) => {
   align-items: flex-start;
 
   .f-graphic-title {
-    @include title-3-size();
+    @include title-4-size();
     font-weight: bold;
     margin-bottom: $pale;
     @include flex-freeze();
