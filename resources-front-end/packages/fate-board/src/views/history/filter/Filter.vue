@@ -98,12 +98,12 @@ onBeforeUnmount(() => {
 
   margin-top: math.div($pale, 2);
 
-  ::v-deep .el-form-item {
+  :deep(.el-form-item) {
     margin-bottom: math.div($pale, 4);
     margin-right: $pale;
   }
 
-  ::v-deep .el-form-item__content {
+  :deep(.el-form-item__content) {
     max-width: 140px;
   }
 

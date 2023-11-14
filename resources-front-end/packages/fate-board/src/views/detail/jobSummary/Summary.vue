@@ -71,8 +71,7 @@ watch(
   .f-summary-item {
     width: 100%;
     padding-top: math.div($pale, 2);
-    padding-bottom: math.div($pale, 2);
-    border-bottom: 1px solid $default-white;
+    padding-bottom: $pale;
   }
 }
 </style>

@@ -2,7 +2,7 @@ import './VirtualScroll.scss'
 import FVirtualScroll from './VirtualScroll.vue'
 
 const VirtualScrollInstall = (app: any) => {
-  app.component('FVurticalScroll', FVirtualScroll)
+  app.component('FVirtualScroll', FVirtualScroll)
 }
 
 export default VirtualScrollInstall

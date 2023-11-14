@@ -20,12 +20,12 @@ const crumbs = computed(() => {
       label:
         each.name === 'running'
           ? 'Home'
-          : `${capitalize(each.name)}${
+          : `${capitalize(each.name)} ${
               store.state.job.jobId ? '(Job:' + store.state.job.jobId + ')' : ''
             }`,
     });
-    return hrefs
   }
+  return hrefs
 });
 </script>
 
@@ -37,6 +37,7 @@ const crumbs = computed(() => {
   background-color: $default-bg;
   @include text-size-small();
   padding: math.div($pale, 3);
+  padding-left: $pale;
   color: var(--el-color-primary);
   border: math.div($pale, 3);
 }
