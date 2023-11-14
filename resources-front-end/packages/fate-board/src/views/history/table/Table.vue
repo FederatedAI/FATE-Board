@@ -18,7 +18,7 @@
 import API from '@/api';
 import { toDate, toTime } from 'fate-tools';
 import { debounce } from 'lodash';
-import { computed, nextTick, onBeforeMount, reactive, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeMount, onMounted, reactive, ref, watch } from 'vue';
 import cols from './ColHeader';
 
 const ftable = ref();
@@ -79,6 +79,7 @@ const dataRequest = debounce(async () => {
         start_time: job.fStartTime ? toDate(job.fStartTime) : '',
         end_time: job.fEndTime ? toDate(job.fEndTime) : '',
         duration: job.fElapsed ? toTime(job.fElapsed) : '',
+        partner: job.partners.join(', '),
         status: {
           value: job.fStatus || 'waiting',
           percentage: job.fStatus.match(/running/i) ? job.fProgress || 0 : undefined,
@@ -115,6 +116,12 @@ const filtering = (newfilters: object) => {
 onBeforeMount(() => {
   dataRequest();
 });
+
+onMounted(() => {
+  setTimeout(() => {
+    requesting.value = false
+  }, 4000)
+})
 
 defineExpose({ search: filtering })
 </script>

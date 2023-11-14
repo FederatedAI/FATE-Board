@@ -4,7 +4,8 @@ import axios, {
   AxiosResponse,
   CreateAxiosDefaults
 } from 'axios';
-import { isBoolean } from 'lodash';
+import { ElMessage } from 'element-plus';
+import { isBoolean, isObject, isUndefined } from 'lodash';
 import toFile from '../toFile';
 
 export interface BasicConfigForParameter extends CreateAxiosDefaults<unknown> {
@@ -17,11 +18,20 @@ export interface BasicResponseData {
   data: unknown;
 }
 
+type CodeCheck = (response: BasicResponseData, reqConfig: any, service: any) => unknown
+
 export interface ErrorCode {
-  [code: number | string]: (response: BasicResponseData) => unknown;
+  [code: number | string]: CodeCheck | {
+    operation: CodeCheck,
+    time?: number,
+    message?: string
+  };
 }
 
 let service: AxiosInstance | undefined = undefined;
+
+const maxReConnect = 5
+const reConnectMap = new Map()
 
 /**
  * Create or Get service instance from axios
@@ -89,15 +99,40 @@ export default function HTTPRequest<B extends BasicConfigForParameter>(
 
         const bodyExplain = (body: BasicResponseData) => {
           if (body.code === 0) {
-            return Promise.resolve(body.data || true);
+            return Promise.resolve(body.data || !!body.data);
           } else {
-            return Promise.resolve((errorCode[body.code] || errorCode['error'])(body)).then((request: unknown) => {
-              if (request && service) {
-                return <any>service(reqConfig)
-              } else {
-                return body
+            const check: any = errorCode[body.code] || errorCode['error']
+            let maxTime = maxReConnect
+            let operation:any = check
+            let hintMsg: any
+            if (isObject(check)) {
+              maxTime = !isUndefined((check as any).time) ? (check as any).time : maxTime
+              operation = operation.operation || (() => true)
+              hintMsg = (check as any).message
+            }
+
+            const message = () => {
+              if (process.env.NODE_ENV === 'development' || hintMsg)
+              ElMessage({
+                type: 'error',
+                message: hintMsg || `code: ${body.code} - message: ${body.msg || String(body.data)}`,
+                showClose: true,
+                center: true
+              })
+              return Promise.reject(body)
+            }
+
+            const times = reConnectMap.get(reqConfig.url) || 0
+            if (times < maxTime) {
+              reConnectMap.set(reqConfig.url, times + 1)
+              if (operation(body, reqConfig, service) === false) {
+                return message()
               }
-            })
+              return Promise.resolve((<any>service)(reqConfig))
+            } else {
+              reConnectMap.delete(reqConfig.url)
+              return message()
+            }
           }
         };
 

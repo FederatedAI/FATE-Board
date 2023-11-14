@@ -1,5 +1,6 @@
 import API from '@/api';
 import transform from '@/transform';
+import { parse } from 'fate-ui-component';
 import { isObject, isString } from 'lodash';
 
 const objectExplain = (data: any): any[] => {
@@ -91,27 +92,36 @@ export default {
       const role = await dispatch('GET_JOB_ROLE')
       const component = state.information.name
       const type = state.information.type
-      if (type && !state.hasLoaded[type]) {
+      if (component && !state.hasLoaded[component]) {
         const configuration: any = transform(state.model, state.metrics, role, partyId, component, type, jobId);
+        const instance = await parse(configuration)
         commit('SET_HASLOADED', {
-          [component]: Object.freeze(configuration)
+          [component]: Object.freeze({
+            parameters: state.parameters,
+            instance
+          })
         })
       }
     },
 
     async parameterRequest({ state, commit, dispatch }: any) {
       try {
-        const job_id = await dispatch('GET_JOBID');
-        const party_id = await dispatch('GET_PARTYID');
-        const role = await dispatch('GET_JOB_ROLE');
-        const responseData = await API.getComponentPara({
-          job_id,
-          party_id,
-          role,
-          component_name: state.information.name,
-        });
-        const responseParam = JSON.parse(responseData);
-        const parameters = objectExplain(responseParam);
+        let parameters
+        if (!state.hasLoaded[state.information.name] || !state.hasLoaded[state.information.name].parameters) {
+          const job_id = await dispatch('GET_JOBID');
+          const party_id = await dispatch('GET_PARTYID');
+          const role = await dispatch('GET_JOB_ROLE');
+          const responseData = await API.getComponentPara({
+            job_id,
+            party_id,
+            role,
+            component_name: state.information.name,
+          });
+          const responseParam = JSON.parse(responseData);
+          parameters = objectExplain(responseParam);
+        } else {
+          parameters = state.hasLoaded[state.information.name].parameters
+        }
         commit('SET_PARAMETER', parameters);
         return parameters;
       } catch (err) {
@@ -121,7 +131,7 @@ export default {
 
     async modelRequest({ state, commit, dispatch }: any) {
       try {
-        if (!state.hasLoaded[state.information.name]) {
+        if (!state.hasLoaded[state.information.name] || !state.hasLoaded[state.information.name].configuration) {
           const job_id = await dispatch('GET_JOBID');
           const party_id = await dispatch('GET_PARTYID');
           const role = await dispatch('GET_JOB_ROLE');
@@ -140,7 +150,7 @@ export default {
 
     async metricRequest({ state, commit, dispatch }: any) {
       try {
-        if (!state.hasLoaded[state.information.name]) {
+        if (!state.hasLoaded[state.information.name] || !state.hasLoaded[state.information.name].configuration) {
           const job_id = await dispatch('GET_JOBID');
           const party_id = await dispatch('GET_PARTYID');
           const role = await dispatch('GET_JOB_ROLE');

@@ -5,16 +5,16 @@
     </section>
     <section class="f-dashboard-main">
       <section class="f-dashboard-information" :class="{
-        'f-dashboard-information--expend': expend
+        'f-dashboard-information--expend': expand
       }">
         <Information class="f-dashboard-item f-dashboard-info"></Information>
         <Gauge class="f-dashboard-item f-dasboard-guage"></Gauge>
         <Dag class="f-dashboard-item f-dashboard-dag"></Dag>
       </section>
       <section class="f-dashboard-log" :class="{
-        'f-dashboard-log--expend': expend
+        'f-dashboard-log--expend': expand
       }">
-        <Logs @expend="expend_change"/>
+        <Logs @expand="expand_change"/>
       </section>
     </section>
   </section>
@@ -28,9 +28,9 @@ import Gauge from './Gauge/Gauge.vue';
 import Information from './Information/Information.vue';
 import Logs from './Log/Log.vue';
 
-const expend = ref(false)
-const expend_change = (newExpend: boolean) => {
-  expend.value = newExpend
+const expand = ref(false)
+const expand_change = (newExpend: boolean) => {
+  expand.value = newExpend
 }
 </script>
 
@@ -78,20 +78,19 @@ const expend_change = (newExpend: boolean) => {
         flex: 1 1 26%;
         max-width: calc(33% - math.div($pale, 2));
         background-color: $default-bg;
-        padding: $pale * 2;
+        padding: $pale;
         border-radius: math.div($pale, 3);
       }
     }
 
     .f-dashboard-information--expend {
-      flex: 1 1 0%;
-      max-height: 0;
+      display: none;
     }
 
     .f-dashboard-log {
       width: 100%;
       flex: 1 1 60%;
-      max-height: calc(60% - $pale);
+      max-height: 60%;
       background-color: $default-bg;
 
       @include flex-row();

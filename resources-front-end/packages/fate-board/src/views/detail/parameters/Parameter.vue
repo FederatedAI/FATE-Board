@@ -57,10 +57,10 @@ const filterNode = (value: string, data: any) => {
 }
 
 const param = reactive<any[]>([]);
-const paramRequest = async (component: any) => {
+const paramRequest = async (comp: any) => {
   parameterLoading.value = true;
   param.length = 0
-  await store.dispatch('chooseComp', component)
+  await store.dispatch('chooseComp', comp)
   param.push(...store.state.comp.parameters)
   count.value = param.length
   parameterLoading.value = false;
@@ -91,7 +91,7 @@ defineExpose({
   align-items: flex-start;
 
   .f-parameter-title {
-    @include title-3-size();
+    @include title-4-size();
     font-weight: bold;
     margin-bottom: $pale;
     @include flex-freeze();
