@@ -96,6 +96,8 @@ watch(
     padding: math.div($pale, 2);
     background-color: $default-white;
     border-radius: math.div($pale, 3);
+    font-size: 12px;
+    color: var(--el-color-info-dark-2);
   }
 
   .f-summary-notes-icon {

@@ -27,7 +27,7 @@
 
 <script lang="ts" setup>
 import { FCrumbs } from '@/components/Crumbs';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import Graphic from './DAGGraphic/Graphic.vue';
 import OutputDialog from './Information/outputs.vue';
@@ -41,7 +41,7 @@ const parameter = ref()
 const jobData = computed(() => store.state.job.details);
 const btnDisable = ref(true) 
 
-const componentChoose = (comp: any) => {
+const componentChoose = async (comp: any) => {
   parameter.value.getParameter(comp)
   btnDisable.value = false
 }
@@ -59,6 +59,12 @@ const dialog = ref()
 const detailDialog = () => {
   dialog.value.on()
 }
+
+onMounted(() => {
+  setTimeout(() => {
+    detailLoading.value = false
+  }, 4000)
+})
 
 </script>
 
@@ -98,7 +104,7 @@ const detailDialog = () => {
     height: 100%;
     flex: 1 2 20%;
     overflow-x: auto;
-    padding: $pale * 2;
+    padding: $pale;
     background-color: $default-bg;
     border-radius: math.div($pale, 3);
     
@@ -122,7 +128,7 @@ const detailDialog = () => {
     height: 100%;
     flex: 2 1 58%;
     margin: 0px $pale;
-    padding: $pale * 2;
+    padding: $pale;
     background-color: $default-bg;
     border-radius: math.div($pale, 3);
 
@@ -141,7 +147,7 @@ const detailDialog = () => {
     @include flex-col();
     justify-content: flex-start;
     align-items: center;
-    padding: $pale * 2;
+    padding: $pale;
     background-color: $default-bg;
     border-radius: math.div($pale, 3);
 

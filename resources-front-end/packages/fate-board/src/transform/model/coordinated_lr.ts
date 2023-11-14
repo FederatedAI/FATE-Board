@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import toFixed from '@/utils/toFixed';
 import { isUndefined } from 'lodash';
 import getModelData from '../tools/getModelData';

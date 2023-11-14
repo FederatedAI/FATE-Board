@@ -1,5 +1,4 @@
-import toFixed from '@/utils/toFixed';
-import { isNumber } from 'lodash';
+import toData from '../tools/toData';
 import toGroup from '../tools/toGroup';
 import toSelect from '../tools/toSelect';
 import toTable from '../tools/toTable';
@@ -62,7 +61,7 @@ export default function Summary(
       ...Object.keys(data).map((key: string) => {
         return {
           variable: key,
-          value: isNumber(data[key]) ? toFixed(data[key]) : data[key],
+          value: toData(data[key]),
         };
       })
     );

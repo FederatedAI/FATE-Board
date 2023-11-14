@@ -4,10 +4,11 @@ import { createApp } from 'vue';
 import * as UIComponent from '../lib/main';
 // import App from './Table.vue';
 // import App from './Text.vue';
-import App from './Selection.vue';
+// import App from './Selection.vue';
 // import App from './Tab.vue';
 // import App from './UIParse.vue';
 // import App from './BreadCrumb.vue';
+import App from './Scroll.vue';
 
 const app = createApp(App)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
