@@ -54,7 +54,7 @@ const fullScreen = () => {
     flex: 1 1 10%;
 
     > * {  
-      @include title-3-size();
+      @include title-4-size();
       font-weight: bold;
     }
 
@@ -63,7 +63,7 @@ const fullScreen = () => {
       height: $pale * 2;
       padding: 2px;
       border-radius: $pale;
-      background-color: $default-white;
+      background-color: var(--el-bg-color);
       color: var(--el-color-info);
       cursor: pointer;
     }
@@ -72,13 +72,13 @@ const fullScreen = () => {
   .f-dashboard-chart {
     position: relative;
     width: 100%;
-    flex: 2 2 90%;
-    max-height: 90%;
-    background-color: $default-white;
+    flex: 2 2 calc(100% - 18px - $pale);
+    max-height: calc(100% - 18px - $pale);
+    background-color: var(--el-bg-color);
   }
 
   .f-dashboard-dag {
-    background-color: $default-white;
+    background-color: var(--el-bg-color);
   }
 }
 </style>

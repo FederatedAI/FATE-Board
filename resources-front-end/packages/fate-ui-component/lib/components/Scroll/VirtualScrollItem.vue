@@ -1,167 +1,142 @@
-<script>
-/**
- *
- *  Copyright 2019 The FATE Authors. All Rights Reserved.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
+<template>
+  <component ref="container" :is="tag || 'div'">
+    <slot name="default"></slot>
+  </component>
+</template>
 
-export default {
-  name: 'VirtualScrollItem',
-  inject: ['scrollData', 'scrollParent', 'scrollResizeObserver'],
-  props: {
-    item: {
-      type: Object,
-      required: true
-    },
-    active: {
-      type: Boolean,
-      required: true
-    },
-    index: {
-      type: Number,
-      default: undefined
-    },
-    tag: {
-      type: String,
-      default: 'div'
-    }
-  },
-  computed: {
-    id() {
-      return this.item[this.scrollData.keyField]
-    },
-    size() {
-      return (
-        (this.scrollData.validSizes[this.id] &&
-					this.scrollData.sizes[this.id]) ||
-				0
-      )
-    },
-    finalActive() {
-      return this.active && this.scrollData.active
-    }
-  },
-  watch: {
-    id() {
-      if (!this.size) {
-        this.onDataUpdate()
-      }
-    },
+<script lang="ts" setup>
+import { computed, inject, nextTick, onMounted, ref, watch } from 'vue';
 
-    finalActive(value) {
-      if (!this.size) {
-        if (value) {
-          if (!this.scrollParent.$_undefinedMap[this.id]) {
-            this.scrollParent.$_undefinedSizes++
-            this.scrollParent.$_undefinedMap[this.id] = true
-          }
-        } else {
-          if (this.scrollParent.$_undefinedMap[this.id]) {
-            this.scrollParent.$_undefinedSizes--
-            this.scrollParent.$_undefinedMap[this.id] = false
-          }
-        }
-      }
+const scrollData: any = inject('scrollData');
+const scrollResizeObserver: any = inject('scrollResizeObserver');
+const undefinedMap: any = inject('undefinedMap');
+const undefinedSizes: any = inject('undefinedSizes');
 
-      if (this.scrollResizeObserver) {
-        if (value) {
-          this.observeSize()
-        } else {
-          this.unobserveSize()
-        }
-      } else if (value && this.$_pendingScrollUpdate === this.id) {
-        this.updateSize()
-      }
+const $_forceNextScrollUpdate = ref<any>(null);
+const $_pendingSizeUpdate = ref<any>('');
+const $_pendingScrollUpdate = ref<any>('');
+
+interface Props {
+  item: any,
+  active: boolean,
+  index?: number | undefined,
+  tag?: string
+}
+const props = withDefaults(defineProps<Props>(), {
+  index: undefined,
+  tag: 'div',
+});
+const slots = defineSlots<{
+  default(): any
+}>()
+
+const id = computed(() => props.item[scrollData.keyField]);
+const size = computed<any>(
+  () => (scrollData.validSizes[id.value] && scrollData.sizes[id.value]) || 0
+);
+
+const finalActive = computed(() => props.active && scrollData.active);
+const container = ref();
+
+watch(
+  () => id.value,
+  () => {
+    if (!size.value) {
+      onDataUpdate();
     }
-  },
-  created() {
-    this.$_forceNextScrollUpdate = null
-    if (!this.scrollResizeObserver) {
-      this.vscrollParent.$on('vscroll:update', this.onScrollUpdate)
-    }
-  },
-  mounted() {
-    if (this.scrollData.active) {
-      this.updateSize()
-      this.observeSize()
-    }
-  },
-  methods: {
-    updateSize() {
-      if (this.finalActive) {
-        if (this.$_pendingSizeUpdate !== this.id) {
-          this.$_pendingSizeUpdate = this.id
-          this.$_forceNextScrollUpdate = null
-          this.$_pendingScrollUpdate = null
-          this.computeSize(this.id)
+  }
+);
+
+watch(
+  () => finalActive.value,
+  (value: any) => {
+    if (!size.value) {
+      if (value) {
+        if (!undefinedMap[id.value]) {
+          undefinedSizes.value = undefinedSizes.value++;
+          undefinedMap[id.value] = true;
         }
       } else {
-        this.$_forceNextScrollUpdate = this.id
-      }
-    },
-    computeSize(id) {
-      this.$nextTick(() => {
-        if (this.id === id) {
-          const width = this.$el.offsetWidth
-          const height = this.$el.offsetHeight
-          this.applySize(width, height)
+        if (undefinedMap[id.value]) {
+          undefinedSizes.value -= 1;
+          undefinedMap[id.value] = false;
         }
-        this.$_pendingSizeUpdate = null
-      })
-    },
-    applySize(width, height) {
-      const size = Math.round(height)
-      if (size && this.size !== size) {
-        if (this.scrollParent.$_undefinedMap[this.id]) {
-          this.scrollParent.$_undefinedSizes--
-          this.scrollParent.$_undefinedMap[this.id] = undefined
-        }
-        this.$set(this.scrollData.sizes, this.id, size)
-        this.$set(this.scrollData.validSizes, this.id, true)
       }
-    },
-    observeSize() {
-      if (!this.scrollResizeObserver) return
-      this.scrollResizeObserver.observe(this.$el)
-      this.$el.addEventListener('resize', this.onResize)
-    },
-    unobserveSize() {
-      if (!this.scrollResizeObserver) return
-      this.scrollResizeObserver.unobserve(this.$el)
-      this.$el.removeEventListener('resize', this.onResize)
-    },
-    onResize(event) {
-      const { width, height } = event.detail.contentRect
-      this.applySize(width, height)
-    },
-    onScrollUpdate({ force }) {
-      // If not active, sechedule a size update when it becomes active
-      if (!this.finalActive && force) {
-        this.$_pendingScrollUpdate = this.id
-      }
-
-      if (this.$_forceNextScrollUpdate === this.id || force || !this.size) {
-        this.updateSize()
-      }
-    },
-    onDataUpdate() {
-      this.updateSize()
     }
-  },
-  render(h) {
-    return h(this.tag, this.$slots.default)
+
+    if (scrollResizeObserver) {
+      if (value) {
+        observeSize();
+      } else {
+        unobserveSize();
+      }
+    } else if (value && $_pendingScrollUpdate.value === id.value) {
+      updateSize();
+    }
   }
+);
+
+onMounted(() => {
+  if (scrollData.active) {
+    updateSize();
+    observeSize();
+  }
+});
+
+function updateSize() {
+  if (finalActive.value) {
+    if ($_pendingSizeUpdate.value !== id.value) {
+      $_pendingSizeUpdate.value = id.value;
+      $_forceNextScrollUpdate.value = null;
+      $_pendingScrollUpdate.value = null;
+      computeSize(id.value);
+    }
+  } else {
+    $_forceNextScrollUpdate.value = id.value;
+  }
+}
+
+function computeSize(id: any) {
+  nextTick(() => {
+    if (id.value === id) {
+      const width = container.value.offsetWidth;
+      const height = container.value.offsetHeight;
+      applySize(width, height);
+    }
+    $_pendingSizeUpdate.value = null;
+  });
+}
+
+function applySize(_width: number, height: number) {
+  const csize = Math.round(height);
+  if (csize && size.value !== csize) {
+    if (undefinedMap[id.value]) {
+      undefinedSizes.value--;
+      undefinedMap[id.value] = undefined;
+    }
+    scrollData.sizes[id.value] = csize;
+    scrollData.validSizes[id.value] = true;
+  }
+}
+
+function observeSize() {
+  if (!scrollResizeObserver) return;
+  scrollResizeObserver.observe(container.value);
+  container.value.addEventListener('resize', onResize);
+}
+
+function unobserveSize() {
+  if (!scrollResizeObserver) return;
+  scrollResizeObserver.unobserve(container.value);
+  container.value.removeEventListener('resize', onResize);
+}
+
+function onResize(event: any) {
+  const { width, height } = event.detail.contentRect;
+  applySize(width, height);
+}
+
+function onDataUpdate() {
+  updateSize();
 }
 </script>

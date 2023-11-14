@@ -47,7 +47,7 @@ const parties = computed(() => store.state.job.dataset.parties || []);
   @include box-stretch();
 
   .f-dashboard-dataset--title {
-    @include title-3-size();
+    @include title-4-size();
     font-weight: bold;
     margin-bottom: $pale;
 
@@ -63,21 +63,21 @@ const parties = computed(() => store.state.job.dataset.parties || []);
     position: relative;
     width: 100%;
     height: 100%;
-    flex: 2 2 90%;
-    max-height: 90%;
-    background-color: $default-white;
+    flex: 2 2 calc(100% - 18px - $pale);
+    max-height: calc(100% - 18px - $pale);
+    background-color: var(--el-bg-color);
   }
   
   .f-dashboard-dataset--row {
 
     padding: $pale;
 
-    ::v-deep .f-dashboard-dataset--label {
+    :deep(.f-dashboard-dataset--label) {
       @include text-size();
       color: var(--el-color-info-light-3);
     }
 
-    ::v-deep .f-dashboard-dataset--content {
+    :deep(.f-dashboard-dataset--content) {
       color: var(--el-color-info);
       font-weight: bold;
     }
