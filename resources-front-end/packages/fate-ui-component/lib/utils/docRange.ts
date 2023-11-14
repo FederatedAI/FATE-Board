@@ -16,7 +16,7 @@ export default function docRange (element: HTMLElement) {
       const padding =
         parseFloat(element.style['paddingLeft'] || '0') +
         parseFloat(element.style['paddingRight'] || '0');
-      return operation.rect().width + padding < operation.width() + 4
+      return operation.rect().width + padding < operation.width() + 2
     }
   }
   return operation

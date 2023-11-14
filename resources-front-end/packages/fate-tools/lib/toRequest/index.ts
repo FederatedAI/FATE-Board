@@ -25,7 +25,7 @@ export default function HTTPInit(
   for (const APIId in APIs) {
     const configuration = APIs[APIId];
     const request = <P extends object>(parameter: P) => {
-      return service(Object.assign({ [ configuration.method.match(/post/i) ? 'data' : 'params']: parameter }, configuration));
+      return service(Object.assign({ [ configuration.method.match(/get/i) ? 'params' : 'data']: parameter }, configuration));
     };
     apis[APIId] = request
   }

@@ -12,7 +12,7 @@
     <el-tabs v-model="active" class="f-detail-tabs">
       <el-tab-pane label="model" name="model">
         <section class="f-detail-item f-detail-model">
-          <component :is="componentInstance"></component>
+          <component :is="componentInstance" :key="update"></component>
         </section>
       </el-tab-pane>
       <el-tab-pane label="data" name="data">
@@ -26,8 +26,6 @@
 </template>
 
 <script lang="ts" setup>
-import { parse } from 'fate-ui-component';
-import { isUndefined } from 'lodash';
 import { computed, defineAsyncComponent, onBeforeMount, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
@@ -38,31 +36,42 @@ const active = ref('model');
 const store = useStore();
 
 const component = computed(() => store.state.comp.information.name);
+
 const componentInstance: any = ref(undefined);
+const update = ref(0)
+let unloaded = false
+
 const modelComponent = () => {
   componentInstance.value = undefined;
   if (component.value) {
     componentInstance.value = defineAsyncComponent(async () => {
-      const configuration = store.state.comp.hasLoaded[component.value];
-      if (configuration) {
-        const instance = await parse(configuration)
-        return instance.toVue();
+      const config = store.state.comp.hasLoaded[component.value];
+      if (config && config.instance) {
+        return config.instance.toVue();
       } else {
+        unloaded = true
         return {};
       }
     })
+    update.value++
   }
 };
 
 watch(
   () => store.state.comp.hasLoaded,
   () => {
-    if (
-      store.state.comp.hasLoaded[component.value] &&
-      isUndefined(componentInstance.value)
-    ) {
-      modelComponent();
+    if (store.state.comp.hasLoaded[component.value] && unloaded) {
+      modelComponent()
+      unloaded = false
     }
+  },
+  { deep: true }
+);
+
+watch(
+  () => component.value,
+  () => {
+    modelComponent()
   },
   { deep: true }
 );

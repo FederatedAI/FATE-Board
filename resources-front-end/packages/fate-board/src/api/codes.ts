@@ -1,37 +1,25 @@
 import store from '@/store/store';
-import { ElMessage } from 'element-plus';
+import { setSession } from 'fate-tools';
 
 export default {
-  100: function warning(data: any) {
-    ElMessage({
-      showClose: true,
-      message: `Code:100, warning: ${data.msg || data.data}`,
-      center: true,
-    });
-  },
-
-  10004: function NotFound(data: any) {
+  100: function warning(data: any, _reqConfig: any, _service: any) {
     return data
   },
 
-  10015: async function loginFailed(data: any) {
-    if (process.env.NODE_ENV === 'development') {
-      ElMessage({
-        showClose: true,
-        message: `Code:10015, LoginFailed: ${data.msg || data.data}`,
-        center: true,
-      });
-    }
-    store.commit('SET_RESIGNIN', true)
-    await store.dispatch('signInForMultPage')
-    return true
+  10004: {
+    time: 0
   },
 
-  error: function error(data: any) {
-    ElMessage({
-      showClose: true,
-      message: `Code: ${data.code}, ${data.msg || data.data}`,
-      center: true,
-    });
+  10015: {
+    operation: async function loginFailed(_data: any, _reqConfig: any, _service: any) {
+      setSession('hasSignIn', '')
+      store.commit('SET_RESIGNIN', true)
+      return await store.dispatch('signInForMultPage')
+    },
+    time: 2
   },
+
+  error: function error(data: any, _reqConfig: any, _service: any) {
+    return data
+  }
 };
