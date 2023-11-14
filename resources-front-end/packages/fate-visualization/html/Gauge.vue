@@ -18,8 +18,8 @@ const change = () => {
 <style lang="scss" scoped>
 .app_container {
   position: relative;
-  width: 500px;
-  height: 300px;
+  width: 350px;
+  height: 176px;
   font: 14px '微软雅黑';
   overflow: hidden;
 }

@@ -12,12 +12,12 @@ export default {
   },
 
   actions: {
-    async getPublicKey({ state }: any) {
+    async getPublicKey({ commit, state }: any) {
       if (!state.publicKey) {
         const publicKey = await (API as any).getPublicKey();
-        state.publicKey = publicKey;
+        commit('setPublicKey', publicKey)
       }
-      return state.publicKey;
+      return state.publicKey
     },
   },
 };

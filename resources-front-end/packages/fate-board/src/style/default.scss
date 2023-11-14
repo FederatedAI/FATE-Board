@@ -19,6 +19,12 @@ html, body, #app {
   overflow: hidden;
 }
 
+body {
+  overflow: auto;
+}
+
 #app {
+  min-width: 1200px;
+  min-height: 660px;
   overflow: auto;
 }

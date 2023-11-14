@@ -1,9 +1,9 @@
 <template>
-  <div class="log-content">
-    <div v-if="!logs" class="log-tip">
+  <div class="f-log-content">
+    <div v-if="!logs" class="f-log-tip">
       <span>loading...</span>
     </div>
-    <div v-else-if="!logs.length" class="log-tip">
+    <div v-else-if="!logs.length" class="f-log-tip">
       <span>no data</span>
     </div>
     <FVirtualScroll
@@ -12,15 +12,15 @@
       :items="logs"
       :min-item-size="20"
       emit-scroll
-      class="log-contents"
+      class="f-log-contents"
       @scroll-top="$emit('scroll-top')"
       @scroll="onScroll"
       @afterMounted="afterScrollMount"
     >
-      <template #default="{ item }">
-        <div :id="item.lineNum" class="flex flex-row">
-          <span class="log-lineNum">{{ item.lineNum }}</span>
-          <span class="log-content">{{ item.content }}</span>
+      <template #item="param">
+        <div :id="getLineNum(param)" class="f-log-item">
+          <span class="f-log-item-lineNum">{{ param.item.lineNum }}</span>
+          <span class="f-log-item-content">{{ param.item.content }}</span>
         </div>
       </template>
     </FVirtualScroll>
@@ -31,8 +31,13 @@
 import { ref, watch } from 'vue';
 
 const props = defineProps(['logs']);
+defineEmits(['scroll-top'])
 const bottom = ref(0);
 const scroller = ref();
+
+function getLineNum (param: any) {
+  return param.item.lineNum
+}
 
 function afterScrollMount() {
   scroller.value && scroller.value.scrollToBottom();
@@ -77,19 +82,23 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-.log-content {
+@import '@/style/index.scss';
+.f-log-content {
   height: 100%;
   white-space: pre-wrap;
   font-family: 'lucon', 'Lucida Console', Monaco, monospace, 'Arial';
 }
-.log-contents {
-  height: 100%;
+.f-log-contents {
+  width: calc(100% - $pale * 2);
+  height: calc(100% - $pale * 2);
   overflow-y: auto;
   overflow-x: hidden;
   position: absolute;
-  width: 100%;
   background: #fff;
-  .log-lineNum {
+  .f-log-item {
+    @include flex-row();
+  }
+  .f-log-item-lineNum {
     font-family: 'lucon', 'Lucida Console', Monaco, monospace, 'Arial';
     color: #c6c8cc;
     min-width: 50px;
@@ -98,7 +107,7 @@ watch(
     text-align: left;
     line-height: 20px;
   }
-  .log-content {
+  .f-log-item-content {
     color: #999ba3;
     font-size: 12px;
     text-align: left;
@@ -106,7 +115,7 @@ watch(
     line-height: 20px;
   }
 }
-.log-tip {
+.f-log-tip {
   width: 100%;
   text-align: center;
   color: #999ba3;

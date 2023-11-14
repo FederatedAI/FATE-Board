@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'f-log-expanded': expandAll }" class="f-log">
+  <div class="f-log">
     <!-- main tab -->
     <div class="f-log-tabs">
       <div class="f-log-tab">
@@ -38,9 +38,9 @@
           <span class="f-log-subtab-content">{{ item }}</span>
           <span
             v-if="(counts as any)[key] > 0"
-            :class="item"
             class="f-log-subtab-count"
-            >{{ (counts as any)[key] }}</span
+            :class="`f-log-${item}-total`"
+            >({{ (counts as any)[key] }})</span
           >
         </div>
       </div>
@@ -70,6 +70,7 @@
 
 <script lang="ts">
 import API from '@/api';
+import { ElMessage } from 'element-plus';
 import { WSConnect } from 'fate-tools';
 import { mapState } from 'vuex';
 import LoggerScroll from './LoggerScroll.vue';
@@ -254,13 +255,22 @@ export default {
           `/log/new/${this.jobId}/${this.role}/${this.partyId}/default`
         );
         (this.ws as any).addEventListener('message', (event: any) => {
-          const res: any = { data: JSON.parse(event.data) };
-          if (res.data[JOB_ERROR] !== undefined) {
-            res.type = 'logSize';
-          } else {
-            res.type = 'log';
+          try {
+            const res: any = { data: JSON.parse(event.data) };
+            if (res.data[JOB_ERROR] !== undefined) {
+              res.type = 'logSize';
+            } else {
+              res.type = 'log';
+            }
+            this.handleLogMessage(res);
+          } catch(error) {
+            ElMessage({
+              showClose: true,
+              message: `This job socket has error`,
+              center: true,
+              type: 'error'
+            });
           }
-          this.handleLogMessage(res);
         });
         (this.ws as any).addEventListener('open', () => {
           this.intervalPull();
@@ -408,13 +418,14 @@ export default {
 .f-log {
   position: relative;
   @include box-stretch();
-  padding: $pale * 2;
+  padding: $pale;
 
   .f-log-tabs {
     @include flex-row();
     align-items: center;
     justify-content: flex-start;
-    padding-bottom: $pale;
+    padding-bottom: math.div($pale, 2);
+    margin-bottom: math.div($pale, 2);
 
     .f-log-tab {
       @include flex-row();
@@ -424,6 +435,7 @@ export default {
         font-weight: bold;
         padding-right: $pale;
         color: var(--el-color-info-light-3);
+        cursor: pointer;
       }
 
       .f-log-tab--active {
@@ -434,20 +446,22 @@ export default {
 
   .f-log-info {
     @include flex-col();
-    flex: 1 1 calc(100% - 30px - 12px - 30px - 24px);
-    height: 86%;
+    flex: 1 1 calc(100% - 30px - 30px - 6px);
+    height: calc(100% - 30px - 30px - 6px);
 
     .f-log-subtabs {
       @include flex-row();
+      padding-bottom: math.div($pale, 2);
+      margin-bottom: math.div($pale, 2);
 
       .f-log-subtab {
         @include title-4-size();
         color: var(--el-color-info);
-        padding-right: $pale * 2;
+        padding-right: $pale * 3;
         cursor: pointer;
 
         .f-log-subtab-content {
-          padding: 0 8px 0 0;
+          padding: 0 4px 0 0;
           font-size: 14px;
           color: #6a6c75;
         }
@@ -472,8 +486,7 @@ export default {
     }
     .f-log-containers {
       height: 100%;
-      padding: 0px 12px 0px 0px;
-      margin-top: 15px;
+      padding: 0px math.div($pale, 2) 0px 0px;
       overflow: auto;
       width: 100%;
       position: relative;
@@ -481,12 +494,28 @@ export default {
       border-radius: math.div($pale, 3);
       position: relative;
     }
+
+    .f-log-error-total {
+      color: var(--el-color-error) !important;
+    }
+
+    .f-log-warning-total {
+      color: var(--el-color-warning) !important;
+    }
+
+    .f-log-info-total {
+      color: var(--el-color-info) !important;
+    }
+
+    .f-log-debug-total {
+      color: var(--el-color-primary) !important;
+    }
   }
   .f-log-expended {
     @include flex-row();
     @include flex-center();
     width: 100%;
-    padding: $pale;
+    padding: math.div($pale, 2);
 
     .f-log-clickable {
       width: 130px;
@@ -508,11 +537,9 @@ export default {
   }
 
   .f-dashboard-logger{
-    @include box-stretch();
+    width: 100%;
     padding: $pale;
   }
 }
-.f-log-expanded {
-  height: calc(100% - 28px) !important;
-}
+
 </style>

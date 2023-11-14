@@ -2,11 +2,12 @@ export default function gaugeSeries () {
   return {
     series: {
       type: 'gauge',
-      center: ['50%', '60%'],
-      startAngle: 190,
-      endAngle: -10,
+      center: ['50%', '200%'],
+      startAngle: 120,
+      endAngle: 60,
       min: 0,
       max: 100,
+      radius: '350%',
       splitNumber: 10,
       itemStyle: {
         color: '#95d475',
@@ -52,10 +53,10 @@ export default function gaugeSeries () {
       },
       detail: {
         valueAnimation: true,
-        width: '50%',
-        lineHeight: 40,
-        fontSize: 40,
-        offsetCenter: [0, '-15%'],
+        width: '40%',
+        lineHeight: 20,
+        fontSize: 20,
+        offsetCenter: [0, '-87%'],
         fontWeight: 'bold',
         formatter: `{value} %`,
         color: 'inherit'
