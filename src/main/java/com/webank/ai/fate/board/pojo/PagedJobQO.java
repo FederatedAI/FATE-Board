@@ -28,7 +28,9 @@ import java.util.Objects;
 @EqualsAndHashCode
 @ToString
 public class PagedJobQO implements Serializable {
+    @JsonProperty("job_id")
     private String jobId;
+    @JsonProperty("partyId")
     private String partyId;
     private Long pageNum = 1L;
     private Long pageSize = 10L;
