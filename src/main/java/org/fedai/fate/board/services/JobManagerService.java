@@ -181,11 +181,11 @@ public class JobManagerService {
         }
 
         if (pagedJobQO.getRole() != null && pagedJobQO.getRole().size() > 0) {
-            reqMap.put(Dict.ROLE, String.join(",",pagedJobQO.getRole()));
+            reqMap.put(Dict.ROLE, pagedJobQO.getRole());
 
         }
         if (pagedJobQO.getStatus() != null && pagedJobQO.getStatus().size() > 0) {
-            reqMap.put(Dict.STATUS, String.join(",",pagedJobQO.getStatus()));
+            reqMap.put(Dict.STATUS, pagedJobQO.getStatus());
         }
 
         if (org.apache.commons.lang3.StringUtils.isNotBlank(pagedJobQO.getOrderField())) {
