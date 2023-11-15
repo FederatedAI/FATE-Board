@@ -132,14 +132,15 @@ public class JobWebSocketService implements Runnable {
                         throw new IllegalArgumentException("summary parameter error");
                     }
 
-                    if (pushStatus) {
-                        JSONObject dependency = (JSONObject) flushToWebData.get(Dict.DEPENDENCY_DATA);
-                        dependency.remove("component_module");
-                        dependency.remove("component_need_run");
-                        dependency.remove("dependencies");
-                        Map<String, Object> summary = (Map<String, Object>) flushToWebData.get(Dict.SUMMARY_DATA);
-                        summary.remove("dataset");
-                    }
+//                    if (pushStatus) {
+//                        JSONObject dependency = (JSONObject) flushToWebData.get(Dict.DEPENDENCY_DATA);
+//                        dependency.remove("component_module");
+//                        dependency.remove("component_need_run");
+//                        dependency.remove("dependencies");
+//                        Map<String, Object> summary = (Map<String, Object>) flushToWebData.get(Dict.SUMMARY_DATA);
+//                        summary.remove("dataset");
+//                    }
+//
                     if (session.isOpen()) {
                         session.getBasicRemote().sendText(JSON.toJSONString(flushToWebData));
                         logger.warn("session:{}, data to push:{}", session, JSON.toJSONString(flushToWebData));
@@ -147,6 +148,9 @@ public class JobWebSocketService implements Runnable {
                         if (Dict.JOB_FINISHED_STATUS.contains(status)) {
                             session.close();
                             break;
+
+
+
                         }
                         Thread.sleep(500);
                     } else {
