@@ -19,9 +19,7 @@ const routes: any[] = [
     component: () => import('../views/signIn/SignIn.vue'),
     beforeEnter: async () => {
       store.commit('PUSH_CRUMB', routeGet('running'))
-      if (await store.dispatch('signInForMultPage')) {
-        store.dispatch('toRunning')
-      }
+      await store.dispatch('signInForMultPage')
     }
   },
   {

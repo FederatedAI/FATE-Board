@@ -21,7 +21,7 @@ defineProps(['data']);
   align-items: flex-start;
 }
 .f-summary-title {
-  @include title-3-size();
+  @include title-4-size();
   font-weight: bold;
   margin-bottom: $pale;
 }

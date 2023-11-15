@@ -1,3 +1,4 @@
+export * from './toColor';
 export * from './toDate';
 export * from './toEncrypt';
 export { default as file } from './toFile';

@@ -14,6 +14,8 @@ export default {
     dataset: {},
     dag: {},
     _ws_: undefined,
+
+    _blank_: true
   },
 
   mutations: {
@@ -67,7 +69,12 @@ export default {
           } catch (error) {
             state._ws_.close();
             data = null;
-            if (process.env.NODE_ENV === 'development') console.error(error);
+            ElMessage({
+              showClose: true,
+              message: `This job socket has error`,
+              center: true,
+              type: 'error'
+            });
           }
         });
         commit('SET_WS', ws);

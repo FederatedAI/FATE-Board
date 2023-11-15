@@ -5,7 +5,7 @@
         <Card
           v-if="index % 4 === n - 1"
           :key="index"
-          :job="item.jobId"
+          :jobId="item.jobId"
           :status="item.status"
           :progress="item.progress"
           :role="item.role"
@@ -74,7 +74,7 @@ const cancel = async (item, afterCancel) => {
   align-items: flex-start;
   justify-content: flex-start;
 
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   margin-top: $pale;
 
   & > section {
@@ -82,8 +82,9 @@ const cancel = async (item, afterCancel) => {
     flex-grow: 1;
     flex-shrink: 1;
 
-    max-width: calc(25% - #{$pale * 2}px);
+    width: calc(25% - $pale * 2);
     @include padding-pale(0, $pale);
+    min-width: 300px;
 
     & > :nth-child(n) {
       margin-bottom: $pale;
