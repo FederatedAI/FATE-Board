@@ -31,6 +31,8 @@ public class Dict {
     static public final String JOBID = "job_id";
     static public final String CODE = "code";
     static public final String DATA = "data";
+    static public final String OUTPUT_DATA = "output_data";
+    static public final String DATA_COUNT = "total";
     static public final String JOB = "job";
     static public final String DATASET = "dataset";
     static public final String COMPONENT_NAME = "component_name";
