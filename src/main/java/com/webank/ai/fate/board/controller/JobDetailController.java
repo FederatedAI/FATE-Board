@@ -458,8 +458,21 @@ public class JobDetailController {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
         }
-        String s = result.replaceAll("-Infinity", "\"-Infinity\"");
-        return ResponseUtil.buildResponse(s, null);
+
+        JSONObject object = JSON.parseObject(result);
+        JSONArray outputDataArray  = object.getJSONArray("output_data");
+        JSONObject outputData = (JSONObject)outputDataArray.get(0);
+
+        JSONArray jsonArray = outputData.getJSONArray("data");
+        int count = 0;
+        if (jsonArray != null) {
+            count = jsonArray.size();
+        }
+        outputData.put(Dict.DATA_COUNT,count);
+        outputDataArray.clear();
+        outputDataArray.add(outputData);
+        object.put(Dict.OUTPUT_DATA,outputDataArray);
+        return new ResponseResult(ErrorCode.SUCCESS,object);
     }
 
     @RequestMapping(value = "/tracking/component/metric_data/batch", method = RequestMethod.POST)
