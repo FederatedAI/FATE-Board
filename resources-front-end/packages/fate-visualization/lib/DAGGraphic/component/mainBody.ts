@@ -18,6 +18,7 @@ interface PropOptions {
   disable: boolean;
   stage: string;
   choose: boolean;
+  relativeChoose: boolean;
 
   input: PortInfo[];
   output: PortInfo[];
@@ -31,6 +32,8 @@ interface EventOptions {
   connect: EventCallback;
   overStage: EventCallback;
   outStage: EventCallback;
+  relative: EventCallback
+  unrelative: EventCallback
 }
 
 interface MainBodyParameter {
@@ -40,6 +43,9 @@ interface MainBodyParameter {
 }
 
 function styles(part: string, data: any): string {
+  if (part.match(/border/i) && data.relativeChoose) {
+    return (configuration.body.style as any)['Relative']
+  }
   return (configuration.body.style as any)[
     `${capitalize(data.status)}_${capitalize(part)}${
       data.choose ? '_Choose' : data.disable ? '_Disable' : ''
@@ -75,6 +81,7 @@ export default function mainBody({ prop, attr, event }: MainBodyParameter) {
         change();
       },
       click: (eve: any, tag: PlotCommon) => {
+        eve.stopPropagation()
         if (!tag.prop.choose) {
           tag.setProp('choose', true, 100, () => {
             event?.choose && event?.choose(eve, tag);
@@ -85,6 +92,20 @@ export default function mainBody({ prop, attr, event }: MainBodyParameter) {
         if (tag.prop.choose) {
           tag.setProp('choose', false, 100, () => {
             event?.unchoose && event?.unchoose(eve, tag);
+          });
+        }
+      },
+      relative: (eve: any, tag: PlotCommon) => {
+        if (!tag.prop.relativeChoose) {
+          tag.setProp('relativeChoose', true, 100, () => {
+            event?.relative && event?.relative(eve, tag);
+          });
+        }
+      },
+      unrelative: (eve: any, tag: PlotCommon) => {
+        if (tag.prop.relativeChoose) {
+          tag.setProp('relativeChoose', false, 100, () => {
+            event?.unrelative && event?.unrelative(eve, tag);
           });
         }
       },

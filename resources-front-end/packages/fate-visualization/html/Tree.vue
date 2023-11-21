@@ -1,21 +1,40 @@
 <template>
   <div class="app_container">
-    <FTree :data="demo" />
+    <FTree :data="demo" :color="basicColor[cursor % basicColor.length]"/>
   </div>
+  <button @click="change">change</button>
 </template>
 
 <script lang="ts" setup>
+import { ref } from 'vue';
 import FTree from '../lib/Tree/Tree.vue';
 
 const nodeInfo = (key: string, children?: any[]) => {
   return {
     name: key,
     value: key,
-    metah: {
+    meta: {
       test: `${key} meta`
     },
     children
   }
+}
+
+const basicColor = [
+  'rgba(64,158,255,1)',
+  'rgba(103,194,58,1)',
+  'rgba(230,162,60,1)',
+  'rgba(245,108,108,1)',
+  'rgba(144,147,153,1)',
+  'rgba(255,161,64,1)',
+  'rgba(149,58,194,1)',
+  'rgba(60,128,230,1)',
+  'rgba(108,245,245,1)',
+]
+const cursor = ref(0)
+
+function change () {
+  cursor.value++
 }
 
 const demo = {

@@ -73,6 +73,8 @@ export default function suffix({ prop, attr, event }: SuffixParameter) {
             },
             display: (d: PropOptions) =>
               !!d.status.match(/success|fail/i) ? 'normal' : 'none',
+            fill: (d: any) => d.match(/success/i) ? configuration.icon.color.Success : configuration.icon.color.Fail,
+            stroke: (d: any) => d.match(/success/i) ? configuration.icon.color.Success : configuration.icon.color.Fail
           },
           configuration.icon.size
         ),
@@ -91,6 +93,7 @@ export default function suffix({ prop, attr, event }: SuffixParameter) {
               .range([0, d.height + configuration.common.margin * 2]);
             return yAxis(1) + configuration.common.fontSize / 3;
           },
+          fill: configuration.suffix.style.color,
           fontSize: configuration.common.fontSize,
           fontFamily: configuration.common.fontFamily,
         },
@@ -138,7 +141,8 @@ export default function suffix({ prop, attr, event }: SuffixParameter) {
         },
         event: {
           click: (eve: any, tag: PlotCommon) => {
-            event.retry(eve, tag);
+            eve.stopPropagation()
+            event.retry && event.retry(eve, tag);
           },
         },
         text: 'retry',

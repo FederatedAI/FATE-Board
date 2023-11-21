@@ -70,6 +70,7 @@ export default function portSVG({ prop, attr, event }: PortParameter) {
         event?.outPort && event?.outPort(eve, tag);
       },
       click: (eve: any, plot: PlotCommon) => {
+        eve.stopPropagation()
         event?.connect && event?.connect(eve, plot);
       },
     },

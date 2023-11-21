@@ -1,5 +1,30 @@
 <template>
-<FTabs class="container" :tabs="tabs" :value="'tab1'"/>
+  <section>
+    <section class="container">
+      <FTabs :tabs="tabs" :value="'tab1'"/>
+    </section>
+    <section class="container">
+      <FTabsBySelection label="selection-index" :options="options">
+        <template #beforeHeader>
+          <article>Before Title</article>
+        </template>
+        <template #beforeTab>
+          <article>before tabs</article>
+        </template>
+        <template #afterTab>
+          <article>before tabs</article>
+        </template>
+        <template #afterHeader>
+          <article>After Title</article>
+        </template>
+        <template #default="{ value }">
+          <article>
+            value: {{ String(value) }}
+          </article>
+        </template>
+      </FTabsBySelection>
+    </section>
+  </section>
 </template>
 
 <script lang="ts" setup>
@@ -34,10 +59,21 @@ const tabs = [{
 }, {
   name: 'tab2',
   label: 'tab2',
-  component: () => import('./FTable.vue')
+  component: () => import('./Table.vue')
+}]
+
+const options = [{
+  label: 'label1',
+  value: 1
+}, {
+  label: 'label2',
+  value: 2
 }]
 </script>
 
 <style lang="scss" scoped>
-
+.container {
+  width: 800px;
+  height: 600px;
+}
 </style>
