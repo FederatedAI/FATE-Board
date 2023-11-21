@@ -1,3 +1,4 @@
+import configuration from "@/configuration";
 import { merge } from "lodash";
 import axis from "./axis";
 import dataZoom from "./dataZoom";
@@ -26,7 +27,7 @@ export default function explain (parameters: Parameters, ext?: object) {
         show: false
       }
     }
-  }, ext || {})
+  }, configuration, ext || {})
 
   return config
 }

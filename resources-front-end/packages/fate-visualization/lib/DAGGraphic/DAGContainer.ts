@@ -33,6 +33,8 @@ export default class DAG {
   protected resizeObserve: any;
   protected zoomInstance: any;
 
+  protected connection: any
+
   containerWidth: number = 0;
   containerHeight: number = 0;
 
@@ -103,28 +105,56 @@ export default class DAG {
     this.parent.call(this.zoomInstance).on('dblclick.zoom', null);
   }
 
-  zoomIn() {
+  zoomIn(times?: number) {
     const transform = zoomTransform(this.container.node());
-    const change = transform.scale(0.95);
+    const change = transform.scale(times || 0.95);
     this.containerTransition.k = change.k;
     this.containerTranform();
   }
 
-  zoomOut() {
+  zoomOut(times?: number) {
     const transform = zoomTransform(this.container.node());
-    const change = transform.scale(1.05);
+    const change = transform.scale(times || 1.05);
     this.containerTransition.k = change.k;
     this.containerTranform();
   }
 
   protected $init(data: any) {
     const { comps, links } = explainDependencies(data, this.containerWidth);
+    this.connection = links
     for (const [, comp] of comps) {
       this.addComponent(comp);
     }
     for (const link of links) {
       this.addLinking(link);
     }
+  }
+
+  protected unChoose (except?: PlotCommon) {
+    for (const [, comp] of this.component) {
+      let root = undefined
+      if (except) {
+        root = except.rootPlot();
+      }
+      if (!root || comp.id !== root.id) {
+        comp.dispatchDeep('unrelative');
+        comp.dispatchDeep('unchoose');
+      }
+    }
+    for (const [, link] of this.linking) {
+      let root = undefined
+      if (except) {
+        root = except.rootPlot();
+      }
+      if (!root || link.id !== root.id) {
+        link.dispatchDeep('unrelative');
+        link.dispatchDeep('unchoose');
+      }
+    }
+  }
+
+  chooseWhole () {
+    this.unChoose()
   }
 
   addComponent(prop: any) {
@@ -135,19 +165,37 @@ export default class DAG {
           attr: {},
           event: <any>{
             choose: (event: any, plot: PlotCommon) => {
-              for (const [, comp] of this.component) {
-                const root = plot.rootPlot();
-                if (comp.id !== root.id) {
-                  comp.dispatchDeep('unchoose');
-                }
-              }
-              for (const [, link] of this.linking) {
-                const root = plot.rootPlot();
-                if (link.id !== root.id) {
-                  link.dispatchDeep('unchoose');
-                }
-              }
+              
+              this.unChoose(plot)
               this.event.choose && this.event.choose(event, plot);
+              let connected: any
+              if (this.connection) {
+                const root = plot.rootPlot()
+                connected = this.connection.reduce((pre: any, item: any) => {
+                  if (item.fromComp === root.id || item.toComp === root.id) {
+                    pre.push(item)
+                  }
+                  return pre
+                }, [])
+              }
+              if (connected.length > 0) {
+                for (const each of connected) {
+                  const info = this.getConnection(each)
+                  if (info) {
+                    const { fromComp, toComp, fromPort, toPort} = info
+                    if (fromComp.id !== plot.id) {
+                      fromComp.dispatchDeep('relative');
+                    }
+                    if (toComp.id !== plot.id) {
+                      toComp.dispatchDeep('relative');
+                    }
+                    const link = this.linking.get(`${fromComp.id}_${toComp.id}_${fromPort.id}_${toPort.id}`)
+                    if (link) {
+                      link.dispatchDeep('relative')
+                    }
+                  }
+                }
+              }
             },
             retry: (event: any, plot: PlotCommon) => {
               this.event.retry && this.event.retry(event, plot);
@@ -216,7 +264,7 @@ export default class DAG {
     return prop;
   }
 
-  addLinking(prop: any) {
+  protected getConnection (prop: any): any {
     const fromComp = this.component.get(prop.fromComp);
     const toComp = this.component.get(prop.toComp);
     if (!fromComp || !toComp) {
@@ -257,6 +305,18 @@ export default class DAG {
       }
       return void 0;
     }
+    return {
+      fromComp,
+      toComp,
+      fromPort,
+      toPort
+    }
+  }
+
+  addLinking(prop: any) {
+    const info = this.getConnection(prop)
+    if (!info) return void 0
+    const { fromComp, toComp, fromPort, toPort} = info
     const startPosition = fromPort.position();
     const endPosition = toPort.position();
 

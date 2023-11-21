@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import store from '@/store/store';
-import { setSession } from 'fate-tools';
 
 export default {
   100: function warning(data: any, _reqConfig: any, _service: any) {
@@ -12,9 +12,13 @@ export default {
 
   10015: {
     operation: async function loginFailed(_data: any, _reqConfig: any, _service: any) {
-      setSession('hasSignIn', '')
-      store.commit('SET_RESIGNIN', true)
-      return await store.dispatch('signInForMultPage')
+      store.commit('SET_AUTH')
+      const result = await store.dispatch('signInForMultPage')
+      if (!result) {
+        store.dispatch('toSignIn')
+        return false
+      }
+      return true
     },
     time: 2
   },

@@ -29,6 +29,7 @@ interface PropOptions {
   disable: boolean;
   stage: string;
   lock: boolean;
+  relativeChoose: boolean;
   choose: boolean;
   duration?: number;
 
@@ -87,6 +88,7 @@ export default function component(
       }
     })(),
     {
+      relativeChoose: false,
       choose: false,
       status: 'unrun',
       lock: false,

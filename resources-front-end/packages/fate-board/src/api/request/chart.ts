@@ -6,7 +6,7 @@ export default {
 
   getDataOutput:  {
     url: 'v1/tracking/component/output/data',
-    method: 'get'
+    method: 'post'
   },
 
   getMetrics: {

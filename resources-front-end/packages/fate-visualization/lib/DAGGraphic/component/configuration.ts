@@ -12,7 +12,7 @@ export default {
       Radius: 4,
 
       stageWidth: 2,
-      stageCircle: 6,
+      stageCircle: 7,
 
       topPadding: 6,
       leftPadding: 6,
@@ -21,8 +21,10 @@ export default {
     },
 
     style: {
-      stagePredict: '#424242',
-      stageTrain: '#2e3e92',
+      Relative: '#409eff',
+
+      stagePredict: '#4159D1',
+      stageTrain: '#73767a',
 
       // rnutime status: unrun
       Unrun_Body: '#E8E8EF',
@@ -33,8 +35,8 @@ export default {
       Unrun_Border_Disable: '#BBBBC8',
       Unrun_Text_Disable: '#534C77',
 
-      Unrun_Body_Choose: '#4159D1',
-      Unrun_Border_Choose: '#4159D1',
+      Unrun_Body_Choose: '#409eff',
+      Unrun_Border_Choose: '#409eff',
       Unrun_Text_Choose: '#FFFFFF',
 
       // runtime status: success
@@ -46,8 +48,8 @@ export default {
       Success_Border_Disable: '#0EC7A5',
       Success_Text_Disable: '#534C77',
 
-      Success_Body_Choose: '#4159D1',
-      Success_Border_Choose: '#4159D1',
+      Success_Body_Choose: '#409eff',
+      Success_Border_Choose: '#409eff',
       Success_Text_Choose: '#FFFFFF',
 
       // runtime status: fail
@@ -59,8 +61,8 @@ export default {
       Fail_Border_Disable: '#E8E8EF',
       Fail_Text_Disable: '#534C77',
 
-      Fail_Body_Choose: '#4159D1',
-      Fail_Border_Choose: '#4159D1',
+      Fail_Body_Choose: '#409eff',
+      Fail_Border_Choose: '#409eff',
       Fail_Text_Choose: '#FFFFFF',
 
       // runtime status: Running
@@ -73,7 +75,7 @@ export default {
       Running_Text_Disable: '#534C77',
 
       Running_Body_Choose: 'rgba(36,182,139,0.6)',
-      Running_Border_Choose: '#4159D1',
+      Running_Border_Choose: '#409eff',
       Running_Text_Choose: '#6A6C75',
     },
   },
@@ -103,11 +105,16 @@ export default {
       width: 18,
       height: 18,
     },
+    color: {
+      Success: '#0EC7A5',
+      Fail: '#FF4F38'
+    }
   },
 
   suffix: {
     style: {
-      color: '#1b0f25',
+      color: '#909399',
+      clickable: '#409eff'
     },
   },
 };

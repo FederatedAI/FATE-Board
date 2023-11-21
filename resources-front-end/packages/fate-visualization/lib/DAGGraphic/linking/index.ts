@@ -1,5 +1,5 @@
-import { EventCallback, PlotCommon } from '../Plot';
 import parse from '../parse';
+import { EventCallback, PlotCommon } from '../Plot';
 import configuration from './configuration';
 
 interface PropOptions {
@@ -7,12 +7,15 @@ interface PropOptions {
   from: number[];
   end: number[];
   choose: boolean;
+  relativeChoose: boolean;
 }
 
 interface EventOptions {
   chooseLink: EventCallback;
   unchooseLink: EventCallback;
   delete: EventCallback;
+  relative: EventCallback
+  unrelative: EventCallback
 }
 
 interface LinkingParameter {
@@ -25,7 +28,7 @@ export default function linking(
   { prop, attr, event }: LinkingParameter,
   parent: PlotCommon | undefined | unknown
 ) {
-  prop = Object.assign({ choose: false }, prop);
+  prop = Object.assign({ choose: false, relativeChoose: false }, prop);
 
   const options = {
     id: prop.name,
@@ -65,6 +68,20 @@ export default function linking(
           plot.remove();
         }
       },
+      relative: (eve: any, tag: PlotCommon) => {
+        if (!tag.prop.relativeChoose) {
+          tag.setProp('relativeChoose', true, 100, () => {
+            event?.relative && event?.relative(eve, tag);
+          });
+        }
+      },
+      unrelative: (eve: any, tag: PlotCommon) => {
+        if (tag.prop.relativeChoose) {
+          tag.setProp('relativeChoose', false, 100, () => {
+            event?.unrelative && event?.unrelative(eve, tag);
+          });
+        }
+      },
     },
     children: [
       {
@@ -102,7 +119,11 @@ export default function linking(
           },
           fill: 'none',
           stroke: (d: PropOptions) =>
-            d.choose ? configuration.choose_style : configuration.style,
+            d.relativeChoose
+              ? configuration.Relative
+              : d.choose 
+                ? configuration.choose_style
+                : configuration.style,
           'stroke-width': (d: PropOptions) =>
             d.choose ? configuration.choose_lineWidth : configuration.lineWidth,
           'stroke-linecap': 'round',

@@ -9,9 +9,18 @@ import { h } from 'vue';
 import { classExplain } from '../cellExplain';
 import { columnExplain } from './explain';
 
-const props = defineProps(['data', 'header', 'rowClassName', 'cellClassName', 'index', 'currentPage', 'pageSize', 'headerPagination', 'maxHeight']);
+const props = defineProps([
+  'data',
+  'header',
+  'rowClassName',
+  'cellClassName',
+  'index',
+  'currentPage',
+  'pageSize',
+  'column',
+  'maxHeight',
+]);
 const emits = defineEmits(['sortChange']);
-
 
 function rowClassName(scope: any) {
   const extRow = props.rowClassName
@@ -38,16 +47,20 @@ function sortChange({ column, order }: any) {
 }
 
 const columns: any[] = [];
-let headers: any[] = [...(props.header || [])]
+let headers: any[] = [...(props.header || [])];
 if (props.index) {
-  headers.unshift({ type: 'index' })
+  headers.unshift({ type: 'index' });
 }
 const colExplain = (headers: any[]) => {
   const columns: any[] = [];
   for (const header of headers) {
     const col = h(
       <any>columnExplain(header),
-      Object.assign({}, header, { currentPage: props.currentPage, pageSize: props.pageSize })
+      Object.assign({}, header, {
+        currentPage: props.currentPage,
+        pageSize: props.pageSize,
+        column: props.column
+      })
     );
     columns.push(col);
   }

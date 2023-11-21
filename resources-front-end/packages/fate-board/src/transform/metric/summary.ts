@@ -1,3 +1,4 @@
+import { isObject } from 'lodash';
 import toData from '../tools/toData';
 import toGroup from '../tools/toGroup';
 import toSelect from '../tools/toSelect';
@@ -19,26 +20,40 @@ export default function Summary(
   const tableHeader: any = [];
 
   if (comp_type.match(new RegExp(KeyToHeader.join('|'), 'i'))) {
+    tableHeader.push({
+      label: 'label',
+      prop: 'label'
+    });
     for (const key in data) {
       const value = data[key];
-      tableData.push(
-        Object.assign({}, value, {
-          label: key,
-        })
-      );
-      options.push({
+      tableHeader.push({
         label: key,
-        value: key,
-      });
-    }
-    tableHeader.push(
-      Object.keys(tableData[0]).map((item: string) => {
-        return {
-          label: item,
-          prop: item,
-        };
+        prop: key
       })
-    );
+      if (isObject(value)) {
+        for (const label in value) {
+          if (options.some((item: any) => item.value === label)) {
+            options.push({
+              label,
+              value: label
+            })
+          }
+
+          const cursor = tableData.findIndex((item: any) => item.label === label)
+          if (cursor < 0) {
+            tableData.push({
+              label,
+              [key]: (value as any)[label]
+            });
+          } else {
+            tableData[cursor][key] = (value as any)[label]
+          }
+        }
+      }
+    }
+    if (!tableData[0]) {
+      tableData.push(data)
+    }
   } else {
     tableHeader.push(
       ...[
@@ -72,7 +87,7 @@ export default function Summary(
   if (options.length > 1) {
     SummaryMetricContainer.children.push(
       toSelect('SummaryMetricSelection', options, {
-        placeholder: 'Sample Filter',
+        placeholder: 'Filter',
       })
     );
   }
