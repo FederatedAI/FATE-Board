@@ -9,25 +9,30 @@
     :modal="false"
     class="f-output-dialog"
   >
-    <el-tabs v-model="active" class="f-detail-tabs">
-      <el-tab-pane label="model" name="model">
-        <section class="f-detail-item f-detail-model">
-          <component :is="componentInstance" :key="update"></component>
-        </section>
-      </el-tab-pane>
-      <el-tab-pane label="data" name="data">
-        <section class="f-detail-item f-detail-data"></section>
-      </el-tab-pane>
-      <el-tab-pane label="log" name="log">
-        <section class="f-detail-item f-detail-log"></section>
-      </el-tab-pane>
-    </el-tabs>
+      <el-tabs v-model="active" class="f-detail-tabs">
+        <el-tab-pane label="model" name="model" class="f-detail-item">
+          <component :is="componentInstance" :key="update" class="f-detail-item-content"></component>
+        </el-tab-pane>
+        <el-tab-pane
+          label="data"
+          name="data"
+          :lazy="true"
+          class="f-detail-item"
+        >
+          <DataOutput class="f-detail-item-content"></DataOutput>
+        </el-tab-pane>
+        <el-tab-pane label="log" name="log" :lazy="true" class="f-detail-item">
+          <LogOutput class="f-detail-item-content"></LogOutput>
+        </el-tab-pane>
+      </el-tabs>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, onBeforeMount, ref, watch } from 'vue';
 import { useStore } from 'vuex';
+import DataOutput from './DataOutput.vue';
+import LogOutput from './LogOutput.vue';
 
 const display = ref(false);
 const fullscreen = ref(true);
@@ -38,8 +43,8 @@ const store = useStore();
 const component = computed(() => store.state.comp.information.name);
 
 const componentInstance: any = ref(undefined);
-const update = ref(0)
-let unloaded = false
+const update = ref(0);
+let unloaded = false;
 
 const modelComponent = () => {
   componentInstance.value = undefined;
@@ -49,11 +54,11 @@ const modelComponent = () => {
       if (config && config.instance) {
         return config.instance.toVue();
       } else {
-        unloaded = true
+        unloaded = true;
         return {};
       }
-    })
-    update.value++
+    });
+    update.value++;
   }
 };
 
@@ -61,8 +66,8 @@ watch(
   () => store.state.comp.hasLoaded,
   () => {
     if (store.state.comp.hasLoaded[component.value] && unloaded) {
-      modelComponent()
-      unloaded = false
+      modelComponent();
+      unloaded = false;
     }
   },
   { deep: true }
@@ -71,7 +76,7 @@ watch(
 watch(
   () => component.value,
   () => {
-    modelComponent()
+    modelComponent();
   },
   { deep: true }
 );
@@ -115,6 +120,8 @@ defineExpose({
     }
 
     .f-detail-item {
+      width: 100%;
+      height: 100%;
       @include flex-col();
       align-items: center;
       justify-content: flex-start;
@@ -125,6 +132,15 @@ defineExpose({
       @include title-3-size();
       font-weight: 600;
     }
+  }
+  
+
+  .f-detail-item-content {
+    @keyframes fadeIn {
+      0% { opacity: 0 }
+      100% { opacity: 1 }
+    }
+    animation: 1s ease-in 0s fadeIn;
   }
 }
 </style>

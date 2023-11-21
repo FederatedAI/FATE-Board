@@ -1,12 +1,12 @@
 <template>
   <FTable
     ref="histryList"
-    :header="header"
+    :header="currentHeader"
     :data="dataForTable"
     :current="currentPage"
     :size="pageSize"
-    :total="total"
     :index="true"
+    :column="column"
     :row-class-name="rowClassName"
     @sizeChange="sizeChange"
     @currentChange="currentChange"
@@ -26,6 +26,7 @@ function rowClassName ({ row }: any) {
   }
 }
 
+const currentHeader = ref<any>(undefined)
 const header = [
   {
     type: 'link',
@@ -42,6 +43,42 @@ const header = [
     label: 'Role',
     width: 100,
     showOverflowTooltip: true,
+  },
+  {
+    prop: 'v1',
+    label: 'v1',
+  },
+  {
+    prop: 'v2',
+    label: 'v2',
+  },
+  {
+    prop: 'v3',
+    label: 'v3',
+  },
+  {
+    prop: 'v4',
+    label: 'v4',
+  },
+  {
+    prop: 'v5',
+    label: 'v5',
+  },
+  {
+    prop: 'v6',
+    label: 'v6',
+  },
+  {
+    prop: 'v7',
+    label: 'v7',
+  },
+  {
+    prop: 'v8',
+    label: 'v8',
+  },
+  {
+    prop: 'v9',
+    label: 'v9',
   },
   {
     label: 'Status',
@@ -104,8 +141,9 @@ const props = defineProps(['filter']);
 const histryList = ref();
 
 const currentPage = ref(1);
-const pageSize = ref(20);
+const pageSize = ref(2);
 const total = ref(0);
+const column = ref(true)
 
 // page size change
 const sizeChange = (size: number) => {
@@ -204,13 +242,22 @@ const dataForRequest = () => {
 
 // display data for table
 const dataForTable = computed(() => {
-  return dataRequested.slice(
-    (currentPage.value - 1) * pageSize.value,
-    currentPage.value * pageSize.value
-  );
+  if (!column.value) {
+    return dataRequested.slice(
+      (currentPage.value - 1) * pageSize.value,
+      currentPage.value * pageSize.value
+    );
+  } else {
+    return dataRequested
+  }
 });
 
-onBeforeMount(() => dataForRequest())
+onBeforeMount(() => {
+  dataForRequest()
+  setTimeout(() => {
+    currentHeader.value = header
+  }, 1000)
+})
 </script>
 
 <style lang="scss">

@@ -5,7 +5,7 @@ import axios, {
   CreateAxiosDefaults
 } from 'axios';
 import { ElMessage } from 'element-plus';
-import { isBoolean, isObject, isUndefined } from 'lodash';
+import { isBoolean, isNull, isObject, isUndefined } from 'lodash';
 import toFile from '../toFile';
 
 export interface BasicConfigForParameter extends CreateAxiosDefaults<unknown> {
@@ -98,8 +98,9 @@ export default function HTTPRequest<B extends BasicConfigForParameter>(
         const reqConfig = response.config
 
         const bodyExplain = (body: BasicResponseData) => {
-          if (body.code === 0) {
-            return Promise.resolve(body.data || !!body.data);
+          if (body.code === 0 || body.code === 200) {
+            const data = isNull(body.code) ? true : (body.data || !!body.data)
+            return Promise.resolve(data);
           } else {
             const check: any = errorCode[body.code] || errorCode['error']
             let maxTime = maxReConnect
@@ -125,10 +126,10 @@ export default function HTTPRequest<B extends BasicConfigForParameter>(
             const times = reConnectMap.get(reqConfig.url) || 0
             if (times < maxTime) {
               reConnectMap.set(reqConfig.url, times + 1)
-              if (operation(body, reqConfig, service) === false) {
-                return message()
-              }
-              return Promise.resolve((<any>service)(reqConfig))
+              return Promise.resolve(operation(body, reqConfig, service)).then((res?: boolean) => {
+                if (res === false) return message()
+                else return (<any>service)(reqConfig)
+              })
             } else {
               reConnectMap.delete(reqConfig.url)
               return message()

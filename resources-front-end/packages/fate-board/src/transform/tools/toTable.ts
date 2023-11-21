@@ -13,3 +13,13 @@ export default function toTable(header: any, data: any) {
     },
   };
 }
+
+export function toColumn (
+  label: string,
+  prop: string,
+  ext?: any
+) {
+  return Object.assign({
+    label, prop
+  }, ext || {})
+}
