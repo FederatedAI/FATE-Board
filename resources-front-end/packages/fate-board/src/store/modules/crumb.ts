@@ -1,4 +1,5 @@
 import Router from '@/router/router';
+import { isUndefined } from 'lodash';
 
 export interface RouterRecord {
   name: string,
@@ -8,7 +9,8 @@ export interface RouterRecord {
 
 export default {
   state: {
-    crumbs: []
+    crumbs: [],
+    record: undefined
   },
 
   mutations: {
@@ -18,8 +20,8 @@ export default {
       }
     },
 
-    POP_CRUMB (state: any) {
-      if (state.crumbs.length > 1) {
+    POP_CRUMB (state: any, stop?: string) {
+      if (state.crumbs.length > 1 && (!stop || state.crumbs[state.crumbs.length - 1].name !== stop)) {
         return state.crumbs.pop()
       }
     },
@@ -28,6 +30,10 @@ export default {
       if (state.crumbs.length > 1) {
         return state.crumbs.splice(1)
       }
+    },
+
+    SET_RECORD (state: any, route?: any) {
+      state.record = route
     }
   },
 
@@ -69,5 +75,20 @@ export default {
       }
       Router.push({ name: 'dashboard', path: '/dashboard', params: information })
     },
+
+    setRouteRecord({ state, commit }: any, route: any) {
+      if (isUndefined(state.record)) {
+        commit('SET_RECORD', route)
+      }
+    },
+
+    toRecord({ state, commit, dispatch }: any) {
+      if (state.record) {
+        Router.push(state.record)
+        commit('SET_RECORD')
+      } else {
+        dispatch('toRunning')
+      }
+    }
   }
 };

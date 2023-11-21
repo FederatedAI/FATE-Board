@@ -91,7 +91,7 @@ export default function Coordinated_lr(
   const LR_model_container = {
     id: 'LRModelContainer',
     tag: 'section',
-    prop: { class: 'f-lr-model-container' },
+    prop: { class: 'f-d-container' },
     children: <any[]>[],
   };
 

@@ -1,7 +1,9 @@
 <template>
   <el-row class="l-header">
     <el-col :span="18" class="l-header-title">
-      <LayoutIcon></LayoutIcon>
+      <section class="l-header-title-container">
+        <LayoutIcon></LayoutIcon>
+      </section>
     </el-col>
     <el-col :span="6" class="l-header-operation">
       <el-row>
@@ -30,5 +32,12 @@ import LayoutUserInfo from './LayoutUserInfo.vue';
   @include flex-stretch();
 
   background-color: var(--el-color-primary);
+
+  .l-header-title-container {
+    @include flex-row();
+    & > * {
+      flex: 0 0 auto;
+    }
+  }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="dag_graphic"></div>
+  <div ref="container" class="dag_graphic" @click.stop="chooseWhole"></div>
   <div v-if="operation !== false" @dbclick.stop @click.stop class="btn_operation">
     <FullScreen @click.stop="fullScreen" class="btn_icon" />
     <Minus @click.stop="zoomIn" class="btn_icon" />
@@ -16,7 +16,7 @@ import DAG from './DAGContainer';
 import runningStatus from './runningStatus';
 import { SVGLoading } from './svg';
 
-const props = defineProps(['data', 'operation']);
+const props = defineProps(['data', 'operation', 'mini']);
 const emits = defineEmits(['choose', 'retry', 'loaded']);
 const container = ref();
 let DAGInstance: any;
@@ -40,9 +40,18 @@ const DAGCreator = () => {
       },
       element
     );
+    if (props.mini) {
+      DAGInstance.zoomIn(0.5)
+    }
     if (DAGInstance) {
       emits('loaded')
     }
+  }
+}
+
+function chooseWhole () {
+  if (DAGInstance) {
+    DAGInstance.chooseWhole()
   }
 }
 

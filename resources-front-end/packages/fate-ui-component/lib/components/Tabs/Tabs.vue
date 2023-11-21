@@ -1,13 +1,13 @@
 <template>
-  <ElTabs v-model="selected" :closable="closable" @tab-change="tabChange" class="fb-tabs">
+  <ElTabs v-model="selected" :closable="closable" @tab-change="tabChange" class="f-tabs-container">
     <ElTabPane
       v-for="(tab, index) in tabs"
       :key="index"
       :label="tab.label"
       :name="tab.name"
-      class="fb-tabs-content"
+      class="f-tabs-item"
     >
-      <component :is="componentExplain(tab.component, tab.name)"></component>
+      <component :is="componentExplain(tab.component, tab.name)" class="f-tabs-content"></component>
     </ElTabPane>
   </ElTabs>
 </template>
@@ -78,4 +78,13 @@ const tabChange = (name: any) => {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@use 'sass:math';
+@import '@/styles/index.scss';
+
+.f-tabs-container {
+  .f-tabs-item {
+    min-height: 300px;
+  }
+}
+</style>

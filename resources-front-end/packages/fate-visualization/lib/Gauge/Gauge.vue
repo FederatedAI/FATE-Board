@@ -6,18 +6,20 @@
 
 <script lang="ts" setup>
 import * as echarts from 'echarts';
-import { merge } from 'lodash';
+import { merge, throttle } from 'lodash';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import options from './explain';
 
 const props = defineProps(['title', 'precentage']);
+const emits = defineEmits(['afterDraw'])
+
 const container = ref();
 let displayLabel = false
 let resize: any;
 let chart: any;
 let option: any;
 
-function draw(precentage?: any) {
+const draw = throttle((precentage?: any) => {
   chart.setOption(precentage? {
     series: {
       data: [{
@@ -25,7 +27,8 @@ function draw(precentage?: any) {
       }]
     }
   } : option);
-}
+  emits('afterDraw')
+}, 500)
 
 function display() {
   displayLabel = !displayLabel

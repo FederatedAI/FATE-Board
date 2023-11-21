@@ -1,5 +1,8 @@
+import configuration from "@/configuration"
+import { merge } from "lodash"
+
 export default function TreeSeries (data: any) {
-  return {
+  return merge({
     series: {
       type: 'tree',
       data: [data].flat(Infinity),
@@ -21,8 +24,7 @@ export default function TreeSeries (data: any) {
         align: 'center',
         fontSize: 10,
         lineHeight: 12
-      },
-      animationDurationUpdate: 700
+      }
     }
-  }
+  }, configuration)
 }

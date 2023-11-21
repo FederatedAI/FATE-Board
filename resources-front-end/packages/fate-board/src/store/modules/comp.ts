@@ -187,6 +187,20 @@ export default {
       state.parameters = {}
       state.model = {}
       state.metrics = {}
+    },
+
+    async dataOutput ({ state, dispatch}: any) {
+      const job_id = await dispatch('GET_JOBID');
+      const party_id = await dispatch('GET_PARTYID');
+      const role = await dispatch('GET_JOB_ROLE');
+      const component_name = state.information.name
+      return await API.getDataOutput({
+        job_id, party_id, role, component_name
+      })
+    },
+
+    getComponentName ({ state }: any) {
+      return  state.information.name
     }
   },
 };
