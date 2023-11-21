@@ -1,21 +1,12 @@
 <template>
   <section class="f-selection-container" :class="{
-    'f-selection-container-col': col
+    'f-selection-container-column': column
   }">
     <labe v-if="label" class="f-selection-label">{{ label }}:</labe>
     <ElSelect
-      :name="name"
-      v-model="selected"
-      :multiple="!!multiple"
-      :multiple-limit="isNumber(multiple) ? multiple : 0"
-      :disabled="disabled"
-      :placeholder="placeholder"
-      collapse-tags
-      collapse-tags-tooltip
       clearable
-      filterable
-      @change="selectChange"
-      class="fb-select"
+      v-bind="$attrs"
+      class="f-selection"
     >
       <template v-if="Array.isArray(options) || !Object.keys(options).some(key => isNaN(parseFloat(key)))">
         <ElOption
@@ -24,6 +15,7 @@
           :label="option.label"
           :value="option.value"
           :disabled="option.disabled"
+          class="f-selection-option"
         />
       </template>
 
@@ -32,6 +24,7 @@
           v-for="(group, key) in options"
           :key="key"
           :label="key.toString()"
+          class="f-selection-group"
         >
           <el-option
             v-for="(option, index) in group"
@@ -39,6 +32,7 @@
             :label="option.label"
             :value="option.value"
             :disabled="option.disabled"
+            class="f-selection-option"
           />
         </ElOptionGroup>
       </template>
@@ -48,29 +42,18 @@
 
 <script lang="ts" setup>
 import { ElOption, ElOptionGroup, ElSelect } from 'element-plus';
-import { isNumber } from 'lodash';
-import { ref } from 'vue';
 
 const props = defineProps([
-  'name',
-  'value',
-  'options',
-  'multiple',
-  'placeholder',
-  'disabled',
   'label',
-  'col'
+  'column',
+  'options'
 ]);
-const emits = defineEmits(['change']);
-
-const selected = ref(props.value);
-const selectChange = (value: any) => {
-  selected.value = value;
-  emits('change', selected);
-};
 </script>
 
 <style lang="scss" scoped>
+@use 'sass:math';
+@import '@/styles/index.scss';
+
 .f-selection-container {
   position: relative;
 
@@ -80,13 +63,17 @@ const selectChange = (value: any) => {
   justify-content: flex-start;
 
   .f-selection-label {
-    color: var(--el-color-info);
-    font-size: 14px;
-    padding-right: 12px;
+    color: var(--el-color-info-dark-2);
+    font-size: $text-size;
+    padding-right: $pale;
   }
 }
 
-.f-selection-container-col {
+.f-selection-container-column {
   flex-direction: column;
+  align-items: flex-start;
+  .f-selection-label {
+    padding-bottom: math.div($pale, 4)
+  }
 }
 </style>

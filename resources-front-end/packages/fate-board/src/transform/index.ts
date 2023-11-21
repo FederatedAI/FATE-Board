@@ -11,7 +11,8 @@ export default function explain (
   comp_type: string,
   id: string
 ) {
-  return {
+  let isNoData = false
+  const configuration =  {
     id: 'ComponentDetailContainer',
     tag: 'article',
     prop: {
@@ -27,10 +28,13 @@ export default function explain (
       if (metrics) {
         children.push(metrics)
       }
-      if (children.length === 0) [
+      if (children.length === 0) {
+        isNoData = true
         children.push('No Data')
-      ]
+      }
       return children
     })()
   }
+  configuration.prop.class += ' f-detail-component-group'
+  return configuration
 }

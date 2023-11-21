@@ -19,7 +19,10 @@ const routes: any[] = [
     component: () => import('../views/signIn/SignIn.vue'),
     beforeEnter: async () => {
       store.commit('PUSH_CRUMB', routeGet('running'))
-      await store.dispatch('signInForMultPage')
+      if (await store.dispatch('signInForMultPage')) {
+        store.dispatch('toRecord')
+        return false
+      }
     }
   },
   {
@@ -52,7 +55,11 @@ const routes: any[] = [
     beforeEnter: async (to: any) => {
       const params = to.params
 
-      store.commit('POP_CRUMB')
+      store.commit('POP_CRUMB', 'history')
+      store.commit('PUSH_CRUMB', {
+        name: 'history',
+        path: '/history',
+      })
       store.commit('PUSH_CRUMB', to)
 
       await store.dispatch('SET_BASIC', {
@@ -69,7 +76,11 @@ const routes: any[] = [
     beforeEnter: async (to: any) => {
       const params = to.params
 
-      store.commit('POP_CRUMB')
+      store.commit('POP_CRUMB', 'history')
+      store.commit('PUSH_CRUMB', {
+        name: 'history',
+        path: '/history',
+      })
       store.commit('PUSH_CRUMB', to)
 
       await store.dispatch('SET_BASIC', {

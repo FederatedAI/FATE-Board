@@ -11,6 +11,7 @@ export default {
   },
 
   styles: {
+    Relative: '#4159D1',
     stroke: '#909399',
     data: '#E6B258',
     model: '#00cbff',

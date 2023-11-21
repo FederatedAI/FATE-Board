@@ -6,6 +6,7 @@ import DataInputPlot from './dataInputPlot';
 interface PropOptions {
   name: string;
   type: string;
+  relativeChoose: boolean;
 
   x: number;
   y: number;
@@ -17,6 +18,8 @@ interface EventOptions {
   overInput: EventCallback;
   outInput: EventCallback;
   connect: EventCallback;
+  relative: EventCallback
+  unrelative: EventCallback
 }
 
 interface StartInputParameter {
@@ -56,6 +59,20 @@ export default function startInput(
       connect: (eve: any, plot: PlotCommon) => {
         event?.connect && event?.connect(eve, plot);
       },
+      relative: (eve: any, tag: PlotCommon) => {
+        if (!tag.prop.relativeChoose) {
+          tag.setProp('relativeChoose', true, 100, () => {
+            event?.relative && event?.relative(eve, tag);
+          });
+        }
+      },
+      unrelative: (eve: any, tag: PlotCommon) => {
+        if (tag.prop.relativeChoose) {
+          tag.setProp('relativeChoose', false, 100, () => {
+            event?.unrelative && event?.unrelative(eve, tag);
+          });
+        }
+      },
     },
     children: [
       {
@@ -74,7 +91,10 @@ export default function startInput(
                 ? configuration.styles.cache
                 : configuration.styles.stroke;
             },
-            stroke: configuration.styles.stroke,
+            stroke: (d: any) => 
+              d.relativeChoose
+                ? configuration.styles.Relative
+                : configuration.styles.stroke,
             'stroke-width': configuration.common.lineWidth,
           },
           configuration.size

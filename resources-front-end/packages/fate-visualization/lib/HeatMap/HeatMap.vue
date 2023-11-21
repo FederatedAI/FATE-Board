@@ -6,7 +6,8 @@
 
 <script lang="ts" setup>
 import * as echarts from 'echarts';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { merge } from 'lodash';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import dataFormat from './dataFormat';
 import options from './explain';
 
@@ -15,9 +16,9 @@ const container = ref();
 let displayLabel = false
 let resize: any;
 let chart: any;
-let option: any;
 
-function draw() {
+const draw = () => {
+  const option = optionParsing()
   chart.setOption(option);
 }
 
@@ -32,16 +33,9 @@ function display() {
   })
 }
 
-onMounted(() => {
-  resize = new ResizeObserver(() => {
-    chart.resize();
-  });
-  resize.observe(container.value);
-
-  chart = echarts.init(container.value);
-
+function optionParsing () {
   const { data, min, max }: any = dataFormat(props.x, (props.y || props.x), props.data, !props.y || props.pearson)
-  option = Object.assign(
+  return merge(
     {
       title: {
         text: props.title,
@@ -61,7 +55,23 @@ onMounted(() => {
       }
     })
   );
+}
 
+watch(
+  () => props.data,
+  () => {
+    draw();
+  },
+  { deep: true }
+)
+
+onMounted(() => {
+  resize = new ResizeObserver(() => {
+    chart.resize();
+  });
+  resize.observe(container.value);
+
+  chart = echarts.init(container.value);
   draw();
 });
 

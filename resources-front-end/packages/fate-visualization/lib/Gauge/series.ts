@@ -1,5 +1,8 @@
+import configuration from "@/configuration"
+import { merge } from "lodash"
+
 export default function gaugeSeries () {
-  return {
+  return merge({
     series: {
       type: 'gauge',
       center: ['50%', '200%'],
@@ -62,5 +65,5 @@ export default function gaugeSeries () {
         color: 'inherit'
       }
     }
-  }
+  },configuration)
 }

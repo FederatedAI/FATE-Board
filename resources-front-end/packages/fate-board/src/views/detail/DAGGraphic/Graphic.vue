@@ -38,12 +38,12 @@ const choose = (comp: any) => {
   emits('choose', comp)
 };
 
-const retry = (comp: any) => {
+const retry = async (comp: any) => {
   if (process.env.NODE_ENV === 'development') {
     console.log(comp);
   }
-  store.dispatch('retryJob')
-  emits('retry', comp)
+  const retryResponse = await store.dispatch('retryJob')
+  emits('retry', retryResponse)
 };
 </script>
 

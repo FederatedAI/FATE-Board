@@ -1,3 +1,5 @@
+import configuration from '@/configuration';
+import { merge } from 'lodash';
 import toAxis from './axis';
 import toLegend from './legend';
 
@@ -37,7 +39,7 @@ export default function options({
   color,
 }: OptionsParameter): any {
   const legendData: string[] = [];
-  const options: any = {
+  const options: any = merge({
     tooltip: {
       trigger: 'axis',
     },
@@ -78,7 +80,7 @@ export default function options({
       }
       return list.flat(Infinity);
     })(),
-  };
+  }, configuration);
 
   if (!!legendCustomer === false) {
     options.legend = toLegend(legendData);
