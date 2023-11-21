@@ -6,6 +6,13 @@
   align-items: flex-start;
   justify-content: flex-start;
 
+  .f-d-container {
+    width: 100%;
+    @include flex-col();
+    align-items: flex-start;
+    justify-items: flex-start;
+  }
+
   .f-d-group {
     width: 100%;
   }
@@ -34,4 +41,10 @@
   .f-d-table {
     width: 100%;
   }
+}
+
+.f-detail-component-group {
+  min-height: 100px;
+  @include flex-row();
+  @include flex-center();
 }

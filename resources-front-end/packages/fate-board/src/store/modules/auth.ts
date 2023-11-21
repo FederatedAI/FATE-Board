@@ -1,10 +1,9 @@
 import API from '@/api';
-import { encrypt, getLocal, getSession, setLocal, setSession } from 'fate-tools';
+import { encrypt, getLocal, setLocal } from 'fate-tools';
 
 export default {
   state: {
     username: '',
-    resignIn: false,
   },
 
   mutations: {
@@ -12,12 +11,16 @@ export default {
       state.username = username;
     },
 
-    SET_RESIGNIN: (state: any, resignIn: boolean) => {
-      state.resignIn = resignIn;
-      if (resignIn) {
+    SET_AUTH: (state: any, authOption?: any) => {
+      if (!authOption) {
+        setLocal('hasSignIn', '')
         state.username = '';
+      } else {
+        setLocal('hasSignIn', 'true')
+        setLocal('ingridient', JSON.stringify(authOption));
+        state.username = authOption.username
       }
-    },
+    }
   },
 
   actions: {
@@ -35,38 +38,36 @@ export default {
       };
       const responseData = await (API as any).signIn(paramter);
       if (responseData === true) {
-        commit('SET_RESIGNIN', false);
-        commit('SET_USERNAME', ingridient.username);
-        setLocal('ingridient', JSON.stringify(ingridient));
-        setSession('hasSignIn', 'true')
+        commit('SET_AUTH', paramter);
       } else {
-        setLocal('ingridient', '')
-        setSession('hasSignIn', '')
+        commit('SET_AUTH');
       }
       return responseData;
     },
 
     async signOut({ commit }: any) {
-      commit('SET_RESIGNIN', true);
+      commit('SET_AUTH');
       setLocal('ingridient', '')
-      setSession('hasSignIn', '')
       return await (API as any).signOut();
     },
 
-    async signInForMultPage({ state, commit, dispatch }: any) {
+    async signInForMultPage({ commit, dispatch }: any) {
       let ingridient: any = getLocal('ingridient') || '';
-      const hasSignIn = getSession('hasSignIn')
+      const hasSignIn = getLocal('hasSignIn')
+      let result = false
       if (ingridient) {
         ingridient = JSON.parse(ingridient);
-        if (state.resignIn && !hasSignIn) {
-          return await dispatch('signIn', Object.assign({ security: true }, ingridient));
+        if (!hasSignIn) {
+          result = await dispatch('signIn', Object.assign({ security: true }, ingridient));
         } else {
           commit('SET_USERNAME', ingridient.username);
-          dispatch('toRunning');
-          return true;
+          result = true;
         }
       }
-      return false;
+      if (!result) {
+        setLocal('ingridient', '')
+      }
+      return result
     },
   },
 };

@@ -26,7 +26,10 @@
           classNameExplain(contentClassName, $props)
         )
       "
-      :style="{ width: width ? `${width}px` : '' }"
+      :style="{
+        width: width ? `${width}px` : '',
+        'mix-width': mixWidth ? `${mixWidth}px` : ''
+      }"
     />
 
     <slot name="suffix"></slot>
@@ -42,6 +45,7 @@ defineProps([
   'labelWidth',
   'content',
   'width',
+  'mixWidth',
   'seperator',
   'seperatorWidth',
   'labelClassName',

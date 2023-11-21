@@ -13,14 +13,18 @@ import { useStore } from 'vuex';
 const store = useStore();
 const crumbs = computed(() => {
   const hrefs: any[] = [];
-  for (const each of store.state.crumb.crumbs) {
+  const crumbs = store.state.crumb.crumbs 
+  for (const each of crumbs) {
     hrefs.push({
       icon: each.name === 'running' ? HomeFilled : undefined,
       href: each,
       label:
         each.name === 'running'
-          ? 'Home'
+          ? ''
           : `${capitalize(each.name)} ${
+              each.name &&
+              each.name === crumbs[crumbs.length - 1].name && 
+              each.name.match(/(detail|dashboard)/i) &&
               store.state.job.jobId ? '(Job:' + store.state.job.jobId + ')' : ''
             }`,
     });

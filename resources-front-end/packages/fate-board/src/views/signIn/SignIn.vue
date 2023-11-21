@@ -43,7 +43,7 @@ const signInRequest = async (ingredient) => {
     if (!responseData) {
       hint('hintForSignInFailed');
     } else {
-      store.dispatch('toRunning')
+      store.dispatch('toRecord')
     }
   }
 };
