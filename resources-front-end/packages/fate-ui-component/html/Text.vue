@@ -9,6 +9,7 @@
     :width="400"
     class="txt-container"
   />
+  <FImply :label="'Key'" :content="'Content'"></FImply>
 </template>
 
 <script lang="ts" setup>

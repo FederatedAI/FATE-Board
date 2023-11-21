@@ -15,11 +15,12 @@
 <script lang="ts" setup>
 import * as echarts from 'echarts';
 import { merge } from 'lodash';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import explain from './explain';
 import stretch from './stretch';
 
-const props = defineProps(['title', 'data']);
+const props = defineProps(['title', 'data', 'color']);
+const emits = defineEmits(['afterDraw'])
 
 const container = ref();
 let resize: any;
@@ -28,21 +29,36 @@ let option: any;
 const containerWidth = ref(200);
 const containerHeight = ref(200);
 
-function draw(newOptions?: any) {
-  chart.setOption(newOptions || option);
+const draw = (newOptions?: any, setting?: any) => {
+  chart.setOption(newOptions || option, { merge: true }, setting);
   const { width, height } = stretch(chart);
   containerWidth.value = Number(width);
   containerHeight.value = Number(height);
+  nextTick(() => emits('afterDraw'))
 }
 
 watch(() => props.data,
   () => {
-  draw({
-    series: {
-      data: [props.data].flat(Infinity),
-    },
-  });
-});
+    draw({
+      series: {
+        data: [props.data].flat(Infinity),
+      },
+    });
+  },
+  { deep: true }
+);
+
+watch(() => props.color,
+  () => {
+    draw({
+      series: {
+        itemStyle: {
+          color: props.color,
+        }
+      },
+    });
+  }
+);
 
 onMounted(() => {
   resize = new ResizeObserver(() => {
@@ -55,6 +71,13 @@ onMounted(() => {
       title: {
         text: props.title,
       },
+    },
+    {
+      series: {
+        itemStyle: {
+          color: props.color || '#409eff'
+        }
+      }
     },
     explain(props.data)
   );

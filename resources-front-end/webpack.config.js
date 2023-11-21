@@ -13,6 +13,7 @@ module.exports = function (env, args) {
       server: false,
 
       html: './html/index.html',
+      icon: './html/FATE_logo.png',
       root: __dirname,
       level: 'lib',
     },
@@ -149,6 +150,7 @@ module.exports = function (env, args) {
     options.plugins.push(
       new HtmlWebpackPlugin({
         template: path.resolve(env.root, env.html),
+        favicon: path.resolve(env.root, env.icon)
       })
     );
   }

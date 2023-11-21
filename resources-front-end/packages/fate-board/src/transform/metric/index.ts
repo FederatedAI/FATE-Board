@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import toGroup from "../tools/toGroup"
 
 export default function metricsExplain (
@@ -17,9 +18,13 @@ export default function metricsExplain (
         }
       }
     }
-    const group = toGroup()
-    group.children = children
-    return group
+    if (children.length > 0) {
+      const group = toGroup()
+      group.children = children
+      return group
+    } else {
+      return undefined
+    }
   }
   return undefined
 }
