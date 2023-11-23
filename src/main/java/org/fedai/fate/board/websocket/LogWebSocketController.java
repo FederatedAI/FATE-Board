@@ -251,7 +251,7 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
         PARTY_WARNING("partyWarning", "task_warning"),
         PARTY_INFO("partyInfo", "task_info"),
         PARTY_DEBUG("partyDebug", "task_debug"),
-        COMPONENT_INFO("componentInfo", "componentInfo"),
+        COMPONENT_INFO("componentInfo", "task_info"),
         LOG_SIZE("logSize", null),
         ;
         private final String boardValue;
