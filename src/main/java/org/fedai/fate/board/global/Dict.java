@@ -134,7 +134,7 @@ public class Dict {
         logTypeMap.put("partyWarning", "task_warning");
         logTypeMap.put("partyInfo", "task_info");
         logTypeMap.put("partyDebug", "task_debug");
-        logTypeMap.put("componentInfo", "componentInfo");
+        logTypeMap.put("componentInfo", "task_info");
     }
 
     //the fields for job search
