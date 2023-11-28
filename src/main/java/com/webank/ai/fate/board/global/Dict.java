@@ -29,6 +29,7 @@ public class Dict {
     static public final String ID = "id";
     static public final String NAME = "name";
     static public final String JOBID = "job_id";
+    static public final String LOG_TYPE = "log_type";
     static public final String CODE = "code";
     static public final String DATA = "data";
     static public final String OUTPUT_DATA = "output_data";
@@ -37,6 +38,11 @@ public class Dict {
     static public final String DATASET = "dataset";
     static public final String COMPONENT_NAME = "component_name";
     static public final String TASK_NAME = "task_name";
+    static public final String TASK_ID = "task_id";
+    static public final String COMPONENT_PARAMETERS = "component_parameters";
+    static public final String INSTANCE_ID = "instance_id";
+    static public final String BEGIN = "begin";
+    static public final String END = "end";
     static public final String ROLE = "role";
     static public final String PARTY_ID = "party_id";
     static public final String RETMSG = "message";
@@ -58,6 +64,7 @@ public class Dict {
     static public final String STATUS = "status";
     static public final String COMPONENT_LIST = "component_list";
     static public final String COMPONENT_NEED_RUN = "component_need_run";
+    static public final String COMPONENT_DEPENDENCIES = "dependencies";
 
     static public final String SSH_CONFIG_FILE = "ssh_config_file";
     static public final String LOG_LINE_NUM = "lineNum";
@@ -121,13 +128,13 @@ public class Dict {
 //前端传来的logType和flow的logType对应表
     static public final HashMap<String, String> logTypeMap = new HashMap<>();
     static {
-        logTypeMap.put("jobSchedule", "jobSchedule");
-        logTypeMap.put("jobError", "jobScheduleError");
-        logTypeMap.put("partyError", "partyError");
-        logTypeMap.put("partyWarning", "partyWarning");
-        logTypeMap.put("partyInfo", "partyInfo");
-        logTypeMap.put("partyDebug", "partyDebug");
-        logTypeMap.put("componentInfo", "componentInfo");
+        logTypeMap.put("jobSchedule", "schedule_info");
+        logTypeMap.put("jobError", "schedule_error");
+        logTypeMap.put("partyError", "task_error");
+        logTypeMap.put("partyWarning", "task_warning");
+        logTypeMap.put("partyInfo", "task_info");
+        logTypeMap.put("partyDebug", "task_debug");
+        logTypeMap.put("componentInfo", "task_info");
     }
 
     //the fields for job search
