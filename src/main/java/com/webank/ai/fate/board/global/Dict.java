@@ -67,7 +67,7 @@ public class Dict {
     static public final String COMPONENT_DEPENDENCIES = "dependencies";
 
     static public final String SSH_CONFIG_FILE = "ssh_config_file";
-    static public final String LOG_LINE_NUM = "lineNum";
+    static public final String LOG_LINE_NUM = "line_num";
     static public final String LOG_CONTENT = "content";
     static public final String JOB_PROCESS = "process";
     static public final String JOB_DURATION = "duration";
