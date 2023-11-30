@@ -16,9 +16,10 @@ import { ElTableColumn } from 'element-plus';
 import { contentExplain } from '../cellExplain';
 import { columnExplain } from './explain';
 
-defineProps(['children'])
+const props = defineProps(['children', 'range'])
 
 const content = (scope: any) => {
-  return contentExplain(scope);
+  return contentExplain(scope, props.range);
 };
+
 </script>

@@ -1,5 +1,6 @@
-import FSelection from './Selection.vue'
-import FSelectionChart from './SelectionChart.vue'
+import './selection.scss';
+import FSelection from './Selection.vue';
+import FSelectionChart from './SelectionChart.vue';
 
 const SelectionInstall = (app: any) => {
   app.component('FSelection', FSelection)

@@ -38,6 +38,7 @@ export default function toAxis(props: PropOptions[] | PropOptions) {
               ? 45
               : 0,
         },
+        minInterval: 0.1,
         nameLocation: 'end',
         nameGap: '10',
         nameRotate:
