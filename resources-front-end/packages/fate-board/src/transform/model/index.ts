@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 export default function modelExplain (
   model: any,
   role: string,

@@ -5,7 +5,7 @@
 <script lang="ts" setup>
 import { ElTable } from 'element-plus';
 import { isFunction } from 'lodash';
-import { h } from 'vue';
+import { h, watch } from 'vue';
 import { classExplain } from '../cellExplain';
 import { columnExplain } from './explain';
 
@@ -19,6 +19,7 @@ const props = defineProps([
   'pageSize',
   'column',
   'maxHeight',
+  'range'
 ]);
 const emits = defineEmits(['sortChange']);
 
@@ -46,40 +47,55 @@ function sortChange({ column, order }: any) {
   emits('sortChange', { col: column.property, order });
 }
 
-const columns: any[] = [];
-let headers: any[] = [...(props.header || [])];
-if (props.index) {
-  headers.unshift({ type: 'index' });
-}
-const colExplain = (headers: any[]) => {
+function initing () {
   const columns: any[] = [];
-  for (const header of headers) {
-    const col = h(
-      <any>columnExplain(header),
-      Object.assign({}, header, {
-        currentPage: props.currentPage,
-        pageSize: props.pageSize,
-        column: props.column
-      })
-    );
-    columns.push(col);
+  let headers: any[] = [...(props.header || [])];
+  if (props.index && headers.length > 0) {
+    headers.unshift({ type: 'index', label: 'index', width: 80 });
   }
-  return columns;
-};
-columns.push(...colExplain(headers));
-const FBTable = h(
-  ElTable,
-  {
-    data: props.data,
-    fit: true,
-    stripe: true,
-    maxHeight: props.maxHeight,
-    highlightCurrentRow: true,
-    emptyText: 'NO DATA',
-    cellClassName,
-    rowClassName,
-    onSortChange: sortChange,
-  },
-  columns
-);
+
+  const colExplain = (headers: any[]) => {
+    const columns: any[] = [];
+    for (const header of headers) {
+      const col = h(
+        <any>columnExplain(header),
+        Object.assign({}, header, {
+          currentPage: props.currentPage,
+          pageSize: props.pageSize,
+          column: props.column,
+          range: props.range
+        })
+      );
+      columns.push(col);
+    }
+    return columns;
+  };
+
+  columns.push(...colExplain(headers));
+  return h(
+    ElTable,
+    {
+      data: props.data,
+      fit: true,
+      stripe: true,
+      maxHeight: props.maxHeight,
+      highlightCurrentRow: true,
+      emptyText: 'NO DATA',
+      cellClassName,
+      rowClassName,
+      onSortChange: sortChange,
+    },
+    columns
+  );
+}
+
+let FBTable = initing()
+
+watch(
+  () => props.range,
+  () => {
+    console.log('normal col:', props.range)
+    FBTable = initing()
+  }
+)
 </script>

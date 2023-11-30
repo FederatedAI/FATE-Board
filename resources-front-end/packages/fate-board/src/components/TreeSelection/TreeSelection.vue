@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts" setup>
-import { isFunction } from 'lodash';
+import { isFunction } from '@vue/shared';
 import { FColorGradient, FInput, FSelectionChart, FTable, FTabsBySelection } from 'fate-ui-component';
 import { FTree } from 'fate-visualization';
 import { computed, nextTick, ref, watch } from 'vue';

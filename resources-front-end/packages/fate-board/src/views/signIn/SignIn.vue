@@ -40,6 +40,7 @@ const signInRequest = async (ingredient) => {
     hint('hintForPassword');
   } else {
     const responseData = await store.dispatch('signIn', ingredient);
+    
     if (!responseData) {
       hint('hintForSignInFailed');
     } else {

@@ -13,7 +13,9 @@ export default class ASTNode<P extends object> extends Tree {
   prop: DataProp<P>;
   event: DataEvent;
 
-  constructor(configuration: ASTNodeConfiguration<P>) {
+  protected options: any
+
+  constructor(configuration: ASTNodeConfiguration<P>, options?: any) {
     super({ id: configuration.id || `ASTNode_${ASTNodeUUID++}` });
     this.tag = configuration.tag;
     this.prop = new (<any>(
@@ -22,6 +24,7 @@ export default class ASTNode<P extends object> extends Tree {
     this.event = new (<any>(
       (Configuration as any)[`${capitalize(Configuration.Basic)}Event`]
     ))(configuration.event || {}, this);
+    this.options = options
   }
 
   async init() {

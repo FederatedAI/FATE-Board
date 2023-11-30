@@ -6,6 +6,19 @@
   align-items: flex-start;
   justify-content: flex-start;
 
+  .f-d-seperator {
+    & > * {
+      margin-bottom: $pale * 3;
+      border-bottom: 1px solid var(--el-color-info-light-7);
+    }
+  }
+
+  .f-d-margin {
+    & > * {
+      margin-bottom: $pale;
+    }
+  }
+
   .f-d-container {
     width: 100%;
     @include flex-col();
@@ -17,34 +30,56 @@
     width: 100%;
   }
 
+  .f-d-group-right {
+    width: 100%;
+    @include flex-row();
+    align-items: center;
+    justify-content: flex-end;
+  }
+
   .f-d-select {
     margin-bottom: $pale;
   }
 
+  .f-d-title {
+    color: var(--el-color-info) !important;
+    font-size: 16px !important;
+  }
+
+  .f-d-content {
+    color: var(--el-color-info-light-3) !important;
+    font-size: 14px !important;
+  }
+
   .f-d-text {
     width: 100%;
-    margin-bottom: $pale;
 
     .f-d-text-label {
       min-width: 80px;
-      color: var(--el-color-info);
-      font-size: 16px;
+      @extend .f-d-title;
     }
 
     .f-d-text-content {
       padding-left: $pale;
-      color: var(--el-color-info-light-3);
-      font-size: 14px;
+      @extend .f-d-content;
     }
   }
 
   .f-d-table {
     width: 100%;
   }
+
+  .f-empty {
+    width: 100%;
+    @include flex-row();
+    @include flex-center();
+    min-height: 170px;
+  }
 }
 
 .f-detail-component-group {
   min-height: 100px;
-  @include flex-row();
-  @include flex-center();
+  @include flex-col();
+  align-items: flex-start;
+  justify-content: flex-start;
 }

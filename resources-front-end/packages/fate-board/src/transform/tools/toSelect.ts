@@ -12,7 +12,13 @@ export default function toSelect (
       options,
       name: id,
       class: 'f-d-selection',
-      value: options[0].value,
-    }, ext || {})
+      modelValue: options[0].value,
+      labelClassName: 'f-d-title'
+    }, ext || {}),
+    event: {
+      change(value: any, ast: any) {
+        ast.set('modelValue', value)
+      }
+    }
   }
 }
