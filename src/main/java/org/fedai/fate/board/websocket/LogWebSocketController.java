@@ -134,7 +134,9 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
             reqMap.put(Dict.LOG_TYPE, logTypeEnum.getFlowValue());
             reqMap.put(Dict.ROLE, role);
             reqMap.put(Dict.PARTY_ID, partyId);
-            reqMap.put(Dict.TASK_NAME, componentId);
+            if (!Dict.DEFAULT.equals(componentId)) {
+                reqMap.put(Dict.TASK_NAME, componentId);
+            }
             if (logQuery != null &&  StringUtils.isNotBlank(logQuery.getInstanceId())) {
                 reqMap.put(Dict.INSTANCE_ID,logQuery.getInstanceId());
             }
@@ -192,7 +194,9 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
         reqMap.put(Dict.LOG_TYPE, Dict.logTypeMap.get(logQuery.getType()));
         reqMap.put(Dict.ROLE, role);
         reqMap.put(Dict.PARTY_ID, Integer.valueOf(partyId));
-        reqMap.put(Dict.TASK_NAME, componentId);
+        if (!Dict.DEFAULT.equals(componentId)){
+            reqMap.put(Dict.TASK_NAME, componentId);
+        }
         reqMap.put(Dict.BEGIN, logQuery.getBegin());
         reqMap.put(Dict.END, logQuery.getEnd());
         if (logQuery != null &&  StringUtils.isNotBlank(logQuery.getInstanceId())) {
@@ -202,12 +206,13 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
         JSONObject object = JSONObject.parseObject(resultFlow);
         JSONArray jsonArray = object.getJSONArray(Dict.DATA);
 
+
         List<LogContentResponse.LogContent> contentData = new ArrayList<>();
 
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject logData = (JSONObject) jsonArray.get(i);
             String content = logData.get(Dict.LOG_CONTENT) == null ? "" : (String) logData.get(Dict.LOG_CONTENT);
-            String lineNum = logData.get(Dict.LOG_CONTENT) == null ? "" : (String) logData.get(Dict.LOG_CONTENT);
+            String lineNum = logData.get(Dict.LOG_LINE_NUM) == null ? "" : logData.get(Dict.LOG_LINE_NUM).toString();
             LogContentResponse.LogContent logContent = new LogContentResponse.LogContent();
             logContent.setContent(content);
             logContent.setLineNum(lineNum);
