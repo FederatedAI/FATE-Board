@@ -94,7 +94,7 @@ export default {
       const type = state.information.type
       if (component && !state.hasLoaded[component]) {
         const configuration: any = transform(state.model, state.metrics, role, partyId, component, type, jobId);
-        const instance = await parse(configuration)
+        const instance = await parse(configuration, undefined, <any>({ replace: true }))
         commit('SET_HASLOADED', {
           [component]: Object.freeze({
             parameters: state.parameters,

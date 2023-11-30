@@ -30,7 +30,14 @@ export default function explain (
       }
       if (children.length === 0) {
         isNoData = true
-        children.push('No Data')
+        children.push({
+          id: 'empty',
+          tag: 'section',
+          prop: {
+            class: 'f-empty'
+          },
+          children: ['NO DATA']
+        })
       }
       return children
     })()

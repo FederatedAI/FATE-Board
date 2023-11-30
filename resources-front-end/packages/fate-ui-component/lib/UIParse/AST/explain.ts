@@ -8,7 +8,7 @@ export interface ExplainableConfiguration extends ASTNodeConfiguration<object> {
   children?: ExplainableConfiguration[];
 }
 
-export default async function explain(configuration: ExplainableConfiguration) {
+export default async function explain(configuration: ExplainableConfiguration, options?: any) {
   const building = (configuration: ExplainableConfiguration) => {
     const children: object[] = [];
     if (configuration.children) {
@@ -22,7 +22,7 @@ export default async function explain(configuration: ExplainableConfiguration) {
       const Constructor: any = <ASTNode<object>>(
         (Configuration as any)[`${capitalize(Configuration.Basic)}Node`]
       );
-      current = new Constructor(configuration);
+      current = new Constructor(configuration, options);
       current.addChildren(<any>children);
     } else {
       current = configuration

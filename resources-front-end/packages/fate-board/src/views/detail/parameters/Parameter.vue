@@ -57,14 +57,39 @@ const filterNode = (value: string, data: any) => {
 }
 
 const param = reactive<any[]>([]);
+let timesheet: any
 const paramRequest = async (comp: any) => {
-  parameterLoading.value = true;
-  param.length = 0
-  await store.dispatch('chooseComp', comp)
-  param.push(...store.state.comp.parameters)
-  count.value = param.length
-  parameterLoading.value = false;
+  try {
+    parameterLoading.value = true;
+    param.length = 0
+    await store.dispatch('chooseComp', comp)
+    param.push(...store.state.comp.parameters)
+    count.value = param.length
+    parameterLoading.value = false;
+  } catch (err) {
+    if (timesheet) {
+      clearTimeout(timesheet)
+      timesheet = undefined
+    }
+    timesheet = setTimeout(() => {
+      parameterLoading.value = false
+      timesheet = undefined
+    })
+  }
 };
+watch(
+  () => store.state.comp.parameters,
+  () => {
+    param.length = 0
+    param.push(...store.state.comp.parameters)
+    count.value = param.length
+    parameterLoading.value = false;
+    if (timesheet) {
+      clearTimeout(timesheet)
+      timesheet = undefined
+    }
+  }
+)
 
 const expanding = () => {
   expanded.value = !expanded.value

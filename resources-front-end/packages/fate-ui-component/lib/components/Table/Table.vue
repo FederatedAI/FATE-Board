@@ -10,6 +10,7 @@
       :index="index"
       :column="column"
       :max-height="maxHeight"
+      :range="range"
       v-bind="$attrs"
       class="fb-table-columns"
       @sort-change="sortChange"
@@ -20,9 +21,14 @@
       v-model:page-size="pageSize"
       hide-on-single-page
       :small="true"
-      layout="total, sizes, prev, pager, next"
+      :layout="layout || 'total, sizes, prev, pager, next'"
       :total="currentTotal"
+      background
       class="fb-table-pagination"
+      :class="{
+        'fb-table-pagination-center': position && position.match(/center/i),
+        'fb-table-pagination-right': position && position.match(/right/i)
+      }"
     />
   </section>
 </template>
@@ -44,6 +50,9 @@ const props = defineProps([
   'cellClassName',
   'maxHeight',
   'column',
+  'layout',
+  'position',
+  'range' // table cell exchange according to range
 ]);
 const emits = defineEmits([
   'sizeChange',

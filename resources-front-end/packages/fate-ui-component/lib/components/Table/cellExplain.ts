@@ -1,12 +1,18 @@
 import { isFunction, isObject, isUndefined } from "lodash"
 
-export const contentExplain = ({ row, column }: any) => {
+export const contentExplain = ({ row, column }: any, parameter: unknown) => {
   let content = ''
   const configuration = row[column.property]
-  if (isObject(configuration) && !Array.isArray(configuration)) {
+  if (isObject(configuration) && !Array.isArray(configuration) && !isFunction(configuration)) {
     content = (configuration as any).value
+    if (isFunction(content)) {
+      content = content(parameter)
+    }
   } else {
     content = Array.isArray(configuration) ? configuration.join(',') : configuration
+    if (isFunction(content)) {
+      content = content(parameter)
+    }
   }
   if (isUndefined(content) || content === ' ' || content === '') {
     content = '-'

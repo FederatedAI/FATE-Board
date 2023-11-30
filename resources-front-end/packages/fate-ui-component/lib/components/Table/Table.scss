@@ -13,16 +13,21 @@
   }
 
   .fb-table-pagination {
+    width: 100%;
     padding: math.div($pale, 2);
     flex: 0 0 5%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
   }
 
-  .fb-table-row--filter {
-    background-color: var(--el-color-info);
+  .fb-table-pagination-center {
+    justify-content: center;
   }
 
-  .fb-table-cell--filter {
-    background-color: var(--el-color-info-light-3);
+  .fb-table-pagination-right {
+    justify-content: flex-end;
   }
 
   .fb-table-action {
@@ -63,5 +68,44 @@
     @include flex-col();
     @include flex-center();
     font-size: $text-size;
+  }
+}
+
+.fb-table-columns  {
+  .el-table__body{
+    tr.fb-table-row--filter {
+      td.el-table__cell {
+        background-color: var(--el-color-info-light-5) !important;
+      }
+
+      &:hover {
+        td.el-table__cell {
+          background-color: var(--el-color-info-light-9) !important;
+        }
+      }
+    }
+    tr.fb-table-row--filter.el-table__row--striped {
+      td.el-table__cell {
+        background-color: var(--el-color-info-light-5) !important;
+      }
+
+      &:hover {
+        td.el-table__cell {
+          background-color: var(--el-color-info-light-9) !important;
+        }
+      }
+    }
+
+    tr.el-table__row--striped {
+      td.fb-table-cell--filter.el-table__cell {
+        background-color: var(--el-color-info-light-3) !important;
+      }
+
+      &:hover {
+        td.fb-table-cell--filter.el-table__cell {
+          background-color: var(--el-color-info-light-9) !important;
+        }
+      }
+    }
   }
 }
