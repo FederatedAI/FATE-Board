@@ -6,10 +6,13 @@ import ASTNodeVue from './nodeVue';
 
 export default async function explainWithVue(
   configuration: ExplainableConfiguration,
-  root?: Element
+  root?: Element,
+  options?: {
+    replace?: boolean
+  }
 ) {
   Configuration.Basic = 'vue';
-  const node: ASTNodeVue<any> = <any>await explain(configuration);
+  const node: ASTNodeVue<any> = <any>await explain(configuration, options);
   if (root) {
     const vueComponent = node.toVue((tag: any) => tag);
     const app = createApp(vueComponent);

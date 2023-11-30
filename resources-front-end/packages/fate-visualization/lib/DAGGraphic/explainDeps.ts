@@ -81,34 +81,36 @@ export default function explainDependencies(data: any, containerWidth: number) {
   for (const compId in data.dependencies) {
     const deps = data.dependencies[compId];
     for (const dep of deps) {
-      if (!dep.component_name) {
-        comps.set(dep.name, Object.assign({
-          DisplayAs: 'dataInput',
-          tooltip: dep.name,
-          level: 1, 
-          width: inputConfiguration.size.width,
-          height: inputConfiguration.size.height
-        }, dep))
-      }
-      const link = {
-        fromComp: dep.component_name || dep.name,
-        from: dep.component_name ? (() => {
-          const type = dep?.up_output_info[0] || dep.type;
-          const cursor = dep?.up_output_info[1] || 0
-          return [`${[type,
-            type.match(/data/i) ? 'data' : 'model', 
-            dep.type].join('|')}`, cursor];
-        })() : dep.name,
-        toComp: compId,
-        to: `${dep.type}`,
-      };
-      setLevel(dep.component_name || dep.name, compId)
+      if (dep.component_name !== compId) {
+        if (!dep.component_name) {
+          comps.set(dep.name, Object.assign({
+            DisplayAs: 'dataInput',
+            tooltip: dep.name,
+            level: 1, 
+            width: inputConfiguration.size.width,
+            height: inputConfiguration.size.height
+          }, dep))
+        }
+        const link = {
+          fromComp: dep.component_name || dep.name,
+          from: dep.component_name ? (() => {
+            const type = dep?.up_output_info[0] || dep.type;
+            const cursor = dep?.up_output_info[1] || 0
+            return [`${[type,
+              type.match(/data/i) ? 'data' : 'model', 
+              dep.type].join('|')}`, cursor];
+          })() : dep.name,
+          toComp: compId,
+          to: `${dep.type}`,
+        };
+        setLevel(dep.component_name || dep.name, compId)
 
-      // to level calculate
-      if (!linksForLevels[dep.component_name]) linksForLevels[dep.component_name] = []
-      linksForLevels[dep.component_name].push(link)
-      
-      links.push(link);
+        // to level calculate
+        if (!linksForLevels[dep.component_name]) linksForLevels[dep.component_name] = []
+        linksForLevels[dep.component_name].push(link)
+        
+        links.push(link);
+      }
     }
   }
 

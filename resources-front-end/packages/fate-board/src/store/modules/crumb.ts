@@ -10,6 +10,7 @@ export interface RouterRecord {
 export default {
   state: {
     crumbs: [],
+
     record: undefined
   },
 

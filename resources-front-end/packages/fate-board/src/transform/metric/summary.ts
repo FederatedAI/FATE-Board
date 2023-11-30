@@ -1,4 +1,4 @@
-import { isObject } from 'lodash';
+import { isNumber, isObject } from 'lodash';
 import toData from '../tools/toData';
 import toGroup from '../tools/toGroup';
 import toSelect from '../tools/toSelect';
@@ -24,29 +24,47 @@ export default function Summary(
       label: 'label',
       prop: 'label'
     });
+    
     for (const key in data) {
-      const value = data[key];
-      tableHeader.push({
-        label: key,
-        prop: key
-      })
-      if (isObject(value)) {
-        for (const label in value) {
-          if (options.some((item: any) => item.value === label)) {
-            options.push({
-              label,
-              value: label
+      if (key.match(/total/i) || isNumber(parseFloat(key))) {
+        const row = Object.assign({
+          label: key
+        }, data[key])
+        for (const key in row) {
+          if (!tableHeader.some((header: any) => header.prop === key)) {
+            tableHeader.push({
+              label: key,
+              prop: key
             })
           }
+        }
+        tableData.push(row)
+      } else {
+        const value = data[key];
+        if (!tableHeader.some((header: any) => header.prop === key)) {
+          tableHeader.push({
+            label: key,
+            prop: key
+          })
+        }
+        if (isObject(value)) {
+          for (const label in value) {
+            if (!options.some((item: any) => item.value === label)) {
+              options.push({
+                label,
+                value: label
+              })
+            }
 
-          const cursor = tableData.findIndex((item: any) => item.label === label)
-          if (cursor < 0) {
-            tableData.push({
-              label,
-              [key]: (value as any)[label]
-            });
-          } else {
-            tableData[cursor][key] = (value as any)[label]
+            const cursor = tableData.findIndex((item: any) => item.label === label)
+            if (cursor < 0) {
+              tableData.push({
+                label,
+                [key]: (value as any)[label]
+              });
+            } else {
+              tableData[cursor][key] = (value as any)[label]
+            }
           }
         }
       }
@@ -60,7 +78,7 @@ export default function Summary(
         {
           type: 'index',
           label: 'index',
-          width: 80
+          width: 80,
         },
         {
           label: 'variable',
@@ -85,30 +103,38 @@ export default function Summary(
   const SummaryMetricContainer = toGroup();
 
   if (options.length > 1) {
-    SummaryMetricContainer.children.push(
-      toSelect('SummaryMetricSelection', options, {
-        placeholder: 'Filter',
-      })
-    );
+    SummaryMetricContainer.children.push({
+      id: 'SummaryMetricsOperation',
+      tag: 'section',
+      prop: { class: 'f-d-group-right' },
+      children: [
+        toSelect('SummaryMetricSelection', options, {
+          placeholder: 'Filter',
+          modelValue: '',
+        }),
+      ],
+    });
   }
 
   SummaryMetricContainer.children.push(
     toTable(
       tableHeader,
-      (() => {
-        return options.length > 1
-          ? {
-              request: (value: string) => {
+      options.length > 1
+        ? {
+            request: (value: string) => {
+              if (value) {
                 const cursor = tableData.findIndex(
                   (each: any) => each.label === value
                 );
                 if (cursor >= 0) return [tableData[cursor]];
                 else return [];
-              },
-              parameter: ['SummaryMetricSelection'],
-            }
-          : tableData;
-      })()
+              } else {
+                return tableData;
+              }
+            },
+            parameter: ['SummaryMetricSelection.modelValue'],
+          }
+        : tableData
     )
   );
 

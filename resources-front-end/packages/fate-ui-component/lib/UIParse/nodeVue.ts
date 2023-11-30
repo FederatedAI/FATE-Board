@@ -10,28 +10,40 @@ export default class ASTNodeVue<P extends object> extends ASTNode<P> {
   set(keyOrObj: string | object, value?: unknown) {
     super.set(keyOrObj, value);
     if (this.StateSet) {
-      merge(this.StateSet, this.prop.content);
+      if (this.options?.replace)
+        Object.assign(this.StateSet, this.prop.content)
+      else
+        merge(this.StateSet, this.prop.content);
     }
   }
 
   del(keyOrObj: string) {
     super.del(keyOrObj);
     if (this.StateSet) {
-      merge(this.StateSet, this.prop.content);
+      if (this.options?.replace)
+        Object.assign(this.StateSet, this.prop.content)
+      else
+        merge(this.StateSet, this.prop.content);
     }
   }
 
   setEvent(keyOrObj: string | object, value?: unknown): void {
     super.setEvent(keyOrObj, value);
     if (this.StateSet) {
-      merge(this.StateSet, { event: this.event.content });
+      if (this.options?.replace)
+        Object.assign(this.StateSet, { event: this.event.content })
+      else
+        merge(this.StateSet, { event: this.event.content });
     }
   }
 
   delEvent(keyword: string): void {
     super.delEvent(keyword);
     if (this.StateSet) {
-      merge(this.StateSet, { event: this.event.content });
+      if (this.options?.replace)
+        Object.assign(this.StateSet, { event: this.event.content })
+      else
+        merge(this.StateSet, { event: this.event.content });
     }
   }
 

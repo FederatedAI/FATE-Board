@@ -13,11 +13,9 @@ export default {
 
     SET_AUTH: (state: any, authOption?: any) => {
       if (!authOption) {
-        setLocal('hasSignIn', '')
         state.username = '';
       } else {
-        setLocal('hasSignIn', 'true')
-        setLocal('ingridient', JSON.stringify(authOption));
+        setLocal('ingridient', Object.values(authOption).join('AND'));
         state.username = authOption.username
       }
     }
@@ -26,19 +24,17 @@ export default {
   actions: {
     async signIn(
       { commit, dispatch }: any,
-      ingridient: { username: string; password: string; security: boolean }
+      ingridient: { username: string; password: string }
     ) {
       // 数据加密
-      const publicKey: string = await dispatch('getPublicKey')
+      const publicKey: string = await (API as any).getPublicKey();
       const paramter = {
         username: ingridient.username,
-        password: !ingridient.security
-          ? encrypt(publicKey, ingridient.password)
-          : ingridient.password,
+        password: encrypt(publicKey, ingridient.password)
       };
       const responseData = await (API as any).signIn(paramter);
       if (responseData === true) {
-        commit('SET_AUTH', paramter);
+        commit('SET_AUTH', ingridient);
       } else {
         commit('SET_AUTH');
       }
@@ -53,15 +49,13 @@ export default {
 
     async signInForMultPage({ commit, dispatch }: any) {
       let ingridient: any = getLocal('ingridient') || '';
-      const hasSignIn = getLocal('hasSignIn')
       let result = false
       if (ingridient) {
-        ingridient = JSON.parse(ingridient);
-        if (!hasSignIn) {
-          result = await dispatch('signIn', Object.assign({ security: true }, ingridient));
-        } else {
-          commit('SET_USERNAME', ingridient.username);
-          result = true;
+        const [ username, password ] = ingridient.split('AND');
+        if (username && password) {
+          result = await dispatch('signIn', {
+            username, password
+          });
         }
       }
       if (!result) {

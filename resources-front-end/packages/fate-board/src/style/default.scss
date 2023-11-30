@@ -5,7 +5,6 @@
   margin: 0;
   padding: 0;
   
-  @include text-size();
   @include text-en();
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;

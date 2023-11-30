@@ -1,3 +1,4 @@
+import './global.scss';
 import FLineOrBar from './LineOrBar.vue';
 
 const install = (app: any) => {
