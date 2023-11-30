@@ -35,7 +35,7 @@ async function initLogSocket () {
   ws.addEventListener('open', () => {
     onSizePull();
   });
-}
+};
 
 function handleLogMessage(data: any) {
   const type =
@@ -163,7 +163,7 @@ function closeSocket() {
 }
 
 watch(
-  () => logSize,
+  () => logSize.value,
   (val: any) => {
     if (val) {
       onPull(false)

@@ -2,11 +2,12 @@
   <section class="f-selection-container" :class="{
     'f-selection-container-column': column
   }">
-    <labe v-if="label" class="f-selection-label">{{ label }}:</labe>
+    <labe v-if="label" class="f-selection-label" :class="classNameExplain(labelClassName, $props)">{{ label }}:</labe>
     <ElSelect
       clearable
       v-bind="$attrs"
       class="f-selection"
+      popper-class="f-selection-popover"
     >
       <template v-if="Array.isArray(options) || !Object.keys(options).some(key => isNaN(parseFloat(key)))">
         <ElOption
@@ -41,12 +42,14 @@
 </template>
 
 <script lang="ts" setup>
+import classNameExplain from '@/utils/classNameExplain';
 import { ElOption, ElOptionGroup, ElSelect } from 'element-plus';
 
 const props = defineProps([
   'label',
   'column',
-  'options'
+  'options',
+  'labelClassName'
 ]);
 </script>
 
