@@ -212,7 +212,7 @@ public class LogWebSocketController implements InitializingBean, ApplicationCont
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject logData = (JSONObject) jsonArray.get(i);
             String content = logData.get(Dict.LOG_CONTENT) == null ? "" : (String) logData.get(Dict.LOG_CONTENT);
-            String lineNum = logData.get(Dict.LOG_LINE_NUM) == null ? "" : (String) logData.get(Dict.LOG_LINE_NUM);
+            String lineNum = logData.get(Dict.LOG_LINE_NUM) == null ? "" : logData.get(Dict.LOG_LINE_NUM).toString();
             LogContentResponse.LogContent logContent = new LogContentResponse.LogContent();
             logContent.setContent(content);
             logContent.setLineNum(lineNum);
