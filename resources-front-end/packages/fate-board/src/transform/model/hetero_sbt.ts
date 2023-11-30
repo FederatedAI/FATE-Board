@@ -1,10 +1,13 @@
+import { FFeatureImportance } from '@/components/FeatureImportance';
 import { FTreeDisplay } from '@/components/TreeSelection';
 import { isUndefined } from 'lodash';
+import fixed from '../tools/fixed';
 import getModelData from '../tools/getModelData';
 
 function TreeNodesExplain(
   nodes: any,
   hyper: any,
+  FidMapping: any,
   role: string,
   partyId: string,
   component: string,
@@ -17,6 +20,7 @@ function TreeNodesExplain(
     const instance = TreeNodeExplain(
       node,
       hyper,
+      FidMapping,
       role,
       partyId,
       component,
@@ -43,6 +47,7 @@ function TreeNodesExplain(
 function TreeNodeExplain(
   node: any,
   hyper: any,
+  FidMapping: string,
   role: string,
   partyId: string,
   component: string,
@@ -67,7 +72,7 @@ function TreeNodeExplain(
   const isMixMode = false;
   const isMultiNodes = isMixMode && role.match(/guest/i);
 
-  const FidVariable = 'FidMapping'; // F
+  const FidVariable = FidMapping;
   const TreePartyId = 'TreePartyId';
 
   // node title or id
@@ -126,7 +131,80 @@ function TreeNodeExplain(
   };
 }
 
-export default function Coordinated_lr(
+function FeatureImportanceTable (feature_importance: any) {
+  const importanceTableData: any = []
+  const importanceTableHeader = [{
+    label: 'FEATURE',
+    prop: 'label',
+    width: '120px',
+  }, {
+    type: 'progress',
+    label: '',
+    prop: 'split',
+  }]
+
+  const gainTableData: any = []
+  const gainTableHeader = [{
+    label: 'FEATURE',
+    prop: 'label',
+    width: '120px',
+  }, {
+    type: 'progress',
+    label: '',
+    prop: 'gain',
+  }]
+  let maxSplit, maxGain
+  for (const label in feature_importance) {
+    const value = feature_importance[label]
+    if (!maxSplit || value.split > maxSplit) maxSplit = value.split
+    if (!maxGain || value.gain > maxGain) maxGain = value.gain
+  }
+  for (const label in feature_importance) {
+    importanceTableData.push({
+      label,
+      split: {
+        value: fixed(feature_importance[label].split || 0),
+        percentage: fixed(((feature_importance[label].split || 0) / maxSplit) * 100)
+      }
+    })
+    gainTableData.push({
+      label,
+      gain: {
+        value: fixed(feature_importance[label].gain || 0),
+        percentage: fixed(((feature_importance[label].gain || 0) / maxGain) * 100)
+      }
+    })
+  }
+  importanceTableData.sort((a: any, b: any) => {
+    if (a.split.value > b.split.value) return -1
+    else return 0
+  })
+  gainTableData.sort((a: any, b: any) => {
+    if (a.gain.value > b.gain.value) return -1
+    else return 0
+  })
+
+  const configuration = {
+    id: 'FeatureImportanceTable',
+    tag: FFeatureImportance,
+    prop: {
+      title: 'Feature Importance',
+      data: {
+        'gain': {
+          header: gainTableHeader,
+          data: gainTableData
+        },
+        'split': { 
+          header: importanceTableHeader,
+          data: importanceTableData
+        },
+      }
+    }
+  }
+  return configuration
+}
+
+export default function Hetero_sbt(
   modelData: object,
   role: string,
   partyId: string,
@@ -136,16 +214,17 @@ export default function Coordinated_lr(
 ) {
   const modelInstance = getModelData(modelData);
 
-  const { hyper_param, trees } = modelInstance.train_model_output;
+  const { hyper_param, trees, fid_name_mapping, feature_importance } = modelInstance.train_model_output;
   const { num_class: classes } = hyper_param;
 
   const TabsOptions = <any>{};
 
+  // SBT Tree explain
   if (Array.isArray(trees)) {
     for (let i = 0; i < trees.length; i++) {
       const CurrentClass = (i % (parseInt(classes) || 1)) + 1;
 
-      const TabLabel = role.match(/guest/i)
+      const TabLabel = !!role.match(/guest/i)
         ? `model_${CurrentClass}`
         : CurrentClass;
       if (!TabsOptions[TabLabel]) {
@@ -168,6 +247,7 @@ export default function Coordinated_lr(
           TreeNodesExplain(
             nodes,
             hyper_param,
+            fid_name_mapping ? fid_name_mapping[i] : i,
             role,
             partyId,
             component,
@@ -180,16 +260,19 @@ export default function Coordinated_lr(
     }
   }
 
-  return {
+  // Feature Importance
+  const parsable = {
     id: 'SBTModelContainer',
     tag: 'section',
-    prop: { class: 'f-d-container' },
+    prop: { class: 'f-d-container f-d-seperator' },
     children: [{
       id: 'SBTTreeSelection',
       tag: FTreeDisplay,
       prop: {
         options: TabsOptions
       }
-    }]
+    }, FeatureImportanceTable(feature_importance)]
   }
+
+  return parsable
 }

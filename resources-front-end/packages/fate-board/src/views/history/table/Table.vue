@@ -7,6 +7,7 @@
     :current="parameter.pageNum"
     :size="parameter.pageSize"
     :total="total"
+    position="center"
     class="f-history-table"
     @sizeChange="sizeChange"
     @currentChange="currentChange"

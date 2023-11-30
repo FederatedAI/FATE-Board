@@ -21,12 +21,14 @@
       :width="400"
       placement="bottom-start"
       trigger="click"
+      popper-style="z-index:2100;"
+      @hide="openPopover=false"
     >
 
       <template #reference>
-        <div class="popover_trigger" @click="openPopover=true">
-          <ArrowUpBold v-show="openPopover"/>
-          <ArrowDownBold v-show="!openPopover"/>
+        <div class="popover_trigger" @click.stop="openPopover=true">
+          <ArrowUpBold v-show="openPopover" :style="iconStyle"/>
+          <ArrowDownBold v-show="!openPopover" :style="iconStyle"/>
         </div>
       </template>
 
@@ -60,14 +62,22 @@ const selected: Set<string> = reactive(new Set())
 const colorCheck = (name: string, i: number, j:number) => {
   if (selected.has(name)) {
     if (props.color) {
-      return props.color[i][j]
+      return Array.isArray(props.color[i])
+        ? props.color[i][j]
+        : props.color[i]
     }
   }
   return '#8c8c8c'
 }
 
+const iconStyle = {
+  width: '18px',
+  height: '18px',
+  'vertical-align': 'center'
+}
+
 const upper = computed(() => {
-  const gp = props.legend[0].length
+  const gp = props.legend[0]?.length || 1
   return props.legend.slice(0, props.upperMax || gp || 4)
 })
 
@@ -136,10 +146,15 @@ defineExpose({
   flex-shrink: 0;
 }
 .popover_trigger {
-  width: 15px;
-  height: 15px;
+  width: 20px;
+  height: 20px;
   padding: 5px;
   border-radius: 15px;
   border: 1px solid #8c8c8c;
+  font-size: 12px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

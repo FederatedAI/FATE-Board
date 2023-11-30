@@ -48,17 +48,28 @@ export default class Plot<
 
   dom: any;
 
-  protected updating = throttle(
-    (
-      operation: (selection: any) => unknown,
-      duration = 400,
-      end?: (event: any) => void,
-      interrupt?: (event: any) => void
-    ) => {
-      const selection = this.dom.transition().duration(duration);
-      operation(selection);
-      end && selection.on('end', end);
-      interrupt && selection.on('interrupt', interrupt);
+  protected updateOperation = <any>[]
+  protected updating = (
+    operation: (selection: any) => unknown,
+    duration = 400,
+    end?: (event: any) => void,
+    interrupt?: (event: any) => void
+  ) => {
+    this.updateOperation.push({
+      operation, duration, end, interrupt
+    })
+    this.updateThrottle()
+  }
+  protected updateThrottle = throttle(
+    () => {
+      for (const each of this.updateOperation) {
+        const { operation, duration, end, interrupt } = each
+        const selection = this.dom.transition().duration(duration);
+        operation(selection);
+        end && selection.on('end', end);
+        interrupt && selection.on('interrupt', interrupt);
+      }
+      this.updateOperation.length = 0
     },
     200
   );
