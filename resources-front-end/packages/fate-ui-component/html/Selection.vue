@@ -1,7 +1,7 @@
 <template>
   <FSelection 
     :name="'selection1'"
-    :value="['v4']"
+    :model-value="['v4']"
     :options="options"
     :multiple="2"
     :placeholder="'choose please'"

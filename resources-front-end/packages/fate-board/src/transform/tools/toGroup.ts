@@ -4,7 +4,7 @@ export default function toGroup () {
   return {
     id: `Group${groupTotal++}`,
     tag: 'section',
-    prop: { class: 'f-d-group' },
+    prop: { class: 'f-d-group f-d-margin' },
     children: <any[]>[]
   }
 }

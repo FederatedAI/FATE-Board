@@ -24,6 +24,7 @@ export default function Coordinated_lr(
     const { coef_, intercept_ } = param;
 
     const text = {
+      'model label': label,
       coverged: is_converged,
       iteration: end_epoch,
       label,
@@ -81,7 +82,7 @@ export default function Coordinated_lr(
         label: key,
         value: i,
       });
-      displayData.push(WeightTableDataExplain(estimator, key));
+      displayData.push(WeightTableDataExplain(estimator[key], key));
       i++;
     }
   } else {
@@ -91,7 +92,7 @@ export default function Coordinated_lr(
   const LR_model_container = {
     id: 'LRModelContainer',
     tag: 'section',
-    prop: { class: 'f-d-container' },
+    prop: { class: 'f-d-container f-d-margin' },
     children: <any[]>[],
   };
 
@@ -114,10 +115,10 @@ export default function Coordinated_lr(
         toText(
           hasSelection
             ? {
-                request: (value: number) => {
-                  return String(displayData[value].text[key]) + ' ';
+                request: (value: any) => {
+                  return String(displayData[parseFloat(value || '0')].text[key]) + ' ';
                 },
-                parameter: ['LROVRSelection'],
+                parameter: ['LROVRSelection.modelValue'],
               }
             : String(value),
           key
@@ -130,14 +131,14 @@ export default function Coordinated_lr(
     toTable(
       hasSelection
         ? {
-            request: (value: number) => displayData[value].table.header,
-            parameter: ['LROVRSelection'],
+            request: (value: string) => displayData[parseFloat(value || '0')].table.header,
+            parameter: ['LROVRSelection.modelValue'],
           }
         : displayData[0].table.header,
       hasSelection
         ? {
-            request: (value: number) => displayData[value].table.data,
-            parameter: ['LROVRSelection'],
+            request: (value: string) => displayData[parseFloat(value || '0')].table.data,
+            parameter: ['LROVRSelection.modelValue'],
           }
         : displayData[0].table.data
     )

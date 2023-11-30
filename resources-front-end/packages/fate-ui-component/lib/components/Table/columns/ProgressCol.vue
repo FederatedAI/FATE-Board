@@ -24,7 +24,7 @@ import { ElProgress, ElTableColumn } from 'element-plus';
 import { isObject } from 'lodash';
 import { contentExplain } from '../cellExplain';
 
-defineProps(['inside'])
+const props = defineProps(['inside', 'range'])
 
 const showPercentage = ({ row, column }: any) => {
   const content = row[column.property]
@@ -36,6 +36,6 @@ const showPercentage = ({ row, column }: any) => {
 }
 
 const showContent = (scope: any) => {
-  return contentExplain(scope)
+  return contentExplain(scope, props)
 }
 </script>

@@ -3,7 +3,7 @@
     <section class="f-detail-header">
       <FCrumbs />
     </section>
-    <section class="f-detail-main">
+    <section class="f-detail-main"> 
       <section class="f-detail-summary">
         <JobSummary :data="jobData" class="f-detail-summary-list"/>
         <section class="f-detail-summary-btn">
@@ -39,7 +39,7 @@ const store = useStore();
 const detailLoading = ref(true);
 const parameter = ref()
 const jobData = computed(() => store.state.job.details);
-const btnDisable = ref(true)
+const btnDisable = ref(true) 
 
 const componentChoose = async (comp: any) => {
   parameter.value.getParameter(comp)
@@ -47,9 +47,7 @@ const componentChoose = async (comp: any) => {
 }
 
 const componentRetry = (retryd: boolean) => {
-  if (retryd) {
-    // TODO
-  }
+  if (retryd) {}
 }
 
 const toDashboard = () => store.dispatch('toDashboard')
@@ -113,7 +111,7 @@ onMounted(() => {
     padding: $pale;
     background-color: $default-bg;
     border-radius: math.div($pale, 3);
-
+    
     .f-detail-summary-btn {
       width: 100%;
       position: sticky;

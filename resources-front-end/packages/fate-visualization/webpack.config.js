@@ -10,7 +10,8 @@ module.exports = function (env, args) {
       library: true,
       root: __dirname,
       html: '',
-      level: 'lib'
+      level: 'lib',
+      icon: ''
     },
     env
   );

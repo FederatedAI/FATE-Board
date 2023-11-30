@@ -1,524 +1,270 @@
-// import getModelData from '../tools/getModelData';
-// import { toColumn } from '../tools/toTable';
+import { FCountTable } from '@/components/CountTable';
+import { FSplitTable } from '@/components/SplitTable';
+import { isUndefined } from 'lodash';
+import fixed from '../tools/fixed';
+import getModelData from '../tools/getModelData';
+import { toColumn } from '../tools/toTable';
 
-// function subHost(hostResults, partyIds, index) {
-//   const checked = []
-//   const whichOne = {}
-//   const finalList = []
-//   for (const val of hostResults) {
-//     whichOne[val.partyId] = (whichOne[val.partyId] || 0) + 1
-//     if (whichOne[val.partyId] === index && !checked.some((item) => item === val.partyId)) {
-//       checked.push(val.partyId)
-//       finalList.push(val)
-//       if (checked.length === partyIds.length) {
-//         break
-//       }
-//     }
-//   }
-//   return finalList
-// }
+export default function hetero_feature_binning(
+  modelData: object,
+  role: string,
+  partyId: string,
+  component: string,
+  comp_type: string,
+  id: string
+) {
+  const binningModel = getModelData(modelData)
 
-// function runningTransform(responseData, role, pre) {
-//   const {
-//     multiClassResult,
-//     header,
-//     headerAnonymous
-//   } = responseData.data && responseData.data.data
-//   const { skipStatic } = responseData.data && responseData.data.meta && responseData.data.meta.meta_data
-//   const {
-//     hostResults,
-//     results,
-//     labels,
-//     binningResult,
-//     hostPartyIds
-//   } = multiClassResult || (responseData.data && responseData.data.data)
-//   const {
-//     optimalMetricMethod
-//   } = responseData.data && responseData.data.meta && responseData.data.meta.meta_data
-//   return multiClassTransform(
-//     header,
-//     headerAnonymous,
-//     hostResults,
-//     results,
-//     labels,
-//     binningResult,
-//     hostPartyIds,
-//     skipStatic,
-//     role,
-//     pre,
-//     optimalMetricMethod
-//   )
-// }
+  const { data, meta } = binningModel.output_model
+  const isGuest = role.match(/guest/i)
+  const isHost = role.match(/host/i)
 
-// function predictTransform(responseData: any, role: string, pre) {
-//   const {
-//     transformMultiClassResult,
-//     header,
-//     headerAnonymous
-//   } = responseData.data && responseData.data.data
-//   const { skipStatic } = responseData.data && responseData.data.meta && responseData.data.meta.meta_data
-//   const {
-//     results,
-//     labels,
-//     hostPartyIds
-//   } = transformMultiClassResult || (responseData.data && responseData.data.data)
-//   let {
-//     hostResults,
-//     binningResult
-//   } = transformMultiClassResult || {}
-//   const {
-//     optimalMetricMethod
-//   } = responseData.data && responseData.data.meta && responseData.data.meta.meta_data
-//   if (!hostResults) hostResults = responseData.data ? responseData.data.data.transformHostResults : null
-//   if (!binningResult) binningResult = responseData.data ? responseData.data.data.transformBinningResult : null
-//   if (hostResults && binningResult) {
-//     return multiClassTransform(
-//       header,
-//       headerAnonymous,
-//       hostResults,
-//       results,
-//       labels,
-//       binningResult,
-//       hostPartyIds,
-//       skipStatic,
-//       role,
-//       pre,
-//       optimalMetricMethod
-//     )
-//   }
-// }
+  // binning count table
+  const BinningCountTable = (
+    data: any
+  ) => {
+    const CountTableHeader = [
+      toColumn('Variable', 'variable'),
+      toColumn('Binning Count', 'binning_count'),
+    ]
+    if (isHost) {
+      CountTableHeader.splice(1, 0, toColumn('Anonym In Guest', 'anonym'))
+    }
+    if (isGuest) {
+      CountTableHeader.push(...[
+        toColumn('IV', 'iv', { sortable: true }),
+        toColumn('Monotocity', 'monotocity', { sortable: true })
+      ])
+    }
+    const { metrics_summary, host_metrics_summary, bin_col, bin_count_dict } = data
+    const { column_anonymous_map } = meta
+    const configuration: any = {}
 
-// function multiClassTransform(
-//   header,
-//   headerAnonymous,
-//   hostResults,
-//   results,
-//   labels,
-//   binningResult,
-//   hostPartyIds,
-//   skipStatic,
-//   crole,
-//   preOfFile,
-//   optimalMetric
-// ) {
-//   const result = []
-//   const selections = []
-//   let hostIndex = 1
-//   if (labels && labels.length !== 0) {
-//     for (let i = 0, l = labels.length; i < l; i++) {
-//       if (hostResults[i] || results[i]) {
-//         const hostList = subHost(hostResults, hostPartyIds, hostIndex)
-//         result.push(binningHandler(results[i], hostList, header, headerAnonymous, skipStatic, optimalMetric, crole, preOfFile))
-//         selections.push({
-//           value: labels[i],
-//           label: labels[i]
-//         })
-//         hostIndex++
-//       }
-//     }
-//   } else {
-//     result.push(binningHandler((results && results[0]) || binningResult, hostResults, header, headerAnonymous, skipStatic, optimalMetric, crole, preOfFile))
-//   }
+    // xxx_metrics_summary explain
+    const createOneOptions = (summary: any, cols?: string[]) => {
+      let tData: any = {}
+      const options = []
+      const explainOption = (summary: any) => {
+        const data: any = []
+        const { iv, is_monotonic, event_count } = summary
+        for (const key in iv) {
+          data.push({
+            variable: key,
+            binning_count: Object.keys(event_count[key]).length,
+            iv: fixed(iv[key]),
+            monotocity: is_monotonic[key]
+          })
+        }
+        return data
+      }
+      if (cols) {
+        for (const name of cols) {
+          options.push({
+            label: name,
+            value: name
+          })
+          if (!tData[name]) tData[name] = []
+          const usableData = summary[name]
+          tData[name].push(...explainOption(usableData))
+        }
+      } else {
+        tData = explainOption(summary)
+      }
+      const result: any = {
+        data: tData
+      }
+      if (options.length > 0) {
+        result.options = options
+      }
+      return result
+    }
 
-//   const options = []
-//   if (result.length === 1) {
-//     return {
-//       type: 'group',
-//       props: {
-//         options: result[0]
-//       }
-//     }
-//   } else {
-//     result.map((val, index) => {
-//       const label = selections[index].value
-//       options.push(createAsyncOption(
-//         label,
-//         val,
-//         null,
-//         (rest) => rest,
-//         '',
-//         false
-//       ))
-//     })
-//   }
-//   sortByName(selections, 'label')
-//   const group = [{
-//     type: 'form',
-//     props: {
-//       form: [createFormComponent(
-//         'f-select',
-//         'tagSelection',
-//         {
-//           options: selections,
-//           multiple: false,
-//           label: 'label index'
-//         },
-//         {
-//           connect: ['labeltext']
-//         }
-//       ), createFormComponent(
-//         'text',
-//         'labeltext',
-//         {
-//           content: 'target label: {t}',
-//           data: {
-//             '{t}': (dataParam) => dataParam
-//           },
-//           className: 'small-form-text',
-//           inner: true
-//         }
-//       )],
-//       inrow: 'left'
-//     }
-//   }, createAsyncComponent(options, true, {
-//     deepReport: true
-//   })]
-//   return {
-//     type: 'group',
-//     props: {
-//       options: group
-//     }
-//   }
-// }
+    // host explain
+    const createOneOptionsForHost = (anony:any, binCount: any, cols: string[]) => {
+      const tData = cols.map((variable: string) => {
+        return {
+          variable,
+          iv: 0,
+          binning_count: binCount[variable],
+          anonym: anony?.[variable]
+        }
+      })
+      return {
+        data: tData
+      }
+    }
 
-// function binningHandler(binningResult, hostData, header, headerAnonymous, skipStatic, optimalMetric, crole, preOfFile) {
-//   let data = binningResult
-//   let guestPartyId = 0
-//   let role = ''
-//   const hostPartyId = []
-//   const hostMiddle = []
-//   let table
-//   if (Array.isArray(data)) {
-//     const first = head(data)
-//     guestPartyId = first.partyId
-//     role = first.role
-//     data = first.binningResult || {}
-//   } else {
-//     guestPartyId = data.partyId
-//     role = data.role
-//     data = data.binningResult
-//   }
+    // guest
+    configuration['guest'] = isGuest ? createOneOptions(metrics_summary) : createOneOptionsForHost(column_anonymous_map, bin_count_dict, bin_col)
 
-//   if (!isEmpty(data) || !isEmpty(hostData)) {
-//     const middleData = handleBinningData(data, header, 'guest', guestPartyId, role, role, skipStatic, headerAnonymous)
-//     const sd = []
-//     const op = []
-//     each(header, val => {
-//       each(middleData.sourceData, sdval => {
-//         if (val === sdval.variable) {
-//           sd.push(sdval)
-//           return false
-//         }
-//       })
-//       each(middleData.options, opval => {
-//         if (val === opval.value) {
-//           op.push(opval)
-//           return false
-//         }
-//       })
-//     })
+    // host
+    if (isGuest) {
+      configuration['host'] = createOneOptions(host_metrics_summary, Object.keys(host_metrics_summary))
+    }
 
-//     middleData.sourceData = sd
-//     middleData.options = op
-//     table = middleData
-//     each(hostData, (val, key) => {
-//       hostMiddle.push(handleBinningData(val.binningResult, header, 'host', val.partyId, val.role, role, skipStatic))
-//       hostPartyId.push(val.partyId || key)
-//     })
-//   } else {
-//     return []
-//   }
+    return {
+      id: 'BinningCountTable',
+      tag: FCountTable,
+      prop: {
+        header: CountTableHeader,
+        data: configuration,
+        class: 'f-d-container'
+      }
+    }
+  }
 
-//   let tableData1
-//   const tableData2 = {}
-//   const form1 = [createFormComponent('search')]
-//   let form2
+  const SplitTable = (
+    data: any
+  ) => {
+    const SplitMaskTableHeader = [
+      toColumn('Binning', 'binning'),
+    ]
+    if (isHost) {
+      SplitMaskTableHeader.splice(1, 0, toColumn('Anonym In Guest', 'anonym'))
+    }
+    if (isGuest) {
+      SplitMaskTableHeader.push(...[
+        toColumn('IV', 'iv'),
+        toColumn('WOE', 'woe'),
+        toColumn('Event Count', 'event_count'),
+        toColumn('Event Ratio', 'event_ratio'),
+        toColumn('Non Event Count', 'non_event_count'),
+        toColumn('Non Event Ratio', 'non_event_ratio')
+      ])
+    }
+    const { metrics_summary, host_metrics_summary, bin_col, split_pt_dict } = data
+    const configuration: any = {}
 
-//   const stackBarSetting = Object.assign({}, table.eventOptions)
-//   const woeDataSetting = Object.assign({}, table.woeOptions)
-//   const stackBarData = Object.assign({}, table.stackBarData)
-//   const woeData = Object.assign({}, table.woeData)
+    const createOneOptions = (summary: string, split: any, cols: any) => {
+      let tData: any = {}
+      const options = []
+      let subOptions: any
+      const explainOption = (summary: any, pre: any) => {
+        const data: any = {}
+        const { iv_array, event_count, event_rate, non_event_count, non_event_rate, woe } = summary
 
-//   each(table.options, op => {
-//     each(table.variableData, (data, key) => {
-//       if (key === op.value) {
-//         tableData2[op.value] = data
-//         return false
-//       }
-//     })
-//   })
+        // sub Options
+        if (!subOptions) subOptions = {}
+        subOptions[pre] = Object.keys(event_count).map((item: string) => {
+          return {
+            label: item,
+            value: item
+          }
+        })
 
-//   if (role === 'guest') {
-//     if (hostPartyId.length > 0) {
-//       form1.push(
-//         createFormComponent(
-//           'f-select',
-//           'tableSelection',
-//           {
-//             options: [
-//               createOption('guest'),
-//               createOption('host', hostPartyId.map(val => ({ label: val, value: val })))
-//             ],
-//             multiple: true
-//           }
-//         )
-//       )
+        for (const each of subOptions[pre]) {
+          data[each.value] = []
+          for (const key in event_count[each.value]) {
+            data[each.value].push({
+              binning: (() => {
+                if (split && split[each.value]) {
+                  const cursor = parseInt(key)
+                  if (isUndefined(event_count[each.value][cursor + 1])) {
+                    return `${each.value} > ${fixed(split[each.value][cursor + 1])}`
+                  } else if (cursor === 0) {
+                    return `${each.value} <= ${fixed(split[each.value][cursor + 1])}`
+                  } else {
+                    return `${fixed(split[each.value][cursor])} < ${each.value} <= ${fixed(split[each.value][cursor + 1])}`
+                  }
+                } else {
+                  return `bin_${key}`
+                }
+              })(),
+              anonym: `bin_${key}`,
+              iv: fixed(iv_array[each.value][key]),
+              woe: fixed(woe[each.value][key]),
+              event_count: fixed(event_count[each.value][key]),
+              event_ratio: fixed(event_rate[each.value][key] * 100) + '%',
+              non_event_count: fixed(non_event_count[each.value][key]),
+              non_event_ratio: fixed(non_event_rate[each.value][key] * 100) + '%'
+            })
+          }
+        }
+        return data
+      }
+      if (Array.isArray(cols)) {
+        for (const name of cols) {
+          options.push({
+            label: name,
+            value: name
+          })
+          const usableData = summary[name]
+          Object.assign(tData, explainOption(usableData, name))
+        }
+      } else {
+        tData = explainOption(summary, cols)
+      }
+      const result: any = {
+        subOptions,
+        data: tData
+      }
+      if (options.length > 0) {
+        result.options = options
+      }
+      return result
+    }
+    const createOneOptionsForHost = (split: any, cols: any) => {
+      let tData: any = {}
+      let subOptions: any = []
+      cols.map((variable: string) => {
+        subOptions.push({
+          label: variable,
+          value: variable
+        })
+        const list: any[] = []
+        for (const key in split[variable]) {
+          const cursor = parseInt(key)
+          list.push({
+            binning: (() => {
+              if (isUndefined(split[variable][cursor + 1])) {
+                return `${variable} > ${fixed(split[variable][cursor - 1])}`
+              } else if (cursor === 1) {
+                return `${variable} <= ${fixed(split[variable][cursor])}`
+              } else {
+                return `${fixed(split[variable][cursor - 1])} < ${variable} <= ${fixed(split[variable][cursor])}`
+              }
+            })(),
+            anonym: `bin_${cursor - 1}`
+          })
+        }
+        tData[variable] = list
+      })
+      return {
+        subOptions,
+        data: tData
+      }
+    }
 
-//       tableData1 = {
-//         guest: table.sourceData
-//       }
-//     } else {
-//       tableData1 = table.sourceData
-//     }
-//     const options4form2 = {
-//       guest: table.options
-//     }
-//     each(hostPartyId, (id, i) => {
-//       const hm = hostMiddle[i]
-//       tableData1[id] = hm.sourceData
-//       options4form2[id] = hm.options
-//       const variableData = hm.variableData
-//       each(hm.options, op => {
-//         each(variableData, (val, key) => {
-//           if (op.value === key) {
-//             tableData2[(op.value = op.label)] = val
-//             stackBarSetting[op.value] = hm.eventOptions[key]
-//             woeDataSetting[op.value] = hm.woeOptions[key]
-//             stackBarData[op.value] = hm.stackBarData[key]
-//             woeData[op.value] = hm.woeData[key]
-//             return false
-//           }
-//         })
-//       })
-//     })
+    if (isGuest) {
+      configuration['guest'] = createOneOptions(metrics_summary, split_pt_dict, 'guest')
+      configuration['host'] = createOneOptions(host_metrics_summary, undefined, Object.keys(host_metrics_summary))
+    }
 
-//     let options = ''
-//     if (hostPartyId.length > 0) {
-//       options = [
-//         createOption('guest', options4form2.guest),
-//         createOption('host', hostPartyId.map(val => ({ label: val, value: options4form2[val] })))
-//       ]
-//     } else {
-//       options = options4form2.guest
-//     }
-//     form2 = [
-//       // createFormComponent('f-select', 'f-select', { options: options4form2 }),
-//       createFormComponent(
-//         'f-select',
-//         'f-select',
-//         {
-//           options: options,
-//           supportFilter: true
-//         }
-//       )
-//     ]
-//   } else {
-//     form2 = [createFormComponent('f-select', 'f-select', {
-//       options: table.options,
-//       supportFilter: true
-//     })]
+    if (isHost) {
+      configuration['host'] = createOneOptionsForHost(split_pt_dict, bin_col)
+    }
 
-//     tableData1 = table.sourceData
-//   }
+    return {
+      id: 'SplitTable',
+      tag: FSplitTable,
+      prop: {
+        header: SplitMaskTableHeader,
+        data: configuration,
+        class: 'f-d-container',
+        chart: isGuest
+      }
+    }
+  }
 
-//   if (crole === 'guest') {
-//     form2.push(createFormComponent('tslider', 'tslider', {
-//       label: 'woe range',
-//       range: true,
-//       step: 0.001,
-//       outSide: function(value) {
-//         const items = value.data
-//         let max, min
-//         each(items, item => {
-//           const data = parseFloat(item['woe'])
-//           if (!min) min = data
-//           if (!max) max = data
-//           if (data < min) {
-//             min = data
-//           }
-//           if (data > max) {
-//             max = data
-//           }
-//         })
-//         this.dataMax = parseFloat(max)
-//         this.dataMin = parseFloat(min)
-//       },
-//       formatRange: function(value) {
-//         const res = { columnName: 'woe' }
-//         res.min = value[0]
-//         res.max = value[1]
-//         return res
-//       }
-//     }))
-//   }
-//   const group2 = [
-//     {
-//       type: 'form',
-//       props: {
-//         form: form2,
-//         toProperty: 'select',
-//         inrow: true
-//       }
-//     },
-//     {
-//       type: 'table',
-//       props: {
-//         header: header2,
-//         data: tableData2,
-//         zeroFormat: '0',
-//         export: (preOfFile ? preOfFile + '_' : '') + 'feature_binning_detail',
-//         toExp: false
-//       }
-//     }
-//   ]
-
-//   if (role === 'guest') {
-//     // let needShowPic = true
-//     // for (const key in stackBarData) {
-//     //   const val = stackBarData[key]
-//     //   if (Object.keys(val) <= 0) {
-//     //     needShowPic = false
-//     //   }
-//     // }
-//     // if (needShowPic) {
-//     group2.push({
-//       type: 'chart',
-//       name: 'stackBar',
-//       props: {
-//         setting: stackBarSetting,
-//         options: stackBarData,
-//         export: (preOfFile ? preOfFile + '_' : '') + 'instance_distribution',
-//         detail: false,
-//         noDataMissing: true
-//       }
-//     })
-//     // }
-//     // let needShowWoePic = true
-//     // for (const key in woeData) {
-//     //   const val = woeData[key]
-//     //   if (Object.keys(val) <= 0) {
-//     //     needShowWoePic = false
-//     //   }
-//     // }
-//     // if (needShowWoePic) {
-//     group2.push({
-//       type: 'chart',
-//       name: 'woe',
-//       props: {
-//         setting: woeDataSetting,
-//         options: woeData,
-//         export: (preOfFile ? preOfFile + '_' : '') + 'woe',
-//         detail: false,
-//         noDataMissing: true
-//       }
-//     })
-//     // }
-//   }
-
-//   const group = [
-//     [
-//       {
-//         type: 'form',
-//         props: {
-//           form: form1,
-//           toProperty: 'tableSelection'
-//         }
-//       },
-//       {
-//         type: 'table',
-//         props: {
-//           header: header1,
-//           data: tableData1,
-//           zeroFormat: '0',
-//           export: (preOfFile ? preOfFile + '_' : '') + 'feature_summary',
-//           toExp: false
-//         }
-//       }
-//     ],
-//     group2
-//   ]
-
-//   return group.map(g => {
-//     return {
-//       type: 'group',
-//       props: {
-//         options: g
-//       }
-//     }
-//   })
-// }
-
-
-
-// export default function hetero_feature_binning(
-//   modelData: object,
-//   role: string,
-//   partyId: string,
-//   component: string,
-//   comp_type: string,
-//   id: string
-// ) {
-//   const binningModel = getModelData(modelData)
-
-//   const { data, meta } = binningModel.data
-//   const isGuest = role.match(/guest/i)
-//   const isHost = role.match(/host/i)
-
-//   // binning count table
-//   const BinningCountTable = (
-//     data: any
-//   ) => {
-//     const CountTableHeader = [
-//       toColumn('Variable', 'variable'),
-//       toColumn('Binning Count', 'binning_coung'),
-//       toColumn('IV', 'iv', { sortable: true }),
-//       toColumn('Monotocity', 'monotocity', { sortable: true })]
-//     if (isHost) {
-//       CountTableHeader.splice(1, 0, toColumn('Anonym In Guest', 'anonym'))
-//     }
-//     const {  }
-//   }
-
-//   const SplitTable = (
-//     data: any
-//   ) => {
-//     const SplitMaskTableHeader = [
-//       toColumn('Binning', 'binning'),
-//       toColumn('IV', 'iv'),
-//       toColumn('WOE', 'woe'),
-//       toColumn('Event Count', 'event_count'),
-//       toColumn('Event Ratio', 'event_ratio'),
-//       toColumn('Non Event Count', 'non_event_count'),
-//       toColumn('Non Event Ratio', 'non_event_ratio')
-//     ]
-//     if (isHost) {
-//       SplitMaskTableHeader.splice(1, 0, toColumn('Anonym In Guest', 'anonym'))
-//     }
-//   }
-
-//   const runningTab = runningTransform(responseData, crole, predictTab ? 'train' : '')
-//   if (predictTab) {
-//     const tabs = {
-//       type: 'tabs',
-//       name: '',
-//       props: {
-//         options: [{
-//           label: 'Predict',
-//           value: 'Predict'
-//         }, {
-//           label: 'Training',
-//           value: 'Training'
-//         }],
-//         content: {
-//           Predict: [predictTab],
-//           Training: [runningTab]
-//         },
-//         needRefresh: true,
-//         sameSelection: false
-//       }
-//     }
-//     return [wrapGroupComponent([tabs])]
-//   } else {
-//     return [wrapGroupComponent(runningTab.props.options)]
-//   }
-// }
+  return {
+    id: 'hetero_feature_binning',
+    tag: 'section',
+    prop: {
+      class: 'f-d-container f-d-seperator'
+    },
+    children: [
+      BinningCountTable(data),
+      SplitTable(data)
+    ]
+  }
+}

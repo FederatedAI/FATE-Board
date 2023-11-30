@@ -18,14 +18,11 @@ export default function randomColor(count: number, gp = 1) {
     }
     return colorGp;
   };
-  let colors = [];
+  const colors = [];
   while (count > 0) {
     const cp = one();
     colors.push(cp);
     count -= cp.length;
-  }
-  if (gp === 1) {
-    colors = colors.flat(Infinity);
   }
   return colors;
 }
