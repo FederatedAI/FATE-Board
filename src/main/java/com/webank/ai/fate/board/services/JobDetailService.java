@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.webank.ai.fate.board.services;
+package org.fedai.fate.board.services;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.webank.ai.fate.board.global.Dict;
-import com.webank.ai.fate.board.pojo.BatchMetricDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.fedai.fate.board.global.Dict;
+import org.fedai.fate.board.pojo.BatchMetricDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
+import org.yaml.snakeyaml.Yaml;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.*;
 
 
 @Service
@@ -43,6 +46,25 @@ public class JobDetailService {
 
     @Value("${fateflow.url}")
     String fateUrl;
+
+    public String getComponentStaticInfo(String componentName) throws Exception {
+        String projectDir = System.getProperty("user.dir");
+        String jsonData = "";
+        String yamlFilePath = projectDir + File.separator + "dag" + File.separator +componentName + ".yaml";
+        File file = new File(yamlFilePath);
+        if (!file.exists()) {
+            logger.error("no this file find: {} ", yamlFilePath);
+            return jsonData;
+        }
+
+        Yaml yaml = new Yaml();
+        ObjectMapper objectMapper = new ObjectMapper();
+        InputStream inputStream = new FileInputStream(yamlFilePath);
+        Map<String, Object> yamlData = yaml.load(inputStream);
+        jsonData = objectMapper.writeValueAsString(yamlData);
+
+        return jsonData;
+    }
 
     public JSONObject getBatchMetricInfo(BatchMetricDTO batchMetricDTO) {
 
@@ -58,27 +80,26 @@ public class JobDetailService {
             String metricNameSpace = entry.getKey();
             String[] metricNames = entry.getValue();
             HashMap<String, JSONObject> stringMapHashMap = new HashMap<>();
-            dataObject.put(metricNameSpace,stringMapHashMap);
+            dataObject.put(metricNameSpace, stringMapHashMap);
             for (String metric : metricNames) {
-                JSONObject metricObject = new JSONObject();
-                metricObject.put(Dict.JOBID, jobId);
-                metricObject.put(Dict.ROLE, role);
-                metricObject.put(Dict.PARTY_ID, new Integer(partyId));
-                metricObject.put(Dict.COMPONENT_NAME, componentName);
-                metricObject.put(Dict.METRIC_NAMESPACE, metricNameSpace);
-                metricObject.put(Dict.METRIC_NAME, metric);
+                Map<String, Object> reqMap = new HashMap<>();
+                reqMap.put(Dict.JOBID, jobId);
+                reqMap.put(Dict.ROLE, role);
+                reqMap.put(Dict.PARTY_ID, new Integer(partyId));
+                reqMap.put(Dict.COMPONENT_NAME, componentName);
+                reqMap.put(Dict.METRIC_NAMESPACE, metricNameSpace);
+                reqMap.put(Dict.METRIC_NAME, metric);
                 ListenableFuture<String> responseResultListenableFuture = asyncServiceExecutor.submitListenable(
-                        () -> flowFeign.post(Dict.URL_COPONENT_METRIC_DATA, metricObject.toJSONString())
+                        () -> flowFeign.get(Dict.URL_COPONENT_METRIC_DATA, reqMap)
                 );
-
 
                 try {
                     String result = responseResultListenableFuture.get();
                     if (result != null && result.trim().length() != 0) {
                         JSONObject resultObject = JSON.parseObject(result);
-                        Integer retCode = resultObject.getInteger(Dict.RETCODE);
+                        Integer retCode = resultObject.getInteger(Dict.CODE);
                         if (retCode == 0) {
-                            stringMapHashMap.put(metric,resultObject);
+                            stringMapHashMap.put(metric, resultObject);
                             continue;
                         }
                     }
