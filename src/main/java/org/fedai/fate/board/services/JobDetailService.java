@@ -47,13 +47,10 @@ public class JobDetailService {
     @Value("${fateflow.url}")
     String fateUrl;
 
-    @Value("${component.config.dir}")
-    String componentConfigPath;
-
-
     public String getComponentStaticInfo(String componentName) throws Exception {
+        String projectDir = System.getProperty("user.dir");
         String jsonData = "";
-        String yamlFilePath = componentConfigPath + File.separator + componentName + ".yaml";
+        String yamlFilePath = projectDir + File.separator + "dag" + File.separator +componentName + ".yaml";
         File file = new File(yamlFilePath);
         if (!file.exists()) {
             logger.error("no this file find: {} ", yamlFilePath);
