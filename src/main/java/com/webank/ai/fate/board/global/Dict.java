@@ -72,7 +72,6 @@ public class Dict {
     static public final String JOB_PROCESS = "process";
     static public final String JOB_DURATION = "duration";
     static public final String JOB_STATUS = "status";
-    static public final String REMOTE_RETURN_MSG = "retmsg";
 
     static public final String URL_COPONENT_METRIC_DATA = "/v2/output/metric/key/query";
     static public final String URL_COPONENT_METRIC = "/v2/output/metric/query";
