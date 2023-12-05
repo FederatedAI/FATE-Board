@@ -155,7 +155,6 @@ public class JobDetailController {
         paramMap.put(Dict.JOBID, componentQueryDTO.getJob_id() );
         paramMap.put(Dict.TASK_ID, taskId);
 
-        //todo
         String result = null;
         try {
             result = flowFeign.get(Dict.URL_TASK_DATAVIEW,paramMap);
@@ -168,14 +167,38 @@ public class JobDetailController {
         }
         JSONObject resultObject = JSON.parseObject(result);
         Integer retcode = resultObject.getInteger(Dict.CODE);
-        String msg = resultObject.getString(Dict.REMOTE_RETURN_MSG);
-
-//        JSONObject data = resultObject.getJSONObject(Dict.DATA);
+        String msg = resultObject.getString(Dict.RETMSG);
 
         JSONObject detail = (JSONObject)resultObject.getJSONArray(Dict.DATA).get(0);
         JSONObject newData = detail.getJSONObject(Dict.COMPONENT_PARAMETERS);
 
-//        String dataWithNull = JSON.toJSONString(data, SerializerFeature.WriteMapNullValue);
+        if (newData != null) {
+            JSONObject conf = newData.getJSONObject("conf");
+            if (conf != null) {
+                JSONObject federation =  conf.getJSONObject("federation");
+                if (federation != null) {
+                    JSONObject metadata = federation.getJSONObject("metadata");
+                    if (metadata != null) {
+                        JSONObject rollSiteConfig = metadata.getJSONObject("rollsite_config");
+                        if (rollSiteConfig != null) {
+                            String host = rollSiteConfig.getString("host");
+                            if (null != host) {
+                                newData.getJSONObject("conf").getJSONObject("federation").getJSONObject("metadata").getJSONObject("rollsite_config").put("host","xxx.xxx.xxx.xxx");
+                            }
+                        }
+                    }
+                }
+            }
+            JSONObject mlmd = newData.getJSONObject("mlmd");
+            if (null != mlmd) {
+                JSONObject metadata = mlmd.getJSONObject("metadata");
+                if (null != metadata) {
+                    String host = metadata.getString("host");
+                    newData.getJSONObject("mlmd").getJSONObject("metadata").put("host","xxx.xxx.xxx.xxx");
+                }
+            }
+        }
+
         String dataWithNull = JSON.toJSONString(newData, SerializerFeature.WriteMapNullValue);
 
         return new ResponseResult<>(retcode, msg, dataWithNull);
