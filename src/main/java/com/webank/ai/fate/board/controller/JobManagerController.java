@@ -205,7 +205,7 @@ public class JobManagerController {
         }
 
         Preconditions.checkArgument(LogFileService.checkPathParameters(updateNotesDTO.getJob_id(), updateNotesDTO.getRole(), updateNotesDTO.getParty_id()));
-        Preconditions.checkArgument(LogFileService.checkParameters("^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5\\s]+$", updateNotesDTO.getNotes()));
+        Preconditions.checkArgument(LogFileService.checkParameters("^[0-9a-zA-Z,.。\\-_\\u4e00-\\u9fa5\\s]+$", updateNotesDTO.getNotes()));
 
         String result;
         try {
