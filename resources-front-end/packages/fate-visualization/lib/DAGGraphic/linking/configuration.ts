@@ -6,4 +6,6 @@ export default {
   Relative: '#409eff',
   style: '#909399',
   choose_style: '#409eff',
+
+  heighter: 50,
 };
