@@ -26,19 +26,7 @@ module.exports = function (env, args) {
   if (args.mode === 'development') {
     options.devServer = {
       static: './html/dist',
-      proxy: {
-        '/log/new': {
-          target: 'ws://172.16.153.61:8008',
-          ws: true,
-          secure: false
-        },
-        '/websocket/progress': {
-          target: 'ws://172.16.153.61:8008',
-          ws: true,
-          secure: false
-        },
-        '*': 'http://172.16.153.61:8008'
-      }
+      proxy: {}
     };
   }
 

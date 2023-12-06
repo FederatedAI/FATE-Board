@@ -102,7 +102,7 @@ export default function suffix({ prop, attr, event }: SuffixParameter) {
             const running = () => {
               runningTimeout = setTimeout(() => {
                 if (tag.dom) {
-                  tag.setProp('duration', (tag.prop as any).duration + 1);
+                  tag.setProp('duration', (tag.prop as any).duration + 1000);
                   running();
                 }
               }, 1000);

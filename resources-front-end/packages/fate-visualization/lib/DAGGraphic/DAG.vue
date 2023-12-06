@@ -10,7 +10,7 @@
 <script lang="ts" setup>
 import { FullScreen, Minus, Plus } from '@element-plus/icons-vue';
 import { select } from 'd3';
-import { isObject } from 'lodash';
+import { isObject, isUndefined } from 'lodash';
 import { onMounted, ref, watch } from 'vue';
 import DAG from './DAGContainer';
 import runningStatus from './runningStatus';
@@ -63,11 +63,28 @@ onMounted(() => {
 
 watch(
   () => props.data,
-  () => {
-    if (DAGInstance) {
-      DAGInstance.release()
+  (newValue: any, oldValue: any) => {
+    if (!DAGInstance) {
+      DAGCreator()
+      // DAGInstance.release()
+    } else {
+      let match = true
+      for(const key in newValue.component_module) {
+        if (isUndefined(oldValue.component_module[key])) {
+          match = false
+          break
+        }
+      }
+      // not match
+      if (!match) {
+        DAGInstance.release()
+        DAGCreator()
+      } else {
+        for (const comp of (newValue?.component_lists || [])) {
+          DAGInstance.setStatus(comp.component_name, comp.status, (new Date().getTime() - comp.time || 0))
+        }
+      }
     }
-    DAGCreator()
   },
   {
     deep: true
@@ -92,16 +109,22 @@ function fullScreen() {
   }
 }
 
-function setStatus(name: string, status: string): void;
+function setStatus(name: string, status: string, duration?: number): void;
 function setStatus(name: object): void;
-function setStatus(name: string | object, status?: string): void {
+function setStatus(name: string | object, status?: string, duration = 0): void {
   if (isObject(name)) {
     for (const id in name) {
-      const status = runningStatus((name as any)[id]);
-      DAGInstance.setStatus(id, status);
+      const info = <any>(name as any)[id]
+      if (!isObject(info)) {
+        const status = runningStatus(info);
+        DAGInstance.setStatus(id, status);
+      } else {
+        const status = runningStatus((info as any).status);
+        DAGInstance.setStatus(id, status, (info as any).duration);
+      }
     }
   } else {
-    DAGInstance.setStatus(name, status);
+    DAGInstance.setStatus(name, status, duration);
   }
 }
 

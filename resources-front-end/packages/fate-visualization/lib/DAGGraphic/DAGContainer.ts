@@ -1,5 +1,4 @@
-import { zoom, zoomTransform } from 'd3';
-import { throttle } from 'lodash';
+import { zoom, zoomIdentity, zoomTransform } from 'd3';
 import component from './component';
 import startInput from './dataInput';
 import explainDependencies from './explainDeps';
@@ -32,25 +31,26 @@ export default class DAG {
   protected mark: any;
   protected resizeObserve: any;
   protected zoomInstance: any;
+  protected zoomRelative: any;
 
   protected connection: any
 
   containerWidth: number = 0;
   containerHeight: number = 0;
 
-  containerTransition = {
-    x: 0,
-    y: 0,
-    k: 1,
-  };
-  zoomMin = 0.2;
+  // containerTransition = {
+  //   x: 0,
+  //   y: 0,
+  //   k: 1,
+  // };
+  zoomMin = 0.1;
   zoomMax = 3;
-  containerTranform = throttle(() => {
-    this.container.attr(
-      'transform',
-      `translate(${this.containerTransition.x} ${this.containerTransition.y}) scale(${this.containerTransition.k})`
-    );
-  }, 50);
+  // containerTranform = throttle((attrs: any) => {
+  //   this.container.attr(
+  //     'transform',
+  //     attrs || `translate(${this.containerTransition.x} ${this.containerTransition.y}) scale(${this.containerTransition.k})`
+  //   );
+  // }, 50);
 
   event: EventOptions;
   parent: any;
@@ -96,27 +96,32 @@ export default class DAG {
   }
 
   protected $zoom() {
+    this.zoomRelative = this.centerForParent()
     this.zoomInstance = zoom()
       .scaleExtent([this.zoomMin, this.zoomMax])
       .on('zoom', () => {
-        this.containerTransition = zoomTransform(this.container.node());
-        this.containerTranform();
+        debugger
+        this.container.attr(
+          'transform', zoomTransform(this.container.node()))
       });
     this.parent.call(this.zoomInstance).on('dblclick.zoom', null);
   }
 
+  protected centerForParent () {
+    return [
+      this.parent.node().clientWidth / 2,
+      this.parent.node().clientHeight / 2
+    ]
+  }
+
   zoomIn(times?: number) {
-    const transform = zoomTransform(this.container.node());
-    const change = transform.scale(times || 0.95);
-    this.containerTransition.k = change.k;
-    this.containerTranform();
+    const transform = zoomIdentity.scale(times || 0.95)
+    this.parent.transition().call(this.zoomInstance.transform, transform)
   }
 
   zoomOut(times?: number) {
-    const transform = zoomTransform(this.container.node());
-    const change = transform.scale(times || 1.05);
-    this.containerTransition.k = change.k;
-    this.containerTranform();
+    const transform = zoomIdentity.scale(times || 1.05)
+    this.parent.transition().call(this.zoomInstance.transform, transform)
   }
 
   protected $init(data: any) {

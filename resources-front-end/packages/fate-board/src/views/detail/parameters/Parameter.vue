@@ -61,10 +61,7 @@ let timesheet: any
 const paramRequest = async (comp: any) => {
   try {
     parameterLoading.value = true;
-    param.length = 0
     await store.dispatch('chooseComp', comp)
-    param.push(...store.state.comp.parameters)
-    count.value = param.length
     parameterLoading.value = false;
   } catch (err) {
     if (timesheet) {
@@ -81,8 +78,9 @@ watch(
   () => store.state.comp.parameters,
   () => {
     param.length = 0
-    param.push(...store.state.comp.parameters)
+    param.push(...(store.state.comp.parameters || []))
     count.value = param.length
+    filter.value = ''
     parameterLoading.value = false;
     if (timesheet) {
       clearTimeout(timesheet)
@@ -155,9 +153,14 @@ defineExpose({
     overflow: auto;
     background-color: $default-white;
     border-radius: math.div($pale, 3);
+    padding-right: math.div($pale, 3);
 
     .f-parameter-tree-item {
       background-color: $default-white;
+    }
+
+    :deep(.el-tree-node>.el-tree-node__children) {
+      overflow: inherit !important;
     }
   }
 }

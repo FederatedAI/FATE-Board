@@ -14,6 +14,7 @@ export default {
     dataset: {},
     dag: {},
     _ws_: undefined,
+    _rerun_: false,
 
     _blank_: true
   },
@@ -47,12 +48,21 @@ export default {
       if (state._ws_) return true;
       const handler = (data: any) => {
         dagExplaination(data.dependency_data, (res: any) => {
-          commit('SET_DAG', res)
+          if (Object.keys(state.dag).length > 0) {
+
+          } else {
+            commit('SET_DAG', res)
+          }
         })
         commit('SET_DATASET', data.summary_date.dataset);
         commit('SET_DETAILS', data.summary_date.job);
         if (data.status && !data.status.match(/running|waiting/)) {
-          state._ws_.close()
+          if (!state._rerun_) {
+            state._ws_.close()
+            commit('SET_WS', undefined)
+          }
+        } else if (data.status.match(/running|waiting/)) {
+          if (state._rerun_) state._rerun_ = false
         }
       };
       if (!state.role || !state.jobId || !state.partyId) {
@@ -83,15 +93,22 @@ export default {
     },
 
     async retryJob({ state }: any, info: any) {
-      if (state.jobId) {
+      if (info?.job_id || state.jobId) {
         const responseData = await API.retryJob(Object.assign({
-          job_id: state.jobId,
+          job_id: info?.job_id || state.jobId,
           component_name: 'pipeline',
         }, info));
         if (responseData) {
           ElMessage({
             showClose: true,
             message: `Job: ${state.jobId} is retrying`,
+            center: true,
+          });
+        } else {
+          ElMessage({
+            type: 'error',
+            showClose: true,
+            message: `Job: ${state.jobId} has retried failly`,
             center: true,
           });
         }
@@ -101,15 +118,22 @@ export default {
     },
 
     async killJob({ state }: any, info: any) {
-      if (state.jobId) {
+      if (info?.job_id || state.jobId) {
         const responseData = await API.killJob(Object.assign({
-          job_id: state.jobId,
+          job_id: info?.job_id || state.jobId,
           component_name: 'pipeline',
         }, info));
         if (responseData) {
           ElMessage({
             showClose: true,
             message: `Job: ${state.jobId} is canceling`,
+            center: true,
+          });
+        } else {
+          ElMessage({
+            type: 'error',
+            showClose: true,
+            message: `Job: ${state.jobId} has canceled failly`,
             center: true,
           });
         }
@@ -120,23 +144,27 @@ export default {
 
     SET_BASIC({ state, commit, dispatch }: any, INFO: any) {
       let changed = false
-      if (state.jobId !== INFO.jobId) {
+      if (INFO?.jobId && state.jobId !== INFO?.jobId) {
         commit('SET_JOBID', INFO.jobId)
         changed = true
       }
-      if (state.role !== INFO.role) {
+      if (INFO?.role && state.role !== INFO?.role) {
         commit('SET_JOB_ROLE', INFO.role)
         changed = true
       }
-      if (state.partyId !== INFO.partyId) {
+      if (INFO?.partyId && state.partyId !== INFO?.partyId) {
         commit('SET_PARTYID', INFO.partyId)
         changed = true
       }
-      if (changed) {
+      if (INFO?.rerun) {
+        state._rerun_ = !!INFO?.rerun
+      }
+      if (changed || !state._ws_) {
         if (state._ws_)  {
           state._ws_.close()
           state._ws_ = undefined
         }
+        state.dag = {}
         dispatch('JOB_INFORMATION')
       }
     },
