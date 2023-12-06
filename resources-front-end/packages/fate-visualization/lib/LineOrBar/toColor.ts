@@ -18,7 +18,7 @@ export default function randomColor(count: number, gp = 1) {
     }
     return colorGp;
   };
-  const colors = [];
+  let colors = [];
   while (count > 0) {
     const cp = one();
     colors.push(cp);

@@ -3,7 +3,7 @@
     <section class="f-r-t-title">
       {{ title }}
     </section>
-    <section class="f-r-t-range">
+    <section v-if="isBoolean(range) ? range : true" class="f-r-t-range">
       <span class="f-r-t-label">{{ label }}</span>
       <FSlider :value="range" v-bind="$attrs" @change="change" :explain="explain"></FSlider>
     </section>
@@ -14,6 +14,7 @@
 </template>
 
 <script lang="ts" setup>
+import { isBoolean } from 'lodash';
 import { ref } from 'vue';
 import FSlider from './Slider.vue';
 
