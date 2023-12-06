@@ -1,8 +1,8 @@
 import store from '@/store/store';
 import { ElMessageBox } from 'element-plus';
 
-export default function open(parameter: any, after: any) {
-  ElMessageBox.confirm(
+export default function open(parameter?: any, after?: any) {
+  return ElMessageBox.confirm(
     `The job will continue from where it end, it may take few seconds to  update job status.`,
     `Retry`,
     {

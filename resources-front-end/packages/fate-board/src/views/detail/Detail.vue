@@ -39,7 +39,7 @@ const store = useStore();
 const detailLoading = ref(true);
 const parameter = ref()
 const jobData = computed(() => store.state.job.details);
-const btnDisable = ref(true) 
+const btnDisable = ref(true)
 
 const componentChoose = async (comp: any) => {
   parameter.value.getParameter(comp)
@@ -47,7 +47,9 @@ const componentChoose = async (comp: any) => {
 }
 
 const componentRetry = (retryd: boolean) => {
-  if (retryd) {}
+  if (retryd) {
+    store.dispatch('SET_BASIC', { rerun: true })
+  }
 }
 
 const toDashboard = () => store.dispatch('toDashboard')

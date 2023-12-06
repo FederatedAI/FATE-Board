@@ -4,5 +4,5 @@ export default function toTime(
   date: number, // ms
   template = 'h:m:s'
 ) {
-  return toTemp(template, date);
+  return toTemp(template, Math.floor(date / 1000));
 }
