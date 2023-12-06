@@ -10,7 +10,7 @@
       class="f-r-slider"
       @change="change"
     ></el-slider>
-    <el-tooltip effect="dark" :content="explain">
+    <el-tooltip effect="dark" :content="explain" :placement="'right'">
       <el-icon class="f-r-icon">
         <QuestionFilled></QuestionFilled>
       </el-icon>

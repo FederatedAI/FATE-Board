@@ -1,4 +1,5 @@
 import { isNumber, isObject } from 'lodash';
+import sort from '../tools/sort';
 import toData from '../tools/toData';
 import toGroup from '../tools/toGroup';
 import toSelect from '../tools/toSelect';
@@ -16,7 +17,7 @@ export default function Summary(
   const { data } = metric_data;
 
   const options: any = [];
-  const tableData: any = [];
+  let tableData: any = [];
   const tableHeader: any = [];
 
   if (comp_type.match(new RegExp(KeyToHeader.join('|'), 'i'))) {
@@ -99,6 +100,14 @@ export default function Summary(
       })
     );
   }
+
+  tableData = sort(tableData, 'label', (a: any, b: any) => {
+    if (a['label'].match(/total/i)) {
+      return 1
+    } else {
+      return -1
+    }
+  })
 
   const SummaryMetricContainer = toGroup();
 

@@ -3,6 +3,7 @@ import { FSplitTable } from '@/components/SplitTable';
 import { isUndefined } from 'lodash';
 import fixed from '../tools/fixed';
 import getModelData from '../tools/getModelData';
+import sort from '../tools/sort';
 import { toColumn } from '../tools/toTable';
 
 export default function hetero_feature_binning(
@@ -66,9 +67,11 @@ export default function hetero_feature_binning(
           if (!tData[name]) tData[name] = []
           const usableData = summary[name]
           tData[name].push(...explainOption(usableData))
+          tData[name] = sort(tData[name], 'variable')
         }
       } else {
         tData = explainOption(summary)
+        tData = sort(tData, 'variable')
       }
       const result: any = {
         data: tData
@@ -81,14 +84,14 @@ export default function hetero_feature_binning(
 
     // host explain
     const createOneOptionsForHost = (anony:any, binCount: any, cols: string[]) => {
-      const tData = cols.map((variable: string) => {
+      const tData = sort(cols.map((variable: string) => {
         return {
           variable,
           iv: 0,
           binning_count: binCount[variable],
           anonym: anony?.[variable]
         }
-      })
+      }), 'variable')
       return {
         data: tData
       }

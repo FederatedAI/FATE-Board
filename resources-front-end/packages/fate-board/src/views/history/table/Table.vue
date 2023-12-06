@@ -19,7 +19,7 @@
 import API from '@/api';
 import { toDate, toTime } from 'fate-tools';
 import { debounce } from 'lodash';
-import { computed, nextTick, onBeforeMount, onMounted, reactive, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
 import cols from './ColHeader';
 
 const ftable = ref();
@@ -66,7 +66,6 @@ const sortChange = ({col, order}: any) => {
 const data = reactive<any[]>([]);
 // table data and total requesting
 const dataRequest = debounce(async () => {
-  requesting.value = true
   const response = await API.queryJobs(parameter);
 
   total.value = response.totalRecord;
@@ -79,7 +78,7 @@ const dataRequest = debounce(async () => {
         partyId: job.fPartyId || '',
         start_time: job.fStartTime ? toDate(job.fStartTime) : '',
         end_time: job.fEndTime ? toDate(job.fEndTime) : '',
-        duration: job.fElapsed ? toTime(job.fElapsed) : '',
+        duration: !(job.fStatus || 'waiting').match(/waiting|running/i) ? (job.fElapsed ? toTime(job.fElapsed) : '') : '',
         partner: job.partners.join(', '),
         status: {
           value: job.fStatus || 'waiting',
@@ -113,15 +112,26 @@ const filtering = (newfilters: object) => {
   ftable.value.pageChange(parameter.pageNum);
 }
 
+let interval: any
 // Before mount request
 onBeforeMount(() => {
+  requesting.value = true
   dataRequest();
+  interval = setInterval(() => {
+    dataRequest();
+  }, 15000)
 });
 
 onMounted(() => {
   setTimeout(() => {
     requesting.value = false
   }, 4000)
+})
+
+onBeforeUnmount(() => {
+  if (interval) {
+    clearInterval(interval)
+  }
 })
 
 defineExpose({ search: filtering })

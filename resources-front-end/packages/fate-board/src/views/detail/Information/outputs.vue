@@ -9,22 +9,21 @@
     :modal="false"
     class="f-output-dialog"
   >
-      <el-tabs v-model="active" class="f-detail-tabs">
-        <el-tab-pane label="model" name="model" class="f-detail-item">
-          <component :is="componentInstance" :key="update" class="f-detail-item-content"></component>
-        </el-tab-pane>
-        <el-tab-pane
-          label="data"
-          name="data"
-          :lazy="true"
-          class="f-detail-item"
-        >
-          <DataOutput class="f-detail-item-content"></DataOutput>
-        </el-tab-pane>
-        <el-tab-pane label="log" name="log" :lazy="true" class="f-detail-item">
-          <LogOutput class="f-detail-item-content"></LogOutput>
-        </el-tab-pane>
-      </el-tabs>
+    <el-tabs v-model="active" class="f-detail-tabs">
+      <el-tab-pane :label="firstModelLabel" name="model" class="f-detail-item">
+        <component
+          :is="componentInstance"
+          :key="update"
+          class="f-detail-item-content"
+        ></component>
+      </el-tab-pane>
+      <el-tab-pane label="data" name="data" :lazy="true" class="f-detail-item">
+        <DataOutput class="f-detail-item-content"></DataOutput>
+      </el-tab-pane>
+      <el-tab-pane label="log" name="log" :lazy="true" class="f-detail-item">
+        <LogOutput class="f-detail-item-content"></LogOutput>
+      </el-tab-pane>
+    </el-tabs>
   </el-dialog>
 </template>
 
@@ -41,6 +40,34 @@ const active = ref('model');
 const store = useStore();
 
 const component = computed(() => store.state.comp.information.name);
+const compType = computed(() => store.state.comp.information.type);
+const firstModelLabel = computed(() => {
+  let name = 'summary';
+  const modelOutputCheck = [
+    'boost',
+    'linr',
+    'lr',
+    'poisson',
+    'nn',
+    'fm',
+    'mf',
+    'svd',
+    'svd',
+    'gmf',
+    'kmeans',
+  ];
+  const metricsOutputCheck = ['evaluation', 'scorecard'];
+  if (
+    compType.value.match(new RegExp(`(${metricsOutputCheck.join('|')})`, 'i'))
+  ) {
+    name = 'metrics';
+  } else if (
+    compType.value.match(new RegExp(`(${modelOutputCheck.join('|')})`, 'i'))
+  ) {
+    name = 'model';
+  }
+  return name;
+});
 
 const componentInstance: any = ref(undefined);
 const update = ref(0);
@@ -133,12 +160,15 @@ defineExpose({
       font-weight: 600;
     }
   }
-  
 
   .f-detail-item-content {
     @keyframes fadeIn {
-      0% { opacity: 0 }
-      100% { opacity: 1 }
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
     }
     animation: 1s ease-in 0s fadeIn;
   }
