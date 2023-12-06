@@ -20,6 +20,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
+import DialogRetry from './DialogRetry';
 
 const emits = defineEmits(['retry', 'choose']);
 
@@ -42,7 +43,7 @@ const retry = async (comp: any) => {
   if (process.env.NODE_ENV === 'development') {
     console.log(comp);
   }
-  const retryResponse = await store.dispatch('retryJob')
+  const retryResponse = await DialogRetry()
   emits('retry', retryResponse)
 };
 </script>

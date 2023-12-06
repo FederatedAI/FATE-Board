@@ -47,6 +47,7 @@ function setColor() {
 
 function legendExplain() {
   if (props.legend !== undefined) {
+    legendHint.length = 0
     if (isNumber(props.legend)) {
       let hints: any[] = []
       let cps: any[] = []

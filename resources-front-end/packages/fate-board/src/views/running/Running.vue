@@ -58,10 +58,10 @@ const cancel = async (item, afterCancel) => {
   const responseData = await API.killJob({
     job_id: item.jobId,
   });
-  if (responseData.data) {
-    afterCancel();
+  if (responseData) {
     dataRequest();
   }
+  afterCancel();
 };
 </script>
 

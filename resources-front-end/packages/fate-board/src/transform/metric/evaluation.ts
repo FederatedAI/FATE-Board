@@ -1,5 +1,6 @@
 import { FCharts } from '@/components/LineChart';
 import { FRangeTable } from '@/components/RangeTable';
+import { isNumber } from 'lodash-es';
 import fixed from '../tools/fixed';
 import toGroup from '../tools/toGroup';
 import evaluationAccuracy from './evaluationAccuracy';
@@ -20,6 +21,7 @@ export default function evaluation(
 ) {
   const { data, groups } = metric_data;
 
+  let isRangeScoreTable = true
   const scoreTable = {
     header: [
       {
@@ -34,6 +36,7 @@ export default function evaluation(
     data: <any>[],
   };
 
+  let isRangeConfusionTable = false
   const confusionMatrixTable = {
     header: [
       {
@@ -124,6 +127,7 @@ export default function evaluation(
 
         // confusion_matrix
         else if (metric.match(/confusion_matrix/i)) {
+          isRangeConfusionTable = true
           const { cuts, fn, fp, tn, tp } = val;
           if (
             !confusionMatrixTable.header.some((item) => item.prop === 'label')
@@ -206,42 +210,44 @@ export default function evaluation(
         }
 
         // precision
-        else if (metric.match(/precision_table/i)) {
-          const isBinary = metric.match(/biClass/i);
-          precisionRecall.binary = isBinary;
-          const { cuts, p } = val;
-
-          // table
-          if (!scoreTable.header.some((item) => item.prop === 'precision')) {
-            scoreTable.header.push({
-              label: 'precision',
-              prop: 'precision',
-            });
-          }
-          let position: any;
-          scoreRow['precision'] = (range: number) => {
-            for (let i = 0; i < cuts.length; i++) {
-              if (range < cuts[i]) {
-                position = i - 1;
-                break;
-              } else if (range === cuts[i]) {
-                position = i;
-                break;
-              }
+        else if (metric.match(/precision/i)) {
+            // table
+            if (!scoreTable.header.some((item) => item.prop === 'precision')) {
+              scoreTable.header.push({
+                label: 'precision',
+                prop: 'precision',
+              });
             }
-            if (position < 0) position = 0;
-            return fixed(p[position]);
-          };
-          precisionRecall.precision = val;
+          if (metric.match(/biclass/i)) {
+            const isBinary = metric.match(/biClass/i);
+            precisionRecall.binary = isBinary;
+            const { cuts, p } = val;
+            isRangeScoreTable = true
+
+            let position: any;
+            scoreRow['precision'] = (range: number) => {
+              for (let i = 0; i < cuts.length; i++) {
+                if (range < cuts[i]) {
+                  position = i - 1;
+                  break;
+                } else if (range === cuts[i]) {
+                  position = i;
+                  break;
+                }
+              }
+              if (position < 0) position = 0;
+              return fixed(p[position]);
+            };
+            precisionRecall.precision = val;
+          } else if (metric.match(/mult/)) {
+            isRangeScoreTable = false
+            scoreRow.precision = fixed(val)
+          }
         }
 
         // recall
-        else if (metric.match(/biclass_recall_table/i)) {
-          const isBinary = metric.match(/biClass/i);
-          precisionRecall.binary = isBinary;
-
-          const { cuts, r } = val;
-
+        else if (metric.match(/recall/i)) {
+          
           // table
           if (!scoreTable.header.some((item) => item.prop === 'recall')) {
             scoreTable.header.push({
@@ -249,26 +255,51 @@ export default function evaluation(
               prop: 'recall',
             });
           }
-          let position: any;
-          scoreRow['recall'] = (range: number) => {
-            for (let i = 0; i < cuts.length; i++) {
-              if (range < cuts[i]) {
-                position = i - 1;
-                break;
-              } else if (range === cuts[i]) {
-                position = i;
-                break;
+
+          if (metric.match(/biclass/i)) {
+            const isBinary = metric.match(/biClass/i);
+            precisionRecall.binary = isBinary;
+
+            const { cuts, r } = val;
+            isRangeScoreTable = true
+
+            let position: any;
+            scoreRow['recall'] = (range: number) => {
+              for (let i = 0; i < cuts.length; i++) {
+                if (range < cuts[i]) {
+                  position = i - 1;
+                  break;
+                } else if (range === cuts[i]) {
+                  position = i;
+                  break;
+                }
               }
-            }
-            if (position < 0) position = 0;
-            return fixed(r[position]);
-          };
-          precisionRecall.recall = val;
+              if (position < 0) position = 0;
+              return fixed(r[position]);
+            };
+            precisionRecall.recall = val;
+          } else {
+            isRangeScoreTable = false
+            scoreRow.recall = fixed(val)
+          }
         }
 
         // accuracy
         else if (metric.match(/accuracy/i)) {
-          accuracy.lineExplain(val, namespace, fromComponent);
+          if (metric.match(/biclass/i)) {
+            accuracy.lineExplain(val, namespace, fromComponent);
+          } else {
+            if (isNumber(val)) {
+              if (!scoreTable.header.some((item) => item.prop === 'accuracy')) {
+                scoreTable.header.push({
+                  label: 'accuracy',
+                  prop: 'accuracy',
+                });
+              }
+              isRangeScoreTable = false
+              scoreRow.accuracy = fixed(val)
+            }
+          }
         }
 
         // f1Score
@@ -361,30 +392,34 @@ export default function evaluation(
       label: 'Quantile',
       header: scoreTable.header,
       data: scoreTable.data,
-      range: 1,
+      range: isRangeScoreTable ? 1 : false,
       explain: 'Update Precision and Recall under the new quantile condition'
     },
   });
 
-  group.children.push({
-    id: 'ConfusionMatrix',
-    tag: FRangeTable,
-    prop: {
-      title: 'Confusion Matrix',
-      label: 'Classification Threshold',
-      header: confusionMatrixTable.header,
-      data: confusionMatrixTable.data,
-      range: 0.5,
-      explain: 'Update the confusion matrix information under the new threshold condition'
-    },
-  });
+  if (isRangeConfusionTable && confusionMatrixTable.data.length > 0) {
+    group.children.push({
+      id: 'ConfusionMatrix',
+      tag: FRangeTable,
+      prop: {
+        title: 'Confusion Matrix',
+        label: 'Classification Threshold',
+        header: confusionMatrixTable.header,
+        data: confusionMatrixTable.data,
+        range: 0.5,
+        explain: 'Update the confusion matrix information under the new threshold condition'
+      },
+    });
+  }
 
-  group.children.push({
-    id: 'EvaluationCharts',
-    tag: FCharts,
-    prop: {
-      data: chartInfo,
-    },
-  });
+  if (Object.keys(chartInfo).length > 0) {
+    group.children.push({
+      id: 'EvaluationCharts',
+      tag: FCharts,
+      prop: {
+        data: chartInfo,
+      },
+    });
+  }
   return group;
 }

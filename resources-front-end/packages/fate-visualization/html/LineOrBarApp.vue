@@ -5,7 +5,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const random = () => {
   const list: number[] = [];
   for (let i = 0; i < 7; i++) {
