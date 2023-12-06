@@ -44,22 +44,30 @@ export default function linking(
           );
         },
         y: (d: PropOptions) => {
+          const s = d.from;
+          const e = d.end;
+          const beHer = e[1] < s[1]
           return Math.min(
             d.from[1] - configuration.margin,
             d.end[1] - configuration.margin
-          );
+          ) - (beHer ? configuration.heighter : 0);
         },
         width: (d: PropOptions) => {
           return Math.abs(d.from[0] - d.end[0]) + configuration.margin * 2;
         },
         height: (d: PropOptions) => {
-          return Math.abs(d.from[1] - d.end[1]) + configuration.margin * 2;
+          const s = d.from;
+          const e = d.end;
+          const beHer = e[1] < s[1]
+          return Math.abs(d.from[1] - d.end[1]) + configuration.margin * 2 + (beHer ? configuration.heighter * 2 : 0);
         },
       },
       attr
     ),
     style: {
-      zIndex: 1,
+      zIndex: (d: PropOptions) => {
+        return (d.relativeChoose || d.choose) ? 5 : 1
+      },
     },
     event: {
       keydown: (eve: any, plot: PlotCommon) => {
@@ -95,15 +103,27 @@ export default function linking(
             const m = configuration.margin;
             const s = d.from;
             const e = d.end;
+            const beHer = e[1] < s[1]
             const w = Math.abs(s[0] - e[0]);
             const h = Math.abs(s[1] - e[1]);
 
-            const f = [s[0] < e[0] ? m : w + m, s[1] < e[1] ? m : h + m];
-            const t = [e[0] < s[0] ? m : w + m, e[1] < s[1] ? m : h + m];
-            const md = [
-              [f[0], f[1] + (t[1] - f[1]) / 2],
-              [t[0], f[1] + (t[1] - f[1]) / 2],
-            ];
+            const f = [s[0] < e[0] ? m : w + m, (s[1] < e[1] ? m : h + m) + (beHer ? configuration.heighter : 0)];
+            const t = [e[0] < s[0] ? m : w + m, (e[1] < s[1] ? m : h + m) + (beHer ? configuration.heighter : 0)];
+            let bet = t[1] - f[1]
+            let md
+            if (bet > 0) {
+              bet = bet / 2
+              md = [
+                [f[0], f[1] + bet],
+                [t[0], f[1] + bet],
+              ]
+            } else {
+              bet = Math.min(bet / 2, -configuration.heighter)
+              md = [
+                [f[0], f[1] - bet],
+                [t[0], f[1] + bet],
+              ]
+            }
 
             path += `M ${f[0]} ${f[1]}`;
             path += `C ${(() => {
