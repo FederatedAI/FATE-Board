@@ -34,6 +34,17 @@ export default debounce(async (data: any, cb: any) => {
         } else {
           ports[key] = portsConfig[key];
         }
+        if (Array.isArray(ports[key])) {
+          ports[key] = ports[key].sort((ap: any, bp: any) => {
+            return ap.type.match(/model/i)
+              ? 1
+              : ap.type.match(/validate/i)
+                ? 1
+                : bp.type.match(/validate/i)
+                  ? -1
+                  : 0
+          })
+        }
       }
       Object.assign(each, ports);
     }
