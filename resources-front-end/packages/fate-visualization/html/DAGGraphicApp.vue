@@ -1,7 +1,7 @@
 <template>
   <button @click="change">change</button>
   <div class="app_container">
-    <DAGGraphic ref="dag" :data="demo" @choose="choose" @retry="retry" />
+    <DAGGraphic ref="dag" :data="demo" :operation="false" :mini="true" @choose="choose" @retry="retry" />
   </div>
 </template>
 
@@ -12,7 +12,7 @@ import DAGGraphic from '../lib/DAGGraphic/DAG.vue';
 const dag = ref();
 
 const demo = JSON.parse(
-  "{\"component_module\":{\"binning_1\":\"hetero_feature_binning\",\"binning_0\":\"hetero_feature_binning\",\"psi_0\":\"psi\"},\"component_stage\":{\"binning_1\":\"train\",\"binning_0\":\"predict\",\"psi_0\":\"default\"},\"component_list\":[{\"component_name\":\"binning_1\",\"status\":\"success\"},{\"component_name\":\"binning_0\",\"status\":\"running\"},{\"component_name\":\"psi_0\",\"time\":1699479165158,\"status\":\"failed\"}],\"component_need_run\":{\"binning_1\":true,\"binning_0\":true,\"psi_0\":true},\"dependencies\":{\"binning_1\":[{\"component_name\":\"binning_0\",\"model_type\":\"data\",\"up_output_info\":[\"train_output_data\"],\"type\":\"train_data\",\"data_source\":false}],\"binning_0\":[{\"component_name\":\"psi_0\",\"model_type\":\"data\",\"up_output_info\":[\"output_data\"],\"type\":\"train_data\",\"data_source\":false}],\"psi_0\":[{\"name_space\":\"experiment\",\"model_type\":\"data\",\"name\":\"breast_hetero_guest\",\"up_output_info\":[],\"type\":\"input_data\",\"data_source\":true}]}}");
+  "{\"component_module\":{\"binning_1\":\"hetero_feature_binning\",\"binning_0\":\"hetero_feature_binning\",\"psi_0\":\"psi\"},\"component_stage\":{\"binning_1\":\"train\",\"binning_0\":\"predict\",\"psi_0\":\"default\"},\"component_list\":[{\"component_name\":\"binning_1\",\"status\":\"success\"},{\"component_name\":\"binning_0\",\"status\":\"running\",\"time\":1699479165189},{\"component_name\":\"psi_0\",\"time\":1699479165158,\"status\":\"failed\"}],\"component_need_run\":{\"binning_1\":true,\"binning_0\":true,\"psi_0\":true},\"dependencies\":{\"binning_1\":[{\"component_name\":\"binning_0\",\"model_type\":\"data\",\"up_output_info\":[\"train_output_data\"],\"type\":\"train_data\",\"data_source\":false}],\"binning_0\":[{\"component_name\":\"psi_0\",\"model_type\":\"data\",\"up_output_info\":[\"output_data\"],\"type\":\"train_data\",\"data_source\":false}],\"psi_0\":[{\"name_space\":\"experiment\",\"model_type\":\"data\",\"name\":\"breast_hetero_guest\",\"up_output_info\":[],\"type\":\"input_data\",\"data_source\":true}]}}");
 
 function choose(data: object) {
   console.log('choose component', data);

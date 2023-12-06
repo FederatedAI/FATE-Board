@@ -99,7 +99,7 @@ export default function HTTPRequest<B extends BasicConfigForParameter>(
 
         const bodyExplain = (body: BasicResponseData) => {
           if (body.code === 0 || body.code === 200) {
-            const data = isNull(body.code) ? true : (body.data || !!body.data)
+            const data = isNull(body.data) ? true : (body.data || !!body.data)
             return Promise.resolve(data);
           } else {
             const check: any = errorCode[body.code] || errorCode['error']
@@ -153,7 +153,7 @@ export default function HTTPRequest<B extends BasicConfigForParameter>(
               if (result.code !== undefined) {
                 resolve(<unknown>bodyExplain(result));
               } else {
-                toFile(<string>result, filename);
+                toFile([<string>fileReader.result], filename);
                 resolve({ code: 0, data: '', msg: 'file download' });
               }
             });
