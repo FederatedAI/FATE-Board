@@ -176,7 +176,7 @@ public class JobManagerService {
 
         String fDescription = pagedJobQO.getFDescription();
         if (fDescription != null && 0 != fDescription.trim().length()) {
-            Preconditions.checkArgument(LogFileService.checkParameters("^[0-9a-zA-Z\\-_\\u4e00-\\u9fa5\\s]+$", fDescription));
+            Preconditions.checkArgument(LogFileService.checkParameters("^[0-9a-zA-Z,.。\\-_\\u4e00-\\u9fa5\\s]+$", fDescription));
             reqMap.put(Dict.DESCRIPTION, pagedJobQO.getFDescription());
         }
 
