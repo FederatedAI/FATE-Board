@@ -51,7 +51,6 @@ export default function EvaAccuracy (
   }
 
   const lineExplain = ({ cuts, accuracy, threshold }: any, namespace: string,  component: string) => {
-    debugger
     const thrs = thresholdMapping.get(namespace) || {}
       thrs[component] = threshold
     thresholdMapping.set(namespace, thrs)

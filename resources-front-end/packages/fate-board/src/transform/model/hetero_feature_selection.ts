@@ -1,5 +1,6 @@
 import { isString, isUndefined } from 'lodash';
 import getModelData from '../tools/getModelData';
+import sort from '../tools/sort';
 import toGroup from '../tools/toGroup';
 import toSelect from '../tools/toSelect';
 import toTable from '../tools/toTable';
@@ -60,7 +61,7 @@ export default function hetero_feature_selection(
 
     // current role data
     if (all_metrics || all_selected_mask) {
-      const toMetricsData = tData[current];
+      const toMetricsData = tData[current] || [];
       const toMetricsHeader = tHeader[current] || [...defaultHeader];
       for (const variable in all_selected_mask) {
         const row: any = {};
@@ -118,7 +119,7 @@ export default function hetero_feature_selection(
         for (const variable in all_host_selected_mask[option]) {
           const row: any = {};
           row['variable'] = variable;
-          for (const col in all_metrics[variable]) {
+          for (const col in all_host_metrics[option][variable]) {
             if (!toHostHeader.some((item: any) => item.prop === col)) {
               toHostHeader.push({
                 label: col,
@@ -140,6 +141,8 @@ export default function hetero_feature_selection(
           );
           if (cursor >= 0) {
             Object.assign(toHostData[cursor], row);
+          } else {
+            toHostData.push(row)
           }
         }
         tHeader[option] = toHostHeader;
@@ -154,6 +157,20 @@ export default function hetero_feature_selection(
     }
   } else {
     tableExplain(slist);
+  }
+
+  for (const key in tData) {
+    tData[key] = sort(tData[key], 'variable', (a: any, b: any) => {
+      if (a._filter && b._filter) {
+        return 0
+      } else if (a._filter) {
+        return 1
+      } else if (b._filter) {
+        return -1
+      } else {
+        return 0
+      }
+    })
   }
 
   const group = toGroup();

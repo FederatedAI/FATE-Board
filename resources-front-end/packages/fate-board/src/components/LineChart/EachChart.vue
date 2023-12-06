@@ -79,6 +79,7 @@ const chart = computed(() => {
       padding: math.div($pale, 3);
       background: var(--el-bg-color);
       border: 1px solid var(--el-color-info);
+      cursor: pointer;
     }
     .f-subtab-active {
       background: var(--el-color-primary);

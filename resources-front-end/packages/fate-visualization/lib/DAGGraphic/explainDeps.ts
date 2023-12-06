@@ -1,7 +1,6 @@
 import measureText from '@/utils/measureText';
 import configuration from './component/configuration';
 import inputConfiguration from './dataInput/configuration';
-import explainPort from './portImply';
 import runningStage from './runningStage';
 import runningStatus from './runningStatus';
 
@@ -54,12 +53,13 @@ export default function explainDependencies(data: any, containerWidth: number) {
         width,
         height,
         txWidth,
+        duration: new Date().getTime() - each.time || 0,
 
         level: 1,
-        input: each.input,
-        output: each.output
+        input: each.input || [],
+        output: each.output || []
       },
-      (!each.input && !each.output) ? explainPort(data.component_module[compId]) : {}
+      // (!each.input && !each.output) ? explainPort(data.component_module[compId]) : {}
     );
     comps.set(compId, comp);
   }

@@ -185,6 +185,8 @@ onMounted(() => {
       font-weight: bold;
       background-color: var(--el-bg-color);
       border: 2px solid var(--el-color-primary);
+      cursor: pointer;
+      z-index: 100;
     }
   }
 
