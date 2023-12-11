@@ -38,7 +38,7 @@ public class PagedJobQO implements Serializable {
     private List<String> status;
     private String orderField;
     private String orderRule;
-    @JsonProperty(value = "fDescription")
+    @JsonProperty(value = "note")
     private String fDescription;
     private String partner;
 
