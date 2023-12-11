@@ -1,3 +1,16 @@
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  $colors: (
+    'success': (
+      'base': #0ec7a5,
+    ),
+    'danger': (
+      'base': #F76161,
+    ),
+  )
+);
+
+@use 'element-plus/theme-chalk/src/index.scss' as *;
+
 @import './index.scss';
 @import './scroll.scss';
 

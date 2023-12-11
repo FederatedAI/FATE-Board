@@ -4,7 +4,7 @@
       <FRow class="t-text" :content="`Job: ${jobId}`" :contentClassName="'f-header-job'"/>
       <FRow class="t-text" :content="`Role: ${role}`" :contentClassName="'f-header-job-role'"/>
     </section>
-    <el-link type="warning" class="p-cancel" @click="$emit('cancel')">
+    <el-link type="primary" class="p-cancel" @click="$emit('cancel')">
       cancel
     </el-link>
   </section>

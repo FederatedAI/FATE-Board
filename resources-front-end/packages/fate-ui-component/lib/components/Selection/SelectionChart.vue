@@ -265,6 +265,18 @@ defineExpose({
   :deep(.f-sub-item--active) {
     border: 1px solid var(--el-color-info);
     box-shadow: 0 0 3px var(--el-color-info-dark-2);
+    position: relative;
+
+    &::after {
+      content: " ";
+      border: 5px solid transparent;
+      border-bottom: 5px solid var(--el-color-info-dark-2);
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      right: 0;
+      margin: auto;
+    }
   }
 }
 </style>

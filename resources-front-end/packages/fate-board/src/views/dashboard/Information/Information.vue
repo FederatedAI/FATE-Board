@@ -73,12 +73,11 @@ const parties = computed(() => store.state.job.dataset.parties || []);
     padding: $pale;
 
     :deep(.f-dashboard-dataset--label) {
-      @include text-size();
-      color: var(--el-color-info-light-3);
+      @include font-title();
     }
 
     :deep(.f-dashboard-dataset--content) {
-      color: var(--el-color-info);
+      @include font-text();
       font-weight: bold;
     }
   }

@@ -92,7 +92,7 @@ export default {
       rx: 2,
     },
     style: {
-      Data_Port: '#E6B258',
+      Data_Port: '#fa9408',
       Cache_Port: '#bcf500',
       Model_Port: '#00cbff',
       Disable_Port: '#7F7D8E',
