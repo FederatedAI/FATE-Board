@@ -72,6 +72,15 @@
 }
 
 .fb-table-columns  {
+
+  .el-table__header {
+    .el-table__cell {
+      .cell {
+        color: #3E4052;
+      }
+    }
+  }
+
   .el-table__body{
     tr.fb-table-row--filter {
       td.el-table__cell {
