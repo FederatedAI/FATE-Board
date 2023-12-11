@@ -7,7 +7,7 @@
         v-if="showPercentage(scope)"
         :percentage="showPercentage(scope)"
         :text-inside="!!inside"
-        :stroke-width="16"
+        :stroke-width="6"
         class="fb-table-progress"
       >
         <span class="fb-table-progress-text">{{ showContent(scope) }}</span>
