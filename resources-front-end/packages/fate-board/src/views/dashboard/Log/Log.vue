@@ -480,7 +480,7 @@ export default {
       .f-log-subtab--active {
         font-weight: 600;
         .f-log-subtab-content {
-          color: $primary-dark;
+          color: var(--el-color-primary);
         }
       }
     }

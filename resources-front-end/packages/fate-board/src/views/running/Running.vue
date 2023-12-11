@@ -1,6 +1,8 @@
 <template>
-  <section class="running-list-container">
-    <section v-for="n in 4" :key="n">
+  <section class="running-list-container" :class="{
+    'running-list-stretch': data.length <= 0
+  }">
+    <section v-if="data.length > 0" v-for="n in 4" :key="n">
       <template v-for="(item, index) in data">
         <Card
           v-if="index % 4 === n - 1"
@@ -14,15 +16,20 @@
         ></Card>
       </template>
     </section>
+    <section v-else class="running-list-hint">
+      No job is running yet,<span class="running-list-link" @click.stop="toHistory">skit to Jobs for more. <el-icon class="running-list-icon"><Right /></el-icon></span>
+    </section>
   </section>
 </template>
 
 <script setup>
 import API from '@/api';
 import { onBeforeMount, onBeforeUnmount, reactive } from 'vue';
+import { useStore } from 'vuex';
 import Card from './Card.vue';
 
 const data = reactive([]);
+const store = useStore();
 
 const dataRequest = async () => {
   const responseData = await API.getRunningJobs();
@@ -63,6 +70,10 @@ const cancel = async (item, afterCancel) => {
   }
   afterCancel();
 };
+
+const toHistory = () => {
+  store.dispatch('toHistory')
+}
 </script>
 
 <style lang="scss" scoped>
@@ -90,5 +101,33 @@ const cancel = async (item, afterCancel) => {
       margin-bottom: $pale;
     }
   }
+
+  .running-list-hint {
+    width: 100%;
+    height: 100%;
+
+    @include flex-row();
+    @include flex-center();
+
+    font-weight: bold;
+    color: var(--el-color-info);
+
+    .running-list-link {
+      margin: 0;
+      padding-left: $pale;
+      color: var(--el-color-primary);
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .running-list-icon {
+      font-size: 25px;
+    }
+  }
+}
+
+.running-list-stretch {
+  height: 90%;
 }
 </style>
