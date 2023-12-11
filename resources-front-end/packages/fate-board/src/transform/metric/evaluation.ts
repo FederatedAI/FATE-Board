@@ -21,7 +21,7 @@ export default function evaluation(
 ) {
   const { data, groups } = metric_data;
 
-  let isRangeScoreTable = true
+  let isRangeScoreTable = false;
   const scoreTable = {
     header: [
       {
@@ -30,13 +30,13 @@ export default function evaluation(
       },
       {
         label: 'dataset',
-        prop: 'dataset'
-      }
+        prop: 'dataset',
+      },
     ],
     data: <any>[],
   };
 
-  let isRangeConfusionTable = false
+  let isRangeConfusionTable = false;
   const confusionMatrixTable = {
     header: [
       {
@@ -45,8 +45,8 @@ export default function evaluation(
       },
       {
         label: 'dataset',
-        prop: 'dataset'
-      }
+        prop: 'dataset',
+      },
     ],
     data: <any>[],
   };
@@ -80,16 +80,16 @@ export default function evaluation(
 
       const scoreRow: any = {
         component: fromComponent,
-        dataset: namespace
+        dataset: namespace,
       };
       const confusionRow: any = [
         {
           component: fromComponent,
-          dataset: namespace
+          dataset: namespace,
         },
         {
           component: fromComponent,
-          dataset: namespace
+          dataset: namespace,
         },
       ];
 
@@ -127,7 +127,7 @@ export default function evaluation(
 
         // confusion_matrix
         else if (metric.match(/confusion_matrix/i)) {
-          isRangeConfusionTable = true
+          isRangeConfusionTable = true;
           const { cuts, fn, fp, tn, tp } = val;
           if (
             !confusionMatrixTable.header.some((item) => item.prop === 'label')
@@ -211,18 +211,18 @@ export default function evaluation(
 
         // precision
         else if (metric.match(/precision/i)) {
-            // table
-            if (!scoreTable.header.some((item) => item.prop === 'precision')) {
-              scoreTable.header.push({
-                label: 'precision',
-                prop: 'precision',
-              });
-            }
+          // table
+          if (!scoreTable.header.some((item) => item.prop === 'precision')) {
+            scoreTable.header.push({
+              label: 'precision',
+              prop: 'precision',
+            });
+          }
           if (metric.match(/biclass/i)) {
             const isBinary = metric.match(/biClass/i);
             precisionRecall.binary = isBinary;
             const { cuts, p } = val;
-            isRangeScoreTable = true
+            isRangeScoreTable = true;
 
             let position: any;
             scoreRow['precision'] = (range: number) => {
@@ -240,14 +240,12 @@ export default function evaluation(
             };
             precisionRecall.precision = val;
           } else if (metric.match(/mult/)) {
-            isRangeScoreTable = false
-            scoreRow.precision = fixed(val)
+            scoreRow.precision = fixed(val);
           }
         }
 
         // recall
         else if (metric.match(/recall/i)) {
-          
           // table
           if (!scoreTable.header.some((item) => item.prop === 'recall')) {
             scoreTable.header.push({
@@ -261,7 +259,7 @@ export default function evaluation(
             precisionRecall.binary = isBinary;
 
             const { cuts, r } = val;
-            isRangeScoreTable = true
+            isRangeScoreTable = true;
 
             let position: any;
             scoreRow['recall'] = (range: number) => {
@@ -279,8 +277,7 @@ export default function evaluation(
             };
             precisionRecall.recall = val;
           } else {
-            isRangeScoreTable = false
-            scoreRow.recall = fixed(val)
+            scoreRow.recall = fixed(val);
           }
         }
 
@@ -296,10 +293,21 @@ export default function evaluation(
                   prop: 'accuracy',
                 });
               }
-              isRangeScoreTable = false
-              scoreRow.accuracy = fixed(val)
+              scoreRow.accuracy = fixed(val);
             }
           }
+        }
+
+        // homo_nn rmse
+        else if (metric.match(/rmse/i)) {
+          if (!scoreTable.header.some((item) => item.prop === 'rmse')) {
+            scoreTable.header.push({
+              label: 'rmse',
+              prop: 'rmse',
+            });
+          }
+          isRangeScoreTable = false;
+          scoreRow.rmse = fixed(val);
         }
 
         // f1Score
@@ -373,17 +381,20 @@ export default function evaluation(
     if (Object.keys(liftChart).length > 0) chartInfo['Lift'] = liftChart;
 
     const multPrChart = multPr.lineChart();
-    if (Object.keys(multPrChart).length > 0) chartInfo['Precision_Recall'] = multPrChart;
+    if (Object.keys(multPrChart).length > 0)
+      chartInfo['Precision_Recall'] = multPrChart;
 
     const binPrChart = binPR.lineChart();
-    if (Object.keys(binPrChart).length > 0) chartInfo['Precision Recall'] = binPrChart;
+    if (Object.keys(binPrChart).length > 0)
+      chartInfo['Precision Recall'] = binPrChart;
 
     const accuracyChart = accuracy.lineChart();
-    if (Object.keys(accuracyChart).length > 0) chartInfo['Accuracy'] = accuracyChart;
+    if (Object.keys(accuracyChart).length > 0)
+      chartInfo['Accuracy'] = accuracyChart;
   }
 
   const group = toGroup();
-  group.prop.class += ' f-d-seperator'
+  group.prop.class += ' f-d-seperator';
   group.children.push({
     id: 'EvaluationScore',
     tag: FRangeTable,
@@ -393,7 +404,7 @@ export default function evaluation(
       header: scoreTable.header,
       data: scoreTable.data,
       range: isRangeScoreTable ? 1 : false,
-      explain: 'Update Precision and Recall under the new quantile condition'
+      explain: 'Update Precision and Recall under the new quantile condition',
     },
   });
 
@@ -407,7 +418,8 @@ export default function evaluation(
         header: confusionMatrixTable.header,
         data: confusionMatrixTable.data,
         range: 0.5,
-        explain: 'Update the confusion matrix information under the new threshold condition'
+        explain:
+          'Update the confusion matrix information under the new threshold condition',
       },
     });
   }

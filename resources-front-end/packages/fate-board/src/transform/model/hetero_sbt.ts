@@ -215,7 +215,11 @@ export default function Hetero_sbt(
   const modelInstance = getModelData(modelData);
 
   const { hyper_param, trees, fid_name_mapping, feature_importance } = modelInstance.train_model_output;
-  const { num_class: classes } = hyper_param;
+  let { num_class: classes } = hyper_param;
+
+  if (!classes || classes <= 2) {
+    classes = 1
+  }
 
   const TabsOptions = <any>{};
 
