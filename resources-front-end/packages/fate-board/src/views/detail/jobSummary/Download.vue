@@ -27,7 +27,6 @@ const role = computed(() => store.state.job.role);
 const partyId = computed(() => store.state.job.partyId);
 
 const download = () => {
-  debugger
   if (!(role.value.match(/arbiter/i))) {
     API.jobDownload({ jobId: jobId.value, role: role.value, partyId: partyId.value });
   }

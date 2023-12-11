@@ -3,6 +3,7 @@
     <FTabsBySelection
       v-model="TabSelected"
       label="model label"
+      :show="TabOptions.length > 1"
       :options="TabOptions">
 
       <template #beforeTab>
