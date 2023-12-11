@@ -2,7 +2,6 @@
 import '@/style/default.scss';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 import ElementPlus from 'element-plus';
-import 'element-plus/dist/index.css';
 import * as FBComponent from 'fate-ui-component';
 import 'fate-ui-component/dist/css/main.css';
 import * as FBVisualization from 'fate-visualization';

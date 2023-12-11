@@ -9,7 +9,7 @@
         </article>
         <article class="f-fi-subtext">
           <slot name="subtitle" :count="count">
-            template{{ count }} features involved in model spliting
+            {{ count }} features involved in model spliting
           </slot>
         </article>
       </article>

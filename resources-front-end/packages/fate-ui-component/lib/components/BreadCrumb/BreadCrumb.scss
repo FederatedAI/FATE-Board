@@ -2,6 +2,28 @@
 @import '@/styles/index.scss';
 
 .fb-breadcrumb {
+  .el-breadcrumb__item {
+    .is-link {
+      .fb-breadcrumb-text {
+        color: var(--el-color-primary);
+      }
+      .fb-breadcrumb-icon {
+        color: var(--el-color-primary);
+      }
+    }
+
+    &:last-child {
+      .fb-breadcrumb-text {
+        color: var(--el-color-regular);
+      }
+      .fb-breadcrumb-icon {
+        color: var(--el-color-regular);
+      }
+    }
+  }
+
+
+
   .fb-breadcrumb-text {
     font-size: $text-size-small;
     line-height: $title-size;

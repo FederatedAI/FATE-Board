@@ -35,3 +35,13 @@
 @mixin text-color($color) {
   color: $color;
 }
+
+@mixin font-title {
+  @include title-4-size();
+  color: #999BA3;
+}
+
+@mixin font-text {
+  @include text-size();
+  color: #3e4052;
+}

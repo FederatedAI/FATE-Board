@@ -100,7 +100,6 @@ export default class DAG {
     this.zoomInstance = zoom()
       .scaleExtent([this.zoomMin, this.zoomMax])
       .on('zoom', () => {
-        debugger
         this.container.attr(
           'transform', zoomTransform(this.container.node()))
       });

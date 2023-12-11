@@ -4,7 +4,7 @@
       <slot name="beforeHeader"></slot>
       <section class="f-tabs-selection-tabs">
         <slot name="beforeTab"></slot>
-        <FSelection v-bind="$attrs"></fSelection>
+        <FSelection v-show="show !== false" v-bind="$attrs"></fSelection>
         <slot name="afterTab"></slot>
       </section>
       <slot name="afterHeader"></slot>
@@ -17,6 +17,8 @@
 
 <script lang="ts" setup>
 import FSelection from '../Selection/Selection.vue';
+
+defineProps(['show'])
 </script>
 
 <style lang="scss" scoped>

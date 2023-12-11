@@ -73,6 +73,14 @@ export default function Summary(
     if (!tableData[0]) {
       tableData.push(data)
     }
+
+    tableData = sort(tableData, 'label', (a: any, b: any) => {
+      if (a['label'].match(/total/i)) {
+        return 1
+      } else {
+        return -1
+      }
+    })
   } else {
     tableHeader.push(
       ...[
@@ -100,14 +108,6 @@ export default function Summary(
       })
     );
   }
-
-  tableData = sort(tableData, 'label', (a: any, b: any) => {
-    if (a['label'].match(/total/i)) {
-      return 1
-    } else {
-      return -1
-    }
-  })
 
   const SummaryMetricContainer = toGroup();
 
