@@ -67,7 +67,10 @@ public class UserService {
         String passwordValue = getValue("server.board.login.password");
         String privateKey = getValue("server.board.encrypt.private_key");
         String encrypted = getValue("server.board.encrypt.enable");
-        if (StringUtils.isNotBlank(privateKey) && "true".equalsIgnoreCase(encrypted)) {
+        if ("true".equalsIgnoreCase(encrypted)) {
+            if (StringUtils.isNotBlank(privateKey)) {
+                return false;
+            }
             try {
                 passwordValue = StandardRSAUtils.decryptByPrivateKey(passwordValue, privateKey);
             } catch (Exception e) {
