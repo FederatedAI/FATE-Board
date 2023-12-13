@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.webank.ai.fate.board.controller;
+package org.fedai.fate.board.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-import com.webank.ai.fate.board.global.Dict;
-import com.webank.ai.fate.board.global.ErrorCode;
-import com.webank.ai.fate.board.global.ResponseResult;
-import com.webank.ai.fate.board.log.LogFileService;
-import com.webank.ai.fate.board.pojo.*;
-import com.webank.ai.fate.board.services.FlowFeign;
-import com.webank.ai.fate.board.services.JobManagerService;
-import com.webank.ai.fate.board.utils.PageBean;
-import com.webank.ai.fate.board.utils.ResponseUtil;
+import org.fedai.fate.board.global.Dict;
+import org.fedai.fate.board.global.ErrorCode;
+import org.fedai.fate.board.global.ResponseResult;
+import org.fedai.fate.board.log.LogFileService;
+import org.fedai.fate.board.services.FlowFeign;
+import org.fedai.fate.board.services.JobManagerService;
+import org.fedai.fate.board.utils.PageBean;
+import org.fedai.fate.board.utils.ResponseUtil;
+import org.fedai.fate.board.pojo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +100,7 @@ public class JobManagerController {
 
         String result;
         try {
-            result = flowFeign.get(Dict.URL_JOB_DATAVIEW, jobManagerService.generateURLParamJobQueryDTO(jobQueryDTO));
+            result = flowFeign.get(Dict.URL_JOB_QUERY, jobManagerService.generateURLParamJobQueryDTO(jobQueryDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -123,7 +124,6 @@ public class JobManagerController {
             return new ResponseResult<>(ErrorCode.DATABASE_ERROR_RESULT_NULL);
         }
 
-//        jobWithBLOBs.setfRunIp(null);
         jobWithBLOBs.setfDsl(null);
         jobWithBLOBs.setfRuntimeConf(null);
         if (jobWithBLOBs.getfStatus().equals(Dict.TIMEOUT)) {
@@ -137,7 +137,7 @@ public class JobManagerController {
 
         String result;
         try {
-            result = flowFeign.get(Dict.URL_JOB_DATAVIEW, paramMap);
+            result = flowFeign.get(Dict.URL_JOB_QUERY, paramMap);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -147,12 +147,26 @@ public class JobManagerController {
         }
 
         JSONObject resultObject = JSON.parseObject(result);
-        Integer retcode = resultObject.getInteger(Dict.RETCODE);
+        Integer retcode = resultObject.getInteger(Dict.CODE);
         if (retcode == null) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_WRONG_RESULT);
         }
+
         if (retcode == 0) {
-            JSONObject data = resultObject.getJSONObject(Dict.DATA);
+            JSONArray jsonArray = resultObject.getJSONArray(Dict.DATA);
+            JSONObject data = jsonArray == null ? null : (JSONObject) jsonArray.get(0);
+            if(data != null) {
+                String dataViewResult;
+                try {
+                    dataViewResult = flowFeign.get(Dict.URL_JOB_DATA_VIEW, paramMap);
+                    JSONObject dataViewResultObj = JSON.parseObject(dataViewResult);
+                    JSONObject dataObject = dataViewResultObj.getJSONObject(Dict.DATA);
+                    JSONObject dataViewObject = dataObject.getJSONObject(Dict.DATA_VIEW);
+                    data.put(Dict.DATA_SET,dataViewObject);
+                } catch (Exception e) {
+                    logger.error("add data view error:", e);
+                }
+            }
             resultMap.put(Dict.JOB, jobWithBLOBs);
             resultMap.put(Dict.DATASET, data);
             return new ResponseResult<>(ErrorCode.SUCCESS, resultMap);
@@ -181,7 +195,6 @@ public class JobManagerController {
         if (!result) {
             return new ResponseResult<>(ErrorCode.REQUEST_PARAMETER_ERROR);
         }
-
 
 
         PageBean<Map<String, Object>> listPageBean = jobManagerService.queryPagedJobs(pagedJobQO);
