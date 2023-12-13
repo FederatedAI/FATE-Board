@@ -93,11 +93,11 @@ public class JobDetailController {
         }
         Preconditions.checkArgument(LogFileService.checkPathParameters(componentQueryDTO.getJob_id(), componentQueryDTO.getRole(), componentQueryDTO.getParty_id(), componentQueryDTO.getComponent_name()));
 
-        Map<String,Object> reqMap = new HashMap<>();
-        reqMap.put(Dict.JOBID,componentQueryDTO.getJob_id());
-        reqMap.put(Dict.ROLE,componentQueryDTO.getRole());
-        reqMap.put(Dict.PARTY_ID,componentQueryDTO.getParty_id());
-        reqMap.put(Dict.TASK_NAME,componentQueryDTO.getComponent_name());
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put(Dict.JOBID, componentQueryDTO.getJob_id());
+        reqMap.put(Dict.ROLE, componentQueryDTO.getRole());
+        reqMap.put(Dict.PARTY_ID, componentQueryDTO.getParty_id());
+        reqMap.put(Dict.TASK_NAME, componentQueryDTO.getComponent_name());
         String result;
         try {
 
@@ -152,12 +152,12 @@ public class JobDetailController {
 
         String taskId = componentQueryDTO.getJob_id() + "_" + componentQueryDTO.getComponent_name();
         Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put(Dict.JOBID, componentQueryDTO.getJob_id() );
+        paramMap.put(Dict.JOBID, componentQueryDTO.getJob_id());
         paramMap.put(Dict.TASK_ID, taskId);
 
         String result = null;
         try {
-            result = flowFeign.get(Dict.URL_TASK_DATAVIEW,paramMap);
+            result = flowFeign.get(Dict.URL_TASK_DATAVIEW, paramMap);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -169,13 +169,13 @@ public class JobDetailController {
         Integer retcode = resultObject.getInteger(Dict.CODE);
         String msg = resultObject.getString(Dict.RETMSG);
 
-        JSONObject detail = (JSONObject)resultObject.getJSONArray(Dict.DATA).get(0);
+        JSONObject detail = (JSONObject) resultObject.getJSONArray(Dict.DATA).get(0);
         JSONObject newData = detail.getJSONObject(Dict.COMPONENT_PARAMETERS);
 
         if (newData != null) {
             JSONObject conf = newData.getJSONObject("conf");
             if (conf != null) {
-                JSONObject federation =  conf.getJSONObject("federation");
+                JSONObject federation = conf.getJSONObject("federation");
                 if (federation != null) {
                     JSONObject metadata = federation.getJSONObject("metadata");
                     if (metadata != null) {
@@ -183,7 +183,7 @@ public class JobDetailController {
                         if (rollSiteConfig != null) {
                             String host = rollSiteConfig.getString("host");
                             if (null != host) {
-                                newData.getJSONObject("conf").getJSONObject("federation").getJSONObject("metadata").getJSONObject("rollsite_config").put("host","xxx.xxx.xxx.xxx");
+                                newData.getJSONObject("conf").getJSONObject("federation").getJSONObject("metadata").getJSONObject("rollsite_config").put("host", "xxx.xxx.xxx.xxx");
                             }
                         }
                     }
@@ -194,7 +194,7 @@ public class JobDetailController {
                 JSONObject metadata = mlmd.getJSONObject("metadata");
                 if (null != metadata) {
                     String host = metadata.getString("host");
-                    newData.getJSONObject("mlmd").getJSONObject("metadata").put("host","xxx.xxx.xxx.xxx");
+                    newData.getJSONObject("mlmd").getJSONObject("metadata").put("host", "xxx.xxx.xxx.xxx");
                 }
             }
         }
@@ -269,91 +269,6 @@ public class JobDetailController {
         }
     }
 
-    public ResponseResult getDagDependenciesNew(String param) {
-        JSONObject jsonObject = JSON.parseObject(param);
-        String jobId = jsonObject.getString(Dict.JOBID);
-        String role = jsonObject.getString(Dict.ROLE);
-        String partyId = jsonObject.getString(Dict.PARTY_ID);
-
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put(Dict.JOBID, jobId);
-        paramMap.put(Dict.ROLE, role);
-        paramMap.put(Dict.PARTY_ID, partyId);
-
-        String result;
-        try {
-            result = flowFeign.get(Dict.URL_JOB_DATAVIEW, paramMap);
-        } catch (Exception e) {
-            logger.error("connect fateflow error:", e);
-            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
-        }
-
-        if ((result == null) || 0 == result.trim().length()) {
-            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
-        }
-
-        JSONObject resultObject = JSON.parseObject(result);
-        Integer retCode = resultObject.getInteger(Dict.CODE);
-        if (retCode == null) {
-            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_WRONG_RESULT);
-        }
-
-        if (retCode == 0) {
-            JSONArray jsonArray = resultObject.getJSONArray(Dict.DATA);
-            if (jsonArray != null && jsonArray.size() > 0) {
-                JSONObject data = new JSONObject();
-
-                JSONObject detailData = (JSONObject) jsonArray.get(0);
-                JSONObject dagData = (JSONObject) detailData.get("dag");
-                JSONObject dagDetail = (JSONObject) dagData.get("dag");
-                JSONObject tasks = (JSONObject) dagDetail.get("tasks");
-                Set<String> taskNames = tasks.keySet();
-                ArrayList<Map<String, Object>> componentList = new ArrayList<>();
-                Map<String, String> componentModule = new HashMap<>();
-                Map<String, Object> dependencies = new HashMap<>();
-                for (String taskName : taskNames) {
-                    JSONObject taskInfo = (JSONObject) tasks.get(taskName);
-
-                    // componentList handle
-                    Map<String, Object> taskDetail = taskManagerService.findTaskDetail(jobId, role, partyId, taskName);
-                    taskDetail.put("component_name", taskName);
-                    componentList.add(taskDetail);
-
-                    // componentModule handle
-                    String component_ref = taskInfo.getString("component_ref");
-                    componentModule.put(taskName, component_ref);
-
-                    // dependencies handle
-                    JSONArray dependentTasks = taskInfo.getJSONArray("dependent_tasks");
-                    if (dependentTasks == null || dependentTasks.size() == 0) {
-                        dependencies.put(taskName, null);
-                    } else {
-                        Object o = dependentTasks.get(0);
-                        Map<String, Object> dependencyInfoMap = new HashMap<>();
-                        dependencyInfoMap.put("component_name", o);
-                        dependencyInfoMap.put("up_output_info", null);
-                        dependencyInfoMap.put("type", null);
-                        JSONArray array = new JSONArray();
-                        array.add(dependencyInfoMap);
-                        dependencies.put(taskName, array);
-                    }
-                }
-
-                // componentNeedRun handle
-                JSONObject needRunInfo = getNeedRunInfo(paramMap);
-
-                data.put("component_list", componentList);
-                data.put("component_need_run", needRunInfo);
-                data.put("component_module", componentModule);
-                data.put("dependencies", dependencies);
-                return new ResponseResult<>(ErrorCode.SUCCESS, data);
-            }
-        } else {
-            return new ResponseResult<>(retCode, resultObject.getString(Dict.RETMSG));
-        }
-        return new ResponseResult<>(retCode, resultObject.getString(Dict.RETMSG));
-    }
-
     public JSONObject getNeedRunInfo(Map paramMap) {
         String result;
         try {
@@ -376,6 +291,7 @@ public class JobDetailController {
         }
         return null;
     }
+
 
     public ResponseResult getDagDependencies(String param) {
         //check and get parameters
@@ -409,13 +325,15 @@ public class JobDetailController {
 
         if (retCode == 0) {
             JSONObject data = resultObject.getJSONObject(Dict.DATA);
-            JSONObject component_need_run = data.getJSONObject(Dict.COMPONENT_NEED_RUN);
+            JSONArray jsonArray = data.getJSONArray(Dict.COMPONENT_LIST);
             ArrayList<Map<String, Object>> componentList = new ArrayList<>();
-            Set<String> keys = component_need_run.keySet();
-            for (Object o : keys) {
+
+
+            for (int i = 0; i < jsonArray.size(); i++) {
+                String componentName = jsonArray.getString(i);
                 HashMap<String, Object> component = new HashMap<>();
-                component.put(Dict.COMPONENT_NAME, o);
-                Map<String, Object> taskDetail = taskManagerService.findTaskDetail(jobId, role, partyId, (String) o);
+                component.put(Dict.COMPONENT_NAME, componentName);
+                Map<String, Object> taskDetail = taskManagerService.findTaskDetail(jobId, role, partyId, (String) componentName);
                 String taskStatus = null;
                 Long createTime = null;
                 if (taskDetail != null) {
@@ -427,7 +345,6 @@ public class JobDetailController {
                 component.put(Dict.TIME, createTime);
                 componentList.add(component);
             }
-
             data.put(Dict.COMPONENT_LIST, componentList);
             return new ResponseResult<>(ErrorCode.SUCCESS, data);
 
@@ -482,20 +399,31 @@ public class JobDetailController {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
         }
 
+        if ((result == null) || 0 == result.trim().length()) {
+            return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
+        }
         JSONObject object = JSON.parseObject(result);
-        JSONArray outputDataArray  = object.getJSONArray("output_data");
-        JSONObject outputData = (JSONObject)outputDataArray.get(0);
+        Set<String> set = object.keySet();
+        String[] keys = set.toArray(new String[0]);
+        JSONArray outputDataArray = new JSONArray();
+        if (keys.length > 0) {
+            String keyName = keys[0];
+            outputDataArray = object.getJSONArray(keyName);
+        }
+
+        JSONObject outputData = (JSONObject) outputDataArray.get(0);
 
         JSONArray jsonArray = outputData.getJSONArray("data");
         int count = 0;
         if (jsonArray != null) {
             count = jsonArray.size();
         }
-        outputData.put(Dict.DATA_COUNT,count);
+        outputData.put(Dict.DATA_COUNT, count);
         outputDataArray.clear();
         outputDataArray.add(outputData);
-        object.put(Dict.OUTPUT_DATA,outputDataArray);
-        return new ResponseResult(ErrorCode.SUCCESS,object);
+        object.clear();
+        object.put(Dict.OUTPUT_DATA, outputDataArray);
+        return new ResponseResult(ErrorCode.SUCCESS, object);
     }
 
     @RequestMapping(value = "/tracking/component/metric_data/batch", method = RequestMethod.POST)

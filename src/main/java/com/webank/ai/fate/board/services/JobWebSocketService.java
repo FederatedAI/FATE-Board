@@ -113,7 +113,6 @@ public class JobWebSocketService implements Runnable {
                     param.put(Dict.JOBID, jobId);
                     param.put(Dict.ROLE, role);
                     param.put(Dict.PARTY_ID, partyId);
-                    //Future<?> dependencyFuture = ThreadPoolTaskExecutorUtil.submitListenable(asyncServiceExecutor, () -> jobDetailController.getDagDependencies(JSON.toJSONString(param)), new int[]{500}, new int[]{3});
                     ListenableFuture<ResponseResult<JSONObject>> dependencyFuture = asyncServiceExecutor.submitListenable(() -> jobDetailController.getDagDependencies(JSON.toJSONString(param)));
                     ResponseResult<JSONObject> responseResult = dependencyFuture.get();
                     if (0 == responseResult.getCode()) {
@@ -132,15 +131,6 @@ public class JobWebSocketService implements Runnable {
                         throw new IllegalArgumentException("summary parameter error");
                     }
 
-//                    if (pushStatus) {
-//                        JSONObject dependency = (JSONObject) flushToWebData.get(Dict.DEPENDENCY_DATA);
-//                        dependency.remove("component_module");
-//                        dependency.remove("component_need_run");
-//                        dependency.remove("dependencies");
-//                        Map<String, Object> summary = (Map<String, Object>) flushToWebData.get(Dict.SUMMARY_DATA);
-//                        summary.remove("dataset");
-//                    }
-//
                     if (session.isOpen()) {
                         session.getBasicRemote().sendText(JSON.toJSONString(flushToWebData));
                         logger.warn("session:{}, data to push:{}", session, JSON.toJSONString(flushToWebData));
@@ -148,15 +138,11 @@ public class JobWebSocketService implements Runnable {
                         if (Dict.JOB_FINISHED_STATUS.contains(status)) {
                             session.close();
                             break;
-
-
-
                         }
                         Thread.sleep(500);
                     } else {
                         break;
                     }
-
 
                 } else {
                     if (session.isOpen()) {
