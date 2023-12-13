@@ -87,7 +87,7 @@ public class JobManagerService {
     private Map<String, Object> getJobMap(Map<String, Object> params) {
         String result = null;
         try {
-            result = flowFeign.get(Dict.URL_JOB_QUERY, params);
+            result = flowFeign.get(Dict.URL_JOB_QUERY_LIST, params);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             LogicException.throwError(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -219,7 +219,7 @@ public class JobManagerService {
                 jobParams.put(Dict.JOBID, jobId1);
                 jobParams.put((Dict.ROLE), role1);
                 jobParams.put(Dict.PARTY_ID, partyId1);
-                String result = flowFeign.get(Dict.URL_JOB_DATAVIEW, jobParams);
+                String result = flowFeign.get(Dict.URL_JOB_QUERY, jobParams);
 
                 JSONObject resultObject = JSON.parseObject(result);
                 Integer retCode = resultObject.getInteger(Dict.RETCODE);
@@ -290,7 +290,7 @@ public class JobManagerService {
         jobParams.put(Dict.PARTY_ID, partyId);
         String result = null;
         try {
-            result = flowFeign.get(Dict.URL_JOB_DATAVIEW, jobParams);
+            result = flowFeign.get(Dict.URL_JOB_QUERY, jobParams);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
