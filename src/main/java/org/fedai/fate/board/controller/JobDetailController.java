@@ -186,6 +186,23 @@ public class JobDetailController {
                                 newData.getJSONObject("conf").getJSONObject("federation").getJSONObject("metadata").getJSONObject("rollsite_config").put("host", "xxx.xxx.xxx.xxx");
                             }
                         }
+                        JSONObject osxConfig = metadata.getJSONObject("osx_config");
+                        if (osxConfig != null) {
+                            String host = osxConfig.getString("host");
+                            if (null != host) {
+                                newData.getJSONObject("conf").getJSONObject("federation").getJSONObject("metadata").getJSONObject("osx_config").put("host", "xxx.xxx.xxx.xxx");
+                            }
+                        }
+                    }
+                }
+                JSONObject computing = conf.getJSONObject("computing");
+                if (computing != null) {
+                    JSONObject metadata = computing.getJSONObject("metadata");
+                    if (metadata != null) {
+                        String host = metadata.getString("host");
+                        if (null != host) {
+                            newData.getJSONObject("conf").getJSONObject("computing").getJSONObject("metadata").put("host", "xxx.xxx.xxx.xxx");
+                        }
                     }
                 }
             }
@@ -194,7 +211,9 @@ public class JobDetailController {
                 JSONObject metadata = mlmd.getJSONObject("metadata");
                 if (null != metadata) {
                     String host = metadata.getString("host");
-                    newData.getJSONObject("mlmd").getJSONObject("metadata").put("host", "xxx.xxx.xxx.xxx");
+                    if (null != host) {
+                        newData.getJSONObject("mlmd").getJSONObject("metadata").put("host", "xxx.xxx.xxx.xxx");
+                    }
                 }
             }
         }
