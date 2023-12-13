@@ -32,6 +32,8 @@ public class Dict {
     static public final String LOG_TYPE = "log_type";
     static public final String CODE = "code";
     static public final String DATA = "data";
+    static public final String DATA_VIEW = "data_view";
+    static public final String DATA_SET = "dataset";
     static public final String OUTPUT_DATA = "output_data";
     static public final String DATA_COUNT = "total";
     static public final String JOB = "job";
@@ -80,8 +82,10 @@ public class Dict {
     static public final String URL_OUTPUT_DATA = "/v2/output/data/display";
 
     static public final String URL_JOB_STOP = "/v2/job/stop";
-    static public final String URL_JOB_QUERY = "/v2/job/list/query";
-    static public final String URL_JOB_DATAVIEW = "/v2/job/query";
+    static public final String URL_JOB_QUERY_LIST = "/v2/job/list/query";
+
+    static public final String URL_JOB_QUERY = "/v2/job/query";
+    static public final String URL_JOB_DATA_VIEW = "/v2/job/data/view";
     static public final String URL_JOB_UPDATE = "/v2/job/notes/add";
     static public final String URL_JOB_RERUN = "/v2/job/rerun";
     static public final String URL_DAG_DEPENDENCY = "/v2/job/dag/dependency";
