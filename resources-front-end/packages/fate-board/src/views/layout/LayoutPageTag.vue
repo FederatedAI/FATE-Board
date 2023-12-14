@@ -45,7 +45,7 @@ const tags = computed(() =>
 
   cursor: pointer;
   color: $default-white;
-  @include title-4-size();
+  @include text-size();
 
   &:hover {
     color: $default-white;
