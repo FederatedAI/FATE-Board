@@ -100,7 +100,7 @@ public class JobManagerController {
 
         String result;
         try {
-            result = flowFeign.get(Dict.URL_JOB_DATAVIEW, jobManagerService.generateURLParamJobQueryDTO(jobQueryDTO));
+            result = flowFeign.get(Dict.URL_JOB_QUERY, jobManagerService.generateURLParamJobQueryDTO(jobQueryDTO));
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -124,7 +124,6 @@ public class JobManagerController {
             return new ResponseResult<>(ErrorCode.DATABASE_ERROR_RESULT_NULL);
         }
 
-//        jobWithBLOBs.setfRunIp(null);
         jobWithBLOBs.setfDsl(null);
         jobWithBLOBs.setfRuntimeConf(null);
         if (jobWithBLOBs.getfStatus().equals(Dict.TIMEOUT)) {
@@ -138,7 +137,7 @@ public class JobManagerController {
 
         String result;
         try {
-            result = flowFeign.get(Dict.URL_JOB_DATAVIEW, paramMap);
+            result = flowFeign.get(Dict.URL_JOB_QUERY, paramMap);
         } catch (Exception e) {
             logger.error("connect fateflow error:", e);
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_CONNECTION);
@@ -152,10 +151,23 @@ public class JobManagerController {
         if (retcode == null) {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_WRONG_RESULT);
         }
+
         if (retcode == 0) {
             JSONArray jsonArray = resultObject.getJSONArray(Dict.DATA);
-            JSONObject data = jsonArray == null ? null : (JSONObject)jsonArray.get(0);
-                    resultMap.put(Dict.JOB, jobWithBLOBs);
+            JSONObject data = jsonArray == null ? null : (JSONObject) jsonArray.get(0);
+            if(data != null) {
+                String dataViewResult;
+                try {
+                    dataViewResult = flowFeign.get(Dict.URL_JOB_DATA_VIEW, paramMap);
+                    JSONObject dataViewResultObj = JSON.parseObject(dataViewResult);
+                    JSONObject dataObject = dataViewResultObj.getJSONObject(Dict.DATA);
+                    JSONObject dataViewObject = dataObject.getJSONObject(Dict.DATA_VIEW);
+                    data.put(Dict.DATA_SET,dataViewObject);
+                } catch (Exception e) {
+                    logger.error("add data view error:", e);
+                }
+            }
+            resultMap.put(Dict.JOB, jobWithBLOBs);
             resultMap.put(Dict.DATASET, data);
             return new ResponseResult<>(ErrorCode.SUCCESS, resultMap);
         } else {
@@ -183,7 +195,6 @@ public class JobManagerController {
         if (!result) {
             return new ResponseResult<>(ErrorCode.REQUEST_PARAMETER_ERROR);
         }
-
 
 
         PageBean<Map<String, Object>> listPageBean = jobManagerService.queryPagedJobs(pagedJobQO);

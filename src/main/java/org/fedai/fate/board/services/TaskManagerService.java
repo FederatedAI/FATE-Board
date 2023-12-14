@@ -68,7 +68,7 @@ public class TaskManagerService {
             if (tasks != null || tasks.size() > 0) {
                 JSONObject taskDetail = (JSONObject)tasks.get(0);
                 resultMap.put("status",taskDetail.getString("status"));
-                resultMap.put("time",taskDetail.get("end_time"));
+                resultMap.put("time",taskDetail.get("start_time"));
             }
             return resultMap;
         }
