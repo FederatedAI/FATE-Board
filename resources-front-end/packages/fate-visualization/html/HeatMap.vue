@@ -24,7 +24,7 @@ const data = reactive<any>([])
 for (let i = 0; i < demox.length; i++) {
   const row = []
   for (let j = 0; j < i + 1; j++) {
-    if (j === i) row.unshift(undefined)
+    if (j === i) row.unshift(10)
     else row.unshift(Number((Math.random() * 10).toFixed(6)))
   }
   data.unshift(row)

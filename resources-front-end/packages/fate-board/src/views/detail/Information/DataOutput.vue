@@ -12,7 +12,7 @@
         class="f-info-data-selection"
       ></FSelection>
     </section>
-    <section class="f-info-data-body">
+    <section class="f-info-data-body" :key="refresh">
       <FTable
         :header="dataTableHeader[selected ? Number(selected) || 0 : 0] || []"
         :data="dataTableData[selected ? Number(selected) || 0 : 0] || []"
@@ -35,6 +35,7 @@ const selected = ref(selections.value[0] ? selections.value[0].value : '');
 const dataTableHeader = ref([]);
 const dataTableData = ref([]);
 const dataTotal = ref([])
+const refresh = ref(0)
 
 const dataRequest = async () => {
   const response = await store.dispatch('dataOutput');
@@ -57,7 +58,7 @@ const dataRequest = async () => {
         for (const item of fields) {
           list.push({
             label: item.name,
-            prop: item.property,
+            prop: item.name,
           });
         }
         return list;
@@ -83,6 +84,7 @@ const dataRequest = async () => {
   dataTableHeader.value = tableHeader;
   dataTableData.value = tableData;
   dataTotal.value = total
+  refresh.value ++
 };
 
 watch(

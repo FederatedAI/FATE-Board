@@ -1,5 +1,5 @@
 <template>
-  <section class="fb-table" :key="refresh">
+  <section class="fb-table">
     <Columns
       :data="currentData"
       :header="currentHeader"
@@ -12,6 +12,7 @@
       :max-height="maxHeight"
       :range="range"
       v-bind="$attrs"
+      :key="refresh"
       class="fb-table-columns"
       @sort-change="sortChange"
     />
@@ -92,7 +93,7 @@ watch(
   () => props.header,
   () => {
     currentPage.value = 1;
-    refresh.value++
+    // refresh.value++
   },
   { deep: true }
 );
@@ -100,7 +101,7 @@ watch(
 watch(
   () => props.data,
   () => {
-    refresh.value++
+    // refresh.value++
   },
   { deep: true }
 )

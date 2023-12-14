@@ -1,7 +1,7 @@
-export default function sort (dataList: any[], key: string, cb?: any) {
+export default function sort (dataList: any[], key?: string, cb?: any) {
   const list = dataList.sort((a: any, b: any) => {
-    const aKey = String(a[key])
-    const bKey = String(b[key])
+    const aKey = String(key ? a[key] : a)
+    const bKey = String(key ? b[key] : b)
     const cbResult = cb ? cb(a, b) : 0
 
     if (cbResult === 0) {
@@ -20,7 +20,10 @@ export default function sort (dataList: any[], key: string, cb?: any) {
         }
         if (!aIsN || !bIsN) {
           if (an && bn) {
-            return parseFloat(an) > parseFloat(bn) ? 1 : -1
+            const anum = parseFloat(an)
+            const bnum = parseFloat(bn)
+            if (anum > bnum) return 1
+            else if (anum < bnum) return -1
           } else if (ac === bc) {
             an = ''
             bn = ''

@@ -1,6 +1,8 @@
 import API from '@/api';
 import portConfigurationExplain from '@/utils/portCongifurationExplain';
+import { ElMessage } from 'element-plus';
 import { getLocal, setLocal } from 'fate-tools';
+import { isObject } from 'lodash';
 
 const KEY = 'PORT_CONFIGURAIONT';
 
@@ -54,10 +56,20 @@ export default {
         const responseData = await API.portConfig({
           componentName: name
         })
-        configuration = portConfigurationExplain(responseData)
-        if (!cache) cache = {}
-        Object.assign(cache, { [name]: configuration })
-        setLocal(KEY, JSON.stringify(cache))
+        if (isObject(responseData)) {
+          configuration = portConfigurationExplain(responseData)
+          if (!cache) cache = {}
+          Object.assign(cache, { [name]: configuration })
+          setLocal(KEY, JSON.stringify(cache))
+        } else {
+          ElMessage({
+            showClose: true,
+            message: `There has no configuration yml for component ${name}`,
+            center: true,
+            type: 'error'
+          })
+          throw new Error('Explain failed')
+        }
       }
       return configuration
     }
