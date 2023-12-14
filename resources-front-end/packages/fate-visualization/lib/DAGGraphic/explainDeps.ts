@@ -45,7 +45,7 @@ export default function explainDependencies(data: any, containerWidth: number) {
           : 'reader',
         disable: data?.component_need_run
           ? !data?.component_need_run[compId]
-          : true,
+          : false,
         stage: runningStage(
           data?.component_stage ? data?.component_stage[compId] : undefined
         ),
@@ -68,8 +68,9 @@ export default function explainDependencies(data: any, containerWidth: number) {
     const fromCompInstance = comps.get(from);
     const toCompInstance = comps.get(end);
     if (toCompInstance && fromCompInstance) {
-      (toCompInstance as any).level < (fromCompInstance as any).level + 1;
-      (toCompInstance as any).level = (fromCompInstance as any).level + 1;
+      if ((toCompInstance as any).level < (fromCompInstance as any).level + 1) {
+        (toCompInstance as any).level = (fromCompInstance as any).level + 1;
+      }
     }
     if (linksForLevels[end]) { 
       for (const each of linksForLevels[end]) {
