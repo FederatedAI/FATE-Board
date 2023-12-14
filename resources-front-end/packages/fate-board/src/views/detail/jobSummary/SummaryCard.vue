@@ -1,14 +1,14 @@
 <template>
   <section class="f-summary">
     <article class="f-summary-title">Job Summary</article>
-    <Summary :data="data"></Summary>
+    <Summary :data="data" :dataset="dataset"></Summary>
   </section>
 </template>
 
 <script lang="ts" setup>
 import Summary from './Summary.vue';
 
-defineProps(['data']);
+defineProps(['data', 'dataset']);
 </script>
 
 <style lang="scss" scoped>

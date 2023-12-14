@@ -18,13 +18,18 @@ export default function explain (parameters: Parameters, ext?: object) {
 
   const config = merge({}, tooltip(), dataZoom(), axis(parameters), visualMap(parameters), {
     grid: {
-      right: 80,
+      right: 100,
+
+      top: '10%',
+      bottom: '14%',
     },
     series: {
       type: 'heatmap',
       data,
       label: {
-        show: false
+        show: false,
+        fontSize: 10,
+        overflow: 'truncate'
       }
     }
   }, configuration, ext || {})
