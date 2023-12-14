@@ -17,7 +17,7 @@
       </template>
     </section>
     <section v-else class="running-list-hint">
-      No job is running yet,<span class="running-list-link" @click.stop="toHistory">skit to Jobs for more. <el-icon class="running-list-icon"><Right /></el-icon></span>
+      No job is running yet,<span class="running-list-link" @click.stop="toHistory">skip to Jobs for more. <el-icon class="running-list-icon"><Right /></el-icon></span>
     </section>
   </section>
 </template>

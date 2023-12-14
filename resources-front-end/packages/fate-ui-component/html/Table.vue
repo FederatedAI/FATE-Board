@@ -8,6 +8,7 @@
     :index="true"
     :row-class-name="rowClassName"
     :range="range"
+    :column="true"
     position="right"
     @sizeChange="sizeChange"
     @currentChange="currentChange"
@@ -30,87 +31,87 @@ function rowClassName ({ row }: any) {
 const range = ref(3)
 const currentHeader = ref<any>(undefined)
 const header = [
-  // {
-  //   type: 'link',
-  //   prop: 'jobId',
-  //   label: 'ID',
-  //   width: 250,
-  //   showOverflowTooltip: true,
-  //   onClick: (scope: any) => {
-  //     console.log('link', scope)
-  //   }
-  // },
-  // {
-  //   prop: 'role',
-  //   label: 'Role',
-  //   width: 100,
-  //   showOverflowTooltip: true,
-  // },
-  // {
-  //   prop: 'v1',
-  //   label: 'v1',
-  // },
-  // {
-  //   prop: 'v2',
-  //   label: 'v2',
-  // },
-  // {
-  //   prop: 'v3',
-  //   label: 'v3',
-  // },
-  // {
-  //   prop: 'v4',
-  //   label: 'v4',
-  // },
+  {
+    type: 'link',
+    prop: 'jobId',
+    label: 'ID',
+    width: 250,
+    showOverflowTooltip: true,
+    onClick: (scope: any) => {
+      console.log('link', scope)
+    }
+  },
+  {
+    prop: 'role',
+    label: 'Role',
+    width: 100,
+    showOverflowTooltip: true,
+  },
+  {
+    prop: 'v1',
+    label: 'v1',
+  },
+  {
+    prop: 'v2',
+    label: 'v2',
+  },
+  {
+    prop: 'v3',
+    label: 'v3',
+  },
+  {
+    prop: 'v4',
+    label: 'v4',
+  },
   {
     prop: 'start_time',
     label: 'start_time'
   },
-  // {
-  //   label: 'Status',
-  //   children: [{
-  //     type: 'progress',
-  //     prop: 'status',
-  //     label: 'runningStatus',
-  //     width: 200,
-  //   }, {
-  //     prop: 'stage',
-  //     label: 'JobStage',
-  //     width: 200
-  //   }]
-  // },
-  // {
-  //   type: 'edit',
-  //   prop: 'notes',
-  //   label: 'Notes',
-  //   minWidth: 170,
-  //   onEdit: (content: string, scope: any) => {
-  //     console.log('edit:',content, scope)
-  //   }
-  // },
-  // {
-  //   type: 'action',
-  //   label: 'Action',
-  //   width: 300,
-  //   fixed: 'right',
-  //   operations: ({ row }: any) => {
-  //     if (row.status.value.match(/(fail|cancel)/i)) {
-  //       return [{
-  //         label: 'retry',
-  //         onclick: ({ row }: any) => {
-  //           console.log('retry', row.jobId)
-  //         }
-  //       }, {
-  //         label: 'log',
-  //         onclick: ({ row }: any) => {
-  //           console.log('log', row.jobId)
-  //         }
-  //       }]
-  //     } else {
-  //       return []
-  //     }
-  //   }
-  // },
+  {
+    label: 'Status',
+    children: [{
+      type: 'progress',
+      prop: 'status',
+      label: 'runningStatus',
+      width: 200,
+    }, {
+      prop: 'stage',
+      label: 'JobStage',
+      width: 200
+    }]
+  },
+  {
+    type: 'edit',
+    prop: 'notes',
+    label: 'Notes',
+    minWidth: 170,
+    onEdit: (content: string, scope: any) => {
+      console.log('edit:',content, scope)
+    }
+  },
+  {
+    type: 'action',
+    label: 'Action',
+    width: 300,
+    fixed: 'right',
+    operations: ({ row }: any) => {
+      if (row.status.value.match(/(fail|cancel)/i)) {
+        return [{
+          label: 'retry',
+          onclick: ({ row }: any) => {
+            console.log('retry', row.jobId)
+          }
+        }, {
+          label: 'log',
+          onclick: ({ row }: any) => {
+            console.log('log', row.jobId)
+          }
+        }]
+      } else {
+        return []
+      }
+    }
+  },
 ];
 
 /**
