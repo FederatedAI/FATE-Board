@@ -7,10 +7,10 @@
     </el-col>
     <el-col :span="6" class="l-header-operation">
       <el-row>
-        <el-col :span="16">
+        <el-col :span="14">
           <LayoutPageTag></LayoutPageTag>
         </el-col>
-        <el-col :span="8">
+        <el-col :span="10">
           <LayoutUserInfo></LayoutUserInfo>
         </el-col>
       </el-row>
