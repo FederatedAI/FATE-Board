@@ -14,11 +14,12 @@
 import { toDate, toTime } from 'fate-tools';
 import { isObject } from 'lodash';
 import { onBeforeMount, reactive, watch } from 'vue';
+import Dataset from './Dataset.vue';
 import Download from './Download.vue';
 import Edit from './Edit.vue';
 import Text from './Text.vue';
 
-const props = defineProps(['data']);
+const props = defineProps(['data', 'dataset']);
 
 const information: any = reactive({
   fJobId: { tag: Text, title: 'Job ID', col: true },
@@ -26,6 +27,7 @@ const information: any = reactive({
   fDescription: { tag: Edit, title: 'notes' },
   fRole: { tag: Text, title: 'role' },
   fPartyId: { tag: Text, title: 'party ID' },
+  fDataset: { tag: Dataset, dataset: props.dataset },
   fDownload: { tag: Download },
   fCreateTime: { tag: Text, title: 'submission time', col: true },
   fStartTime: { tag: Text, title: 'start time', col: true },
@@ -56,6 +58,13 @@ watch(
   explain,
   { deep: true });
 
+watch(
+  () => props.dataset,
+  () => {
+    information.fDataset.dataset = props.dataset
+  },
+  { deep: true }
+)
 </script>
 
 <style lang="scss" scoped>

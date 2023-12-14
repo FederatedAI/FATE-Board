@@ -5,7 +5,7 @@
     </section>
     <section class="f-detail-main"> 
       <section class="f-detail-summary">
-        <JobSummary :data="jobData" class="f-detail-summary-list"/>
+        <JobSummary :data="jobData" :dataset="jobDataset" class="f-detail-summary-list"/>
         <section class="f-detail-summary-btn">
           <el-button type="primary" @click="toDashboard">Dashboard</el-button>
         </section>
@@ -39,6 +39,7 @@ const store = useStore();
 const detailLoading = ref(true);
 const parameter = ref()
 const jobData = computed(() => store.state.job.details);
+const jobDataset = computed(() => store.state.job.dataset?.dataset)
 const btnDisable = ref(true)
 
 const componentChoose = async (comp: any) => {
