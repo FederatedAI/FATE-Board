@@ -7,9 +7,11 @@ export default function toTable(header: any, data: any, ext?: any) {
     tag: FTable,
     prop: Object.assign({
       class: 'f-d-table',
-      maxHeight: '400px',
+      maxHeight: '450px',
       header,
       data,
+      size: 10,
+      total: true
     }, ext || {}),
   };
 }
