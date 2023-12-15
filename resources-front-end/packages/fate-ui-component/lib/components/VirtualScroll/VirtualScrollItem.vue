@@ -1,7 +1,7 @@
 <template>
-  <component ref="container" :is="tag || 'div'">
+  <article ref="container">
     <slot name="default"></slot>
-  </component>
+  </article>
 </template>
 
 <script lang="ts" setup>
@@ -19,11 +19,9 @@ const $_pendingScrollUpdate = ref<any>('');
 interface Props {
   item: any,
   active: boolean,
-  index?: number | undefined,
   tag?: string
 }
 const props = withDefaults(defineProps<Props>(), {
-  index: undefined,
   tag: 'div',
 });
 const slots = defineSlots<{

@@ -80,8 +80,8 @@ watch(
         DAGInstance.release()
         DAGCreator()
       } else {
-        for (const comp of (newValue?.component_lists || [])) {
-          DAGInstance.setStatus(comp.component_name, comp.status, (new Date().getTime() - comp.time || 0))
+        for (const comp of (newValue?.component_list || [])) {
+          DAGInstance.setStatus(comp.component_name, runningStatus(comp.status), (new Date().getTime() - comp.time || 0))
         }
       }
     }

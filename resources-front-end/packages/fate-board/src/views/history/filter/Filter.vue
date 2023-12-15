@@ -10,7 +10,7 @@
         <el-input v-model="filter.job_id" size="small" clearable />
       </el-form-item>
       <el-form-item label="Role">
-        <el-select v-model="filter.role" size="small" placeholder="" clearable collapse-tags multiple>
+        <el-select v-model="filter.role" size="small" placeholder=" " clearable collapse-tags multiple>
           <el-option
             v-for="(item, index) in role"
             :key="index"
@@ -26,7 +26,7 @@
         <el-input v-model="filter.partner" size="small" clearable />
       </el-form-item>
       <el-form-item label="Status">
-        <el-select v-model="filter.status" size="small" placeholder="" clearable collapse-tags multiple>
+        <el-select v-model="filter.status" size="small" placeholder=" " clearable collapse-tags multiple>
           <el-option
             v-for="(item, index) in status"
             :key="index"
