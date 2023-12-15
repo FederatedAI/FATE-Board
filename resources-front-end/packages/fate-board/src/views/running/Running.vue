@@ -50,7 +50,7 @@ const dataRequest = async () => {
 let timeinterval;
 onBeforeMount(() => {
   dataRequest();
-  timeinterval = setTimeout(() => {
+  timeinterval = setInterval(() => {
     dataRequest();
   }, 5000);
 });

@@ -171,6 +171,16 @@ watch(
   }
 )
 
+watch(
+  () => store.state.comp.information,
+  () => {
+    clearData()
+    closeSocket()
+    initLogSocket()
+  },
+  { deep: true }
+)
+
 onBeforeMount(async () => {
   await initLogSocket()
 })
@@ -178,6 +188,15 @@ onBeforeMount(async () => {
 onBeforeUnmount(() => {
   clearData()
   closeSocket()
+})
+
+const refreshing = () => {
+  clearData()
+  closeSocket()
+  initLogSocket()
+}
+defineExpose({
+  refresh: refreshing()
 })
 
 </script>
