@@ -95,9 +95,24 @@ watch(
   { deep: true }
 );
 
+watch(
+  () => store.state.comp.information,
+  () => {
+    dataRequest()
+  },
+  { deep: true }
+)
+
 onMounted(async () => {
   await dataRequest();
 });
+
+const refreshing = () => {
+  dataRequest()
+}
+defineExpose({
+  refresh: refreshing
+})
 </script>
 
 <style lang="scss" scoped>

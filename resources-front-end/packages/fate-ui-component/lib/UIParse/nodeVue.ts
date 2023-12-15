@@ -76,4 +76,10 @@ export default class ASTNodeVue<P extends object> extends ASTNode<P> {
     });
     return this.VueCache;
   }
+
+  release () {
+    this.VueCache = undefined
+    this.StateSet = undefined
+    super.release()
+  }
 }

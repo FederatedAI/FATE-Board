@@ -24,7 +24,7 @@ export default function feature_correlation (
   }]
   let tdata = []
 
-  const hasAnony = Object.keys(column_anonymous_map).length > 0
+  const hasAnony = Object.keys(column_anonymous_map || {}).length > 0
   if (hasAnony) {
     theader.push({
       label: 'anonym',
@@ -60,7 +60,7 @@ export default function feature_correlation (
     }
   }
 
-  let remote_key = Object.keys(remote_corr)
+  let remote_key = Object.keys(remote_corr || {})
   if (remote_key && remote_key.length > 0) {
     remote_key = sort(remote_key)
   }
