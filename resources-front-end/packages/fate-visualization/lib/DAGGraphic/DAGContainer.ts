@@ -366,7 +366,7 @@ export default class DAG {
 
   setStatus(name: string, status: string, duration: number) {
     const comp = this.component.get(name);
-    if (comp) {
+    if (comp && comp.prop.status !== status) {
       const tiktok = comp.find('tiktok');
       if (tiktok) {
         tiktok.setProp('duration', duration);
