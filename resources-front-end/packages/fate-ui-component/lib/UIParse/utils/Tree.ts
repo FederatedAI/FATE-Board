@@ -180,6 +180,17 @@ export default class TNode {
   findById(ID: string) {
     return TNode.FindById(this, ID);
   }
+
+  /** 节点释放 */
+  release() {
+    this.children.forEach((value) => {
+      if (!isString(value)) {
+        value.release()
+      }
+    })
+    this.children.clear()
+    this.setParentNode()
+  }
 }
 
 /***** 公用方法 *****/
