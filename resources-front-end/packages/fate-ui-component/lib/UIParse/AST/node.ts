@@ -74,4 +74,10 @@ export default class ASTNode<P extends object> extends Tree {
   after(cb: AfterInjectUpdate | AfterInjectUpdate[]): void {
     this.prop.after(<any>cb);
   }
+
+  release () {
+    this.tag = ''
+    this.prop.release()
+    this.event.release()
+  }
 }

@@ -22,7 +22,7 @@
     </section>
   </div>
 
-  <OutputDialog ref="dialog"/>
+  <OutputDialog ref="dialog" @refresh="componentChoose"/>
 </template>
 
 <script lang="ts" setup>
@@ -42,7 +42,7 @@ const jobData = computed(() => store.state.job.details);
 const jobDataset = computed(() => store.state.job.dataset?.dataset)
 const btnDisable = ref(true)
 
-const componentChoose = async (comp: any) => {
+const componentChoose = async (comp?: any) => {
   parameter.value.getParameter(comp)
   btnDisable.value = false
 }

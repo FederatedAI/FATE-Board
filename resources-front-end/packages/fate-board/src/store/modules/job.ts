@@ -2,7 +2,7 @@ import API from '@/api';
 import dagExplaination from '@/utils/dagExplaination';
 import { ElMessage } from 'element-plus';
 import { WSConnect } from 'fate-tools';
-import { merge } from 'lodash';
+import { merge, throttle } from 'lodash';
 
 export default {
   state: {
@@ -46,18 +46,17 @@ export default {
   actions: {
     async JOB_INFORMATION({ state, commit }: any) {
       if (state._ws_) return true;
+
+      // 首次加载标识
+      let firstTimeHandle = true
       const handler = (data: any) => {
         dagExplaination(data.dependency_data, (res: any) => {
-          if (Object.keys(state.dag).length > 0) {
-
-          } else {
-            commit('SET_DAG', res)
-          }
+          commit('SET_DAG', res)
         })
         commit('SET_DATASET', data.summary_date.dataset);
         commit('SET_DETAILS', data.summary_date.job);
         if (data.status && !data.status.match(/running|waiting/)) {
-          if (!state._rerun_) {
+          if (!state._rerun_ && state._ws_) {
             state._ws_.close()
             commit('SET_WS', undefined)
           }
@@ -65,6 +64,7 @@ export default {
           if (state._rerun_) state._rerun_ = false
         }
       };
+      const throttleHandler = throttle(handler, 10000)
       if (!state.role || !state.jobId || !state.partyId) {
         return false;
       } else {
@@ -75,7 +75,12 @@ export default {
           let data;
           try {
             data = JSON.parse(event.data);
-            handler(data);
+            if (firstTimeHandle) {
+              handler(data);
+              firstTimeHandle = false
+            } else {
+              throttleHandler(data)
+            }
           } catch (error) {
             state._ws_.close();
             data = null;

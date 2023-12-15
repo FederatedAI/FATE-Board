@@ -82,8 +82,10 @@ export default {
   },
 
   actions: {
-    async chooseComp({ state, commit, dispatch }: any, comp: any) {
-      commit('SET_INFORMATION', comp);
+    async chooseComp({ state, commit, dispatch }: any, comp?: any) {
+      if (comp) {
+        commit('SET_INFORMATION', comp);
+      }
       await dispatch('parameterRequest');
       await dispatch('modelRequest');
       await dispatch('metricRequest');
@@ -131,7 +133,7 @@ export default {
 
     async modelRequest({ state, commit, dispatch }: any) {
       try {
-        if (!state.hasLoaded[state.information.name] || !state.hasLoaded[state.information.name].configuration) {
+        if (!state.hasLoaded[state.information.name] || !state.hasLoaded[state.information.name].instance) {
           const job_id = await dispatch('GET_JOBID');
           const party_id = await dispatch('GET_PARTYID');
           const role = await dispatch('GET_JOB_ROLE');
@@ -150,7 +152,7 @@ export default {
 
     async metricRequest({ state, commit, dispatch }: any) {
       try {
-        if (!state.hasLoaded[state.information.name] || !state.hasLoaded[state.information.name].configuration) {
+        if (!state.hasLoaded[state.information.name] || !state.hasLoaded[state.information.name].instance) {
           const job_id = await dispatch('GET_JOBID');
           const party_id = await dispatch('GET_PARTYID');
           const role = await dispatch('GET_JOB_ROLE');
@@ -164,6 +166,14 @@ export default {
         }
       } catch (err) {
         return {};
+      }
+    },
+
+    modelRefresh ({ state }: any) {
+      const component = state.information.name
+      if (component && state.hasLoaded[component]) {
+        state.hasLoaded[component].instance?.release()
+        delete state.hasLoaded[component]
       }
     },
 

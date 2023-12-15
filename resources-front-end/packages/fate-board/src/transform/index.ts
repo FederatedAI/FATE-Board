@@ -16,7 +16,7 @@ export default function explain (
     id: 'ComponentDetailContainer',
     tag: 'article',
     prop: {
-      class: 'f-detail-component',
+      class: 'f-detail-component f-d-seperator',
     },
     children: (() => {
       const children: any = []

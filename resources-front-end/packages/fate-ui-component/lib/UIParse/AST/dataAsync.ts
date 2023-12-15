@@ -238,4 +238,11 @@ export default class DataAsync<C extends object> extends Data<C> {
   after(cb: AfterInjectUpdate | AfterInjectUpdate[]): void {
     this.afterInject.push(...(<AfterInjectUpdate[]>toArray(cb)));
   }
+
+  release () {
+    this.beforeInject.length = 0
+    this.afterInject.length = 0
+    this.async = undefined
+    super.release();
+  }
 }
