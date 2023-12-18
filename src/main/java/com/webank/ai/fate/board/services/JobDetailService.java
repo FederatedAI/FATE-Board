@@ -50,20 +50,33 @@ public class JobDetailService {
     public String getComponentStaticInfo(String componentName) throws Exception {
         String projectDir = System.getProperty("user.dir");
         String jsonData = "";
-        String yamlFilePath = projectDir + File.separator + "dag" + File.separator +componentName + ".yaml";
-        File file = new File(yamlFilePath);
-        if (!file.exists()) {
-            logger.error("no this file find: {} ", yamlFilePath);
-            return jsonData;
+        List<String> whiteList = getWhiteList(projectDir);
+        String fileName = componentName + ".yaml";
+        int index = whiteList.indexOf(fileName);
+        if (index > -1) {
+            String yamlFilePath = projectDir + File.separator + "dag" + File.separator +componentName + ".yaml";
+            Yaml yaml = new Yaml();
+            ObjectMapper objectMapper = new ObjectMapper();
+            InputStream inputStream = new FileInputStream(yamlFilePath);
+            Map<String, Object> yamlData = yaml.load(inputStream);
+            jsonData = objectMapper.writeValueAsString(yamlData);
         }
-
-        Yaml yaml = new Yaml();
-        ObjectMapper objectMapper = new ObjectMapper();
-        InputStream inputStream = new FileInputStream(yamlFilePath);
-        Map<String, Object> yamlData = yaml.load(inputStream);
-        jsonData = objectMapper.writeValueAsString(yamlData);
-
         return jsonData;
+    }
+
+    private  List<String> getWhiteList(String projectDir) {
+        String dirPath =  projectDir + File.separator + "dag";
+        File dir = new File(dirPath);
+        File[] files = dir.listFiles();
+        List<String> whiteList = new ArrayList<>();
+        if (files != null && files.length > 0) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    whiteList.add(file.getName());
+                }
+            }
+        }
+        return whiteList;
     }
 
     public JSONObject getBatchMetricInfo(BatchMetricDTO batchMetricDTO) {
