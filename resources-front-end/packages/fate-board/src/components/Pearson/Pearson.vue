@@ -162,6 +162,10 @@ watch(
     width: calc(100% - 450px);
     min-height: 600px;
     @include flex-col();
+    padding: 0px $pale;
+    background: var(--el-bg-color);
+    border: 1px solid var(--el-color-info-light-9);
+    border-radius: 2px;
   }
 
   .f-p-map-header {

@@ -25,6 +25,7 @@ export default {
 
       stagePredict: '#4159D1',
       stageTrain: '#73767a',
+      stageCross_validation: '#b88230',
 
       // rnutime status: unrun
       Unrun_Body: '#E8E8EF',

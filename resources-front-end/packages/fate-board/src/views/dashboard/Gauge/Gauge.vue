@@ -61,19 +61,19 @@ const toDetail = () => {
 const elapsed = () => {
   let elapsed: any = store.state.job.details.fElapsed
   if (!elapsed) {
-    elapsed = Math.floor((store.state.job.details.fStartTime ? (new Date().getTime() - store.state.job.details.fStartTime) : 0) / 1000)
+    elapsed = Math.floor((store.state.job.details.fStartTime ? (new Date().getTime() - store.state.job.details.fStartTime) : 0))
   }
   duration.value = elapsed
 }
 const elapsing = () => {
   setTimeout(() => {
     if (status.value.match(/running/i)) {
-      duration.value += 1
+      duration.value += 1000
       elapsing()
     } else {
       elapsed()
     }
-  }, 950)
+  }, 1000)
 }
 
 watch(

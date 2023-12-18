@@ -8,22 +8,37 @@ export default function Loss (
   const configuration = {
     xAxis: {
       type: 'category',
+      name: 'epoch'
     },
     yAxis: {
       type: 'value',
       name: 'loss'
     },
-    series:[{
-      type: 'line',
-      name: 'loss',
-      data: (() => {
-        const list = []
-        for (const each of data) {
-          list.push(fixed(each.metric))
+    series: (() => {
+      let cursor = 0
+      const result = []
+      const pointers = <any>[]
+      for (const each of data) {
+        if (each.step === 0 && pointers.length > 0) {
+          result.push({
+            type: 'line',
+            name: `loss_${cursor ++}`,
+            data: [...pointers]
+          })
+          pointers.length = 0
         }
-        return list
-      })()
-    }]
+        pointers.push([each.step, fixed(each.metric)])
+      }
+      if (pointers.length > 0) {
+        result.push({
+          type: 'line',
+          name: `loss_${cursor}`,
+          data: [...pointers]
+        })
+        pointers.length = 0
+      }
+      return result
+    })()
   }
 
   return {
@@ -31,7 +46,8 @@ export default function Loss (
     tag: FLine,
     prop: {
       title: 'Loss',
-      data: configuration
+      data: configuration,
+      legend: 1
     }
   }
 }
