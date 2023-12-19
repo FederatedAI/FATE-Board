@@ -104,6 +104,7 @@ export default {
           })
         })
       }
+      return true
     },
 
     async parameterRequest({ state, commit, dispatch }: any) {

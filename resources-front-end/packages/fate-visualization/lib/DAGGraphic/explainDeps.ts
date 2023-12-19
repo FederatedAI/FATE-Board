@@ -122,7 +122,7 @@ export default function explainDependencies(data: any, containerWidth: number) {
     levels[cursor - 1].push(comp);
   }
 
-  let fromy = 50;
+  let fromy = 30;
   for (const level of levels) {
     const countWidth = level.reduce(
       (pre: number, value: object) => pre + (value as any).width + 100 + 10,

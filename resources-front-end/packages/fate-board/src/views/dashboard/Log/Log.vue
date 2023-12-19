@@ -40,7 +40,7 @@
             v-if="(counts as any)[key] > 0"
             class="f-log-subtab-count"
             :class="`f-log-${item}-total`"
-            >({{ (counts as any)[key] }})</span
+            >{{ (counts as any)[key] }}</span
           >
         </div>
       </div>
@@ -474,6 +474,7 @@ export default {
           line-height: 16px;
           text-align: center;
           color: #fff;
+          // font-weight: bold;
         }
       }
 
@@ -481,6 +482,9 @@ export default {
         font-weight: 600;
         .f-log-subtab-content {
           color: var(--el-color-primary);
+        }
+        .f-log-subtab-count {
+          font-weight: normal;
         }
       }
     }
@@ -496,19 +500,19 @@ export default {
     }
 
     .f-log-error-total {
-      color: var(--el-color-error) !important;
+      background-color: var(--el-color-error) !important;
     }
 
     .f-log-warning-total {
-      color: var(--el-color-warning) !important;
+      background-color: var(--el-color-warning) !important;
     }
 
     .f-log-info-total {
-      color: var(--el-color-info) !important;
+      background-color: var(--el-color-success) !important;
     }
 
     .f-log-debug-total {
-      color: var(--el-color-primary) !important;
+      background-color: var(--el-color-primary) !important;
     }
   }
   .f-log-expended {
