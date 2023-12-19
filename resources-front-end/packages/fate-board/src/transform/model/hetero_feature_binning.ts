@@ -135,9 +135,21 @@ export default function hetero_feature_binning(
         toColumn('Non Event Ratio', 'non_event_ratio')
       ])
     }
-    const { metrics_summary, host_metrics_summary, bin_col, split_pt_dict } = data
-    const configuration: any = {}
 
+    const { metrics_summary, host_metrics_summary, bin_col, split_pt_dict } = data
+    if (split_pt_dict && Object.keys(split_pt_dict).length > 0) {
+      for (const key in split_pt_dict) {
+        let keys = Object.keys(split_pt_dict[key])
+        keys = keys.sort((a, b) => parseFloat(a) > parseFloat(b) ? 1 : -1)
+        const result = <any>{}
+        for (let i = 0; i < keys.length; i++) {
+          result[i + 1] = split_pt_dict[key][keys[i]]
+        }
+        split_pt_dict[key] = result
+      }
+    }
+
+    const configuration: any = {}
     const createOneOptions = (summary: string, split: any, cols: any) => {
       let tData: any = {}
       const options = []
