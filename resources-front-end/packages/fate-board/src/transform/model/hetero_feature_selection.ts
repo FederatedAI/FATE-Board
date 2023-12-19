@@ -64,7 +64,8 @@ export default function hetero_feature_selection(
       const toMetricsData = tData[current] || [];
       const toMetricsHeader = tHeader[current] || [...defaultHeader];
       for (const variable in all_selected_mask) {
-        const row: any = {};
+        const cursor = toMetricsData.findIndex((item: any) => item.variable === variable)
+        const row: any = cursor < 0 ? {} : toMetricsData[cursor];
         row['variable'] = variable;
         for (const col in all_selected_mask[variable]) {
           if (!toMetricsHeader.some((item: any) => item.prop === col)) {
@@ -78,7 +79,9 @@ export default function hetero_feature_selection(
         if (selected_mask && !isUndefined(selected_mask[variable])) {
           row._filter = !selected_mask[variable];
         }
-        toMetricsData.push(row);
+        if (cursor < 0) {
+          toMetricsData.push(row);
+        }
       }
       tHeader[current] = toMetricsHeader;
       tData[current] = toMetricsData;
@@ -90,15 +93,15 @@ export default function hetero_feature_selection(
         prop: method,
       });
       for (const variable in selected_mask) {
-        const row: any = {};
-        row['variable'] = variable;
-        row[method] = '-';
-        row._filter = !selected_mask[variable];
         const cursor = toMethodData.findIndex(
           (item: any) => item['variable'] === variable
         );
-        if (cursor >= 0) {
-          Object.assign(toMethodData[cursor], row);
+        const row: any = cursor < 0 ? {} : toMethodData[cursor];
+        row['variable'] = variable;
+        row[method] = '-';
+        row._filter = !selected_mask[variable];
+        if (cursor < 0) {
+          toMethodData.push(row)
         }
       }
       tHeader[current] = toMethodHeader;
@@ -117,7 +120,10 @@ export default function hetero_feature_selection(
         const toHostData = tData[option] || [];
         const toHostHeader = tHeader[option] || [...defaultHeader];
         for (const variable in all_host_selected_mask[option]) {
-          const row: any = {};
+          const cursor = toHostData.findIndex(
+            (item: any) => item['variable'] === variable
+          );
+          const row: any = cursor < 0 ? {} : toHostData[cursor];
           row['variable'] = variable;
           for (const col in all_host_metrics[option][variable]) {
             if (!toHostHeader.some((item: any) => item.prop === col)) {
@@ -135,13 +141,8 @@ export default function hetero_feature_selection(
           if (selected_mask && !isUndefined(selected_mask[variable])) {
             row._filter = !selected_mask[variable];
           }
-
-          const cursor = toHostData.findIndex(
-            (item: any) => item['variable'] === variable
-          );
-          if (cursor >= 0) {
-            Object.assign(toHostData[cursor], row);
-          } else {
+          
+          if (cursor < 0) {
             toHostData.push(row)
           }
         }

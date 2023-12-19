@@ -3,39 +3,46 @@
     <article class="f-dashboard-dataset--title">Parties info</article>
 
     <section class="f-dashboard-dataset--main">
-      <el-row
-        v-for="(item, index) in parties"
-        :gutter="24"
-        class="f-dashboard-dataset--row"
-      >
-        <el-col :span="6">
-          <FRow
-            :label="'Role'"
-            :labelClassName="'f-dashboard-dataset--label'"
-            :content="item.role"
-            :contentClassName="'f-dashboard-dataset--content'"
-          ></FRow>
-        </el-col>
-        <el-col :span="14">
-          <FRow
-            :label="'PartyId'"
-            :labelClassName="'f-dashboard-dataset--label'"
-            :content="(item.party_id || []).join(', ')"
-            :contentClassName="'f-dashboard-dataset--content'"
-          ></FRow>
-        </el-col>
-      </el-row>
+      <template v-for="(item, key) in dataset">
+        <el-row
+          :gutter="24"
+          class="f-dashboard-dataset--row f-dashboard-dataset--subtitle"
+        >
+          <el-col :span="8"><article class="f-dashboard-dataset--label">{{ capitalize(key.toString() || '') }}</article></el-col>
+          <el-col :span="16"><article class="f-dashboard-dataset--label">Dataset</article></el-col>
+        </el-row>
+        <template v-for="(namespace, partyid) in item">
+          <el-row
+            :gutter="24"
+            class="f-dashboard-dataset--row"
+          >
+            <el-col :span="8">
+              <article class="f-dashboard-dataset--content">{{ partyid }}</article>
+            </el-col>
+            <el-col :span="16">
+              <article class="f-dashboard-dataset--column">
+                <article
+                  v-for="(name, index) in namespace"
+                  class="f-dashboard-dataset--content">
+                  {{ `${name.namespace}.${name.name}` }}
+                </article>
+              </article>
+            </el-col>
+          </el-row>
+        </template>
+      </template>
     </section>
   </article>
 </template>
 
 <script lang="ts" setup>
+import { capitalize } from 'lodash';
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
 
-const parties = computed(() => store.state.job.dataset.parties || []);
+const dataset = computed(() => store.state.job.dataset.dataset || {});
 </script>
 
 <style lang="scss" scoped>
@@ -66,11 +73,16 @@ const parties = computed(() => store.state.job.dataset.parties || []);
     flex: 2 2 calc(100% - 18px - $pale);
     max-height: calc(100% - 18px - $pale);
     background-color: var(--el-bg-color);
+    overflow-y: auto;
+    overflow-x: hidden;
   }
   
   .f-dashboard-dataset--row {
 
-    padding: $pale;
+    padding: math.div($pale, 2) $pale;
+    &:first-child {
+      padding-top: $pale * 2;
+    }
 
     :deep(.f-dashboard-dataset--label) {
       @include font-title();
@@ -79,6 +91,18 @@ const parties = computed(() => store.state.job.dataset.parties || []);
     :deep(.f-dashboard-dataset--content) {
       @include font-text();
       font-weight: bold;
+    }
+
+    .f-dashboard-dataset--column {
+      @include flex-col();
+    }
+  }
+
+  .f-dashboard-dataset--subtitle {
+    margin-top: $pale;
+
+    &:first-child{
+      margin-top: 0;
     }
   }
 }
