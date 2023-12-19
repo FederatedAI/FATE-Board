@@ -17,10 +17,12 @@ export default function feature_correlation (
   const { local_corr, remote_corr, vif } = data
   const { column_anonymous_map } = meta
 
+  const isHost = role.match(/host/i)
+
   const  theader = <any>[{
     label: 'variable',
     prop: 'variable',
-    width: 100,
+    width: 90,
   }]
   let tdata = []
 
@@ -29,7 +31,7 @@ export default function feature_correlation (
     theader.push({
       label: 'anonym',
       prop: 'anonym',
-      width: 120,
+      width: 130,
     })
   }
 
@@ -62,7 +64,11 @@ export default function feature_correlation (
 
   let remote_key = Object.keys(remote_corr || {})
   if (remote_key && remote_key.length > 0) {
-    remote_key = sort(remote_key)
+    if (!isHost) {
+      remote_key = sort(remote_key)
+    } else {
+      remote_key = sort(Object.keys(remote_corr[remote_key[0]]))
+    }
   }
 
   const correlation = {
