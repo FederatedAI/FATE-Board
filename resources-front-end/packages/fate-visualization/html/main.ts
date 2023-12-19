@@ -3,8 +3,8 @@ import 'element-plus/dist/index.css';
 import { createApp } from 'vue';
 import * as Visual from '../lib/main';
 // import App from './LineOrBarApp.vue';
-import App from './DAGGraphicApp.vue';
-// import App from './HeatMap.vue';
+// import App from './DAGGraphicApp.vue';
+import App from './HeatMap.vue';
 // import App from './Tree.vue';
 // import App from './Gauge.vue';
 

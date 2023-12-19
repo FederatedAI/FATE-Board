@@ -56,8 +56,8 @@ onBeforeMount(() => {
   modelComponent();
 });
 
-const refreshing = () => {
-  store.dispatch('modelRefresh')
+const refreshing = async () => {
+  await store.dispatch('modelRefresh')
 }
 defineExpose({
   refresh: refreshing

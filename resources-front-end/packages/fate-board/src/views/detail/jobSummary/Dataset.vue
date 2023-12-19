@@ -27,7 +27,7 @@
           <template #reference>
             <section class="f-dataset-popover">
               <span>{{ Object.keys(other).length }}</span>
-              <el-link type="primary">view</el-link>
+              <el-link type="primary" class="f-dataset-view">view</el-link>
             </section>
           </template>
 
@@ -171,12 +171,18 @@ watch(
 
   .f-dataset-popover {
     @include flex-row();
+    align-items: center;
+    justify-content: flex-start;
     @include text-size-small();
     color: var(--el-color-info-dark-2);
 
     & > span {
       padding-right: $pale;
     }
+  }
+
+  .f-dataset-view {
+    @include text-size-small();
   }
 }
 
