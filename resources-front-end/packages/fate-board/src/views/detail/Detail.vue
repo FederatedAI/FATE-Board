@@ -43,8 +43,9 @@ const jobDataset = computed(() => store.state.job.dataset?.dataset)
 const btnDisable = ref(true)
 
 const componentChoose = async (comp?: any) => {
-  parameter.value.getParameter(comp)
+  await parameter.value.getParameter(comp)
   btnDisable.value = false
+  dialog.value.refreshed()
 }
 
 const componentRetry = (retryd: boolean) => {

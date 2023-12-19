@@ -7,6 +7,7 @@
     :current="parameter.pageNum"
     :size="parameter.pageSize"
     :total="total"
+    :layout="'total, sizes, prev, pager, next'"
     position="center"
     class="f-history-table"
     @sizeChange="sizeChange"
