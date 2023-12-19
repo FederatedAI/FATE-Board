@@ -1,5 +1,5 @@
 component:
-  name: hetero_sbt
+  name: hetero_secureboost
   description: ''
   provider: fate
   version: 2.0.0-beta
@@ -35,6 +35,16 @@ component:
         title: ConstrainedNumberMeta
         exclusiveMinimum: 0
         type: integer
+    complete_secure:
+      type: ConstrainedNumberMeta
+      default: 0
+      optional: true
+      description: number of trees to use guest features only in the complete secure
+        mode, 0 means no complete secure
+      type_meta:
+        title: ConstrainedNumberMeta
+        minimum: 0
+        type: integer
     max_bin:
       type: ConstrainedNumberMeta
       default: 32
@@ -62,6 +72,34 @@ component:
         title: ConstrainedNumberMeta
         exclusiveMinimum: 0
         type: integer
+    goss:
+      type: bool
+      default: false
+      optional: true
+      description: whether to use goss sampling
+      type_meta:
+        title: bool
+        type: boolean
+        default: true
+        description: whether output prediction result per cv fold
+    goss_start_iter:
+      type: ConstrainedNumberMeta
+      default: 0
+      optional: true
+      description: start iteration of goss sampling
+      type_meta:
+        title: ConstrainedNumberMeta
+        exclusiveMinimum: 0
+        type: integer
+    l1:
+      type: ConstrainedNumberMeta
+      default: 0
+      optional: true
+      description: L1 regularization
+      type_meta:
+        title: ConstrainedNumberMeta
+        minimum: 0
+        type: number
     l2:
       type: ConstrainedNumberMeta
       default: 0.1
@@ -69,7 +107,7 @@ component:
       description: L2 regularization
       type_meta:
         title: ConstrainedNumberMeta
-        exclusiveMinimum: 0
+        minimum: 0
         type: number
     min_impurity_split:
       type: ConstrainedNumberMeta
@@ -116,7 +154,7 @@ component:
         title: bool
         type: boolean
         default: true
-        description: whether to use histogram subtraction
+        description: whether output prediction result per cv fold
     split_info_pack:
       type: bool
       default: true
@@ -126,7 +164,7 @@ component:
         title: bool
         type: boolean
         default: true
-        description: whether to use histogram subtraction
+        description: whether output prediction result per cv fold
     hist_sub:
       type: bool
       default: true
@@ -136,7 +174,7 @@ component:
         title: bool
         type: boolean
         default: true
-        description: whether to use histogram subtraction
+        description: whether output prediction result per cv fold
     he_param:
       type: HEParam
       default:
@@ -167,6 +205,68 @@ component:
           key_length: 1024
         description: homomorphic encryption param, support paillier, ou and mock in
           current version
+    top_rate:
+      type: ConstrainedNumberMeta
+      default: 0.2
+      optional: true
+      description: top rate of goss sampling
+      type_meta:
+        title: ConstrainedNumberMeta
+        exclusiveMinimum: 0
+        type: number
+    other_rate:
+      type: ConstrainedNumberMeta
+      default: 0.1
+      optional: true
+      description: other rate of goss sampling
+      type_meta:
+        title: ConstrainedNumberMeta
+        exclusiveMinimum: 0
+        type: number
+    cv_param:
+      type: CVParam
+      default:
+        n_splits: 5
+        shuffle: false
+        random_state:
+      optional: true
+      description: cross validation param
+      type_meta:
+        title: CVParam
+        $ref: '#/definitions/abc__CVParam'
+        definitions:
+          abc__CVParam:
+            title: CVParam
+            type: object
+            properties:
+              n_splits:
+                title: N Splits
+                exclusiveMinimum: 1
+                type: integer
+              shuffle:
+                title: Shuffle
+                default: false
+                type: boolean
+              random_state:
+                title: Random State
+                type: integer
+            required:
+              - n_splits
+        default:
+          n_splits: 5
+          shuffle: false
+          random_state:
+        description: cross validation param
+    output_cv_data:
+      type: bool
+      default: true
+      optional: true
+      description: whether output prediction result per cv fold
+      type_meta:
+        title: bool
+        type: boolean
+        default: true
+        description: whether output prediction result per cv fold
   input_artifacts:
     data:
       train_data:
@@ -197,6 +297,17 @@ component:
         optional: false
         stages:
           - predict
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+      cv_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - cross_validation
         roles:
           - guest
           - host
@@ -249,6 +360,17 @@ component:
           - host
         description: ''
         is_multi: false
+      cv_output_datas:
+        types:
+          - dataframe
+        optional: true
+        stages:
+          - cross_validation
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: true
     model:
       train_model_output:
         types:
