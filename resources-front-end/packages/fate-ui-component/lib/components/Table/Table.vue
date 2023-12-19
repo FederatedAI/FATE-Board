@@ -1,8 +1,8 @@
 <template>
   <section class="fb-table">
     <Columns
-      :data="currentData"
-      :header="currentHeader"
+      :data="currentData()"
+      :header="currentHeader()"
       :row-class-name="rowClassName"
       :cell-class-name="cellClassName"
       :current-page="currentPage"
@@ -22,7 +22,7 @@
       v-model:page-size="pageSize"
       hide-on-single-page
       :small="true"
-      :layout="layout || 'total, sizes, prev, pager, next'"
+      :layout="layout || 'total, prev, pager, next'"
       :total="currentTotal"
       background
       class="fb-table-pagination"
@@ -37,7 +37,7 @@
 <script lang="ts" setup>
 import { ElPagination } from 'element-plus';
 import { isNumber } from 'lodash';
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import Columns from './columns/index.vue';
 
 const props = defineProps([
@@ -77,23 +77,25 @@ const pageSize = ref(props.column
   ? Number(props.size) || 10
   : Number(props.size) || 20
 );
-const currentHeader = computed(() => props.column && props.header
+const currentHeader = () => props.column && props.header
   ? props.header.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value)
   : props.header
-);
-const currentData = computed(() => {
+
+const currentData = () => {
   return (!props.column && props.total !== undefined && props.total !== false && props.data.length > pageSize.value && props.data)
     ? props.data.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value)
     : props.data
   }
-)
+
 const refresh = ref(0)
 
 watch(
   () => props.header,
   () => {
     currentPage.value = 1;
-    // refresh.value++
+    nextTick(() => {
+      refresh.value++
+    })
   },
   { deep: true }
 );

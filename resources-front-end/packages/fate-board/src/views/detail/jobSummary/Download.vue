@@ -48,7 +48,7 @@ const download = () => {
     cursor: pointer;
     :deep(.f-summary-link)   {
       @include text-size-small();
-      color: var(--el-color-primary-light-3);
+      color: var(--el-color-primary);
     }
   }
   

@@ -105,7 +105,7 @@ function zoomOut() {
 
 function fullScreen() {
   if (DAGInstance) {
-    // DAGInstance.fullScreen()
+    DAGInstance.fullScreen()
   }
 }
 

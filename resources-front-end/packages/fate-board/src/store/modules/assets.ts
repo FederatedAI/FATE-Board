@@ -64,7 +64,7 @@ export default {
         } else {
           ElMessage({
             showClose: true,
-            message: `There has no configuration yml for component ${name}`,
+            message: `There has no configuration yaml for component ${name}`,
             center: true,
             type: 'error'
           })
