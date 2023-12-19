@@ -9,7 +9,7 @@
     :modal="false"
     class="f-output-dialog"
   >
-    <section class="f-detail-container">
+    <section v-loading="loading" class="f-detail-container">
       <section class="f-detail-operation">
         <el-link :icon="Refresh" type="primary" class="f-d-refresh" @click="refreshing">Refresh</el-link>
       </section>
@@ -44,6 +44,7 @@ const active = ref('model');
 
 const store = useStore();
 
+const loading = ref(true)
 const component = computed(() => store.state.comp.information.name);
 const compType = computed(() => store.state.comp.information.type);
 const firstModelLabel = computed(() => {
@@ -77,14 +78,18 @@ const firstModelLabel = computed(() => {
 const model = ref()
 const data = ref()
 const log = ref()
-const refreshing = () => {
+const refreshing = async () => {
+  loading.value = true
   if (model.value)
-    model.value.refresh()
+    await model.value.refresh()
   if (data.value)
-    data.value.refresh()
+    await data.value.refresh()
   if (log.value)
-    log.value.refresh()
+    await log.value.refresh()
   emits('refresh')
+}
+const refreshed = () => {
+  loading.value = false
 }
 
 const on = () => {
@@ -97,6 +102,7 @@ const off = () => {
 defineExpose({
   on,
   off,
+  refreshed
 });
 </script>
 

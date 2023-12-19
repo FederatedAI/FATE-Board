@@ -11,7 +11,7 @@ import { onMounted, onUnmounted, ref, watch } from 'vue';
 import dataFormat from './dataFormat';
 import options from './explain';
 
-const props = defineProps(['title', 'x', 'y', 'data', 'min', 'max', 'pearson']);
+const props = defineProps(['title', 'x', 'y', 'data', 'min', 'max', 'pearson', 'ext']);
 const container = ref();
 let displayLabel = false
 let resize: any;
@@ -53,7 +53,8 @@ function optionParsing () {
           show: displayLabel
         }
       }
-    })
+    }),
+    props.ext || {}
   );
 }
 
