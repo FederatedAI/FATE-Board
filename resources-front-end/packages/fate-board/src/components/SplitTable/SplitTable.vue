@@ -22,6 +22,7 @@
 </template>
 
 <script lang="ts" setup>
+import sort from '@/transform/tools/sort';
 import { computed, ref } from '@vue/runtime-core';
 import { FSelection } from 'fate-ui-component';
 import { isUndefined } from 'lodash-es';
@@ -68,7 +69,7 @@ const options = function(radio: string) {
       selectedList.value[radio] = result
     }
   }
-  return opts
+  return sort(opts, 'label')
 }
 
 const subOptions = computed(() => {
@@ -82,7 +83,7 @@ const subOptions = computed(() => {
           ? data.subOptions[current]
           : []))
       : []
-    return list
+    return sort(list, 'label')
   } else {
     return []
   }
