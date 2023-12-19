@@ -4,8 +4,8 @@
       class="f-p-table"
       :header="header"
       :data="data"
-      :pageSize="10"
-      :total="total"
+      :size="10"
+      :total="data.length"
       :index="true"
     >
     </FTable>
@@ -40,6 +40,7 @@
           :max="1"
           :min="0"
           :pearson="false"
+          :ext="tooltipFormatter"
         >
         </FHeatMap>
       </section>
@@ -49,8 +50,10 @@
 
 <script lang="ts" setup>
 import { computed, onBeforeMount, ref, watch } from 'vue';
+import { useStore } from 'vuex';
 import RoleSelection from './selection.vue';
 
+const store = useStore()
 const props = defineProps([
   'header',
   'data',
@@ -59,20 +62,26 @@ const props = defineProps([
   'localData',
   'remoteData',
 ]);
-const total = computed(() => {
-  return props.data ? props.data.length : 0;
-});
 
+const role = computed(() => store.state.job.details?.fRole);
 const selectonRole = [
   {
     label: 'all',
     value: 'all',
   },
-  {
+];
+if (role.value?.match(/guest/i)) {
+  selectonRole.push({
     label: 'guest',
     value: 'guest',
-  }
-];
+  })
+}
+if (role.value?.match(/host/i)) {
+  selectonRole.push({
+    label: 'host',
+    value: 'guest',
+  })
+}
 const selected = ref('all');
 const correlation = ref<string[]>([]);
 
@@ -116,12 +125,40 @@ const correlationData = computed(() => {
         const yImply = props.localData[y] || props.remoteData[y] || {};
         result = yImply[x] ? Number(yImply[x].toFixed(6)) : yImply[x]
       }
+      if (!result) {
+        const yImply = props.remoteData[x] || props.remoteData[x] || {};
+        result = yImply[y] ? Number(yImply[y].toFixed(6)) : yImply[y]
+      }
+      if (!result) {
+        const yImply = props.remoteData[y] || props.remoteData[y] || {};
+        result = yImply[x] ? Number(yImply[x].toFixed(6)) : yImply[x]
+      }
       row.push(result);
     }
     corrData.push(row);
   }
   return corrData;
 });
+
+const tooltipFormatter = {
+  tooltip: {
+    formatter: (params: any) => {
+      const [xc, yc, data] = params.data
+      const x = correlation.value[xc]
+      const y = correlation.value[yc]
+      let getAnonym = (imp: any) => {
+        const cursor = props.data.findIndex((item: any) => item.variable === imp)
+        if (cursor >= 0) {
+          return props.data[cursor].anonym
+        }
+        return ''
+      }
+      const xanony = getAnonym(x)
+      const yanony = getAnonym(y)
+      return `features: ${x}${xanony ? '(' + xanony + ')' : ''}, ${y}${yanony ? '(' + yanony + ')' : ''} <br /> coefficient: ${data}`
+    }
+  }
+}
 
 const coefficient = () => {
   pearsonMap.value.displayLabel();
@@ -166,6 +203,7 @@ watch(
     background: var(--el-bg-color);
     border: 1px solid var(--el-color-info-light-9);
     border-radius: 2px;
+    padding-top: 12px;
   }
 
   .f-p-map-header {

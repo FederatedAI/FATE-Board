@@ -38,11 +38,7 @@ export default class DAG {
   containerWidth: number = 0;
   containerHeight: number = 0;
 
-  // containerTransition = {
-  //   x: 0,
-  //   y: 0,
-  //   k: 1,
-  // };
+  containerTransition: any
   zoomMin = 0.1;
   zoomMax = 3;
   // containerTranform = throttle((attrs: any) => {
@@ -91,35 +87,75 @@ export default class DAG {
       .append('svg')
       .attr('id', 'dag_container')
       .attr('overflow', 'visible')
+      .attr('style', 'transform-origin: 0px 0px;')
       .attr('width', this.containerWidth)
       .attr('height', this.containerHeight);
   }
 
   protected $zoom() {
-    this.zoomRelative = this.centerForParent()
+    this.containerTransition = zoomIdentity
     this.zoomInstance = zoom()
       .scaleExtent([this.zoomMin, this.zoomMax])
-      .on('zoom', () => {
+      .on('zoom', (event: any) => {
         this.container.attr(
           'transform', zoomTransform(this.container.node()))
       });
     this.parent.call(this.zoomInstance).on('dblclick.zoom', null);
   }
 
-  protected centerForParent () {
-    return [
-      this.parent.node().clientWidth / 2,
-      this.parent.node().clientHeight / 2
-    ]
-  }
-
   zoomIn(times?: number) {
-    const transform = zoomIdentity.scale(times || 0.95)
+    const box = this.container.node().getBoundingClientRect()
+    const center = [box.width / 2 , box.height / 2]
+    const transform = zoomTransform(this.container.node()).scale(times || 0.95)
+    const toK = times || 0.95
+    const transformx = center[0] * (1 - toK)
+    const transformy = center[1] * (1 - toK)
+    transform.x += transformx
+    transform.y += transformy
     this.parent.transition().call(this.zoomInstance.transform, transform)
   }
 
   zoomOut(times?: number) {
-    const transform = zoomIdentity.scale(times || 1.05)
+    const box = this.container.node().getBoundingClientRect()
+    const center = [box.width / 2 , box.height / 2]
+    const transform = zoomTransform(this.container.node()).scale(times || 1.05)
+    const toK = times || 1.05
+    const transformx = center[0] * (1 - toK)
+    const transformy = center[1] * (1 - toK)
+    transform.x += transformx
+    transform.y += transformy
+    this.parent.transition().call(this.zoomInstance.transform, transform)
+  }
+
+  fullScreen () {
+    // 中位点
+    const containerBox = this.parent.node().getBoundingClientRect()
+    const center = [containerBox.width / 2, containerBox.height / 2]
+
+    // 当前变换信息
+    const transform = zoomTransform(this.container.node())
+
+    // 上层padding位置
+    const fromTop = 30 * transform.k
+
+    // 框选子组件
+    const range = new Range()
+    range.selectNodeContents(this.container.node())
+
+    const contentBox = range.getBoundingClientRect()
+    let times = Math.min(
+      containerBox.width / ((contentBox.width + fromTop * 2) / transform.k),
+      containerBox.height / ((contentBox.height + fromTop * 2) / transform.k))
+    if (times < 1) {
+      times = Math.min(times, this.zoomMin)
+      transform.k = times
+      transform.x = center[0] * (1 - times)
+      transform.y = center[1] * (1 - times)
+    } else {
+      transform.k = 1
+      transform.x = 0
+      transform.y = 0
+    }
     this.parent.transition().call(this.zoomInstance.transform, transform)
   }
 
