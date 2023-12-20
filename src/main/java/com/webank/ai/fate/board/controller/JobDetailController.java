@@ -422,6 +422,9 @@ public class JobDetailController {
             return new ResponseResult<>(ErrorCode.FATEFLOW_ERROR_NULL_RESULT);
         }
         JSONObject object = JSON.parseObject(result);
+        if (object.isEmpty()) {
+            return new ResponseResult(ErrorCode.SUCCESS, object);
+        }
         Set<String> set = object.keySet();
         String[] keys = set.toArray(new String[0]);
         JSONArray outputDataArray = new JSONArray();
