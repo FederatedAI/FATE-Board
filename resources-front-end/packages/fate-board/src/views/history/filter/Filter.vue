@@ -5,12 +5,13 @@
       :model="filter"
       label-width="70px"
       class="h-filter-form"
+      @keydown.enter="$emit('search', filter)"
     >
       <el-form-item label="Job ID">
-        <el-input v-model="filter.job_id" size="small" clearable />
+        <el-input v-model="filter.job_id" size="small" clearable @clear="$emit('search', filter)"/>
       </el-form-item>
       <el-form-item label="Role">
-        <el-select v-model="filter.role" size="small" placeholder=" " clearable collapse-tags multiple>
+        <el-select v-model="filter.role" size="small" placeholder=" " clearable collapse-tags multiple @clear="$emit('search', filter)">
           <el-option
             v-for="(item, index) in role"
             :key="index"
@@ -20,13 +21,13 @@
         </el-select>
       </el-form-item>
       <el-form-item label="Party ID">
-        <el-input v-model="filter.party_id" size="small" clearable />
+        <el-input v-model="filter.party_id" size="small" clearable @clear="$emit('search', filter)"/>
       </el-form-item>
       <el-form-item label="Partner">
-        <el-input v-model="filter.partner" size="small" clearable />
+        <el-input v-model="filter.partner" size="small" clearable @clear="$emit('search', filter)"/>
       </el-form-item>
       <el-form-item label="Status">
-        <el-select v-model="filter.status" size="small" placeholder=" " clearable collapse-tags multiple>
+        <el-select v-model="filter.status" size="small" placeholder=" " clearable collapse-tags multiple @clear="$emit('search', filter)">
           <el-option
             v-for="(item, index) in status"
             :key="index"
