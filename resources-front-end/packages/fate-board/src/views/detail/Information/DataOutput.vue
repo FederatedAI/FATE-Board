@@ -32,58 +32,66 @@ const store = useStore();
 
 const selections = ref<any>([]);
 const selected = ref(selections.value[0] ? selections.value[0].value : '');
-const dataTableHeader = ref([]);
-const dataTableData = ref([]);
+const dataTableHeader = ref<any>([]);
+const dataTableData = ref<any>([]);
 const dataTotal = ref([])
 const refresh = ref(0)
 
 const dataRequest = async () => {
-  const response = await store.dispatch('dataOutput');
-  const { output_data } = response;
-  const options: any = [];
-  const tableHeader: any = [];
-  const tableData: any = [];
-  const total: any = []
-  for (let i = 0; i < output_data.length; i++) {
-    const each = output_data[i];
-    const { data, metadata } = each;
-    const { anonymous_summary, fields } = metadata.schema_meta;
-    options.push({
-      label: anonymous_summary.site_name,
-      value: i,
-    });
-    tableHeader.push(
-      (() => {
-        const list: any = [];
-        for (const item of fields) {
-          list.push({
-            label: item.name,
-            prop: item.name,
-          });
-        }
-        return list;
-      })()
-    );
-    tableData.push(
-      (() => {
-        const header = tableHeader[tableHeader.length - 1];
-        const list: any = [];
-        for (const item of data) {
-          const row: any = {};
-          for (let j = 0; j < header.length; j++) {
-            row[header[j].prop] = item[j];
-          }
-          list.push(row);
-        }
-        return list;
-      })()
-    );
-    total.push(tableData[tableData.length - 1].length)
+  try {
+    const response = await store.dispatch('dataOutput');
+    const { output_data } = response;
+    const options: any = [];
+    const tableHeader: any = [];
+    const tableData: any = [];
+    const total: any = []
+    if (output_data) {
+      for (let i = 0; i < output_data.length; i++) {
+        const each = output_data[i];
+        const { data, metadata } = each;
+        const { anonymous_summary, fields } = metadata.schema_meta;
+        options.push({
+          label: anonymous_summary.site_name,
+          value: i,
+        });
+        tableHeader.push(
+          (() => {
+            const list: any = [];
+            for (const item of fields) {
+              list.push({
+                label: item.name,
+                prop: item.name,
+              });
+            }
+            return list;
+          })()
+        );
+        tableData.push(
+          (() => {
+            const header = tableHeader[tableHeader.length - 1];
+            const list: any = [];
+            for (const item of data) {
+              const row: any = {};
+              for (let j = 0; j < header.length; j++) {
+                row[header[j].prop] = item[j];
+              }
+              list.push(row);
+            }
+            return list;
+          })()
+        );
+        total.push(tableData[tableData.length - 1].length)
+      }
+    }
+    selections.value = options;
+    dataTableHeader.value = tableHeader;
+    dataTableData.value = tableData;
+    dataTotal.value = total
+  } catch(err) {
+    dataTableHeader.value = []
+    dataTableData.value = []
+    dataTotal.value = []
   }
-  selections.value = options;
-  dataTableHeader.value = tableHeader;
-  dataTableData.value = tableData;
-  dataTotal.value = total
   refresh.value ++
 };
 
