@@ -34,6 +34,7 @@ fatepath=$(
 
 main_class=org.fedai.fate.board.bootstrap.Bootstrap
 module=fateboard
+version=2.0.0
 
 
 if test -f "${fatepath}/fate/bin/init_env.sh";then
@@ -48,7 +49,7 @@ fi
 
 
 getpid() {
-  pid=$(ps -ef | grep java | grep ${basepath}/fateboard.jar | grep -v grep | awk '{print $2}')
+  pid=$(ps -ef | grep java | grep ${basepath}/fateboard-${version}.jar | grep -v grep | awk '{print $2}')
 
   if [[ -n ${pid} ]]; then
     return 1
@@ -80,9 +81,9 @@ start() {
   if [[ $? -eq 0 ]]; then
     mklogsdir
     if [[ $1 == "front" ]]; then
-      exec $JAVA_HOME/bin/java -Dspring.config.location=$configpath/application.properties -Dssh_config_file=$basepath/ssh/ -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -cp $libpath/*:$basepath/${module}.jar ${main_class} >/dev/null 2>&1
+      exec $JAVA_HOME/bin/java -Dspring.config.location=$configpath/application.properties -Dssh_config_file=$basepath/ssh/ -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -cp $libpath/*:$basepath/${module}-${version}.jar ${main_class} >/dev/null 2>&1
     else
-     nohup $JAVA_HOME/bin/java -Dspring.config.location=$configpath/application.properties -Dssh_config_file=$basepath/ssh/ -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -cp $libpath/*:$basepath/${module}.jar ${main_class} >/dev/null 2>&1 &
+     nohup $JAVA_HOME/bin/java -Dspring.config.location=$configpath/application.properties -Dssh_config_file=$basepath/ssh/ -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -cp $libpath/*:$basepath/${module}-${version}.jar ${main_class} >/dev/null 2>&1 &
 
     fi
 
