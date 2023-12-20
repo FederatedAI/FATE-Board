@@ -50,7 +50,7 @@ const routes: any[] = [
   },
   {
     name: 'detail',
-    path: '/detail/:jobId/:role/:partyId',
+    path: '/detail/:jobId/:role/:partyId/:pageSize?/:currentPage?',
     component: () => import('../views/detail/Detail.vue'),
     beforeEnter: async (to: any) => {
       const params = to.params
@@ -65,13 +65,15 @@ const routes: any[] = [
       await store.dispatch('SET_BASIC', {
         jobId: params.jobId,
         role: params.role,
-        partyId: params.partyId
+        partyId: params.partyId,
+        pageSize: params.pageSize || 20,
+        currentPage: params.currentPage || 1
       })
     }
   },
   {
     name: 'dashboard',
-    path: '/dashboard/:jobId/:role/:partyId',
+    path: '/dashboard/:jobId/:role/:partyId/:pageSize?/:currentPage?',
     component: () => import('../views/dashboard/Dashboard.vue'),
     beforeEnter: async (to: any) => {
       const params = to.params
@@ -86,7 +88,9 @@ const routes: any[] = [
       await store.dispatch('SET_BASIC', {
         jobId: params.jobId,
         role: params.role,
-        partyId: params.partyId
+        partyId: params.partyId,
+        pageSize: params.pageSize || 20,
+        currentPage: params.currentPage || 1
       })
     }
   },
