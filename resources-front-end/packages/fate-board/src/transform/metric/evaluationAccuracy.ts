@@ -51,6 +51,8 @@ export default function EvaAccuracy (
   }
 
   const lineExplain = ({ cuts, accuracy, threshold }: any, namespace: string,  component: string) => {
+    accuracy = accuracy.reverse()
+    threshold = threshold.reverse()
     const thrs = thresholdMapping.get(namespace) || {}
       thrs[component] = threshold
     thresholdMapping.set(namespace, thrs)

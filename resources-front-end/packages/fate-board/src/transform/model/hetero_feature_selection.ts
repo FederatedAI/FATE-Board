@@ -1,4 +1,5 @@
-import { isString, isUndefined } from 'lodash';
+import { isNumber, isString, isUndefined } from 'lodash';
+import fixed from '../tools/fixed';
 import getModelData from '../tools/getModelData';
 import sort from '../tools/sort';
 import toGroup from '../tools/toGroup';
@@ -75,6 +76,9 @@ export default function hetero_feature_selection(
             value: all_metrics?.[variable][col] || '-',
             filter: all_selected_mask?.[variable][col] || true,
           };
+          if (isNumber(row[col].value)) {
+            row[col].value = fixed(row[col].value)
+          }
         }
         if (selected_mask && !isUndefined(selected_mask[variable])) {
           row._filter = !selected_mask[variable];
@@ -136,6 +140,9 @@ export default function hetero_feature_selection(
               value: all_host_metrics[option]?.[variable][col] || '-',
               filter: all_host_selected_mask?.[option][variable][col] || true,
             };
+            if (isNumber(row[col].value)) {
+              row[col].value = fixed(row[col].value)
+            }
           }
           const selected_mask = host_selected_mask?.[option] || true;
           if (selected_mask && !isUndefined(selected_mask[variable])) {
@@ -201,6 +208,7 @@ export default function hetero_feature_selection(
       {
         index: true,
         maxHeight: undefined,
+        border: true
       }
     )
   );

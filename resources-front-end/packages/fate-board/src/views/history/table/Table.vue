@@ -21,8 +21,10 @@ import API from '@/api';
 import { toDate, toTime } from 'fate-tools';
 import { debounce } from 'lodash';
 import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { useStore } from 'vuex';
 import cols from './ColHeader';
 
+const store = useStore()
 const ftable = ref();
 const requesting = ref(true)
 
@@ -35,8 +37,8 @@ const header = computed(() => {
 });
 
 const parameter = reactive({
-  pageNum: 1,
-  pageSize: 20,
+  pageNum: store.state.job.currentPage || 1,
+  pageSize: store.state.job.pageSize || 20,
   orderRule: 'desc',
   orderField: 'f_job_id',
   job_id: '',
@@ -49,9 +51,15 @@ const parameter = reactive({
 const total = ref(0);
 
 // page size change
-const sizeChange = (size: number) => {  parameter.pageSize = size; };
+const sizeChange = (size: number) => { 
+  parameter.pageSize = size;
+  store.commit('SET_PAGESIZE', size)
+};
 // current page change
-const currentChange = (current: number) => { parameter.pageNum = current; };
+const currentChange = (current: number) => {
+  parameter.pageNum = current;
+  store.commit('SET_CURRENTPAGE', current)
+};
 // sort change
 const sortChange = ({col, order}: any) => {
   const Implying: any = {
