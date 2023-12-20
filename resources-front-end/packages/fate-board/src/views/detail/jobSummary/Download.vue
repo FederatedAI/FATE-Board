@@ -1,7 +1,7 @@
 <template>
   <article class="f-summary-download">
     <FRow
-      content="Conf Download"
+      content="DAG Download"
       @click="download()"
       class="f-summary-download-text"
       :class="{

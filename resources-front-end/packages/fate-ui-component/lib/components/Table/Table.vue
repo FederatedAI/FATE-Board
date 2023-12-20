@@ -53,7 +53,8 @@ const props = defineProps([
   'column',
   'layout',
   'position',
-  'range' // table cell exchange according to range
+  'range', // table cell exchange according to range
+  'showOverflow'
 ]);
 const emits = defineEmits([
   'sizeChange',
@@ -77,9 +78,17 @@ const pageSize = ref(props.column
   ? Number(props.size) || 10
   : Number(props.size) || 20
 );
-const currentHeader = () => props.column && props.header
+const currentHeader = () => {
+  const columns = props.column && props.header
   ? props.header.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value)
   : props.header
+  if (props.showOverflow !== false) {
+    for (const each of columns) {
+      each.showOverflowTooltip = true
+    }
+  }
+  return columns
+}
 
 const currentData = () => {
   return (!props.column && props.total !== undefined && props.total !== false && props.data.length > pageSize.value && props.data)

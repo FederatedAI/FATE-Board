@@ -1,4 +1,4 @@
-import './Selection.scss';
+import './selection.scss';
 import FSelection from './Selection.vue';
 import FSelectionChart from './SelectionChart.vue';
 

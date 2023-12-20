@@ -150,7 +150,7 @@ const dataForRequest = () => {
     list: <any>[
       {
         fJobId: 'job1',
-        fRole: 'guest',
+        fRole: 'gueguestguestguestguestguestguestguestguestguestguestst',
         fPartyId: 9999,
         partner: '',
         fStartTime: 1234123412,

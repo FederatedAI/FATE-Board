@@ -74,6 +74,7 @@ const paramRequest = async (comp: any) => {
     })
   }
 };
+
 watch(
   () => store.state.comp.parameters,
   () => {
