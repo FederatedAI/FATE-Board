@@ -199,6 +199,9 @@ watch(
     :first-child {
       min-width: 100px;
     }
+    .f-d-c-col {
+      @include flex-col();
+    }
   }
 
   .f-d-c-title {

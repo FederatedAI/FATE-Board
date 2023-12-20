@@ -102,7 +102,11 @@ function TreeNodeExplain(
     }
   }
 
-  // node weight (none)
+  // node weight
+  if (isLeaf) {
+    key += ` \n weight: ${fixed(weight)}`
+  }
+
   // node partyId
   if (!isHomoBoost) {
     key +=

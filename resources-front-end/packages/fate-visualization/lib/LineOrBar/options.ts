@@ -85,6 +85,9 @@ export default function options({
                     focus: 'series',
                   },
                 },
+                (param as any).type === 'bar' ? {
+                  barMaxWidth: 30
+                } : {},
                 param
               )
             );

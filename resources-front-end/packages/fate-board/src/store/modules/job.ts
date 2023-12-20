@@ -9,6 +9,8 @@ export default {
     jobId: '',
     role: '',
     partyId: '',
+    pageSize: 20,
+    currentPage: 1,
 
     details: {},
     dataset: {},
@@ -28,6 +30,12 @@ export default {
     },
     SET_PARTYID(state: any, partyId: string) {
       state.partyId = partyId;
+    },
+    SET_PAGESIZE(state: any, pageSize: number) {
+      state.pageSize = pageSize
+    },
+    SET_CURRENTPAGE(state: any, currentPage: number) {
+      state.currentPage = currentPage
     },
     SET_DAG(state: any, dag: object) {
       state.dag = merge(state.dag, dag);
@@ -161,6 +169,8 @@ export default {
         commit('SET_PARTYID', INFO.partyId)
         changed = true
       }
+      commit('SET_PAGESIZE', INFO.pageSize || 20)
+      commit('SET_CURRENTPAGE', INFO.currentPage || 1)
       if (INFO?.rerun) {
         state._rerun_ = !!INFO?.rerun
       }
