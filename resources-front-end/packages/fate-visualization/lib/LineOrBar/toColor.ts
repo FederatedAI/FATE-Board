@@ -73,7 +73,7 @@ export default function randomColor(count: number, gp = 1) {
     const cp = one(i);
     colors.push(cp);
     count -= cp.length;
-    i++
+    i++;
   }
   return colors;
 }
