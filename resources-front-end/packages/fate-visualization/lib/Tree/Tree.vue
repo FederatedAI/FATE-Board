@@ -14,6 +14,7 @@
 
 <script lang="ts" setup>
 import * as echarts from 'echarts';
+import { toRGBA } from 'fate-tools';
 import { merge } from 'lodash';
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import explain from './explain';
@@ -37,6 +38,10 @@ const draw = (newOptions?: any, setting?: any) => {
   nextTick(() => emits('afterDraw'))
 }
 
+const rgba = (color: string, opacity: number) => {
+  return toRGBA(color, opacity)
+}
+
 watch(() => props.data,
   () => {
     draw({
@@ -52,8 +57,13 @@ watch(() => props.color,
   () => {
     draw({
       series: {
-        itemStyle: {
-          color: props.color,
+        label: {
+          backgroundColor: props.color,
+        },
+        leaves: {
+          label: {
+            backgroundColor: rgba(props.color, 0.8)
+          }
         }
       },
     });
@@ -74,8 +84,13 @@ onMounted(() => {
     },
     {
       series: {
-        itemStyle: {
-          color: props.color || '#409eff'
+        label: {
+          backgroundColor: props.color || '#409eff',
+        },
+        leaves: {
+          label: {
+            backgroundColor: rgba(props.color || '#409eff', 0.8)
+          }
         }
       }
     },
