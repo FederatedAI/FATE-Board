@@ -11,7 +11,7 @@ export default function EvaLift (
 
   const basicChartConfiguration = {
     xAxis: {
-      type: 'category',
+      type: 'value',
     },
     yAxis: {
       type: 'value',

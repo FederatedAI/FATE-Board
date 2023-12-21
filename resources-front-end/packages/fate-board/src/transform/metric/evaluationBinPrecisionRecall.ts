@@ -34,8 +34,8 @@ export default function ExpPR (
               const threshold = thresholdMapping.get(namespace)
               parameter.ths = fixed(threshold[componentName][each.dataIndex])
             }
-            parameter['precision'] = each.data
-            parameter['recall'] = ''
+            parameter['precision'] = each.data[0]
+            parameter['recall'] = each.data[1]
             parameters.set(componentName, parameter)
           }
           let display = ''
