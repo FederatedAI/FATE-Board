@@ -34,11 +34,11 @@ export default function HomoLr (
   
   for (const key in state_dict) {
     const [ _model, modelLabel, parameter ] = key.split('.')
-    const optionIndex = options.findIndex((item: any) => item.prop === modelLabel)
+    const optionIndex = options.findIndex((item: any) => item.value === modelLabel)
     if (optionIndex < 0) {
       options.push({
         label: `model_${modelLabel}`,
-        prop: modelLabel
+        value: modelLabel
       })
     }
     if (parameter.match(/bias/i)) {
@@ -72,7 +72,7 @@ export default function HomoLr (
       toText(
         {
           request: (value: any) => {
-            const index =  options.findIndex((item: any) => item.prop === value)
+            const index =  options.findIndex((item: any) => item.value === value)
             return options[index].label
           },
           parameter: ['LROVRSelection.modelValue'],
@@ -89,7 +89,7 @@ export default function HomoLr (
           return tBias[value];
         },
         parameter: ['LROVRSelection.modelValue'],
-      } : tBias[options[0].prop],
+      } : tBias[options[0].value],
       'Bias'
     )
   )
@@ -102,7 +102,7 @@ export default function HomoLr (
           return tData[value]
         },
         parameter: ['LROVRSelection.modelValue'],
-      } : tData[options[0].prop],
+      } : tData[options[0].value],
       {
         index: true
       }
