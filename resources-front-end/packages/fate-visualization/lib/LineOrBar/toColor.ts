@@ -67,12 +67,13 @@ export default function randomColor(count: number, gp = 1) {
     }
     return colorGp;
   };
-  let colors = [];
+  const colors = [];
   let i = 0
   while (count > 0) {
     const cp = one(i);
     colors.push(cp);
     count -= cp.length;
+    i++
   }
   return colors;
 }
