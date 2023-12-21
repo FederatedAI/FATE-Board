@@ -25,7 +25,17 @@
       <template #default>
         <section class="f-tree-content">
           <section class="f-tree-selection">
-            <FSelectionChart :color="SubTabColor" :options="SubTabOptions" @change="change"/>
+            <FSelectionChart :color="SubTabColor" :options="SubTabOptions" @change="change" class="f-tree-selection-choose"/>
+            <section class="f-tree-selection-detail">
+              <article>
+                <span class="f-t-title">Tree ID:</span>
+                <span class="f-t-content">{{ treeid }}</span>
+              </article>
+              <article>
+                <span class="f-t-title">Tree Size:</span>
+                <span class="f-t-content">{{ treeSize }}</span>
+              </article>
+            </section>
           </section>
           <section v-show="chartData" v-loading="chartLoading" class="f-tree-chart">
             <FTree :data="chartData" :color="SubTabColor"/>
@@ -109,7 +119,12 @@ const tableHeader = [{
   prop: 'importance'
 }]
 
-const change = (value: any) => {
+const treeid = ref('')
+const treeSize = ref('')
+const change = (item: any) => {
+  treeid.value = '' + item.id
+  treeSize.value = '' + item.weight
+  const value = item.value
   if (value.chart) {
     chartLoading.value = true
     const chartValue = value.chart
@@ -174,11 +189,39 @@ watch(
     .f-tree-selection {
       position: relative;
       width: 100%;
-      height: 60px;
+      height: 80px;
       margin-bottom: $pale;
+    }
+
+    .f-tree-selection-choose {
       background-color: var(--el-bg-color);
       border: 1px solid var(--el-color-info-light-9);
       border-radius: 2px;
+      height: 60px;
+      margin-bottom: math.div($pale, 2)
+    }
+
+    .f-tree-selection-detail {
+      @include flex-row();
+      width: 100%;
+      & > article {
+        padding-right: $pale;
+        @include flex-row();
+
+        .f-t-title {
+          max-width: 160px;
+          color: var(--el-color-info) !important;
+          font-size: 16px !important;
+          padding-right: $pale;
+        }
+
+        .f-t-content {
+          min-width: 70px;
+          max-width: 120px;
+          color: var(--el-color-info-light-3) !important;
+          font-size: 14px !important;
+        }
+      }
     }
 
     .f-tree-chart {
@@ -199,4 +242,6 @@ watch(
     }
   }
 }
+
+
 </style>
