@@ -31,6 +31,7 @@ export default function toAxis(props: PropOptions[] | PropOptions) {
         },
         axisLine: {
           show: true,
+          onZero: true
         },
         axisLabel: {
           rotate:

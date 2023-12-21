@@ -54,7 +54,8 @@ const props = defineProps([
   'layout',
   'position',
   'range', // table cell exchange according to range
-  'showOverflow'
+  'showOverflow',
+  'needToRefresh'
 ]);
 const emits = defineEmits([
   'sizeChange',
@@ -84,7 +85,9 @@ const currentHeader = () => {
   : props.header
   if (props.showOverflow !== false) {
     for (const each of columns) {
-      each.showOverflowTooltip = true
+      if (!each.type) {
+        each.showOverflowTooltip = true
+      }
     }
   }
   return columns
@@ -112,7 +115,9 @@ watch(
 watch(
   () => props.data,
   () => {
-    // refresh.value++
+    if (props.needToRefresh !== false) {
+      refresh.value++
+    }
   },
   { deep: true }
 )
