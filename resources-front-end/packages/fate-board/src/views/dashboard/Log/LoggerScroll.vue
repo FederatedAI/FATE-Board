@@ -6,7 +6,7 @@
     <div v-else-if="!logs.length" class="f-log-tip">
       <span>no data</span>
     </div>
-    <FVirtualScroll
+    <FCVirtualScroll
       v-else
       ref="scroller"
       :items="logs"
@@ -23,20 +23,21 @@
           <span class="f-log-item-content">{{ param.item.content }}</span>
         </div>
       </template>
-    </FVirtualScroll>
+    </FCVirtualScroll>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { FCVirtualScroll } from '@/components/VirtualScroll';
 import { ref, watch } from 'vue';
 
 const props = defineProps(['logs']);
-defineEmits(['scroll-top'])
+defineEmits(['scroll-top']);
 const bottom = ref(0);
 const scroller = ref();
 
-function getLineNum (param: any) {
-  return param.item.lineNum
+function getLineNum(param: any) {
+  return param.item.lineNum;
 }
 
 function afterScrollMount() {
