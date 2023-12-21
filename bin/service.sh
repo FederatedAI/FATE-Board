@@ -37,11 +37,11 @@ module=fateboard
 version=2.0.0
 
 
-if test -f "${fatepath}/fate/fate_flow/bin/init_env.sh";then
-  source ${fatepath}/fate/fate_flow/bin/init_env.sh
+if test -f "${fatepath}/fate_flow/bin/init_env.sh";then
+  source ${fatepath}/fate_flow/bin/init_env.sh
   echo "JAVA_HOME=$JAVA_HOME"
 else
-  echo "file not found:${fatepath}/fate/fate_flow/bin/init_env.sh"
+  echo "file not found:${fatepath}/fate_flow/bin/init_env.sh"
   exit
 fi
 
