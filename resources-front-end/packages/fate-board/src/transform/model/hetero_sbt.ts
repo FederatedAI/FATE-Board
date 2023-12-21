@@ -241,7 +241,8 @@ export default function Hetero_sbt(
 
       const { feature_importance, hyper_param, nodes } = trees[i];
       const SubTabs = {
-        label: `weight: ${nodes.length}`,
+        label: `id: ${i}`,
+        id: 0,
         weight: nodes.length,
         value: <any>{},
       };

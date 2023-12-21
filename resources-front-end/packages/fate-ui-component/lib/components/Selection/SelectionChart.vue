@@ -111,7 +111,7 @@ function colorGet(option: any) {
 function change(item: any, key: number) {
   if (!moved.value) {
     current.value = key;
-    emits('change', item.value);
+    emits('change', item);
   }
   moved.value = false
 }
@@ -191,7 +191,7 @@ onMounted(() => {
   hasLeftIcon()
   hasRightIcon()
   if (props.options && props.options[current.value]) {
-    emits('change', props.options[current.value].value)
+    emits('change', props.options[current.value])
   }
 })
 

@@ -8,23 +8,60 @@ export default function TreeSeries (data: any) {
       data: [data].flat(Infinity),
       initialTreeDepth: -1,
       roam: true,
-      left: '5%',
-      right: '5%',
-      top: '12%',
-      bottom: '12%',
-
-      symbol: 'emptyCircle',
-      symbolSize: 100,
+      left: '2%',
+      right: '2%',
+      top: '7%',
+      bottom: '7%',
+      symbol: 'rect',
+      symbolSize: [95, 55],
+      layout: 'center',
       orient: 'vertical',
-      expandAndCollapse: true,
+      lineStyle: {
+        color: '#e8e8ef',
+        width: 2
+      },
+      itemStyle: {
+        normal: {
+          color: 'transparent',
+          borderColor: 'transparent'
+        }
+      },
+      expandAndCollapse: false,
+
       label: {
-        borderWidth: 2,
+        position: 'inside',
+        color: '#fff',
+        distance: 0,
         rotate: 0,
         verticalAlign: 'middle',
+        borderRadius: 5,
         align: 'center',
-        fontSize: 10,
-        lineHeight: 12
-      }
+        fontSize: 9,
+        borderWidth: 1,
+        padding: [3, 1],
+        width: 105,
+        height: 60,
+        lineHeight: 16,
+        rich: {}
+      },
+
+      leaves: {
+        label: {
+          position: 'inside',
+          color: '#fff',
+          distance: 0,
+          rotate: 0,
+          verticalAlign: 'middle',
+          borderRadius: 5,
+          fontSize: 9,
+          align: 'center',
+          borderWidth: 1,
+          width: 105,
+          height: 60,
+          lineHeight: 16,
+          rich: {}
+        }
+      },
     }
   }, configuration)
 }
