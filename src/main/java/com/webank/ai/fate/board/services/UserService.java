@@ -68,7 +68,7 @@ public class UserService {
         String privateKey = getValue("server.board.encrypt.private_key");
         String encrypted = getValue("server.board.encrypt.enable");
         if ("true".equalsIgnoreCase(encrypted)) {
-            if (StringUtils.isNotBlank(privateKey)) {
+            if (StringUtils.isBlank(privateKey)) {
                 return false;
             }
             try {
