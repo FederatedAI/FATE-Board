@@ -14,6 +14,13 @@ export default function toRGBA(color: string, opacity = 1): string {
       sColorChange.push(parseInt('0x' + sColor.slice(i, i + 2)))
     }
     return 'rgba(' + sColorChange.join(',') + ',' + (opacity !== undefined ? opacity : 1) + ')'
+  } else {
+    const colors = color.replace(/rgba?/, '').replace(/[\(\)]/, '').split(',')
+    if (colors[3]) {
+      colors[3] = '' + (opacity !== undefined ? opacity : 1) 
+    } else {
+      colors.push('' + (opacity !== undefined ? opacity : 1) )
+    }
+    return 'rgba(' + colors.join(',') + ')'
   }
-  return sColor
 }

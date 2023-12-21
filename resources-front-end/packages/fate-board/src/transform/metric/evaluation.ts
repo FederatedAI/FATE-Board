@@ -239,7 +239,7 @@ export default function evaluation(
               return fixed(p[position]);
             };
             precisionRecall.precision = val;
-          } else if (metric.match(/mult/)) {
+          } else {
             scoreRow.precision = fixed(val);
           }
         }
