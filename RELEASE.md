@@ -1,3 +1,11 @@
+# Release 2.0.0
+
+#### Major Features and Improvements
+**Major Features**
+
+* Support for display of FATE 2.0.0
+* New Style Theme
+
 # Release 1.11.1
 
 #### Major Features and Improvements
