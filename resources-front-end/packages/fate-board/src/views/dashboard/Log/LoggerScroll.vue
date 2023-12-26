@@ -114,6 +114,8 @@ watch(
     text-align: left;
     text-indent: initial;
     line-height: 20px;
+    white-space: pre-wrap;
+    font-family: 'lucon', 'Lucida Console', Monaco, monospace, 'Arial';
   }
 }
 .f-log-tip {

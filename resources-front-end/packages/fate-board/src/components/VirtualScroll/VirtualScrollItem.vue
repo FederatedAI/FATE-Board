@@ -71,7 +71,8 @@ watch(
     } else if (value && $_pendingScrollUpdate.value === id.value) {
       updateSize();
     }
-  }
+  },
+  { deep: true }
 );
 
 onMounted(() => {
