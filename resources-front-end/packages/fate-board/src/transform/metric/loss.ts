@@ -7,8 +7,9 @@ export default function Loss (
 
   const configuration = {
     xAxis: {
-      type: 'category',
-      name: 'epoch'
+      type: 'value',
+      name: 'epoch',
+      minInterval: 1
     },
     yAxis: {
       type: 'value',
@@ -38,7 +39,13 @@ export default function Loss (
         pointers.length = 0
       }
       return result
-    })()
+    })(),
+    tooltip: {
+      formatter: (parameters: any) => {
+        return `Epoch: ${parameters[0].axisValue} <br />
+        Loss: ${parameters[0].data[1]}`
+      }
+    }
   }
 
   return {
