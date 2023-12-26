@@ -32,6 +32,8 @@ fatepath=$(
   pwd
 )
 
+cd $basepath
+
 main_class=org.fedai.fate.board.bootstrap.Bootstrap
 module=fateboard
 version=2.0.0
