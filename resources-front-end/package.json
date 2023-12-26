@@ -1,7 +1,9 @@
 {
-  "name": "fateboard",
+  "name": "aisp-scvmadm-web",
   "version": "2.0.0",
-  "license": "ISC",
+  "license": "MIT",
+  "description": "aisp-scvmadm-web",
+  "author": "webank",
   "devDependencies": {
     "@babel/core": "^7.23.2",
     "@babel/preset-env": "^7.23.2",
