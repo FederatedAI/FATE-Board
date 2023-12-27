@@ -12,23 +12,9 @@ FATEBoard是联邦学习建模的可视化工具，旨在帮助用户简单而�
 
 # **使用** #
 
-**数据库配置**
-
-集群版本FATEBoard默认的数据库是mysql，如果你使用单机版FATEBoard，那么你需要用sqlite数据库。只要用sqlite参数更新这个文件：FATEBoard/src/main/resources/application.properties。你需要更新的参数如下：
-spring.datasource.driver-Class-Name=org.sqlite.JDBC 
-
-fateboard.datasource.jdbc-url=xxx 
-
-fateboard.datasource.username= 
-
-fateboard.datasource.password=
-
-
 **启动FATEBoard** 
 
 FATEBoard代码使用spring-boot框架并嵌入在tomcat容器中，默认的网络端口是8080。在启动前，需要检查机器的8080端口是否被占用，如果端口被占用，FATEBoard将会启动失败。
-
-FATEBoard通过访问mysql数据库来获得任务列表，如果没有正确安装数据库，那么任务获取就会失败。 
 
 FATEBoard通过HTTP协议来访问FATEFlow。如果没有正常启动FATEFlow，FATEBoard将无法呈现任务图表。
 
@@ -89,6 +75,6 @@ FATEBoard通过给FATE-Flow发送Http请求获得每个算法模块的输出数�
 
 **FATEBoard没有显示算法模块运行日志**
 
-FATEBoard通过查询数据库展示所有的算法任务以及他们的详细信息。
+FATEBoard通过查询FATEFLOW展示所有的算法任务以及他们的详细信息。
 在单机版中,FATEBoard查询本地日志文件，并通过websocket协议在前端展示。所以如果日志无法显示，请确认日志文件是否正常生成。
 在集群版中，FATEBoard通过ssh方式读取不同机器上的日志文件，通过websocket协议推送到前端。默认的日志路径是/data/projects/fate/logs。如果日志无法展示，那么可能是ssh的连接信息错误，你可以点击页面右上角的设置按钮重新设置正确的ssh连接信息。
