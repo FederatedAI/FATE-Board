@@ -3,8 +3,10 @@
 #### Major Features and Improvements
 **Major Features**
 
-* Support for display of FATE 2.0.0
-* New Style Theme
+* Refactoring DAG components, adding support for stage status, and displaying dynamic ports.
+* Update the cache structure to optimize issues such as user timeout handling and duplicate storage of configuration information.
+* Optimize some interactive functions.
+* Update the style theme.
 
 # Release 1.11.1
 
