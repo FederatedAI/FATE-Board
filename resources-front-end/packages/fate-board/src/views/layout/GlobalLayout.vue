@@ -31,7 +31,7 @@ import LayoutHeader from './LayoutHeader.vue';
 
   @include flex-row();
   @include flex-stretch();
-
+  
   background-color: $default-white;
   overflow: hidden;
 

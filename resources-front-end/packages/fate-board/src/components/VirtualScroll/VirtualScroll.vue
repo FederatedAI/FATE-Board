@@ -31,7 +31,6 @@
 </template>
 
 <script lang="ts" setup>
-import { debounce } from 'lodash';
 import {
 computed,
 nextTick,
@@ -121,11 +120,10 @@ let resizeObserver: any = undefined;
 
 const itemsWithSize = computed<any[]>(() => {
   const result = [];
-  const { items, keyField } = _props;
   const sizes: any = scrollData.sizes;
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    const id = item[keyField] || i;
+  for (let i = 0; i < _props.items.length; i++) {
+    const item = _props.items[i];
+    const id = item[_props.keyField];
     let size = sizes[id];
     if (typeof size === 'undefined' && !$_undefinedMap[id]) {
       size = 0;
@@ -143,13 +141,11 @@ const sizes = computed<any>(() => {
   const sizes: any = {
     '-1': { accumulator: 0 },
   };
-  const items = itemsWithSize;
-  const minItemSize = _props.minItemSize;
   let computedMinSize = 10000;
   let accumulator = 0;
   let current;
-  for (let i = 0, l = items.value.length; i < l; i++) {
-    current = items.value[i].size || minItemSize;
+  for (let i = 0, l = itemsWithSize.value.length; i < l; i++) {
+    current = itemsWithSize.value[i].size || _props.minItemSize;
     if (current < computedMinSize) {
       computedMinSize = current;
     }
@@ -171,18 +167,17 @@ function addView(pool: any[], index: number, item: unknown, key: unknown) {
   const view = {
     item,
     position: 0,
-    info: property,
+    info: property
   };
   pool.push(view);
   return view;
 }
 function unuseView(view: any, fake = false) {
-  const unusedViews = $_unusedViews;
   const type = view.info.type;
-  let unusedPool = unusedViews.get(type);
+  let unusedPool = $_unusedViews.get(type);
   if (!unusedPool) {
     unusedPool = [];
-    unusedViews.set(type, unusedPool);
+    $_unusedViews.set(type, unusedPool);
   }
   unusedPool.push(view);
   if (!fake) {
@@ -192,19 +187,18 @@ function unuseView(view: any, fake = false) {
   }
 }
 
-const scrollUpdateItem = debounce(() => {
-  $_scrollDirty.value = false;
-  const { continuous } = updateItems(false, true);
-  if (!continuous) {
-    clearTimeout($_refreshTimout);
-    $_refreshTimout = setTimeout(handleScroll, 200);
-  }
-}, 100);
 function handleScroll() {
   checkPosition();
   if (!$_scrollDirty.value) {
     $_scrollDirty.value = true;
-    requestAnimationFrame(scrollUpdateItem);
+    requestAnimationFrame(() => {
+      $_scrollDirty.value = false;
+      const { continuous } = updateItems(false, true);
+      if (!continuous) {
+        clearTimeout($_refreshTimout);
+        $_refreshTimout = setTimeout(handleScroll, 100);
+      }
+    });
   }
 }
 function getRange(scroll: { start: any; end: any }) {
@@ -486,22 +480,9 @@ watch(
   { deep: true }
 );
 
-watch(
-  () => scrollData.sizes,
-  () => updateItems(true),
-  { deep: true }
-);
-
-watch(
-  () => scrollData.validSizes,
-  () => updateItems(true),
-  { deep: true }
-);
-
 onMounted(() => {
   nextTick(() => {
     updateItems(true);
-    emit('afterMounted');
     ready.value = true;
   });
   addResizeObserver();
