@@ -31,6 +31,7 @@
 </template>
 
 <script lang="ts" setup>
+import { debounce } from 'lodash';
 import {
 computed,
 nextTick,
@@ -46,20 +47,20 @@ import ScrollItemRedo from './VirtualScrollItem.vue';
 let uid = 0;
 
 interface Props {
-  items: { content: string, lineNum: number, [name: string]: keyof any }[],
-  distance?: number,
-  disabled?: boolean,
-  minItemSize: number,
-  buffer?: number,
-  keyField?: string,
-  emitScroll?: boolean
+  items: { content: string; lineNum: number; [name: string]: keyof any }[];
+  distance?: number;
+  disabled?: boolean;
+  minItemSize: number;
+  buffer?: number;
+  keyField?: string;
+  emitScroll?: boolean;
 }
 const _props = withDefaults(defineProps<Props>(), {
   distance: 0,
   keyField: 'lineNum',
   disabled: false,
   buffer: 200,
-  emitScroll: false
+  emitScroll: false,
 });
 const emit = defineEmits([
   'scrollTop',
@@ -98,11 +99,11 @@ let $_scrollingToBottom: any;
 let $_lastUpdateScrollPosition = 0;
 
 const container = ref();
-const items = ref()
+const items = ref();
 const vScrollUpdate = (params: any) => {
   if (items.value) {
     for (const item of items.value) {
-      item.onScrollUpdate(params)
+      item.onScrollUpdate(params);
     }
   }
 };
@@ -114,9 +115,10 @@ const scrollData = reactive({
   active: true,
   sizes: {},
   validSizes: {},
-  keyField: _props.keyField
+  keyField: _props.keyField,
 });
 let resizeObserver: any = undefined;
+
 const itemsWithSize = computed<any[]>(() => {
   const result = [];
   const { items, keyField } = _props;
@@ -136,6 +138,7 @@ const itemsWithSize = computed<any[]>(() => {
   }
   return result;
 });
+
 const sizes = computed<any>(() => {
   const sizes: any = {
     '-1': { accumulator: 0 },
@@ -189,18 +192,19 @@ function unuseView(view: any, fake = false) {
   }
 }
 
+const scrollUpdateItem = debounce(() => {
+  $_scrollDirty.value = false;
+  const { continuous } = updateItems(false, true);
+  if (!continuous) {
+    clearTimeout($_refreshTimout);
+    $_refreshTimout = setTimeout(handleScroll, 200);
+  }
+}, 100);
 function handleScroll() {
   checkPosition();
   if (!$_scrollDirty.value) {
     $_scrollDirty.value = true;
-    requestAnimationFrame(() => {
-      $_scrollDirty.value = false;
-      const { continuous } = updateItems(false, true);
-      if (!continuous) {
-        clearTimeout($_refreshTimout);
-        $_refreshTimout = setTimeout(handleScroll, 200);
-      }
-    });
+    requestAnimationFrame(scrollUpdateItem);
   }
 }
 function getRange(scroll: { start: any; end: any }) {
@@ -471,13 +475,25 @@ watch(
 );
 
 watch(
-  () => sizes,
+  () => sizes.value,
   () => updateItems(false),
   { deep: true }
 );
 
 watch(
-  () => itemsWithSize,
+  () => itemsWithSize.value,
+  () => updateItems(true),
+  { deep: true }
+);
+
+watch(
+  () => scrollData.sizes,
+  () => updateItems(true),
+  { deep: true }
+);
+
+watch(
+  () => scrollData.validSizes,
   () => updateItems(true),
   { deep: true }
 );
@@ -495,18 +511,21 @@ onBeforeUnmount(() => {
   if (resizeObserver) {
     resizeObserver.disconnect();
   }
+  if ($_resizeObserver) {
+    $_resizeObserver.disconnect();
+  }
 });
 
 provide('scrollData', scrollData);
 provide('scrollResizeObserver', $_resizeObserver);
-provide('undefinedMap', $_undefinedMap)
-provide('undefinedSizes', $_undefinedSizes)
+provide('undefinedMap', $_undefinedMap);
+provide('undefinedSizes', $_undefinedSizes);
 
 defineExpose({
   scrollToBottom,
   scrollToItem,
-  scrollToPosition
-})
+  scrollToPosition,
+});
 </script>
 
 <style lang="scss" scoped>

@@ -35,7 +35,7 @@ const routes = useRouter();
 const killMessage = ref();
 
 const cancelConfirm = () => {
-  killMessage.value.open(props.job);
+  killMessage.value.open(props.jobId);
 };
 const canceling = (afterCancel) => {
   emits('cancel', afterCancel);
