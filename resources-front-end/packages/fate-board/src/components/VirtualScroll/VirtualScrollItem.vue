@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 const scrollData: any = inject('scrollData');
 const scrollResizeObserver: any = inject('scrollResizeObserver');
@@ -13,8 +13,6 @@ const undefinedMap: any = inject('undefinedMap');
 const undefinedSizes: any = inject('undefinedSizes');
 
 const $_forceNextScrollUpdate = ref<any>(null);
-const $_pendingSizeUpdate = ref<any>('');
-const $_pendingScrollUpdate = ref<any>('');
 
 interface Props {
   item: any;
@@ -42,6 +40,10 @@ watch(
     if (!size.value) {
       onDataUpdate();
     }
+  },
+  {
+    deep: true,
+    immediate: true,
   }
 );
 
@@ -68,11 +70,12 @@ watch(
       } else {
         unobserveSize();
       }
-    } else if (value && $_pendingScrollUpdate.value === id.value) {
+    }
+    if (value) {
       updateSize();
     }
   },
-  { deep: true }
+  { deep: true, immediate: true }
 );
 
 onMounted(() => {
@@ -80,18 +83,16 @@ onMounted(() => {
     updateSize();
     observeSize();
   }
+  // observeSizeOfItem();
 });
+
+onBeforeUnmount(() => {
+  // unobserveSizeOfItem()
+})
 
 function updateSize() {
   if (finalActive.value) {
-    if ($_pendingSizeUpdate.value !== id.value) {
-      $_pendingSizeUpdate.value = id.value;
-      $_forceNextScrollUpdate.value = null;
-      $_pendingScrollUpdate.value = null;
-      computeSize(id.value);
-    }
-  } else {
-    $_forceNextScrollUpdate.value = id.value;
+    computeSize(id.value);
   }
 }
 
@@ -102,7 +103,6 @@ function computeSize(id: any) {
       const height = container.value.offsetHeight;
       applySize(width, height);
     }
-    $_pendingSizeUpdate.value = null;
   });
 }
 
@@ -115,19 +115,42 @@ function applySize(_width: number, height: number) {
     }
     scrollData.sizes[id.value] = csize;
     scrollData.validSizes[id.value] = true;
+    return true;
+  } else {
+    return false;
   }
 }
 
+// let $_resizeOfItem: any
+// function observeSizeOfItem() {
+//   $_resizeOfItem = new ResizeObserver(debounce(() => {
+//     if (!scrollData.sizes[id.value] || !scrollData.validSizes[id.value]) {
+//       computeSize(id.value)
+//     }
+//   }))
+//   $_resizeOfItem.observe(container.value)
+// }
+
+// function unobserveSizeOfItem() {
+//   if ($_resizeOfItem) {
+//     $_resizeOfItem.disconnect()
+//   }
+// }
+
 function observeSize() {
   if (!scrollResizeObserver) return;
-  scrollResizeObserver.observe(container.value);
-  container.value.addEventListener('resize', onResize);
+  if (container.value) {
+    scrollResizeObserver.observe(container.value);
+    container.value.addEventListener('resize', onResize);
+  }
 }
 
 function unobserveSize() {
   if (!scrollResizeObserver) return;
-  scrollResizeObserver.unobserve(container.value);
-  container.value.removeEventListener('resize', onResize);
+  if (container.value) {
+    scrollResizeObserver.unobserve(container.value);
+    container.value.removeEventListener('resize', onResize);
+  }
 }
 
 function onResize(event: any) {
@@ -137,9 +160,6 @@ function onResize(event: any) {
 
 function onScrollUpdate({ force }: any) {
   if (!finalActive.value && force) {
-    $_pendingScrollUpdate.value = id.value;
-  }
-  if ($_forceNextScrollUpdate === id.value || force || !size.value) {
     updateSize();
   }
 }
@@ -149,6 +169,6 @@ function onDataUpdate() {
 }
 
 defineExpose({
-  onScrollUpdate
-})
+  onScrollUpdate,
+});
 </script>
