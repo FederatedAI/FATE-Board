@@ -1,11 +1,11 @@
 <template>
-  <article ref="container">
+  <component ref="container" :is="tag || 'div'">
     <slot name="default"></slot>
-  </article>
+  </component>
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, inject, nextTick, onMounted, ref, watch } from 'vue';
 
 const scrollData: any = inject('scrollData');
 const scrollResizeObserver: any = inject('scrollResizeObserver');
@@ -13,18 +13,22 @@ const undefinedMap: any = inject('undefinedMap');
 const undefinedSizes: any = inject('undefinedSizes');
 
 const $_forceNextScrollUpdate = ref<any>(null);
+const $_pendingSizeUpdate = ref<any>('');
+const $_pendingScrollUpdate = ref<any>('');
 
 interface Props {
-  item: any;
-  active: boolean;
-  tag?: string;
+  item: any,
+  active: boolean,
+  index?: number | undefined,
+  tag?: string
 }
 const props = withDefaults(defineProps<Props>(), {
+  index: undefined,
   tag: 'div',
 });
 const slots = defineSlots<{
-  default(): any;
-}>();
+  default(): any
+}>()
 
 const id = computed(() => props.item[scrollData.keyField]);
 const size = computed<any>(
@@ -40,10 +44,6 @@ watch(
     if (!size.value) {
       onDataUpdate();
     }
-  },
-  {
-    deep: true,
-    immediate: true,
   }
 );
 
@@ -70,12 +70,10 @@ watch(
       } else {
         unobserveSize();
       }
-    }
-    if (value) {
+    } else if (value && $_pendingScrollUpdate.value === id.value) {
       updateSize();
     }
-  },
-  { deep: true, immediate: true }
+  }
 );
 
 onMounted(() => {
@@ -83,26 +81,29 @@ onMounted(() => {
     updateSize();
     observeSize();
   }
-  // observeSizeOfItem();
 });
-
-onBeforeUnmount(() => {
-  // unobserveSizeOfItem()
-})
 
 function updateSize() {
   if (finalActive.value) {
-    computeSize(id.value);
+    if ($_pendingSizeUpdate.value !== id.value) {
+      $_pendingSizeUpdate.value = id.value;
+      $_forceNextScrollUpdate.value = null;
+      $_pendingScrollUpdate.value = null;
+      computeSize(id.value);
+    }
+  } else {
+    $_forceNextScrollUpdate.value = id.value;
   }
 }
 
-function computeSize(id: any) {
+function computeSize(idChecked: any) {
   nextTick(() => {
-    if (id.value === id) {
+    if (id.value === idChecked) {
       const width = container.value.offsetWidth;
       const height = container.value.offsetHeight;
       applySize(width, height);
     }
+    $_pendingSizeUpdate.value = null;
   });
 }
 
@@ -115,27 +116,8 @@ function applySize(_width: number, height: number) {
     }
     scrollData.sizes[id.value] = csize;
     scrollData.validSizes[id.value] = true;
-    return true;
-  } else {
-    return false;
   }
 }
-
-// let $_resizeOfItem: any
-// function observeSizeOfItem() {
-//   $_resizeOfItem = new ResizeObserver(debounce(() => {
-//     if (!scrollData.sizes[id.value] || !scrollData.validSizes[id.value]) {
-//       computeSize(id.value)
-//     }
-//   }))
-//   $_resizeOfItem.observe(container.value)
-// }
-
-// function unobserveSizeOfItem() {
-//   if ($_resizeOfItem) {
-//     $_resizeOfItem.disconnect()
-//   }
-// }
 
 function observeSize() {
   if (!scrollResizeObserver) return;
@@ -160,7 +142,11 @@ function onResize(event: any) {
 
 function onScrollUpdate({ force }: any) {
   if (!finalActive.value && force) {
-    updateSize();
+    $_pendingScrollUpdate.value = id.value
+  }
+
+  if ($_forceNextScrollUpdate.value === id.value || force || !size.value) {
+    updateSize()
   }
 }
 
