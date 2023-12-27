@@ -19,8 +19,8 @@
     >
       <template #item="param">
         <div :id="getLineNum(param)" class="f-log-item">
-          <span class="f-log-item-lineNum">{{ param.item.lineNum }}</span>
-          <span class="f-log-item-content">{{ param.item.content }}</span>
+          <article class="f-log-item-lineNum">{{ param.item.lineNum }}</article>
+          <article class="f-log-item-content">{{ param.item.content }}</article>
         </div>
       </template>
     </FCVirtualScroll>
@@ -48,10 +48,6 @@ function scrollTo(index: any) {
 }
 function onScroll(detail: any) {
   bottom.value = detail.bottom;
-}
-function setSpace(content: any) {
-  return content;
-  // return content.replace(/\s/g, '&nbsp;')
 }
 
 watch(
@@ -97,7 +93,9 @@ watch(
   position: absolute;
   background: #fff;
   .f-log-item {
+    width: 100%;
     @include flex-row();
+    position: relative;
   }
   .f-log-item-lineNum {
     font-family: 'lucon', 'Lucida Console', Monaco, monospace, 'Arial';
