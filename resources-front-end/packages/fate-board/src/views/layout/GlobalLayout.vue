@@ -5,9 +5,9 @@
     </el-header>
     <el-main class="layout-body">
       <router-view v-slot="{ Component }">
-        <transition name="fade">
+        <!-- <transition name="fade"> -->
           <component :is="Component" />
-        </transition>
+        <!-- </transition> -->
       </router-view>
     </el-main>
   </el-container>
@@ -31,7 +31,7 @@ import LayoutHeader from './LayoutHeader.vue';
 
   @include flex-row();
   @include flex-stretch();
-  
+
   background-color: $default-white;
   overflow: hidden;
 
