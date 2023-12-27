@@ -12,23 +12,10 @@ As a built-in visualization tool for FATE, FATEBoard presents abundant data visu
 
 # **Usage** #
 
-**Database Configuration**
-
-The default database for FATEBoard for cluster version is mysql. If you want to use standalone version, you should use sqlite databse. Just update the file : FATEBoard/src/main/resources/application.properties with right parameters of sqlite. The parameters you should update are below: 
-
-spring.datasource.driver-Class-Name=org.sqlite.JDBC 
-
-fateboard.datasource.jdbc-url=xxx 
-
-fateboard.datasource.username= 
-
-fateboard.datasource.password=
-
 **Starting FATEBoard** 
 
 The FATEBoard source code uses the spring-boot framework and the embedded tomcat container. The default web port provided is 8080. Before starting, it is necessary to check whether port 8080 of the machine is already occupied. If the port is occupied, FATEBoard will fail to start.
 
-FATEBoard gets job list through accessing MySQL database. If the database is not installed properly, the job list query will fail.
 FATEBoard access FATE-Flow through HTTP protocol. If FATE-Flow is not started properly, FATEBoard will not display charts.
 
 You can access FATEBoard by visiting http://{fateboard-ip}:8080.
@@ -89,6 +76,6 @@ FATEBoard sends a request to access FATE-Flow via HTTP to obtain all the data ne
 
 **My FATEBoard isn’t showing any log！**
 
-FATEBoard gets the list of jobs and details by querying MySQL. 
+FATEBoard gets the list of jobs and details by querying fateflow. 
 In a stand-alone environment, FATEBoard reads the local log file and returns it to the user through WebSocekt. If the log file cannot be displayed, you can first check whether the local log file has been generated.
 In a clustered environment, FATEBoard could access log files on different machines with SSH, and push them to the browser through WebSocket. The default log lookup path is /data/projects/fate/logs. If you cannot view the logs, it may be an error in SSH information in the cluster. you can set the correct SSH information by clicking the button in the upper right corner of the page.
