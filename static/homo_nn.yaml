@@ -2,7 +2,7 @@ component:
   name: homo_nn
   description: ''
   provider: fate
-  version: 2.0.0-beta
+  version: 2.0.0
   labels: []
   roles:
     - guest
@@ -11,7 +11,7 @@ component:
   parameters:
     runner_module:
       type: str
-      default: default_runner
+      default: homo_default_runner
       optional: true
       description: name of your runner script
       type_meta:
@@ -54,6 +54,7 @@ component:
       train_data:
         types:
           - dataframe
+          - data_directory
         optional: false
         stages:
           - train
@@ -65,6 +66,7 @@ component:
       validate_data:
         types:
           - dataframe
+          - data_directory
         optional: true
         stages:
           - train
@@ -76,6 +78,7 @@ component:
       test_data:
         types:
           - dataframe
+          - data_directory
         optional: false
         stages:
           - predict
@@ -153,4 +156,3 @@ component:
         description: metric, invisible for user
         is_multi: false
 schema_version: v1
-

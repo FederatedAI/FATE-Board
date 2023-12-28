@@ -2,7 +2,7 @@ component:
   name: homo_lr
   description: ''
   provider: fate
-  version: 2.0.0-beta
+  version: 2.0.0
   labels: []
   roles:
     - guest
@@ -12,9 +12,9 @@ component:
     learning_rate_scheduler:
       type: LRSchedulerParam
       default:
-        method: linear
+        method: constant
         scheduler_params:
-          start_factor: 1.0
+          factor: 1.0
       optional: true
       description: learning rate scheduler, select method from {'step', 'linear',
         'constant'}for list of configurable arguments, refer to torch.optim.lr_scheduler
@@ -34,9 +34,9 @@ component:
                 title: Scheduler Params
                 type: object
         default:
-          method: linear
+          method: constant
           scheduler_params:
-            start_factor: 1.0
+            factor: 1.0
         description: learning rate scheduler, select method from {'step', 'linear',
           'constant'}for list of configurable arguments, refer to torch.optim.lr_scheduler
     epochs:
@@ -52,10 +52,10 @@ component:
       type: ConstrainedNumberMeta
       default: 100
       optional: true
-      description: batch size, value less or equals to 0 means full batch
+      description: batch size, int > 0, if None means full batchnon
       type_meta:
         title: ConstrainedNumberMeta
-        minimum: -1
+        minimum: 0
         type: integer
     optimizer:
       type: OptimizerParam
@@ -104,9 +104,10 @@ component:
     init_param:
       type: InitParam
       default:
-        method: zeros
+        method: random
         fill_val: 0.0
         fit_intercept: true
+        random_state:
       optional: true
       description: Model param init setting.
       type_meta:
@@ -131,10 +132,14 @@ component:
                 title: Fit Intercept
                 default: true
                 type: boolean
+              random_state:
+                title: Random State
+                type: integer
         default:
-          method: zeros
+          method: random
           fill_val: 0.0
           fit_intercept: true
+          random_state:
         description: Model param init setting.
     threshold:
       type: ConstrainedNumberMeta
@@ -150,12 +155,12 @@ component:
       type: bool
       default: false
       optional: true
-      description: predict threshold for binary data
+      description: enable ovr for multi-classifcation
       type_meta:
         title: bool
         type: boolean
         default: false
-        description: predict threshold for binary data
+        description: enable ovr for multi-classifcation
     label_num:
       type: ConstrainedNumberMeta
       default:
