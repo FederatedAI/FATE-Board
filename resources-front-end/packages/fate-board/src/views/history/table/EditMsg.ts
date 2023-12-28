@@ -12,7 +12,7 @@ export default async function editMsg (
     job_id: row.jobId,
     party_id: row.partyId,
     role: row.role,
-    notes: content.value || content
+    notes: content.value !== undefined ? content.value : content
   })
   if (responseData) {
     after(content, scope)
