@@ -1,0 +1,316 @@
+component:
+  name: hetero_feature_selection
+  description: ''
+  provider: fate
+  version: 2.0.0-beta
+  labels: [ ]
+  roles:
+    - guest
+    - host
+  parameters:
+    method:
+      type: typing.List[fate.components.core.params._fields.StringChoice]
+      default:
+        - manual
+      optional: false
+      description: 'selection method, options: {manual, binning, statistics}'
+      type_meta:
+        title: typing.List[fate.components.core.params._fields.StringChoice]
+        type: array
+        items:
+          type: string
+        default:
+          - manual
+        description: 'selection method, options: {manual, binning, statistics}'
+    select_col:
+      type: typing.List[str]
+      default:
+      optional: true
+      description: list of column names to be selected, if None, all columns will
+        be considered
+      type_meta:
+        title: typing.List[str]
+        type: array
+        items:
+          type: string
+        default:
+        description: list of column names to be selected, if None, all columns will
+          be considered
+    iv_param:
+      type: ModelMetaclass
+      default:
+        metrics:
+          - iv
+        filter_type:
+          - threshold
+        threshold:
+          - 1.0
+        take_high:
+          - true
+        host_filter_type:
+          - threshold
+        host_threshold:
+          - 1.0
+        host_take_high:
+          - true
+        select_federated: true
+      optional: true
+      description: iv filter param
+      type_meta:
+        title: IVFilterParam
+        type: object
+        properties:
+          metrics:
+            title: Metrics
+            default:
+              - iv
+            type: array
+            items:
+              type: string
+          filter_type:
+            title: Filter Type
+            default:
+              - threshold
+            type: array
+            items:
+              type: string
+          threshold:
+            title: Threshold
+            default:
+              - 1.0
+            type: array
+            items:
+              anyOf:
+                - type: number
+                  minimum: 0.0
+                  maximum: 1.0
+                - type: integer
+                  minimum: 1
+          take_high:
+            title: Take High
+            default:
+              - true
+            type: array
+            items:
+              type: boolean
+          host_filter_type:
+            title: Host Filter Type
+            default:
+              - threshold
+            type: array
+            items:
+              type: string
+          host_threshold:
+            title: Host Threshold
+            default:
+              - 1.0
+            type: array
+            items:
+              anyOf:
+                - type: number
+                  minimum: 0.0
+                  maximum: 1.0
+                - type: integer
+                  minimum: 1
+          host_take_high:
+            title: Host Take High
+            default:
+              - true
+            type: array
+            items:
+              type: boolean
+          select_federated:
+            title: Select Federated
+            default: true
+            type: boolean
+    statistic_param:
+      type: ModelMetaclass
+      default:
+        metrics:
+          - mean
+        filter_type:
+          - threshold
+        threshold:
+          - 1.0
+        take_high:
+          - true
+      optional: true
+      description: statistic filter param
+      type_meta:
+        title: StatisticFilterParam
+        type: object
+        properties:
+          metrics:
+            title: Metrics
+            default:
+              - mean
+            type: array
+            items:
+              anyOf:
+                - type: string
+                - type: string
+          filter_type:
+            title: Filter Type
+            default:
+              - threshold
+            type: array
+            items:
+              type: string
+          threshold:
+            title: Threshold
+            default:
+              - 1.0
+            type: array
+            items:
+              anyOf:
+                - type: number
+                  minimum: 0.0
+                  maximum: 1.0
+                - type: integer
+                  minimum: 1
+          take_high:
+            title: Take High
+            default:
+              - true
+            type: array
+            items:
+              type: boolean
+    manual_param:
+      type: ModelMetaclass
+      default:
+        keep_col: [ ]
+        filter_out_col: [ ]
+      optional: true
+      description: manual filter param
+      type_meta:
+        title: ManualFilterParam
+        type: object
+        properties:
+          keep_col:
+            title: Keep Col
+            default: [ ]
+            type: array
+            items:
+              type: string
+          filter_out_col:
+            title: Filter Out Col
+            default: [ ]
+            type: array
+            items:
+              type: string
+    keep_one:
+      type: bool
+      default: true
+      optional: true
+      description: whether to keep at least one feature among `select_col`
+      type_meta:
+        title: bool
+        type: boolean
+        default: false
+        description: bool, whether interpret `select_col` & `filter_out_col` & `keep_col`
+          as anonymous column names
+    use_anonymous:
+      type: bool
+      default: false
+      optional: true
+      description: bool, whether interpret `select_col` & `filter_out_col` & `keep_col`
+        as anonymous column names
+      type_meta:
+        title: bool
+        type: boolean
+        default: false
+        description: bool, whether interpret `select_col` & `filter_out_col` & `keep_col`
+          as anonymous column names
+  input_artifacts:
+    data:
+      train_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - train
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+      test_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - predict
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+    model:
+      input_models:
+        types:
+          - json_model
+        optional: true
+        stages:
+          - train
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: true
+      input_model:
+        types:
+          - json_model
+        optional: false
+        stages:
+          - predict
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+  output_artifacts:
+    data:
+      train_output_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - train
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+      test_output_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - predict
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+    model:
+      train_output_model:
+        types:
+          - json_model
+        optional: false
+        stages:
+          - train
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+    metric:
+      metric:
+        types:
+          - json_metric
+        optional: false
+        stages: [ ]
+        roles: [ ]
+        description: metric, invisible for user
+        is_multi: false
+schema_version: v1
