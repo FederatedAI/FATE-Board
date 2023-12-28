@@ -25,9 +25,3 @@ npm run dev
 ```bash
 npm run build
 ```
-
-# Build for production and view the bundle analyzer report
-
-```bash
-npm run build --report
-```

@@ -1,0 +1,63 @@
+component:
+  name: reader
+  description: ''
+  provider: fate
+  version: 2.0.0
+  labels: []
+  roles:
+    - guest
+    - host
+    - arbiter
+  parameters:
+    name:
+      type: str
+      default:
+      optional: false
+      description: ''
+      type_meta:
+        title: str
+        type: string
+        default:
+        description: ''
+    namespace:
+      type: str
+      default:
+      optional: false
+      description: ''
+      type_meta:
+        title: str
+        type: string
+        default:
+        description: ''
+  input_artifacts:
+    data: {}
+    model: {}
+  output_artifacts:
+    data:
+      output_data:
+        types:
+          - data_unresolved
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+          - arbiter
+        description: ''
+        is_multi: false
+    model: {}
+    metric:
+      metric:
+        types:
+          - json_metric
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+          - arbiter
+        description: metric, invisible for user
+        is_multi: false
+schema_version: v1

@@ -1,0 +1,34 @@
+@mixin flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+@mixin flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-center {
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-start {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@mixin flex-end {
+  align-items: center;
+  justify-content: flex-end;
+}
+
+@mixin flex-stretch {
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-freeze {
+  flex-shrink: 0;
+  flex-grow: 0;
+}
