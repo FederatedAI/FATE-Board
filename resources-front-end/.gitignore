@@ -1,18 +1,13 @@
-.DS_Store
-node_modules/
-dist/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-package-lock.json
-yarn.lock
+#git ignore
+node_modules
+dist
+@types
 
-# Editor directories and files
-.idea
-.vscode
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.zip
+*-lock*
+*-log*
+*-bug*
+*.log
+
 *.7z
+*.rar
+*.zip
