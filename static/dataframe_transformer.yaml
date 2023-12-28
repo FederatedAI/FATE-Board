@@ -2,67 +2,43 @@ component:
   name: dataframe_transformer
   description: ''
   provider: fate
-  version: 2.0.0-beta
+  version: 2.0.0
   labels: []
   roles:
     - local
+    - guest
+    - host
   parameters:
     namespace:
-      type: parameter_namespace
+      type: str
       default:
       optional: true
       description: ''
       type_meta:
-        title: parameter_namespace
-        type: object
-        properties:
-          data:
-            title: Data
-            type: string
-        required:
-          - data
+        title: str
+        type: string
+        default:
+        description: ''
     name:
-      type: parameter_name
+      type: str
       default:
       optional: true
       description: ''
       type_meta:
-        title: parameter_name
-        type: object
-        properties:
-          data:
-            title: Data
-            type: string
-        required:
-          - data
-    anonymous_role:
-      type: parameter_anonymous_role
+        title: str
+        type: string
+        default:
+        description: ''
+    site_name:
+      type: str
       default:
       optional: true
       description: ''
       type_meta:
-        title: parameter_anonymous_role
-        type: object
-        properties:
-          data:
-            title: Data
-            type: string
-        required:
-          - data
-    anonymous_party_id:
-      type: parameter_anonymous_party_id
-      default:
-      optional: true
-      description: ''
-      type_meta:
-        title: parameter_anonymous_party_id
-        type: object
-        properties:
-          data:
-            title: Data
-            type: string
-        required:
-          - data
+        title: str
+        type: string
+        default:
+        description: ''
   input_artifacts:
     data:
       table:
@@ -73,6 +49,8 @@ component:
           - default
         roles:
           - local
+          - guest
+          - host
         description: ''
         is_multi: false
     model: {}
@@ -86,8 +64,23 @@ component:
           - default
         roles:
           - local
+          - guest
+          - host
         description: ''
         is_multi: false
     model: {}
-    metric: {}
+    metric:
+      metric:
+        types:
+          - json_metric
+        optional: false
+        stages:
+          - default
+        roles:
+          - local
+          - guest
+          - host
+        description: metric, invisible for user
+        is_multi: false
 schema_version: v1
+

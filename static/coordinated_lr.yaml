@@ -2,7 +2,7 @@ component:
   name: coordinated_lr
   description: ''
   provider: fate
-  version: 2.0.0-beta
+  version: 2.0.0
   labels: [ ]
   roles:
     - guest
