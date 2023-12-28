@@ -30,7 +30,7 @@ import java.util.Objects;
 public class PagedJobQO implements Serializable {
     @JsonProperty("job_id")
     private String jobId;
-    @JsonProperty("partyId")
+    @JsonProperty("party_id")
     private String partyId;
     private Long pageNum = 1L;
     private Long pageSize = 10L;
