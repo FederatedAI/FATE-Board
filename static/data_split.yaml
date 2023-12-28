@@ -1,0 +1,163 @@
+component:
+  name: data_split
+  description: ''
+  provider: fate
+  version: 2.0.0-beta
+  labels: [ ]
+  roles:
+    - guest
+    - host
+  parameters:
+    train_size:
+      type: typing.Union[fate.components.core.params._fields.ConstrainedFloatValue,
+        fate.components.core.params._fields.ConstrainedIntValue]
+      default:
+      optional: true
+      description: size of output training data, should be either int for exact sample
+        size or float for fraction
+      type_meta:
+        title: typing.Union[fate.components.core.params._fields.ConstrainedFloatValue,
+          fate.components.core.params._fields.ConstrainedIntValue]
+        anyOf:
+          - type: number
+            minimum: 0.0
+            maximum: 1.0
+          - type: integer
+            minimum: 0
+        default:
+        description: size of output training data, should be either int for exact
+          sample size or float for fraction
+    validate_size:
+      type: typing.Union[fate.components.core.params._fields.ConstrainedFloatValue,
+        fate.components.core.params._fields.ConstrainedIntValue]
+      default:
+      optional: true
+      description: size of output validation data, should be either int for exact
+        sample size or float for fraction
+      type_meta:
+        title: typing.Union[fate.components.core.params._fields.ConstrainedFloatValue,
+          fate.components.core.params._fields.ConstrainedIntValue]
+        anyOf:
+          - type: number
+            minimum: 0.0
+            maximum: 1.0
+          - type: integer
+            minimum: 0
+        default:
+        description: size of output validation data, should be either int for exact
+          sample size or float for fraction
+    test_size:
+      type: typing.Union[fate.components.core.params._fields.ConstrainedFloatValue,
+        fate.components.core.params._fields.ConstrainedIntValue]
+      default:
+      optional: true
+      description: size of output test data, should be either int for exact sample
+        size or float for fraction
+      type_meta:
+        title: typing.Union[fate.components.core.params._fields.ConstrainedFloatValue,
+          fate.components.core.params._fields.ConstrainedIntValue]
+        anyOf:
+          - type: number
+            minimum: 0.0
+            maximum: 1.0
+          - type: integer
+            minimum: 0
+        default:
+        description: size of output test data, should be either int for exact sample
+          size or float for fraction
+    stratified:
+      type: bool
+      default: false
+      optional: true
+      description: whether sample with stratification, should not use this for data
+        with continuous label values
+      type_meta:
+        title: bool
+        type: boolean
+        default: true
+        description: whether guest sync data set sids with host, default True for
+          hetero scenario, should set to False for local and homo scenario
+    random_state:
+      type: ConstrainedNumberMeta
+      default:
+      optional: true
+      description: random state
+      type_meta:
+        title: ConstrainedNumberMeta
+        minimum: 0
+        type: integer
+    hetero_sync:
+      type: bool
+      default: true
+      optional: true
+      description: whether guest sync data set sids with host, default True for hetero
+        scenario, should set to False for local and homo scenario
+      type_meta:
+        title: bool
+        type: boolean
+        default: true
+        description: whether guest sync data set sids with host, default True for
+          hetero scenario, should set to False for local and homo scenario
+  input_artifacts:
+    data:
+      input_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+    model: { }
+  output_artifacts:
+    data:
+      train_output_data:
+        types:
+          - dataframe
+        optional: true
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+      validate_output_data:
+        types:
+          - dataframe
+        optional: true
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+      test_output_data:
+        types:
+          - dataframe
+        optional: true
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+    model: { }
+    metric:
+      metric:
+        types:
+          - json_metric
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: metric, invisible for user
+        is_multi: false
+schema_version: v1
