@@ -1,0 +1,8 @@
+@import '@/style/index.scss';
+
+.f-lr-model-container {
+  width: 100%;
+  @include flex-col();
+  align-items: flex-start;
+  justify-items: flex-start;
+}

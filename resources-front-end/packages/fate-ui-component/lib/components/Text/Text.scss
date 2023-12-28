@@ -1,0 +1,68 @@
+@use 'sass:math';
+@import '@/styles/index.scss';
+
+.fb-txColumn {
+  @include flex-col();
+  @include flex-center();
+
+  .fb-txColumn-title {
+    @include font-bold();
+    @include font-title();
+    @include font-family();
+  }
+}
+
+.fb-txRow {
+  @include flex-row();
+  align-items: center;
+  justify-content: flex-start;
+
+  :nth-child(n) {
+    @include flex-freeze();
+  }
+
+  .fb-txRow-label {
+    justify-content: flex-start;
+    max-width: 40%;
+    padding-right: math.div($pale, 3);
+    flex-shrink: 1;
+  }
+  
+  .fb-txRow-seperator {
+    padding: 0px math.div($pale, 6);
+  }
+  
+  .fb-txRow-content {
+    justify-content: flex-start;
+    max-width: 60%;
+    padding: 0px math.div($pale, 3);
+    flex-shrink: 1;
+  }
+
+  .fb-txRow-content--only {
+    justify-content: center;
+    max-width: 100%;
+  }
+}
+
+.fb-txOverflow {
+
+  @include flex-row();
+  @include flex-center();
+
+  :nth-child(n) {
+    @include flex-freeze();
+  }
+
+  .fb-txOverflow-content {
+    max-width: 100%;
+    display: inline-block;
+    @include text-ellipse();
+    flex-shrink: 1;
+  }
+}
+
+.fb-context {
+  justify-content: flex-start;
+  align-items: flex-start;
+}
