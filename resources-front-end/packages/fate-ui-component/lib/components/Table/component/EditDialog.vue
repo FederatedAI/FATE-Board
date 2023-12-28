@@ -37,7 +37,7 @@ const on = (origin?: string) => {
 
 const off = (submit?: boolean) => {
   if (submit) {
-    emits('submit', content)
+    emits('submit', content.value)
   }
   display.value = false
 }
