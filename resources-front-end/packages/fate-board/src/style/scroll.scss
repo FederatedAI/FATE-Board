@@ -1,0 +1,19 @@
+$ScrollbarWidth: 10px;
+$ScrollbarHeight: 6px;
+
+$ScrollbarColor: #f8f9fa;
+$ScrollbarThumb: #dcdde0;
+
+*::-webkit-scrollbar {
+  background-color: $ScrollbarColor;
+  width: $ScrollbarWidth;
+  height: $ScrollbarHeight;
+  border-radius: $ScrollbarHeight;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: $ScrollbarThumb;
+  width: $ScrollbarWidth;
+  height: $ScrollbarHeight;
+  border-radius: $ScrollbarHeight;
+}
