@@ -1,0 +1,43 @@
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  $colors: (
+    'success': (
+      'base': #0ec7a5,
+    ),
+    'danger': (
+      'base': #F76161,
+    ),
+  )
+);
+
+@use 'element-plus/theme-chalk/src/index.scss' as *;
+
+@import './index.scss';
+@import './scroll.scss';
+@import './font/font.scss';
+
+* {
+  margin: 0;
+  padding: 0;
+  
+  @include text-en();
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  position: relative;
+  @include box-stretch();
+  overflow: hidden;
+}
+
+body {
+  overflow: auto;
+}
+
+#app {
+  min-width: 1200px;
+  min-height: 500px;
+  overflow: auto;
+}

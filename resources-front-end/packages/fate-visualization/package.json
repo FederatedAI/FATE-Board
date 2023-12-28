@@ -1,0 +1,26 @@
+{
+  "name": "fate-visualization",
+  "version": "1.0.0",
+  "license": "ISC",
+  "main": "dist/main.js",
+  "types": "@types/lib/main.d.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "dev": "webpack-dev-server --env html=./html/index.html server=true --mode=development",
+    "build": "tsc && webpack --mode=production",
+    "build:dev": "tsc && webpack --mode=development"
+  },
+  "dependencies": {
+    "d3": "^7.8.5",
+    "echarts": "^5.4.3"
+  },
+  "peerDependencies": {
+    "fate-tools": "^1.0.0"
+  }
+}

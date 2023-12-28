@@ -1,0 +1,143 @@
+component:
+  name: upload
+  description: ''
+  provider: fate_flow
+  version: 2.0.0
+  labels: []
+  roles:
+    - guest
+    - host
+    - local
+  parameters:
+    name:
+      type: str
+      default:
+      optional: false
+      description: ''
+      type_meta:
+        title: str
+        type: string
+        default:
+        description: ''
+    namespace:
+      type: str
+      default:
+      optional: false
+      description: ''
+      type_meta:
+        title: str
+        type: string
+        default:
+        description: ''
+    file:
+      type: str
+      default:
+      optional: false
+      description: ''
+      type_meta:
+        title: str
+        type: string
+        default:
+        description: ''
+    storage_engine:
+      type: str
+      default:
+      optional: true
+      description: ''
+      type_meta:
+        title: str
+        type: string
+        default:
+        description: ''
+    head:
+      type: str
+      default:
+      optional: true
+      description: ''
+      type_meta:
+        title: str
+        type: string
+        default:
+        description: ''
+    partitions:
+      type: str
+      default:
+      optional: true
+      description: ''
+      type_meta:
+        title: str
+        type: string
+        default:
+        description: ''
+    extend_sid:
+      type: str
+      default:
+      optional: true
+      description: ''
+      type_meta:
+        title: str
+        type: string
+        default:
+        description: ''
+    is_temp_file:
+      type: str
+      default:
+      optional: true
+      description: ''
+      type_meta:
+        title: str
+        type: string
+        default:
+        description: ''
+    address:
+      type: str
+      default:
+      optional: true
+      description: ''
+      type_meta:
+        title: str
+        type: string
+        default:
+        description: ''
+    meta:
+      type: str
+      default:
+      optional: true
+      description: ''
+      type_meta:
+        title: str
+        type: string
+        default:
+        description: ''
+  input_artifacts:
+    data: {}
+    model: {}
+  output_artifacts:
+    data:
+      table:
+        types:
+          - table
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+          - local
+        description: ''
+        is_multi: false
+    model: {}
+    metric:
+      metric:
+        types:
+          - json_metric
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+          - local
+        description: metric, invisible for user
+        is_multi: false
+schema_version: v1

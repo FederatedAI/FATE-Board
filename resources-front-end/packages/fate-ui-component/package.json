@@ -1,0 +1,26 @@
+{
+  "name": "fate-ui-component",
+  "version": "1.0.0",
+  "license": "ISC",
+  "main": "dist/main.js",
+  "types": "@types/lib/main.d.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "dev": "webpack-dev-server --env html=./html/index.html server=true --mode=development",
+    "build": "tsc && webpack --mode=production",
+    "build:dev": "tsc && webpack --mode=development"
+  },
+  "peerDependencies": {
+    "fate-tools": "^1.0.0",
+    "@element-plus/icons-vue": "^2.1.0",
+    "element-plus": "^2.4.1",
+    "lodash": "^4.17.21",
+    "vue": "^3.3.4"
+  }
+}
