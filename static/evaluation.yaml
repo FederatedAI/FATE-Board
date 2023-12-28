@@ -2,7 +2,7 @@ component:
   name: evaluation
   description: ''
   provider: fate
-  version: 2.0.0-beta
+  version: 2.0.0
   labels: []
   roles:
     - guest
@@ -32,8 +32,8 @@ component:
       default:
       optional: true
       description: predict data column name, if None(default), will use                                         'predict_score'
-        when use binary and regression default setting,                                         and
-        use 'predict_result' on multi classification default setting
+        in the input dataframe when the default setting are binary and regression,                                         and
+        use 'predict_result' if default setting is multi
       type_meta:
         title: str
         type: string
@@ -82,4 +82,3 @@ component:
         description: metric, invisible for user
         is_multi: false
 schema_version: v1
-
