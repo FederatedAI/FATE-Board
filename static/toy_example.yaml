@@ -1,0 +1,69 @@
+component:
+  name: toy_example
+  description: ''
+  provider: fate
+  version: 2.0.0-beta
+  labels: []
+  roles:
+    - guest
+    - host
+  parameters:
+    data_num:
+      type: ConstrainedNumberMeta
+      default:
+      optional: false
+      description: data_num
+      type_meta:
+        title: ConstrainedNumberMeta
+        exclusiveMinimum: 1
+        type: integer
+    partition:
+      type: ConstrainedNumberMeta
+      default:
+      optional: false
+      description: data_partition
+      type_meta:
+        title: ConstrainedNumberMeta
+        exclusiveMinimum: 1
+        type: integer
+  input_artifacts:
+    data: {}
+    model: {}
+  output_artifacts:
+    data:
+      output_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+    model:
+      json_model_output:
+        types:
+          - json_model
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+    metric:
+      metric:
+        types:
+          - json_metric
+        optional: false
+        stages:
+          - default
+        roles:
+          - guest
+          - host
+        description: metric, invisible for user
+        is_multi: false
+schema_version: v1

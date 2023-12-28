@@ -1,0 +1,25 @@
+{
+  "name": "fate-board",
+  "version": "2.0.0",
+  "license": "ISC",
+  "main": "src/main.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "dev": "webpack-dev-server --env html=./html/index.html server=true --mode=development",
+    "build": "tsc && webpack --mode=production",
+    "build:dev": "tsc && webpack --mode=development"
+  },
+  "dependencies": {
+    "fate-tools": "^1.0.0",
+    "fate-ui-component": "^1.0.0",
+    "fate-visualization": "^1.0.0",
+    "vue-router": "^4.2.5",
+    "vuex": "^4.1.0"
+  }
+}

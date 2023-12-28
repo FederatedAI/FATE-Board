@@ -1,0 +1,8 @@
+@use 'sass:math';
+@import '@/styles/index.scss';
+
+.fb-tabs {
+  .fb-tabs-content {
+    min-height: 300px;
+  }
+}

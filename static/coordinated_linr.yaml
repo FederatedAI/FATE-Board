@@ -1,0 +1,380 @@
+component:
+  name: coordinated_linr
+  description: ''
+  provider: fate
+  version: 2.0.0-beta
+  labels: [ ]
+  roles:
+    - guest
+    - host
+    - arbiter
+  parameters:
+    learning_rate_scheduler:
+      type: LRSchedulerParam
+      default:
+        method: linear
+        scheduler_params:
+          start_factor: 1.0
+      optional: true
+      description: learning rate scheduler, select method from {'step', 'linear',
+        'constant'}for list of configurable arguments, refer to torch.optim.lr_scheduler
+      type_meta:
+        title: LRSchedulerParam
+        $ref: '#/definitions/abc__LRSchedulerParam'
+        definitions:
+          abc__LRSchedulerParam:
+            title: LRSchedulerParam
+            type: object
+            properties:
+              method:
+                title: Method
+                default: constant
+                type: string
+              scheduler_params:
+                title: Scheduler Params
+                type: object
+        default:
+          method: linear
+          scheduler_params:
+            start_factor: 1.0
+        description: learning rate scheduler, select method from {'step', 'linear',
+          'constant'}for list of configurable arguments, refer to torch.optim.lr_scheduler
+    epochs:
+      type: ConstrainedNumberMeta
+      default: 20
+      optional: true
+      description: max iteration num
+      type_meta:
+        title: ConstrainedNumberMeta
+        exclusiveMinimum: 0
+        type: integer
+    batch_size:
+      type: ConstrainedNumberMeta
+      default:
+      optional: true
+      description: batch size, None means full batch, otherwise should be no less
+        than 10, default None
+      type_meta:
+        title: ConstrainedNumberMeta
+        minimum: 10
+        type: integer
+    optimizer:
+      type: OptimizerParam
+      default:
+        method: sgd
+        penalty: l2
+        alpha: 1.0
+        optimizer_params:
+          lr: 0.01
+          weight_decay: 0
+      optional: true
+      description: ''
+      type_meta:
+        title: OptimizerParam
+        $ref: '#/definitions/abc__OptimizerParam'
+        definitions:
+          abc__OptimizerParam:
+            title: OptimizerParam
+            type: object
+            properties:
+              method:
+                title: Method
+                default: sgd
+                type: string
+              penalty:
+                title: Penalty
+                default: l2
+                type: string
+              alpha:
+                title: Alpha
+                default: 1.0
+                type: number
+              optimizer_params:
+                title: Optimizer Params
+                type: object
+            required:
+              - optimizer_params
+        default:
+          method: sgd
+          penalty: l2
+          alpha: 1.0
+          optimizer_params:
+            lr: 0.01
+            weight_decay: 0
+        description: ''
+    tol:
+      type: ConstrainedNumberMeta
+      default: 0.0001
+      optional: true
+      description: ''
+      type_meta:
+        title: ConstrainedNumberMeta
+        minimum: 0
+        type: number
+    early_stop:
+      type: type
+      default: diff
+      optional: true
+      description: early stopping criterion, choose from {weight_diff, diff, abs,
+        val_metrics}
+      type_meta:
+        title: type
+        type: string
+    init_param:
+      type: InitParam
+      default:
+        method: random_uniform
+        fill_val: 0.0
+        fit_intercept: true
+        random_state:
+      optional: true
+      description: Model param init setting.
+      type_meta:
+        title: InitParam
+        $ref: '#/definitions/abc__InitParam'
+        definitions:
+          abc__InitParam:
+            title: InitParam
+            type: object
+            properties:
+              method:
+                title: Method
+                default: zeros
+                type: string
+              fill_val:
+                title: Fill Val
+                default: 0.0
+                anyOf:
+                  - type: integer
+                  - type: number
+              fit_intercept:
+                title: Fit Intercept
+                default: true
+                type: boolean
+              random_state:
+                title: Random State
+                type: integer
+        default:
+          method: random_uniform
+          fill_val: 0.0
+          fit_intercept: true
+          random_state:
+        description: Model param init setting.
+    he_param:
+      type: HEParam
+      default:
+        kind: paillier
+        key_length: 1024
+      optional: true
+      description: homomorphic encryption param
+      type_meta:
+        title: HEParam
+        $ref: '#/definitions/abc__HEParam'
+        definitions:
+          abc__HEParam:
+            title: HEParam
+            type: object
+            properties:
+              kind:
+                title: Kind
+                type: string
+              key_length:
+                title: Key Length
+                default: 1024
+                type: integer
+            required:
+              - kind
+        default:
+          kind: paillier
+          key_length: 1024
+        description: homomorphic encryption param
+    floating_point_precision:
+      type: ConstrainedNumberMeta
+      default: 23
+      optional: true
+      description: 'floating point precision, '
+      type_meta:
+        title: ConstrainedNumberMeta
+        minimum: 0
+        type: integer
+    cv_param:
+      type: CVParam
+      default:
+        n_splits: 5
+        shuffle: false
+        random_state:
+      optional: true
+      description: cross validation param
+      type_meta:
+        title: CVParam
+        $ref: '#/definitions/abc__CVParam'
+        definitions:
+          abc__CVParam:
+            title: CVParam
+            type: object
+            properties:
+              n_splits:
+                title: N Splits
+                exclusiveMinimum: 1
+                type: integer
+              shuffle:
+                title: Shuffle
+                default: false
+                type: boolean
+              random_state:
+                title: Random State
+                type: integer
+            required:
+              - n_splits
+        default:
+          n_splits: 5
+          shuffle: false
+          random_state:
+        description: cross validation param
+    metrics:
+      type: type
+      default:
+        - mse
+      optional: true
+      description: ''
+      type_meta:
+        title: type
+        type: string
+    output_cv_data:
+      type: bool
+      default: true
+      optional: true
+      description: whether output prediction result per cv fold
+      type_meta:
+        title: bool
+        type: boolean
+        default: true
+        description: whether output prediction result per cv fold
+  input_artifacts:
+    data:
+      train_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - train
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+      validate_data:
+        types:
+          - dataframe
+        optional: true
+        stages:
+          - train
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+      test_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - predict
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+      cv_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - cross_validation
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+    model:
+      warm_start_model:
+        types:
+          - json_model
+        optional: true
+        stages:
+          - train
+        roles:
+          - guest
+          - host
+          - arbiter
+        description: ''
+        is_multi: false
+      input_model:
+        types:
+          - json_model
+        optional: false
+        stages:
+          - predict
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+  output_artifacts:
+    data:
+      train_output_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - train
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+      test_output_data:
+        types:
+          - dataframe
+        optional: false
+        stages:
+          - predict
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: false
+      cv_output_datas:
+        types:
+          - dataframe
+        optional: true
+        stages:
+          - cross_validation
+        roles:
+          - guest
+          - host
+        description: ''
+        is_multi: true
+    model:
+      output_model:
+        types:
+          - json_model
+        optional: false
+        stages:
+          - train
+        roles:
+          - guest
+          - host
+          - arbiter
+        description: ''
+        is_multi: false
+    metric:
+      metric:
+        types:
+          - json_metric
+        optional: false
+        stages: [ ]
+        roles: [ ]
+        description: metric, invisible for user
+        is_multi: false
+schema_version: v1

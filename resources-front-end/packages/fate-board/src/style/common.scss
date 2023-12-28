@@ -1,0 +1,35 @@
+@mixin width-stretch {
+  width: 100%;
+}
+
+@mixin height-stretch {
+  height: 100%;
+}
+
+@mixin box-stretch {
+  @include width-stretch();
+  @include height-stretch();
+}
+
+@mixin absolute-horizon-center {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+@mixin absolute-vertical-center {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+@mixin absolute-center {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
