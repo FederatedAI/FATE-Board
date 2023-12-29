@@ -2,7 +2,7 @@ component:
   name: sshe_linr
   description: ''
   provider: fate
-  version: 2.0.0-beta
+  version: 2.0.0
   labels: [ ]
   roles:
     - guest
@@ -40,7 +40,8 @@ component:
       type: type
       default: diff
       optional: true
-      description: early stopping criterion, choose from {weight_diff, diff, abs}
+      description: early stopping criterion, choose from {weight_diff, diff, abs},
+        if use weight_diff,weight will be revealed every epoch
       type_meta:
         title: type
         type: string
@@ -57,8 +58,8 @@ component:
       type: bool
       default: false
       optional: true
-      description: whether reveal encrypted result every epoch, if False, only reveal
-        at the end of training
+      description: whether reveal encrypted result every epoch, only accept False
+        for now
       type_meta:
         title: bool
         type: boolean
