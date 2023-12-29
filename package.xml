@@ -68,5 +68,13 @@
             </includes>
         </fileSet>
 
+        <fileSet>
+            <outputDirectory>/ssh</outputDirectory>
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>ssh.properties</include>
+            </includes>
+        </fileSet>
+
     </fileSets>
 </assembly>

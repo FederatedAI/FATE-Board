@@ -2,7 +2,7 @@ component:
   name: hetero_secureboost
   description: ''
   provider: fate
-  version: 2.0.0-beta
+  version: 2.0.0
   labels: []
   roles:
     - guest
@@ -76,7 +76,7 @@ component:
       type: bool
       default: false
       optional: true
-      description: whether to use goss sampling
+      description: whether to use goss subsample
       type_meta:
         title: bool
         type: boolean
@@ -84,13 +84,33 @@ component:
         description: whether output prediction result per cv fold
     goss_start_iter:
       type: ConstrainedNumberMeta
-      default: 0
+      default: 5
       optional: true
-      description: start iteration of goss sampling
+      description: start iteration of goss subsample
+      type_meta:
+        title: ConstrainedNumberMeta
+        minimum: 0
+        type: integer
+    top_rate:
+      type: ConstrainedNumberMeta
+      default: 0.2
+      optional: true
+      description: top rate of goss subsample
       type_meta:
         title: ConstrainedNumberMeta
         exclusiveMinimum: 0
-        type: integer
+        exclusiveMaximum: 1
+        type: number
+    other_rate:
+      type: ConstrainedNumberMeta
+      default: 0.1
+      optional: true
+      description: other rate of goss subsample
+      type_meta:
+        title: ConstrainedNumberMeta
+        exclusiveMinimum: 0
+        exclusiveMaximum: 1
+        type: number
     l1:
       type: ConstrainedNumberMeta
       default: 0
@@ -205,24 +225,6 @@ component:
           key_length: 1024
         description: homomorphic encryption param, support paillier, ou and mock in
           current version
-    top_rate:
-      type: ConstrainedNumberMeta
-      default: 0.2
-      optional: true
-      description: top rate of goss sampling
-      type_meta:
-        title: ConstrainedNumberMeta
-        exclusiveMinimum: 0
-        type: number
-    other_rate:
-      type: ConstrainedNumberMeta
-      default: 0.1
-      optional: true
-      description: other rate of goss sampling
-      type_meta:
-        title: ConstrainedNumberMeta
-        exclusiveMinimum: 0
-        type: number
     cv_param:
       type: CVParam
       default:
@@ -393,4 +395,3 @@ component:
         description: metric, invisible for user
         is_multi: false
 schema_version: v1
-
