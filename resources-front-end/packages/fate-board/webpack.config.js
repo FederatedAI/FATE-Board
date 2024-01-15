@@ -19,6 +19,7 @@ module.exports = function (env, args) {
     plugins: [
       new webpack.DefinePlugin({
         'process.env': require('./dev.env'),
+        __VUE_PROD_DEVTOOLS__: JSON.stringify(false)
       }),
     ],
   }
