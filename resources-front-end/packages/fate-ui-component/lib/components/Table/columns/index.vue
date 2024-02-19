@@ -1,11 +1,11 @@
 <template>
-  <FBTable></FBTable>
+  <FBTable ref="instance"></FBTable>
 </template>
 
 <script lang="ts" setup>
 import { ElTable } from 'element-plus';
 import { isFunction } from 'lodash';
-import { h, watch } from 'vue';
+import { h, ref, watch } from 'vue';
 import { classExplain } from '../cellExplain';
 import { columnExplain } from './explain';
 
@@ -23,6 +23,7 @@ const props = defineProps([
 ]);
 const emits = defineEmits(['sortChange']);
 
+// eslint-disable-next-line vue/no-dupe-keys
 function rowClassName(scope: any) {
   const extRow = props.rowClassName
     ? isFunction(props.rowClassName)
@@ -34,6 +35,7 @@ function rowClassName(scope: any) {
   );
 }
 
+// eslint-disable-next-line vue/no-dupe-keys
 function cellClassName(scope: any) {
   const extCell = props.cellClassName
     ? isFunction(props.cellClassName)
@@ -47,6 +49,11 @@ function sortChange({ column, order }: any) {
   emits('sortChange', { col: column.property, order });
 }
 
+function rowSelection (row: object) {
+  instance.value.setCurrentRow(row)
+}
+
+const instance = ref()
 function initing () {
   const columns: any[] = [];
   let headers: any[] = [...(props.header || [])];
@@ -98,4 +105,8 @@ watch(
     FBTable = initing()
   }
 )
+
+defineExpose({
+  rowSelection
+})
 </script>
