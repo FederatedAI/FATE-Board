@@ -53,7 +53,7 @@
     "vue": "^3.3.4"
   },
   "scripts": {
-    "dev": "lerna run dev --scope=fate-board",
+    "dev": "lerna run build && lerna run dev --scope=fate-board",
     "build": "lerna run build"
   }
 }
