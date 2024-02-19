@@ -147,11 +147,14 @@ module.exports = function (env, args) {
   }
 
   if (env.html) {
+    const config = {
+      template: path.resolve(env.root, env.html),
+    }
+    if (env.icon) {
+      config.favicon = path.resolve(env.root, env.icon)
+    }
     options.plugins.push(
-      new HtmlWebpackPlugin({
-        template: path.resolve(env.root, env.html),
-        favicon: path.resolve(env.root, env.icon)
-      })
+      new HtmlWebpackPlugin(config)
     );
   }
 
