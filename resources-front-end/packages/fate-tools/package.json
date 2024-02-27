@@ -16,7 +16,7 @@
     "build:dev": "tsc && webpack --mode=development"
   },
   "dependencies": {
-    "axios": "^1.5.1",
+    "axios": "^1.6.4",
     "encryptlong": "^3.1.4",
     "file-saver": "^2.0.5"
   },
