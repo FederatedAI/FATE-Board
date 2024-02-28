@@ -1,3 +1,12 @@
+# Release 2.1.0
+
+#### Major Features and Improvements
+**Major Features**
+
+* Added table targeting search for summary display
+* Limit the zoom range of line charts and bar charts
+* Display problem optimization
+
 # Release 2.0.0
 
 #### Major Features and Improvements
