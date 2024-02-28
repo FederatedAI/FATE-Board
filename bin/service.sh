@@ -80,7 +80,7 @@ eval action=\$$#
 
 main_class=org.fedai.fate.board.bootstrap.Bootstrap
 module=fateboard
-version=2.0.0
+version=2.1.0
 start_type=background
 
 if [ $action = starting ];then
