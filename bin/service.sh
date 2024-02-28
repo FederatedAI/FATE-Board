@@ -81,9 +81,11 @@ eval action=\$$#
 main_class=org.fedai.fate.board.bootstrap.Bootstrap
 module=fateboard
 version=2.0.0
+start_type=background
 
 if [ $action = starting ];then
 	action=start
+	start_type=front
 elif [ $action = restarting ];then
 	action=restart
 fi
@@ -252,7 +254,7 @@ start() {
 		cmd="$JAVA_HOME/bin/java -Dspring.config.location=$configpath/application.properties -Dssh_config_file=$basepath/ssh/ -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -cp $libpath/*:$basepath/${module}-${version}.jar ${main_class}"
 		print_info "The command is: $cmd"
 
-		if [[ $1 == "front" ]]; then
+		if [[ ${start_type} == "front" ]]; then
 		  exec $cmd >> ${BOARD_HOME}/logs/bootstrap.${module}.out 2>>${BOARD_HOME}/logs/bootstrap.${module}.err
     else
       exec $cmd >> ${BOARD_HOME}/logs/bootstrap.${module}.out 2>>${BOARD_HOME}/logs/bootstrap.${module}.err &
