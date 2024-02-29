@@ -87,7 +87,7 @@ component:
         description: ''
         is_multi: false
     model:
-      train_model_input:
+      warm_start_model:
         types:
           - model_directory
         optional: true
@@ -98,7 +98,7 @@ component:
           - host
         description: ''
         is_multi: false
-      predict_model_input:
+      input_model:
         types:
           - model_directory
         optional: false
@@ -111,7 +111,7 @@ component:
         is_multi: false
   output_artifacts:
     data:
-      train_data_output:
+      train_output_data:
         types:
           - dataframe
         optional: true
@@ -122,7 +122,7 @@ component:
           - host
         description: ''
         is_multi: false
-      predict_data_output:
+      test_output_data:
         types:
           - dataframe
         optional: true
@@ -134,7 +134,7 @@ component:
         description: ''
         is_multi: false
     model:
-      train_model_output:
+      output_model:
         types:
           - model_directory
         optional: true
@@ -155,3 +155,4 @@ component:
         description: metric, invisible for user
         is_multi: false
 schema_version: v1
+
