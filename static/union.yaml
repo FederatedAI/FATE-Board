@@ -10,7 +10,7 @@ component:
   parameters: { }
   input_artifacts:
     data:
-      input_data_list:
+      input_datas:
         types:
           - dataframe
         optional: false
