@@ -54,7 +54,7 @@ component:
           use 'label' in the input dataframe
   input_artifacts:
     data:
-      input_data:
+      input_datas:
         types:
           - dataframe
         optional: false
@@ -82,3 +82,4 @@ component:
         description: metric, invisible for user
         is_multi: false
 schema_version: v1
+
