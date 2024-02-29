@@ -2,12 +2,12 @@ component:
   name: union
   description: ''
   provider: fate
-  version: 2.0.0
-  labels: [ ]
+  version: 2.1.0
+  labels: []
   roles:
     - guest
     - host
-  parameters: { }
+  parameters: {}
   input_artifacts:
     data:
       input_datas:
@@ -21,7 +21,7 @@ component:
           - host
         description: ''
         is_multi: true
-    model: { }
+    model: {}
   output_artifacts:
     data:
       output_data:
@@ -35,7 +35,7 @@ component:
           - host
         description: ''
         is_multi: false
-    model: { }
+    model: {}
     metric:
       metric:
         types:
@@ -49,3 +49,4 @@ component:
         description: metric, invisible for user
         is_multi: false
 schema_version: v1
+

@@ -2,8 +2,8 @@ component:
   name: feature_correlation
   description: ''
   provider: fate
-  version: 2.0.0
-  labels: [ ]
+  version: 2.1.0
+  labels: []
   roles:
     - guest
     - host
@@ -65,9 +65,9 @@ component:
           - host
         description: ''
         is_multi: false
-    model: { }
+    model: {}
   output_artifacts:
-    data: { }
+    data: {}
     model:
       output_model:
         types:
@@ -93,3 +93,4 @@ component:
         description: metric, invisible for user
         is_multi: false
 schema_version: v1
+

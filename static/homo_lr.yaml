@@ -2,7 +2,7 @@ component:
   name: homo_lr
   description: ''
   provider: fate
-  version: 2.0.0
+  version: 2.1.0
   labels: []
   roles:
     - guest
