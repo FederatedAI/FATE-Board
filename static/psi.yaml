@@ -2,7 +2,7 @@ component:
   name: psi
   description: ''
   provider: fate
-  version: 2.0.0
+  version: 2.1.0
   labels: []
   roles:
     - guest
@@ -69,3 +69,4 @@ component:
         description: metric, invisible for user
         is_multi: false
 schema_version: v1
+
