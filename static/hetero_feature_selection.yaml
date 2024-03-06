@@ -2,8 +2,8 @@ component:
   name: hetero_feature_selection
   description: ''
   provider: fate
-  version: 2.0.0
-  labels: [ ]
+  version: 2.1.0
+  labels: []
   roles:
     - guest
     - host
@@ -178,8 +178,8 @@ component:
     manual_param:
       type: ModelMetaclass
       default:
-        keep_col: [ ]
-        filter_out_col: [ ]
+        keep_col: []
+        filter_out_col: []
       optional: true
       description: manual filter param
       type_meta:
@@ -188,13 +188,13 @@ component:
         properties:
           keep_col:
             title: Keep Col
-            default: [ ]
+            default: []
             type: array
             items:
               type: string
           filter_out_col:
             title: Filter Out Col
-            default: [ ]
+            default: []
             type: array
             items:
               type: string
@@ -309,8 +309,9 @@ component:
         types:
           - json_metric
         optional: false
-        stages: [ ]
-        roles: [ ]
+        stages: []
+        roles: []
         description: metric, invisible for user
         is_multi: false
 schema_version: v1
+
