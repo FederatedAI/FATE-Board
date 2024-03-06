@@ -2,8 +2,8 @@ component:
   name: sshe_lr
   description: ''
   provider: fate
-  version: 2.0.0
-  labels: [ ]
+  version: 2.1.0
+  labels: []
   roles:
     - guest
     - host
@@ -297,8 +297,9 @@ component:
         types:
           - json_metric
         optional: false
-        stages: [ ]
-        roles: [ ]
+        stages: []
+        roles: []
         description: metric, invisible for user
         is_multi: false
 schema_version: v1
+

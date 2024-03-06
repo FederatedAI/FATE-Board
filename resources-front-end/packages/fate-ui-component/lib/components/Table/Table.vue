@@ -1,6 +1,15 @@
 <template>
   <section class="fb-table">
+    <section class="fb-table-searching">
+      <section><slot name="header"></slot></section>
+      <SearchInput
+        v-if="needSearch"
+        class="fb-table-pagination-search"
+        @change="rowChange">
+      </SearchInput>
+    </section>
     <Columns
+      ref="columnsInstance"
       :data="currentData()"
       :header="currentHeader()"
       :row-class-name="rowClassName"
@@ -36,9 +45,11 @@
 
 <script lang="ts" setup>
 import { ElPagination } from 'element-plus';
+import { column } from 'element-plus/es/components/table-v2/src/common';
 import { isNumber } from 'lodash';
 import { computed, nextTick, ref, watch } from 'vue';
 import Columns from './columns/index.vue';
+import SearchInput from './component/SearchInput.vue';
 
 const props = defineProps([
   'total',
@@ -55,7 +66,8 @@ const props = defineProps([
   'position',
   'range', // table cell exchange according to range
   'showOverflow',
-  'needToRefresh'
+  'needToRefresh',
+  'needSearch'
 ]);
 const emits = defineEmits([
   'sizeChange',
@@ -83,7 +95,7 @@ const currentHeader = () => {
   const columns = props.column && props.header
   ? props.header.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value)
   : props.header
-  if (props.showOverflow !== false) {
+  if (props.showOverflow !== false && Array.isArray(columns)) {
     for (const each of columns) {
       if (!each.type) {
         each.showOverflowTooltip = true
@@ -100,6 +112,39 @@ const currentData = () => {
   }
 
 const refresh = ref(0)
+const columnsInstance = ref()
+
+let lastCursor = -1
+function rowSelection (search: string) {
+  let cursorFound = false
+  for (let i = lastCursor + 1; i < props.data.length; i++) {
+    const row = props.data[i]
+    for (const key in row) {
+      if (row[key].toString().match(new RegExp(search, 'i'))) {
+        cursorFound = true
+        break
+      }
+    }
+    if (cursorFound) {
+      lastCursor = i
+      break
+    }
+  }
+  if (cursorFound) {
+    currentPage.value = Math.floor(lastCursor / pageSize.value) + 1
+    nextTick(() => {
+      columnsInstance.value.rowSelection(props.data[lastCursor])
+    })
+  } else {
+    lastCursor = -1
+  }
+  return cursorFound
+}
+
+
+const rowChange = (filter: string) => {
+  rowSelection(filter)
+}
 
 watch(
   () => props.header,

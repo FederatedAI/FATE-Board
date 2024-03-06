@@ -143,7 +143,10 @@ export default function Summary(
             },
             parameter: ['SummaryMetricSelection.modelValue'],
           }
-        : tableData
+        : tableData,
+      {
+        needSearch: true
+      }
     )
   );
 

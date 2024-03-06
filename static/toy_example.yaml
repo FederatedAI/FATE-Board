@@ -2,7 +2,7 @@ component:
   name: toy_example
   description: ''
   provider: fate
-  version: 2.0.0-beta
+  version: 2.1.0
   labels: []
   roles:
     - guest

@@ -121,6 +121,7 @@ export default function options({
           []
         ),
         show: true,
+        minSpan: 20
       },
       {
         type: zoomType || 'inside',
@@ -132,6 +133,7 @@ export default function options({
           []
         ),
         show: true,
+        minSpan: 20
       },
     ];
     if (color) {

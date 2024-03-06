@@ -7,6 +7,7 @@ import axios, {
 import { ElMessage } from 'element-plus';
 import { isBoolean, isNull, isObject, isUndefined } from 'lodash';
 import toFile from '../toFile';
+import JSYmal from 'js-yaml';
 
 export interface BasicConfigForParameter extends CreateAxiosDefaults<unknown> {
   ConsolePrinting?: boolean;
@@ -149,7 +150,12 @@ export default function HTTPRequest<B extends BasicConfigForParameter>(
             const fileReader: FileReader = new FileReader();
 
             fileReader.addEventListener('loadend', function () {
-              const result = JSON.parse(<string>fileReader.result);
+              let result
+              if (filename.match(/json/i)) {
+                result = JSON.parse(<string>fileReader.result);
+              } else {
+                result = JSYmal.load(fileReader.result)
+              }
               if (result.code !== undefined) {
                 resolve(<unknown>bodyExplain(result));
               } else {

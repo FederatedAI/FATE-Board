@@ -20,6 +20,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.fedai.fate.board.exceptions.LogicException;
@@ -39,6 +41,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.util.concurrent.ListenableFuture;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -319,8 +323,10 @@ public class JobManagerService {
         response.setContentType("application/force-download");
         response.setHeader("Content-Disposition", "attachment;fileName=" + fileOutputName);
         try {
+            String yamlStr  = jsonConverToYaml(dagInfo.toJSONString());
             OutputStream os = response.getOutputStream();
-            os.write(JSON.toJSONBytes(dagInfo, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat));
+//            os.write(JSON.toJSONBytes(dagInfo, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat));
+            os.write(yamlStr.getBytes());
             log.info("download success,file :{}", fileOutputName);
         } catch (Exception e) {
             log.error("download failed", e);
@@ -328,6 +334,17 @@ public class JobManagerService {
         }
         return null;
     }
+
+    private String jsonConverToYaml(String jsonString) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Object obj = objectMapper.readValue(jsonString, Object.class);
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        Yaml yaml = new Yaml(options);
+        String yamlStr = yaml.dumpAsMap(obj);
+        return yamlStr;
+    }
+
 
     //host端需过滤掉其他方信息
     private JSONObject getHostConfig(JSONObject runtime_confObject) {

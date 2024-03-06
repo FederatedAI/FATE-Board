@@ -32,7 +32,9 @@ const requesting = ref(true)
 // table header confgiuration
 const header = computed(() => {
   return cols(
-    (content: string, { $index }: any) => data[$index].notes = content,
+    (content: string, { $index }: any) => {
+      data[$index].notes = content
+    },
     () => dataRequest(),
     () => dataRequest())
 });

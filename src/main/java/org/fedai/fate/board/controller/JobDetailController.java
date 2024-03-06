@@ -434,13 +434,6 @@ public class JobDetailController {
         }
 
         JSONObject outputData = (JSONObject) outputDataArray.get(0);
-
-        JSONArray jsonArray = outputData.getJSONArray("data");
-        int count = 0;
-        if (jsonArray != null) {
-            count = jsonArray.size();
-        }
-        outputData.put(Dict.DATA_COUNT, count);
         outputDataArray.clear();
         outputDataArray.add(outputData);
         object.clear();

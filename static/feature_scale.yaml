@@ -2,7 +2,7 @@ component:
   name: feature_scale
   description: ''
   provider: fate
-  version: 2.0.0
+  version: 2.1.0
   labels: []
   roles:
     - guest
@@ -29,7 +29,7 @@ component:
         title: typing.Union[list, dict]
         anyOf:
           - type: array
-            items: { }
+            items: {}
           - type: object
         default:
           - 0
@@ -164,8 +164,9 @@ component:
         types:
           - json_metric
         optional: false
-        stages: [ ]
-        roles: [ ]
+        stages: []
+        roles: []
         description: metric, invisible for user
         is_multi: false
 schema_version: v1
+
