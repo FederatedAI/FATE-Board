@@ -105,7 +105,7 @@ onBeforeUnmount(() => {
   }
 
   :deep(.el-form-item__content) {
-    max-width: 140px;
+    width: 140px;
   }
 
   .h-filter-btn {

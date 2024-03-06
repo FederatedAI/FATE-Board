@@ -80,7 +80,7 @@ const dataRequest = async () => {
             return list;
           })()
         );
-        total.push(tableData[tableData.length - 1].length)
+        total.push(each.total)
       }
     }
     selections.value = options;

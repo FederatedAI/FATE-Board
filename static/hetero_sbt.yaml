@@ -2,7 +2,7 @@ component:
   name: hetero_secureboost
   description: ''
   provider: fate
-  version: 2.0.0
+  version: 2.1.0
   labels: []
   roles:
     - guest
@@ -316,7 +316,7 @@ component:
         description: ''
         is_multi: false
     model:
-      train_model_input:
+      warm_start_model:
         types:
           - json_model
         optional: true
@@ -327,7 +327,7 @@ component:
           - host
         description: ''
         is_multi: false
-      predict_model_input:
+      input_model:
         types:
           - json_model
         optional: false
@@ -340,7 +340,7 @@ component:
         is_multi: false
   output_artifacts:
     data:
-      train_data_output:
+      train_output_data:
         types:
           - dataframe
         optional: true
@@ -374,7 +374,7 @@ component:
         description: ''
         is_multi: true
     model:
-      train_model_output:
+      output_model:
         types:
           - json_model
         optional: true
@@ -395,3 +395,4 @@ component:
         description: metric, invisible for user
         is_multi: false
 schema_version: v1
+
