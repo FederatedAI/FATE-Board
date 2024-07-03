@@ -25,24 +25,24 @@ Launch a FATE-Board service by following steps.
 
 1. Modify FATE-Board/src/main/resources/application.properties.
 
-   | Item                                      | explains                    | default                                                      |
-   | :---------------------------------------- | :-------------------------- | :----------------------------------------------------------- |
-   | server.port                               | port of FATE-Board          | 8080                                                         |
-   | fateflow.url                              | the url of fate_flow server | none                                                         |
-   | spring.http.encoding.charset              | code set for http           | UTF-8                                                        |
-   | spring.http.encoding.enabled              | toggle for encoding         | true                                                         |
-   | server.tomcat.uri-encoding                | code set for tomcat         | UTF-8                                                        |
-   | server.tomcat.max-threads                 | max threads of tomcat       | 1000                                                         |
-   | server.tomcat.max-connections             | max connections of tomcat   | 2000                                                         |
-   | spring.servlet.multipart.max-file-size    | max-file-size               | 10MB                                                         |
-   | spring.servlet.multipart.max-request-size | max-request-size            | 100MB                                                        |
-   | server.compression.enabled                | compression                 | true                                                         |
+   | Item                                      | explains                    | default                                                        |
+   | :---------------------------------------- |:---------------------------------------------------------------| :----------------------------------------------------------- |
+   | server.port                               | port of FATE-Board          | 8080                                                           |
+   | fateflow.url                              | the url of fate_flow server | none                                                           |
+   | spring.http.encoding.charset              | code set for http           | UTF-8                                                          |
+   | spring.http.encoding.enabled              | toggle for encoding         | true                                                           |
+   | server.tomcat.uri-encoding                | code set for tomcat         | UTF-8                                                          |
+   | server.tomcat.max-threads                 | max threads of tomcat       | 1000                                                           |
+   | server.tomcat.max-connections             | max connections of tomcat   | 2000                                                           |
+   | spring.servlet.multipart.max-file-size    | max-file-size               | 10MB                                                           |
+   | spring.servlet.multipart.max-request-size | max-request-size            | 100MB                                                          |
+   | server.compression.enabled                | compression                 | true                                                           |
    | server.compression.mime-types             | compression.mime-types      | application/json,application/xml,text/html,text/xml,text/plain |
-   | server.board.login.username               | username                    | admin                                                        |
-   | server.board.login.password               | password                    | admin                                                        |
-   | management.endpoints.web.exposure.exclude | web.exposure.exclude        | *                                                            |
-   | spring.session.store-type                 | open spring session         | jdbc                                                         |
-   | spring.session.jdbc.initialize-schema     | initialize spring session   | always                                                       |
+   | server.board.login.username               | username                    | admin                                                          |
+   | server.board.login.password               | password                    | demo                                                           |
+   | management.endpoints.web.exposure.exclude | web.exposure.exclude        | *                                                              |
+   | spring.session.store-type                 | open spring session         | jdbc                                                           |
+   | spring.session.jdbc.initialize-schema     | initialize spring session   | always                                                         |
 
 
    - example
@@ -60,7 +60,7 @@ Launch a FATE-Board service by following steps.
      server.compression.enabled=true
      server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain
      server.board.login.username=admin
-     server.board.login.password=admin
+     server.board.login.password=demo
      management.endpoints.web.exposure.exclude=*
      spring.session.store-type=jdbc
      spring.session.jdbc.initialize-schema=always

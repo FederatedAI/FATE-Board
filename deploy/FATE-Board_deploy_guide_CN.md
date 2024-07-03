@@ -21,24 +21,24 @@
 
 1. 修改文件 FATE-Board/src/main/resources/application.properties.
 
-   | 配置项                                            | 说明                            | 默认值                                                       |
-   | :------------------------------------------------ | :------------------------------ | :----------------------------------------------------------- |
-   | server.port                                       | FATE-Board的端口                | 8080                                                         |
-   | fateflow.url                                      | fate_flow服务的url              | 无                                                           |
-   | spring.http.encoding.charset                      | code set for http               | UTF-8                                                        |
-   | spring.http.encoding.enabled                      | http编码开关                    | true                                                         |
-   | server.tomcat.uri-encoding                        | tomcat编码                      | UTF-8                                                        |
-   | server.tomcat.max-threads                         | tomcat最大线程数                | 1000                                                         |
-   | server.tomcat.max-connections                     | tomcat最大连接数                | 2000                                                         |
-   | spring.servlet.multipart.max-file-size            | 最大上传文件大小                | 10MB                                                         |
-   | spring.servlet.multipart.max-request-size         | 单次请求的文件的总大小          | 100MB                                                        |
-   | server.compression.enabled                        | 是否开启压缩                    | true                                                         |
+   | 配置项                                            | 说明                            | 默认值                                                            |
+   | :------------------------------------------------ |:---------------------------------------------------------------| :----------------------------------------------------------- |
+   | server.port                                       | FATE-Board的端口                | 8080                                                           |
+   | fateflow.url                                      | fate_flow服务的url              | 无                                                              |
+   | spring.http.encoding.charset                      | code set for http               | UTF-8                                                          |
+   | spring.http.encoding.enabled                      | http编码开关                    | true                                                           |
+   | server.tomcat.uri-encoding                        | tomcat编码                      | UTF-8                                                          |
+   | server.tomcat.max-threads                         | tomcat最大线程数                | 1000                                                           |
+   | server.tomcat.max-connections                     | tomcat最大连接数                | 2000                                                           |
+   | spring.servlet.multipart.max-file-size            | 最大上传文件大小                | 10MB                                                           |
+   | spring.servlet.multipart.max-request-size         | 单次请求的文件的总大小          | 100MB                                                          |
+   | server.compression.enabled                        | 是否开启压缩                    | true                                                           |
    | server.compression.mime-types                     | 要压缩的MIME type               | application/json,application/xml,text/html,text/xml,text/plain |
-   | server.board.login.username                       | 用户名                          | admin                                                        |
-   | server.board.login.password                       | 用户密码                        | admin                                                        |
-   | management.endpoints.web.exposure.exclude         | http方式排除需要公开的端点      | *                                                            |
-   | spring.session.store-type                         | 开启spring session              | jdbc                                                         |
-   | spring.session.jdbc.initialize-schema             | 初始化spring session            | always                                                       |
+   | server.board.login.username                       | 用户名                          | admin                                                          |
+   | server.board.login.password                       | 用户密码                        | demo                                                           |
+   | management.endpoints.web.exposure.exclude         | http方式排除需要公开的端点      | *                                                              |
+   | spring.session.store-type                         | 开启spring session              | jdbc                                                           |
+   | spring.session.jdbc.initialize-schema             | 初始化spring session            | always                                                         |
 
 - 示例
 
@@ -55,7 +55,7 @@
    server.compression.enabled=true
    server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain
    server.board.login.username=admin
-   server.board.login.password=admin
+   server.board.login.password=demo
    management.endpoints.web.exposure.exclude=*
    spring.session.store-type=jdbc
    spring.session.jdbc.initialize-schema=always
