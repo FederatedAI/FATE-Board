@@ -52,7 +52,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>5.3.27</version>
+            <version>6.1.13</version>
             <scope>compile</scope>
         </dependency>
 
